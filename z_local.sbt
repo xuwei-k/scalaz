@@ -1,3 +1,5 @@
+import com.jsuereth.pgp.sbtplugin.PgpKeys._
+
 credentials := Seq(Credentials(Path.userHome / ".ivy2" / ".rgcredentials"))
 
 publishTo <<= (version) { version: String =>
@@ -5,3 +7,5 @@ publishTo <<= (version) { version: String =>
   if (version.trim.endsWith("SNAPSHOT")) Some("snapshots" at nexus+"public-snapshots/") 
   else                                   Some("releases"  at nexus+"public-releases/")
 }
+
+skip in pgpSigner := true
