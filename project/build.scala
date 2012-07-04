@@ -4,7 +4,7 @@ import sbt._
 import Keys._
 import GenTypeClass._
 import Project.Setting
-//import com.jsuereth.pgp.GpgPlugin._
+import com.jsuereth.pgp.sbtplugin.PgpPlugin._
 
 object build extends Build {
   type Sett = Project.Setting[_]
@@ -13,6 +13,8 @@ object build extends Build {
     organization := "org.scalaz",
     version := "7.0-SNAPSHOT",
     scalaVersion := "2.9.2",
+    crossScalaVersions := Seq("2.9.1", "2.9.2", "2.10.0-M4"),
+    crossVersion := CrossVersion.full,
     scalacOptions <++= (scalaVersion).map((sv: String) => Seq("-deprecation", "-unchecked") ++ (if(sv.contains("2.10")) None else Some("-Ydependent-method-types"))),
     scalacOptions in (Compile, doc) <++= (baseDirectory in LocalProject("scalaz")).map {
       bd => Seq("-sourcepath", bd.getAbsolutePath, "-doc-source-url", "https://github.com/scalaz/scalaz/tree/scalaz-seven€{FILE_PATH}.scala")
