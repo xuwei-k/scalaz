@@ -1,4 +1,4 @@
-import com.jsuereth.pgp.sbtplugin.PgpKeys._
+//import com.jsuereth.pgp.sbtplugin.PgpKeys._
 
 credentials := Seq(Credentials(Path.userHome / ".ivy2" / ".rgcredentials"))
 
@@ -8,4 +8,4 @@ publishTo <<= (version) { version: String =>
   else                                   Some("releases"  at nexus+"public-releases/")
 }
 
-skip in pgpSigner := true
+//skip in pgpSigner := true
