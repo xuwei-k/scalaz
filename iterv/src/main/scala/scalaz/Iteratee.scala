@@ -57,6 +57,8 @@ sealed trait IterV[E, A] {
         done = (x2, _) => Done(x2, str),
         cont = _(str)),
       cont = k => Cont(str2 => k(str2) flatMap f))
+
+  def map[B](f: A => B): IterV[E, B] = flatMap(a => Done(f(a), Empty[E]))
 }
 
 /** Monadic Iteratees */
@@ -306,7 +308,7 @@ object IterV {
     Cont(step(r.monoid.zero))
   }
 
-  /** Input that has a value available */
+  /** Input that has no values available */
   object Empty {
     def apply[E] : Input[E] = new Input[E] {
       def apply[Z](empty: => Z, el: (=> E) => Z, eof: => Z): Z = empty
@@ -318,7 +320,7 @@ object IterV {
           eof = Left(EOF[E])).fold(x => false, x => x)
   }
 
-  /** Input that has no values available  */
+  /** Input that has a value available  */
   object El {
     def apply[E](e0: => E): Input[E] = new Input[E] {
       def apply[Z](empty: => Z, el: (=> E) => Z, eof: => Z): Z = el(e0)
