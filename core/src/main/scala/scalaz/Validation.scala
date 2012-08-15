@@ -217,7 +217,15 @@ sealed trait Validation[+E, +A] {
   def |||[EE >: E, AA >: A](x: => Validation[EE, AA]): Validation[EE, AA] =
     orElse(x)
 
-  /** Return the first success or if they are both success, sum them and return that success. */
+  /**
+   * Sums up values inside validation, if both are success or failure. Returns first failure otherwise.
+   * {{{
+   * success(v1) +++ success(v2) → success(v1 + v2)
+   * success(v1) +++ failure(v2) → failure(v2)
+   * failure(v1) +++ success(v2) → failure(v1)
+   * failure(v1) +++ failure(v2) → failure(v1 + v2)
+   * }}}
+   */
   def +++[EE >: E, AA >: A](x: => Validation[EE, AA])(implicit M1: Semigroup[AA], M2: Semigroup[EE]): Validation[EE, AA] =
     this match {
       case Failure(a1) => x match {
@@ -346,12 +354,12 @@ trait ValidationInstances0 extends ValidationInstances1 {
       f1 compare f2
   }
 
-  implicit def ValidationMonoid[E: Monoid, A: Semigroup]: Monoid[Validation[E, A]] =
+  implicit def ValidationMonoid[E: Semigroup, A: Monoid]: Monoid[Validation[E, A]] =
     new Monoid[Validation[E, A]] {
       def append(a1: Validation[E, A], a2: => Validation[E, A]) =
         a1 +++ a2
       def zero =
-        Failure(Monoid[E].zero)
+        Success(Monoid[A].zero)
     }
 }
 
