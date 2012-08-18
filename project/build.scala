@@ -8,12 +8,27 @@ import Project.Setting
 object build extends Build {
   type Sett = Project.Setting[_]
 
-  lazy val standardSettings: Seq[Sett] = Defaults.defaultSettings ++ sbtrelease.ReleasePlugin.releaseSettings ++ Seq[Sett](
+  val kindProjectorJarPath = TaskKey[String]("kind-projector-jar-path")
+
+  lazy val baseSettings: Seq[Sett] = Defaults.defaultSettings ++ Seq[Sett](
     organization := "org.scalaz",
     scalaVersion := "2.9.2",
     crossScalaVersions := Seq("2.9.2", "2.10.0-M5"),
     crossVersion := CrossVersion.full,
-    resolvers += "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/releases",
+    resolvers += "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/releases"
+  )
+
+  lazy val kindProjector = Project(
+    "kind-projector",
+    file("kind-projector"),
+    settings = Seq[Sett](
+      libraryDependencies <+= scalaVersion("org.scala-lang" % "scala-compiler" % _ % "provided"),
+      kindProjectorJarPath <<= (packageBin in Compile).map(_.getAbsolutePath) 
+    ) ++ baseSettings
+  )
+
+  lazy val standardSettings: Seq[Sett] = baseSettings ++ sbtrelease.ReleasePlugin.releaseSettings ++ Seq[Sett](
+    scalacOptions <+= (kindProjectorJarPath in kindProjector).map("-Xplugin:" + _),
     scalacOptions <++= (scalaVersion).map((sv: String) => Seq("-deprecation", "-unchecked") ++ (if(sv.contains("2.10")) None else Some("-Ydependent-method-types"))),
     scalacOptions in (Compile, doc) <++= (baseDirectory in LocalProject("scalaz")).map {
       bd => Seq("-sourcepath", bd.getAbsolutePath, "-doc-source-url", "https://github.com/scalaz/scalaz/tree/scalaz-seven€{FILE_PATH}.scala")
@@ -106,7 +121,8 @@ object build extends Build {
       (sourceGenerators in Compile) <+= (sourceManaged in Compile) map {
         dir => Seq(generateTupleW(dir))
       }
-    )
+    ),
+    dependencies = Seq(kindProjector % "plugin->default(compile)")
   )
 
   lazy val concurrent = Project(
