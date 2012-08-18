@@ -68,7 +68,7 @@ sealed trait EitherT[F[+_], +A, +B] {
 
   /** Traverse on the right of this disjunction. */
   def traverse[G[_], AA >: A, C](f: (B) => G[C])(implicit F: Traverse[F], G: Applicative[G]): G[EitherT[F, AA, C]] =
-    G.map(F.traverse(run)(o => Traverse[({type λ[α] = (AA \/ α)})#λ].traverse(o)(f)))(EitherT(_))
+    G.map(F.traverse(run)(o => Traverse[AA \/ ?].traverse(o)(f)))(EitherT(_))
 
   /** Run the side-effect on the right of this disjunction. */
   def foreach(f: B => Unit)(implicit F: Each[F]): Unit =
@@ -245,53 +245,53 @@ trait EitherTFunctions {
 }
 
 
-trait EitherTFunctor[F[+_], E] extends Functor[({type λ[α]=EitherT[F, E, α]})#λ] {
+trait EitherTFunctor[F[+_], E] extends Functor[EitherT[F, E, ?]] {
   implicit def F: Functor[F]
 
   override def map[A, B](fa: EitherT[F, E, A])(f: (A) => B): EitherT[F, E, B] = fa map f
 }
 
-trait EitherTPointed[F[+_], E] extends Pointed[({type λ[α]=EitherT[F, E, α]})#λ] with EitherTFunctor[F, E] {
+trait EitherTPointed[F[+_], E] extends Pointed[EitherT[F, E, ?]] with EitherTFunctor[F, E] {
   implicit def F: Pointed[F]
 
   def point[A](a: => A): EitherT[F, E, A] = EitherT(F.point(\/-(a)))
 }
 
-trait EitherTApply[F[+_], E] extends Apply[({type λ[α]=EitherT[F, E, α]})#λ] with EitherTFunctor[F, E] {
+trait EitherTApply[F[+_], E] extends Apply[EitherT[F, E, ?]] with EitherTFunctor[F, E] {
   implicit def F: Apply[F]
 
   override def ap[A, B](fa: => EitherT[F, E, A])(f: => EitherT[F, E, (A) => B]): EitherT[F, E, B] = fa ap f
 }
 
-trait EitherTApplicative[F[+_], E] extends Applicative[({type λ[α]=EitherT[F, E, α]})#λ] with EitherTApply[F, E] with EitherTPointed[F, E] {
+trait EitherTApplicative[F[+_], E] extends Applicative[EitherT[F, E, ?]] with EitherTApply[F, E] with EitherTPointed[F, E] {
   implicit def F: Applicative[F]
 }
 
-trait EitherTMonad[F[+_], E] extends Monad[({type λ[α]=EitherT[F, E, α]})#λ] with EitherTApplicative[F, E] {
+trait EitherTMonad[F[+_], E] extends Monad[EitherT[F, E, ?]] with EitherTApplicative[F, E] {
   implicit def F: Monad[F]
 
   def bind[A, B](fa: EitherT[F, E, A])(f: (A) => EitherT[F, E, B]): EitherT[F, E, B] = fa flatMap f
 }
 
-trait EitherTFoldable[F[+_], E] extends Foldable.FromFoldr[({type λ[α]=EitherT[F, E, α]})#λ] {
+trait EitherTFoldable[F[+_], E] extends Foldable.FromFoldr[EitherT[F, E, ?]] {
   implicit def F: Foldable[F]
 
   override def foldRight[A, B](fa: EitherT[F, E, A], z: => B)(f: (A, => B) => B): B = fa.foldRight(z)(f)
 }
 
-trait EitherTTraverse[F[+_], E] extends Traverse[({type λ[α]=EitherT[F, E, α]})#λ] with EitherTFoldable[F, E] {
+trait EitherTTraverse[F[+_], E] extends Traverse[EitherT[F, E, ?]] with EitherTFoldable[F, E] {
   implicit def F: Traverse[F]
 
   def traverseImpl[G[_]: Applicative, A, B](fa: EitherT[F, E, A])(f: (A) => G[B]): G[EitherT[F, E, B]] = fa traverse f
 }
 
-trait EitherTBifunctor[F[+_]] extends Bifunctor[({type λ[α, β]=EitherT[F, α, β]})#λ] {
+trait EitherTBifunctor[F[+_]] extends Bifunctor[EitherT[F, ?, ?]] {
   implicit def F: Functor[F]
 
   override def bimap[A, B, C, D](fab: EitherT[F, A, B])(f: (A) => C, g: (B) => D): EitherT[F, C, D] = fab.bimap(f, g)
 }
 
-trait EitherTBitraverse[F[+_]] extends Bitraverse[({type λ[α, β] = EitherT[F, α, β]})#λ] with EitherTBifunctor[F] {
+trait EitherTBitraverse[F[+_]] extends Bitraverse[EitherT[F, ?, ?]] with EitherTBifunctor[F] {
   implicit def F: Traverse[F]
 
   def bitraverseImpl[G[_] : Applicative, A, B, C, D](fab: EitherT[F, A, B])
@@ -300,11 +300,11 @@ trait EitherTBitraverse[F[+_]] extends Bitraverse[({type λ[α, β] = EitherT[F,
 }
 
 trait EitherTMonadTrans[A] extends MonadTrans[({type λ[α[+_], β] = EitherT[α, A, β]})#λ] {
-  def hoist[M[+_], N[+_]](f: M ~> N)(implicit M: Monad[M]) = new (({type λ[α] = EitherT[M, A, α]})#λ ~> ({type λ[α] = EitherT[N, A, α]})#λ) {
+  def hoist[M[+_], N[+_]](f: M ~> N)(implicit M: Monad[M]) = new (EitherT[M, A, ?] ~> EitherT[N, A, ?]) {
     def apply[B](mb: EitherT[M, A, B]): EitherT[N, A, B] = EitherT(f.apply(mb.run))
   }
 
   def liftM[M[+_], B](mb: M[B])(implicit M: Monad[M]): EitherT[M, A, B] = EitherT(M.map(mb)(\/-(_)))
 
-  implicit def apply[M[+_] : Monad]: Monad[({type λ[α] = EitherT[M, A, α]})#λ] = EitherT.eitherTMonad
+  implicit def apply[M[+_] : Monad]: Monad[EitherT[M, A, ?]] = EitherT.eitherTMonad
 }
