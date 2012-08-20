@@ -76,7 +76,7 @@ sealed trait EitherT[F[+_], +A, +B] {
 
   /** Apply a function in the environment of the right of this disjunction. */
   def ap[AA >: A, C](f: => EitherT[F, AA, B => C])(implicit F: Apply[F]): EitherT[F, AA, C] =
-    EitherT(F.map2(run, f.run)((a, b) => a flatMap (x => b map (_(x)))))
+    EitherT(F(run, f.run)((a, b) => a flatMap (x => b map (_(x)))))
 
   /** Bind through the right of this disjunction. */
   def flatMap[AA >: A, C](f: B => EitherT[F, AA, C])(implicit F: Monad[F]): EitherT[F, AA, C] =
@@ -149,7 +149,7 @@ sealed trait EitherT[F[+_], +A, +B] {
    * }}}
    */
   def +++[AA >: A, BB >: B](x: => EitherT[F, AA, BB])(implicit M1: Semigroup[BB], M2: Semigroup[AA], F: Apply[F]): EitherT[F, AA, BB] =
-    EitherT(F.map2(run, x.run)(_ +++ _))
+    EitherT(F(run, x.run)(_ +++ _))
 
   /** Ensures that the right value of this disjunction satisfies the given predicate, or returns left with the given value. */
   def ensure[AA >: A](onLeft: => AA)(f: B => Boolean)(implicit F: Functor[F]): EitherT[F, AA, B] =
@@ -157,11 +157,11 @@ sealed trait EitherT[F[+_], +A, +B] {
 
   /** Compare two disjunction values for equality. */
   def ===[AA >: A, BB >: B](x: EitherT[F, AA, BB])(implicit EA: Equal[AA], EB: Equal[BB], F: Apply[F]): F[Boolean] =
-    F.map2(run, x.run)(_ == _)
+    F(run, x.run)(_ == _)
 
   /** Compare two disjunction values for ordering. */
   def compare[AA >: A, BB >: B](x: EitherT[F, AA, BB])(implicit EA: Order[AA], EB: Order[BB], F: Apply[F]): F[Ordering] =
-    F.map2(run, x.run)(_ compare _)
+    F(run, x.run)(_ compare _)
 
   /** Show for a disjunction value. */
   def show[AA >: A, BB >: B](implicit SA: Show[AA], SB: Show[BB], F: Functor[F]): F[Cord] =
@@ -344,14 +344,14 @@ trait EitherTMonadWriter[F[+_, +_], W, A] extends MonadWriter[({type λ[+α, +β
   implicit def W = MW.W
 
   def writer[B](v: (W, B)): EitherT[({type λ[+α] = F[W, α]})#λ, A, B] =
-    liftM[({type λ[+α] = F[W, α]})#λ, B](MW.writer(v)) 
+    liftM[({type λ[+α] = F[W, α]})#λ, B](MW.writer(v))
 
   def left[B](v: => A): EitherT[({type λ[+α] = F[W, α]})#λ, A, B] =
     EitherT.left[({type λ[+α] = F[W, α]})#λ, A, B](MW.point(v))
 
   def right[B](v: => B): EitherT[({type λ[+α] = F[W, α]})#λ, A, B] =
     EitherT.right[({type λ[+α] = F[W, α]})#λ, A, B](MW.point(v))
-} 
+}
 
 trait EitherTListenableMonadWriter[F[+_, +_], W, A] extends ListenableMonadWriter[({type λ[+α, +β] = EitherT[({type f[+x] = F[α, x]})#f, A, β]})#λ, W] with EitherTMonadWriter[F, W, A] {
   implicit def MW: ListenableMonadWriter[F, W]
@@ -359,7 +359,7 @@ trait EitherTListenableMonadWriter[F[+_, +_], W, A] extends ListenableMonadWrite
   def listen[B](ma: EitherT[({type λ[+α] = F[W, α]})#λ, A, B]): EitherT[({type λ[+α] = F[W, α]})#λ, A, (B, W)] = {
     val tmp = MW.bind[(A \/ B, W), A \/ (B, W)](MW.listen(ma.run)){
       case (-\/(a), _) => MW.point(-\/(a))
-      case (\/-(b), w) => MW.point(\/-((b, w))) 
+      case (\/-(b), w) => MW.point(\/-((b, w)))
     }
 
     EitherT[({type λ[+α] = F[W, α]})#λ, A, (B, W)](tmp)
