@@ -36,14 +36,14 @@ trait Applicative[F[_]] extends Apply[F] with Pointed[F] { self =>
     traverse(as)(a => a)
 
   /**The composition of Applicatives `F` and `G`, `[x]F[G[x]]`, is an Applicative */
-  def compose[G[_]](implicit G0: Applicative[G]): Applicative[({type λ[α] = F[G[α]]})#λ] = new CompositionApplicative[F, G] {
+  def compose[G[_]](implicit G0: Applicative[G]): Applicative[Lambda[A => F[G[A]]]] = new CompositionApplicative[F, G] {
     implicit def F = self
 
     implicit def G = G0
   }
 
   /**The product of Applicatives `F` and `G`, `[x](F[x], G[x]])`, is an Applicative */
-  def product[G[_]](implicit G0: Applicative[G]): Applicative[({type λ[α] = (F[α], G[α])})#λ] = new ProductApplicative[F, G] {
+  def product[G[_]](implicit G0: Applicative[G]): Applicative[Lambda[A => (F[A], G[A])]] = new ProductApplicative[F, G] {
     implicit def F = self
 
     implicit def G = G0
