@@ -6,7 +6,7 @@ trait ApplyOps[F[_],A] extends Ops[F[A]] {
   implicit def F: Apply[F]
   ////
 
-  final def <*>[B](f: F[B]): F[(A,B)] = F.tuple(self,f)
+  final def <*>[B](f: F[A => B]): F[B] = F.ap(self)(f)
   final def tuple[B](f: F[B]): F[(A,B)] = F.tuple(self,f)
 
   @deprecated("Use `a tuple b` instead", "7")
@@ -41,13 +41,11 @@ trait ApplyOps[F[_],A] extends Ops[F[A]] {
    * Warning: each call to `|@|` leads to an allocation of wrapper object. For performance sensitive code, consider using
    *          [[scalaz.Apply]]`#mapN` directly.
    */
-  @deprecated("Use `^(f1,f2..fN)((a,b,c) => ..)` instead", "7")
   final def |@|[B](fb: F[B]) = new ApplicativeBuilder[F, A, B] {
     val a: F[A] = self
     val b: F[B] = fb
   }
   /** Alias for `|@|` */
-  @deprecated("Use `f1 <*> f2` or `f1 tuple f2` instead", "7")
   final def ⊛[B](fb: F[B]) = |@|(fb)
 
   ////

@@ -30,6 +30,9 @@ sealed trait EitherT[F[+_], +A, +B] {
       def r = right
     }
 
+  def fold[X](l: A => X, r: B => X)(implicit F: Functor[F]): F[X] =
+    F.map(run)(_.fold(l, r))
+
   /** Return `true` if this disjunction is left. */
   def isLeft(implicit F: Functor[F]): F[Boolean] =
     F.map(run)(_.isLeft)
@@ -47,11 +50,11 @@ sealed trait EitherT[F[+_], +A, +B] {
     swap
 
   /** Run the given function on this swapped value. Alias for `~` */
-  def swapped[AA >: A, BB >: B](k: (B \/ A) => (BB \/ AA))(implicit F: Functor[F]): EitherT[F, AA, BB] =
+  def swapped[AA, BB](k: (B \/ A) => (BB \/ AA))(implicit F: Functor[F]): EitherT[F, AA, BB] =
     EitherT(F.map(run)(_ swapped k))
 
   /** Run the given function on this swapped value. Alias for `swapped` */
-  def ~[AA >: A, BB >: B](k: (B \/ A) => (BB \/ AA))(implicit F: Functor[F]): EitherT[F, AA, BB] =
+  def ~[AA, BB](k: (B \/ A) => (BB \/ AA))(implicit F: Functor[F]): EitherT[F, AA, BB] =
     swapped(k)
 
   /** Binary functor map on this disjunction. */
@@ -176,7 +179,7 @@ sealed trait EitherT[F[+_], +A, +B] {
     F.map(run)(_.validation)
 
   /** Run a validation function and back to disjunction again. */
-  def validationed[AA >: A, BB >: B](k: Validation[A, B] => Validation[AA, BB])(implicit F: Functor[F]): EitherT[F, AA, BB] =
+  def validationed[AA, BB](k: Validation[A, B] => Validation[AA, BB])(implicit F: Functor[F]): EitherT[F, AA, BB] =
     EitherT(F.map(run)(_ validationed k))
 
 }
@@ -199,7 +202,7 @@ object EitherT extends EitherTFunctions with EitherTInstances {
     apply(F.map(e)(_ fold (\/.left, \/.right)))
 
   /** Evaluate the given value, which might throw an exception. */
-  def fromTryCatch[F[+_], A](a: => F[A])(implicit F: Functor[F] with Pointed[F]): EitherT[F, Throwable, A] = try {
+  def fromTryCatch[F[+_], A](a: => F[A])(implicit F: Pointed[F]): EitherT[F, Throwable, A] = try {
     right(a)
   } catch {
     case e => left(F.point(e))
