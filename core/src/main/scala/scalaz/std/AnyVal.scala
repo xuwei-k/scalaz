@@ -7,23 +7,23 @@ import Id._
 trait AnyValInstances {
 
   implicit val unitInstance: Group[Unit] with Enum[Unit] with Show[Unit] = new Group[Unit] with Enum[Unit] with Show[Unit] {
-    override def shows(f: Unit) = ().toString
+    override def shows(f) = ().toString
 
-    def append(f1: Unit, f2: => Unit) = ()
+    def append(f1, f2) = ()
 
     def zero = ()
 
-    def inverse(f:Unit) = ()
+    def inverse(f) = ()
 
-    def order(x: Unit, y: Unit) = Ordering.EQ
+    def order(x, y) = Ordering.EQ
 
-    def succ(u: Unit) = ()
+    def succ(u) = ()
 
-    def pred(u: Unit) = ()
+    def pred(u) = ()
 
-    override def succn(a: Int, b: Unit) = ()
+    override def succn(a, b) = ()
 
-    override def predn(a: Int, b: Unit) = ()
+    override def predn(a, b) = ()
 
     override def min = Some(())
 
@@ -34,15 +34,15 @@ trait AnyValInstances {
 
   implicit val nothingInstance: Semigroup[Nothing] with Show[Nothing] with Equal[Nothing] =
     new Semigroup[Nothing] with Show[Nothing] with Enum[Nothing] {
-      override def shows(f: Nothing) = f.toString
-      def append(f1: Nothing, f2: => Nothing) = f1
-      def order(x: Nothing, y: Nothing) = Ordering.EQ
-      def succ(n: Nothing) = n
-      def pred(n: Nothing) = n
+      override def shows(f) = f.toString
+      def append(f1, f2) = f1
+      def order(x, y) = Ordering.EQ
+      def succ(n) = n
+      def pred(n) = n
 
-      override def succn(a: Int, b: Nothing) = b
+      override def succn(a, b) = b
 
-      override def predn(a: Int, b: Nothing) = b
+      override def predn(a, b) = b
 
       override def min = None
 
@@ -52,17 +52,17 @@ trait AnyValInstances {
     }
 
   implicit object booleanInstance extends Enum[Boolean] with Show[Boolean] {
-    override def shows(f: Boolean) = f.toString
+    override def shows(f) = f.toString
 
-    def order(x: Boolean, y: Boolean) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
+    def order(x, y) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
 
-    def succ(b: Boolean) = !b
+    def succ(b) = !b
 
-    def pred(b: Boolean) = !b
+    def pred(b) = !b
 
-    override def succn(n: Int, b: Boolean) = if(n % 2 == 0) b else !b
+    override def succn(n, b) = if(n % 2 == 0) b else !b
 
-    override def predn(n: Int, b: Boolean) = if(n % 2 == 0) b else !b
+    override def predn(n, b) = if(n % 2 == 0) b else !b
 
     override def min = Some(false)
 
@@ -71,13 +71,13 @@ trait AnyValInstances {
     override def equalIsNatural: Boolean = true
 
     object conjunction extends Monoid[Boolean] {
-      def append(f1: Boolean, f2: => Boolean) = f1 && f2
+      def append(f1, f2) = f1 && f2
 
       def zero: Boolean = true
     }
 
     object disjunction extends Monoid[Boolean] {
-      def append(f1: Boolean, f2: => Boolean) = f1 || f2
+      def append(f1, f2) = f1 || f2
 
       def zero = false
     }
@@ -87,19 +87,19 @@ trait AnyValInstances {
   import Tags.{Conjunction, Disjunction}
 
   implicit val booleanDisjunctionNewTypeInstance: Monoid[Boolean @@ Disjunction] with Enum[Boolean @@ Disjunction] = new Monoid[Boolean @@ Disjunction] with Enum[Boolean @@ Disjunction] {
-    def append(f1: Boolean @@ Disjunction, f2: => Boolean @@ Disjunction) = Disjunction(f1 || f2)
+    def append(f1, f2) = Disjunction(f1 || f2)
 
     def zero: Boolean @@ Disjunction = Disjunction(false)
 
-    def order(a1: Boolean @@ Disjunction, a2: Boolean @@ Disjunction) = Order[Boolean].order(a1, a2)
+    def order(a1, a2) = Order[Boolean].order(a1, a2)
 
-    def succ(b: Boolean @@ Disjunction) = Disjunction(Enum[Boolean].succ(b))
+    def succ(b) = Disjunction(Enum[Boolean].succ(b))
 
-    def pred(b: Boolean @@ Disjunction) = Disjunction(Enum[Boolean].pred(b))
+    def pred(b) = Disjunction(Enum[Boolean].pred(b))
 
-    override def succn(n: Int, b: Boolean @@ Disjunction) = Disjunction(Enum[Boolean].succn(n, b))
+    override def succn(n , b) = Disjunction(Enum[Boolean].succn(n, b))
 
-    override def predn(n: Int, b: Boolean @@ Disjunction) = Disjunction(Enum[Boolean].predn(n, b))
+    override def predn(n , b) = Disjunction(Enum[Boolean].predn(n, b))
 
     override def min = Enum[Boolean].min map (Disjunction(_))
 
@@ -108,19 +108,19 @@ trait AnyValInstances {
   }
 
   implicit val booleanConjunctionNewTypeInstance: Monoid[Boolean @@ Conjunction] with Enum[Boolean @@ Conjunction] = new Monoid[Boolean @@ Conjunction] with Enum[Boolean @@ Conjunction] {
-    def append(f1: Boolean @@ Conjunction, f2: => Boolean @@ Conjunction) = Conjunction(f1 && f2)
+    def append(f1, f2) = Conjunction(f1 && f2)
 
     def zero: Boolean @@ Conjunction = Conjunction(true)
 
-    def order(a1: Boolean @@ Conjunction, a2: Boolean @@ Conjunction) = Order[Boolean].order(a1, a2)
+    def order(a1, a2) = Order[Boolean].order(a1, a2)
 
-    def succ(b: Boolean @@ Conjunction) = Conjunction(Enum[Boolean].succ(b))
+    def succ(b) = Conjunction(Enum[Boolean].succ(b))
 
-    def pred(b: Boolean @@ Conjunction) = Conjunction(Enum[Boolean].pred(b))
+    def pred(b) = Conjunction(Enum[Boolean].pred(b))
 
-    override def succn(n: Int, b: Boolean @@ Conjunction) = Conjunction(Enum[Boolean].succn(n, b))
+    override def succn(n , b) = Conjunction(Enum[Boolean].succn(n, b))
 
-    override def predn(n: Int, b: Boolean @@ Conjunction) = Conjunction(Enum[Boolean].predn(n, b))
+    override def predn(n , b) = Conjunction(Enum[Boolean].predn(n, b))
 
     override def min = Enum[Boolean].min map (Conjunction(_))
 
@@ -129,25 +129,25 @@ trait AnyValInstances {
   }
 
   implicit val byteInstance: Monoid[Byte] with Enum[Byte] with Show[Byte] = new Monoid[Byte] with Enum[Byte] with Show[Byte] {
-    override def shows(f: Byte) = f.toString
+    override def shows(f) = f.toString
 
-    def append(f1: Byte, f2: => Byte) = (f1 + f2).toByte
+    def append(f1, f2) = (f1 + f2).toByte
 
     def zero: Byte = 0
 
-    def order(x: Byte, y: Byte) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
+    def order(x, y) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
 
-    def succ(b: Byte) = (b + 1).toByte
-    def pred(b: Byte) = (b - 1).toByte
-    override def succn(a: Int, b: Byte) = (b + a).toByte
-    override def predn(a: Int, b: Byte) = (b - a).toByte
+    def succ(b) = (b + 1).toByte
+    def pred(b) = (b - 1).toByte
+    override def succn(a, b) = (b + a).toByte
+    override def predn(a, b) = (b - a).toByte
     override def min = Some(Byte.MinValue)
     override def max = Some(Byte.MaxValue)
 
     override def equalIsNatural: Boolean = true
 
     object multiplication extends Monoid[Byte] {
-      def append(f1: Byte, f2: => Byte) = (f1 * f2).toByte
+      def append(f1, f2) = (f1 * f2).toByte
 
       def zero: Byte = 1
     }
@@ -157,19 +157,19 @@ trait AnyValInstances {
   import Tags.{Multiplication}
 
   implicit val byteMultiplicationNewType: Monoid[Byte @@ Multiplication] with Enum[Byte @@ Multiplication] = new Monoid[Byte @@ Multiplication] with Enum[Byte @@ Multiplication] {
-    def append(f1: Byte @@ Multiplication, f2: => Byte @@ Multiplication) = Multiplication((f1 * f2).toByte)
+    def append(f1, f2) = Multiplication((f1 * f2).toByte)
 
     def zero: Byte @@ Multiplication = Multiplication(1)
 
-    def order(a1: Byte @@ Multiplication, a2: Byte @@ Multiplication) = Order[Byte].order(a1, a2)
+    def order(a1, a2) = Order[Byte].order(a1, a2)
 
-    def succ(b: Byte @@ Multiplication) = Multiplication(Enum[Byte].succ(b))
+    def succ(b) = Multiplication(Enum[Byte].succ(b))
 
-    def pred(b: Byte @@ Multiplication) = Multiplication(Enum[Byte].pred(b))
+    def pred(b) = Multiplication(Enum[Byte].pred(b))
 
-    override def succn(n: Int, b: Byte @@ Multiplication) = Multiplication(Enum[Byte].succn(n, b))
+    override def succn(n , b) = Multiplication(Enum[Byte].succn(n, b))
 
-    override def predn(n: Int, b: Byte @@ Multiplication) = Multiplication(Enum[Byte].predn(n, b))
+    override def predn(n , b) = Multiplication(Enum[Byte].predn(n, b))
 
     override def min = Enum[Byte].min map (Multiplication(_))
 
@@ -180,25 +180,25 @@ trait AnyValInstances {
   }
 
   implicit val char: Monoid[Char] with Enum[Char] with Show[Char] = new Monoid[Char] with Enum[Char] with Show[Char] {
-    override def shows(f: Char) = f.toString
+    override def shows(f) = f.toString
 
-    def append(f1: Char, f2: => Char) = (f1 + f2).toChar
+    def append(f1, f2) = (f1 + f2).toChar
 
     def zero: Char = 0
 
-    def order(x: Char, y: Char) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
+    def order(x, y) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
 
-    def succ(b: Char) = (b + 1).toChar
-    def pred(b: Char) = (b - 1).toChar
-    override def succn(a: Int, b: Char) = (b + a).toChar
-    override def predn(a: Int, b: Char) = (b - a).toChar
+    def succ(b) = (b + 1).toChar
+    def pred(b) = (b - 1).toChar
+    override def succn(a, b) = (b + a).toChar
+    override def predn(a, b) = (b - a).toChar
     override def min = Some(Char.MinValue)
     override def max = Some(Char.MaxValue)
 
     override def equalIsNatural: Boolean = true
 
     object multiplication extends Monoid[Char] {
-      def append(f1: Char, f2: => Char) = (f1 * f2).toChar
+      def append(f1, f2) = (f1 * f2).toChar
 
       def zero: Char = 1
     }
@@ -206,19 +206,19 @@ trait AnyValInstances {
   }
 
   implicit val charMultiplicationNewType: Monoid[Char @@ Multiplication] with Enum[Char @@ Multiplication] = new Monoid[Char @@ Multiplication] with Enum[Char @@ Multiplication] {
-    def append(f1: Char @@ Multiplication, f2: => Char @@ Multiplication) = Multiplication((f1 * f2).toChar)
+    def append(f1, f2) = Multiplication((f1 * f2).toChar)
 
     def zero: Char @@ Multiplication = Multiplication(1)
 
-    def order(a1: Char @@ Multiplication, a2: Char @@ Multiplication) = Order[Char].order(a1, a2)
+    def order(a1, a2) = Order[Char].order(a1, a2)
 
-    def succ(b: Char @@ Multiplication) = Multiplication(Enum[Char].succ(b))
+    def succ(b) = Multiplication(Enum[Char].succ(b))
 
-    def pred(b: Char @@ Multiplication) = Multiplication(Enum[Char].pred(b))
+    def pred(b) = Multiplication(Enum[Char].pred(b))
 
-    override def succn(n: Int, b: Char @@ Multiplication) = Multiplication(Enum[Char].succn(n, b))
+    override def succn(n , b) = Multiplication(Enum[Char].succn(n, b))
 
-    override def predn(n: Int, b: Char @@ Multiplication) = Multiplication(Enum[Char].predn(n, b))
+    override def predn(n , b) = Multiplication(Enum[Char].predn(n, b))
 
     override def min = Enum[Char].min map (Multiplication(_))
 
@@ -228,27 +228,27 @@ trait AnyValInstances {
   }
 
   implicit val shortInstance: Group[Short] with Enum[Short] with Show[Short] = new Group[Short] with Enum[Short] with Show[Short] {
-    override def shows(f: Short) = f.toString
+    override def shows(f) = f.toString
 
-    def append(f1: Short, f2: => Short) = (f1 + f2).toShort
+    def append(f1, f2) = (f1 + f2).toShort
 
     def zero: Short = 0
 
-    def inverse(f:Short) = (-f).toShort
+    def inverse(f) = (-f).toShort
 
-    def order(x: Short, y: Short) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
+    def order(x, y) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
 
-    def succ(b: Short) = (b + 1).toShort
-    def pred(b: Short) = (b - 1).toShort
-    override def succn(a: Int, b: Short) = (b + a).toShort
-    override def predn(a: Int, b: Short) = (b - a).toShort
+    def succ(b) = (b + 1).toShort
+    def pred(b) = (b - 1).toShort
+    override def succn(a, b) = (b + a).toShort
+    override def predn(a, b) = (b - a).toShort
     override def min = Some(Short.MinValue)
     override def max = Some(Short.MaxValue)
 
     override def equalIsNatural: Boolean = true
 
     object multiplication extends Monoid[Short] {
-      def append(f1: Short, f2: => Short) = (f1 * f2).toShort
+      def append(f1, f2) = (f1 * f2).toShort
 
       def zero: Short = 1
     }
@@ -256,49 +256,47 @@ trait AnyValInstances {
   }
 
   implicit val shortMultiplicationNewType: Monoid[Short @@ Multiplication] with Enum[Short @@ Multiplication] = new Monoid[Short @@ Multiplication] with Enum[Short @@ Multiplication] {
-    def append(f1: Short @@ Multiplication, f2: => Short @@ Multiplication) = Multiplication((f1 * f2).toShort)
+    def append(f1, f2) = Multiplication((f1 * f2).toShort)
 
     def zero: Short @@ Multiplication = Multiplication(1)
 
-    def succ(b: Short @@ Multiplication) = Multiplication(Enum[Short].succ(b))
+    def succ(b) = Multiplication(Enum[Short].succ(b))
 
-    def pred(b: Short @@ Multiplication) = Multiplication(Enum[Short].pred(b))
+    def pred(b) = Multiplication(Enum[Short].pred(b))
 
-    override def succn(n: Int, b: Short @@ Multiplication) = Multiplication(Enum[Short].succn(n, b))
+    override def succn(n , b) = Multiplication(Enum[Short].succn(n, b))
 
-    override def predn(n: Int, b: Short @@ Multiplication) = Multiplication(Enum[Short].predn(n, b))
+    override def predn(n , b) = Multiplication(Enum[Short].predn(n, b))
 
     override def min = Enum[Short].min map (Multiplication(_))
 
     override def max = Enum[Short].max map (Multiplication(_))
 
-    def order(a1: Short @@ Multiplication, a2: Short @@ Multiplication) = Order[Short].order(a1, a2)
+    def order(a1, a2) = Order[Short].order(a1, a2)
   }
 
   implicit val intInstance: Group[Int] with Enum[Int] with Show[Int] = new Group[Int] with Enum[Int] with Show[Int] {
-    override def shows(f: Int) = f.toString
+    override def shows(f) = f.toString
 
-    def append(f1: Int, f2: => Int) = f1 + f2
+    def append(f1, f2: => Int) = f1 + f2
 
     def zero: Int = 0
 
     def inverse(f:Int) = -f
 
-    def distance(a: Int, b: Int): Int = b - a
+    def order(x, y) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
 
-    def order(x: Int, y: Int) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
-
-    def succ(b: Int) = b + 1
-    def pred(b: Int) = b - 1
-    override def succn(a: Int, b: Int) = b + a
-    override def predn(a: Int, b: Int) = b - a
+    def succ(b) = b + 1
+    def pred(b) = b - 1
+    override def succn(a, b) = b + a
+    override def predn(a, b) = b - a
     override def min = Some(Int.MinValue)
     override def max = Some(Int.MaxValue)
 
     override def equalIsNatural: Boolean = true
 
     object multiplication extends Monoid[Int] {
-      def append(f1: Int, f2: => Int) = f1 * f2
+      def append(f1, f2: => Int) = f1 * f2
 
       def zero: Int = 1
     }
@@ -306,51 +304,51 @@ trait AnyValInstances {
 
   /** Warning: the triangle inequality will not hold if `b - a` overflows. */
   implicit val intMetricSpace: MetricSpace[Int] = new MetricSpace[Int] {
-    def distance(a: Int, b: Int): Int = scala.math.abs(b - a)
+    def distance(a, b): Int = scala.math.abs(b - a)
   }
 
   implicit val intMultiplicationNewType: Monoid[Int @@ Multiplication] with Enum[Int @@ Multiplication] = new Monoid[Int @@ Multiplication] with Enum[Int @@ Multiplication] {
-    def append(f1: Int @@ Multiplication, f2: => Int @@ Multiplication) = Multiplication(f1 * f2)
+    def append(f1, f2) = Multiplication(f1 * f2)
 
     def zero: Int @@ Multiplication = Multiplication(1)
 
-    def succ(b: Int @@ Multiplication) = Multiplication(Enum[Int].succ(b))
+    def succ(b) = Multiplication(Enum[Int].succ(b))
 
-    def pred(b: Int @@ Multiplication) = Multiplication(Enum[Int].pred(b))
+    def pred(b) = Multiplication(Enum[Int].pred(b))
 
-    override def succn(n: Int, b: Int @@ Multiplication) = Multiplication(Enum[Int].succn(n, b))
+    override def succn(n , b) = Multiplication(Enum[Int].succn(n, b))
 
-    override def predn(n: Int, b: Int @@ Multiplication) = Multiplication(Enum[Int].predn(n, b))
+    override def predn(n , b) = Multiplication(Enum[Int].predn(n, b))
 
     override def min = Enum[Int].min map (Multiplication(_))
 
     override def max = Enum[Int].max map (Multiplication(_))
 
-    def order(a1: Int @@ Multiplication, a2: Int @@ Multiplication) = Order[Int].order(a1, a2)
+    def order(a1, a2) = Order[Int].order(a1, a2)
   }
 
   implicit val longInstance: Group[Long] with Enum[Long] with Show[Long] = new Group[Long] with Enum[Long] with Show[Long] {
-    override def shows(f: Long) = f.toString
+    override def shows(f) = f.toString
 
-    def append(f1: Long, f2: => Long) = f1 + f2
+    def append(f1, f2) = f1 + f2
 
     def zero: Long = 0L
 
-    def inverse(f: Long) = -f
+    def inverse(f) = -f
 
-    def order(x: Long, y: Long) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
+    def order(x, y) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
 
-    def succ(b: Long) = b + 1
-    def pred(b: Long) = b - 1
-    override def succn(a: Int, b: Long) = b + a
-    override def predn(a: Int, b: Long) = b - a
+    def succ(b) = b + 1
+    def pred(b) = b - 1
+    override def succn(a, b) = b + a
+    override def predn(a, b) = b - a
     override def min = Some(Long.MinValue)
     override def max = Some(Long.MaxValue)
 
     override def equalIsNatural: Boolean = true
 
     object multiplication extends Monoid[Long] {
-      def append(f1: Long, f2: => Long) = f1 * f2
+      def append(f1, f2) = f1 * f2
 
       def zero: Long = 1
     }
@@ -358,70 +356,70 @@ trait AnyValInstances {
   }
 
   implicit val longMultiplicationNewType: Monoid[Long @@ Multiplication] with Enum[Long @@ Multiplication] = new Monoid[Long @@ Multiplication] with Enum[Long @@ Multiplication] {
-    def append(f1: Long @@ Multiplication, f2: => Long @@ Multiplication) = Multiplication(f1 * f2)
+    def append(f1, f2) = Multiplication(f1 * f2)
 
     def zero: Long @@ Multiplication = Multiplication(1)
 
-    def succ(b: Long @@ Multiplication) = Multiplication(Enum[Long].succ(b))
+    def succ(b) = Multiplication(Enum[Long].succ(b))
 
-    def pred(b: Long @@ Multiplication) = Multiplication(Enum[Long].pred(b))
+    def pred(b) = Multiplication(Enum[Long].pred(b))
 
-    override def succn(n: Int, b: Long @@ Multiplication) = Multiplication(Enum[Long].succn(n, b))
+    override def succn(n , b) = Multiplication(Enum[Long].succn(n, b))
 
-    override def predn(n: Int, b: Long @@ Multiplication) = Multiplication(Enum[Long].predn(n, b))
+    override def predn(n , b) = Multiplication(Enum[Long].predn(n, b))
 
     override def min = Enum[Long].min map (Multiplication(_))
 
     override def max = Enum[Long].max map (Multiplication(_))
 
-    def order(a1: Long @@ Multiplication, a2: Long @@ Multiplication) = Order[Long].order(a1, a2)
+    def order(a1, a2) = Order[Long].order(a1, a2)
   }
 
   implicit val floatInstance: Group[Float] with Enum[Float] with Show[Float] = new Group[Float] with Enum[Float] with Show[Float] {
-    override def shows(f: Float) = f.toString
+    override def shows(f) = f.toString
 
-    def append(f1: Float, f2: => Float) = f1 + f2
+    def append(f1, f2) = f1 + f2
 
     def zero: Float = 0f
 
-    def inverse(f: Float) = -f
+    def inverse(f) = -f
 
-    def succ(b: Float) = b + 1
-    def pred(b: Float) = b - 1
-    override def succn(a: Int, b: Float) = b + a
-    override def predn(a: Int, b: Float) = b - a
+    def succ(b) = b + 1
+    def pred(b) = b - 1
+    override def succn(a, b) = b + a
+    override def predn(a, b) = b - a
     override def min = Some(Float.MinValue)
     override def max = Some(Float.MaxValue)
 
     override def equalIsNatural: Boolean = true
 
-    def order(x: Float, y: Float) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
+    def order(x, y) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
   }
 
   implicit val floatMultiplicationNewType: Group[Float @@ Multiplication] = new Group[Float @@ Multiplication] {
-    def append(f1: Float @@ Multiplication, f2: => Float @@ Multiplication) = Multiplication(f1 * f2)
+    def append(f1, f2) = Multiplication(f1 * f2)
 
     def zero: Float @@ Multiplication = Multiplication(1.0f)
 
-    def inverse(f: Float @@ Multiplication) = Multiplication(1.0f/f)
+    def inverse(f) = Multiplication(1.0f/f)
 
   }
 
   implicit val doubleInstance: Group[Double] with Enum[Double] with Show[Double] = new Group[Double] with Enum[Double] with Show[Double] {
-    override def shows(f: Double) = f.toString
+    override def shows(f) = f.toString
 
-    def append(f1: Double, f2: => Double) = f1 + f2
+    def append(f1, f2) = f1 + f2
 
     def zero: Double = 0d
 
-    def inverse(f: Double) = -f
+    def inverse(f) = -f
 
-    def order(x: Double, y: Double) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
+    def order(x, y) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
 
-    def succ(b: Double) = b + 1
-    def pred(b: Double) = b - 1
-    override def succn(a: Int, b: Double) = b + a
-    override def predn(a: Int, b: Double) = b - a
+    def succ(b) = b + 1
+    def pred(b) = b - 1
+    override def succn(a, b) = b + a
+    override def predn(a, b) = b - a
     override def min = Some(Double.MinValue)
     override def max = Some(Double.MaxValue)
 
@@ -429,11 +427,11 @@ trait AnyValInstances {
   }
 
   implicit val doubleMultiplicationNewType: Group[Double @@ Multiplication] = new Group[Double @@ Multiplication] {
-    def append(f1: Double @@ Multiplication, f2: => Double @@ Multiplication) = Multiplication(f1 * f2)
+    def append(f1, f2) = Multiplication(f1 * f2)
 
     def zero: Double @@ Multiplication = Multiplication(1.0d)
 
-    def inverse(f: Double @@ Multiplication) = Multiplication(1.0d/f)
+    def inverse(f) = Multiplication(1.0d/f)
   }
 }
 
