@@ -183,6 +183,30 @@ object build extends Build {
     dependencies = Seq(core)
   )
 
+  lazy val allExampleRun = Project(
+    id = "all-example-run",
+    base = file("all-example-run"),
+    dependencies = Seq(example),
+    settings = standardSettings ++ Seq[Sett](
+      genAllMainRun <<= (sourceManaged in Compile,discoveredMainClasses in Compile in example).map{ 
+        (dir,mainClasses) =>
+        val ignoreClasses = Seq("scalaz.example.xml.ParsePrintFile")
+        val src =
+        """package scalaz.example
+          |
+          |object AllMainRun extends App{
+          |  %s
+          |}
+          |""".stripMargin.format(mainClasses.filterNot(ignoreClasses.contains).map{_ + ".main(Array())"}.mkString("\n"))
+
+        val generated:File = dir / "scalaz" / "AllMainRun.scala"
+        IO.write(generated, src)
+        generated
+      },
+      sourceGenerators in Compile <+= genAllMainRun.map(Seq(_))
+    )
+  )
+
   lazy val example = Project(
     id = "example",
     base = file("example"),
@@ -244,6 +268,8 @@ object build extends Build {
   lazy val showDoc = TaskKey[Unit]("show-doc")
 
   lazy val typeClassTree = TaskKey[String]("type-class-tree", "Generates scaladoc formatted tree of type classes.")
+
+  lazy val genAllMainRun = TaskKey[File]("gen-all-main-run")
 
   def generateTupleW(outputDir: File) = {
     val arities = 2 to 12
