@@ -73,37 +73,33 @@ trait OptionInstances extends OptionInstances0 {
     }
   }
 
-  implicit def optionFirst[A] = new Monoid[FirstOption[A]] {
-    def zero: FirstOption[A] = Tag(None)
-
-    def append(f1: FirstOption[A], f2: => FirstOption[A]) = Tag(f1.orElse(f2))
-  }
+  implicit def optionFirst[A]:Monoid[FirstOption[A]] = optionFirstMonadPlus[A].monoid
 
   implicit def optionFirstShow[A: Show]: Show[FirstOption[A]] = Tag.subst(Show[Option[A]])
 
   implicit def optionFirstOrder[A: Order]: Order[FirstOption[A]] = Tag.subst(Order[Option[A]])
 
-  implicit def optionFirstMonad[A]: Monad[FirstOption] = new Monad[FirstOption] {
+  implicit def optionFirstMonadPlus[A]: MonadPlus[FirstOption] = new MonadPlus[FirstOption] {
     def point[A](a: => A): FirstOption[A] = Tag(Some(a))
     override def map[A, B](fa: FirstOption[A])(f: A => B) = Tag(fa map f)
     def bind[A, B](fa: FirstOption[A])(f: A => FirstOption[B]): FirstOption[B] = Tag(fa flatMap f)
+    def empty[A] = Tag(None)
+    def plus[A](f1: FirstOption[A], f2: => FirstOption[A]) = Tag(f1.orElse(f2))
   }
 
 
-  implicit def optionLast[A] = new Monoid[LastOption[A]] {
-    def zero: LastOption[A] = Tag(None)
-
-    def append(f1: LastOption[A], f2: => LastOption[A]) = Tag(f2.orElse(f1))
-  }
+  implicit def optionLast[A]: Monoid[LastOption[A]] = optionLastMonadPlus[A].monoid
 
   implicit def optionLastShow[A: Show]: Show[LastOption[A]] = Tag.subst(Show[Option[A]])
 
   implicit def optionLastOrder[A: Order]: Order[LastOption[A]] = Tag.subst(Order[Option[A]])
 
-  implicit def optionLastMonad[A]: Monad[LastOption] = new Monad[LastOption] {
+  implicit def optionLastMonadPlus[A]: MonadPlus[LastOption] = new MonadPlus[LastOption] {
     def point[A](a: => A): LastOption[A] = Tag(Some(a))
     override def map[A, B](fa: LastOption[A])(f: A => B) = Tag(fa map f)
     def bind[A, B](fa: LastOption[A])(f: A => LastOption[B]): LastOption[B] = Tag(fa flatMap f)
+    def empty[A]: LastOption[A] = Tag(None)
+    def plus[A](f1: LastOption[A], f2: => LastOption[A]) = Tag(f2.orElse(f1))
   }
 
   implicit def optionMin[A](implicit o: Order[A]) = new Monoid[MinOption[A]] {

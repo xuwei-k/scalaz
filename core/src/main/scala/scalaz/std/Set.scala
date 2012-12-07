@@ -63,10 +63,7 @@ trait SetInstances {
     override val equalIsNatural: Boolean = Equal[A].equalIsNatural
   }
 
-  implicit def setMonoid[A]: Monoid[Set[A]] = new Monoid[Set[A]] {
-    def append(f1: Set[A], f2: => Set[A]) = f1 ++ f2
-    def zero: Set[A] = Set[A]()
-  }
+  implicit def setMonoid[A]: Monoid[Set[A]] = setInstance.monoid
 
   implicit def setShow[A: Show]: Show[Set[A]] = new Show[Set[A]] {
     override def show(as: Set[A]) = Cord("Set(", Cord.mkCord(",", as.map(Show[A].show).toSeq:_*), ")")
