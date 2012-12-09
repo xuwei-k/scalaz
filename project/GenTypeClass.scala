@@ -32,6 +32,7 @@ object TypeClass {
   lazy val pointed = TypeClass("Pointed", *->*, extendsList = Seq(functor))
   lazy val apply: TypeClass = TypeClass("Apply", *->*, extendsList = Seq(functor))
   lazy val applicative = TypeClass("Applicative", *->*, extendsList = Seq(apply, pointed))
+  lazy val monoidal = TypeClass("Monoidal", *->*, extendsList = Seq(functor))
   lazy val zip = TypeClass("Zip", *->*)
   lazy val unzip = TypeClass("Unzip", *->*)
   lazy val bind = TypeClass("Bind", *->*, extendsList = Seq(apply))
@@ -91,6 +92,7 @@ object TypeClass {
     copointed,
     apply,
     applicative,
+    monoidal,
     zip,
     unzip,
     cozip,
@@ -371,7 +373,7 @@ trait To%sOps %s {
   ////
 }
 
-trait %sSyntax[F[_, _]] %s { 
+trait %sSyntax[F[_, _]] %s {
   implicit def To%sOps[A, B](v: F[A, B]): %sOps[F, A, B] = new %sOps[F, A, B] { def self = v; implicit def F: %s[F] = %sSyntax.this.F }
 
   def F: %s[F]
