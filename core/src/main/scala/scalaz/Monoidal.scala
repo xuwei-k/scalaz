@@ -22,6 +22,21 @@ trait Monoidal[F[_]] extends Functor[F] { self =>
     def ap[A, B](fa: => F[A])(f: => F[A => B]): F[B] = map(**(fa, f)){case (a,b) => b(a)} 
   }
 
+  trait MonoidalLaw extends FunctorLaw{
+    def naturality[A, B](a: F[A], b: F[B], f: B => A, g: A => B)(implicit FAB: Equal[F[(A,B)]]): Boolean =
+      FAB.equal(**(map(b)(f), map(a)(g)), map(**(a, b)){case (x, y) => (f(y), g(x))})
+/*
+    def leftIdentity[A](fa: F[A])(implicit EA: Equal[F[A]]): Boolean = EA.equal(**(unit, fa), fa)
+
+    def rightIdentity[A](fa: F[A])(implicit EA: Equal[F[A]]): Boolean = EA.equal(**(fa, unit), fa)
+
+    def associativity[A](a: F[A], b: F[A], c: F[A])(implicit EA: Equal[F[A]]): Boolean =
+      EA.equal(**(a, **(b, c)), **(**(a, b), c))
+*/
+  }
+
+  def monoidalLaw = new MonoidalLaw {}
+
   ////
   val monoidalSyntax = new scalaz.syntax.MonoidalSyntax[F] { def F = Monoidal.this }
 }
