@@ -57,6 +57,13 @@ trait Applicative[F[_]] extends Apply[F] with Pointed[F] { self =>
       F.ap(f)(F.map(fa)(a => (f: A => B) => f(a)))
   }
 
+  def monoidal: Monoidal[F] = new Monoidal[F]{
+
+    def unit: F[Unit] = point(())
+
+    def **[A, B](fa: F[A], fb: F[B]): F[(A, B)] = apply2(fa, fb){case (a,b) => (a,b)}
+  }
+
   trait ApplicativeLaw extends FunctorLaw {
     def identityAp[A](fa: F[A])(implicit FA: Equal[F[A]]): Boolean =
       FA.equal(ap(fa)(point((a: A) => a)), fa)
