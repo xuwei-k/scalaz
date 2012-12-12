@@ -10,7 +10,7 @@ trait ListInstances0 {
 }
 
 trait ListInstances extends ListInstances0 {
-  implicit val listInstance = new Traverse[List] with MonadPlus[List] with Each[List] with Index[List] with Length[List] with ApplicativePlus[List] with Zip[List] with Unzip[List] {
+  implicit val listInstance = new Traverse[List] with MonadPlus[List] with Each[List] with Index[List] with Length[List] with Zip[List] with Unzip[List] with IsEmpty[List] {
     def each[A](fa: List[A])(f: (A) => Unit) = fa foreach f
     def index[A](fa: List[A], i: Int) = {
       var n = 0
@@ -75,6 +75,7 @@ trait ListInstances extends ListInstances0 {
       r
     }
 
+    def isEmpty[A](fa: List[A]) = fa.isEmpty
   }
 
   implicit def listMonoid[A]: Monoid[List[A]] = new Monoid[List[A]] {
@@ -89,7 +90,6 @@ trait ListInstances extends ListInstances0 {
   implicit def listOrder[A](implicit A0: Order[A]): Order[List[A]] = new ListOrder[A] {
     implicit def A = A0
   }
-
 }
 
 trait ListFunctions {
