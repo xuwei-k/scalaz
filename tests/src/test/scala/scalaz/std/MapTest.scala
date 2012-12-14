@@ -9,6 +9,7 @@ class MapTest extends Spec {
   checkAll(traverse.laws[({type F[V] = Map[Int,V]})#F])
   checkAll(isEmpty.laws[({type F[V] = Map[Int,V]})#F])
 
+  /*
   "map ordering" ! prop {
     val O = implicitly[Order[Map[String,Int]]]
     val O2 = SOrdering.Iterable(implicitly[SOrdering[(String,Int)]])
@@ -21,4 +22,5 @@ class MapTest extends Spec {
       }
     }
   }
+  */
 }
