@@ -253,10 +253,10 @@ object ScalazArbitrary {
     })
 
   implicit val qnameArbitrary: Arbitrary[QName] =
-    ^^(arb[Str],arb[Option[Str]],arb[Option[Str]])(QName.qname)
+    ^^(arb[List[Char]],arb[Option[List[Char]]],arb[Option[List[Char]]])(QName.qname)
 
   implicit val attrArbitrary: Arbitrary[Attr] =
-    ^(arb[QName],arb[Str])(Attr.attr)
+    ^(arb[QName],arb[List[Char]])(Attr.attr)
 
   implicit val cdataKindArbitrary: Arbitrary[CDataKind] = {
     import CDataKind._
@@ -264,7 +264,7 @@ object ScalazArbitrary {
   }
 
   implicit val cdataArbitrary: Arbitrary[CData] =
-    ^^(arb[CDataKind], arb[Str], arb[Option[Line]])(CData.cdata)
+    ^^(arb[CDataKind], arb[List[Char]], arb[Option[Line]])(CData.cdata)
 
   implicit val elementArbitrary: Arbitrary[Element] =
     ^^^(arb[QName], arb[List[Attr]], smallListArb[Content], arb[Option[Line]])(Element.element)
@@ -274,22 +274,22 @@ object ScalazArbitrary {
     Arbitrary(oneOf(
       arbitrary[Element].map(elem),
       arbitrary[CData].map(text),
-      arbitrary[Str].map(cref),
-      arbitrary[Str].map(comment)
+      arbitrary[List[Char]].map(cref),
+      arbitrary[List[Char]].map(comment)
     ))
   }
 
   implicit val nsInfoArbitrary: Arbitrary[NSInfo] =
-    ^(arb[List[(Str, Str)]],arb[Option[Str]])(NSInfo.nsInfo)
+    ^(arb[List[(List[Char], List[Char])]],arb[Option[List[Char]]])(NSInfo.nsInfo)
 
   implicit val tokenArbitrary: Arbitrary[Token] = {
     import Token._
     Arbitrary(oneOf(
       ^^^(arbitrary[CData.Line], arbitrary[QName], arbitrary[List[Attr]], arbitrary[Boolean])(startToken),
       ^(arbitrary[CData.Line], arbitrary[QName])(endToken),
-      arbitrary[Str].map(crefToken),
+      arbitrary[List[Char]].map(crefToken),
       arbitrary[CData].map(textToken),
-      arbitrary[Str].map(commentToken)
+      arbitrary[List[Char]].map(commentToken)
     ))
   }
 
@@ -297,7 +297,7 @@ object ScalazArbitrary {
     ^^(arb[QName], arb[List[Attr]], arb[Option[Line]])(Tag.tag)
 
   implicit val cursorArbitrary: Arbitrary[Cursor] =
-    ^^^(arb[Content], smallListArb[Content], smallListArb[Content], arb[Cursor.Path])(Cursor.cursor)
+    ^^^(arb[Content], smallListArb[Content], smallListArb[Content], arb[List[(List[Content], Tag, List[Content])]])(Cursor.cursor)
 
   implicit def predicateArbitrary[A](implicit P: Arbitrary[A => Boolean]): Arbitrary[Predicate[A]] =
     ^(P, arb[Option[List[Char]]])(Predicate.predicate)
