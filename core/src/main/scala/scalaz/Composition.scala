@@ -109,9 +109,11 @@ private[scalaz] trait CompositionBiapplicative[F[_, _], G[_, _]] extends Biappli
 
   implicit def G: Biapplicative[G]
 
-  override def bipure[A, B](a: A, b: B): F[G[A, B], G[A, B]] = ???
- 
-  override def biap[A, B, C, D](fac: => F[G[A, C], G[A, C]])(fabcd: => F[G[A => B, C => D], G[A => B, C => D]]): F[G[B, D], G[B, D]] = ???
+  override def bipure[A, B](a: A, b: B): F[G[A, B], G[A, B]] =
+    F.bipure(G.bipure(a, b), G.bipure(a, b))
+  override def biap[A, B, C, D](fac: => F[G[A, C], G[A, C]])(fabcd: => F[G[A => B, C => D], G[A => B, C => D]]): F[G[B, D], G[B, D]] =
+    ???
+
 }
 
 private[scalaz] trait CompositionBifoldable[F[_, _], G[_, _]] extends Bifoldable[({type λ[α, β]=F[G[α, β], G[α, β]]})#λ] {

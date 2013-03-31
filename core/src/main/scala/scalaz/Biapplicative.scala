@@ -22,7 +22,7 @@ trait Biapplicative[F[_, _]] extends Bifunctor[F] { self =>
 
   def biap[A, B, C, D](fac: => F[A, C])(fabcd: => F[A => B, C => D]): F[B, D]
 
-  def biapply2[A, B, C, D](fab: => F[A, B], fcd: => F[C, D])(f: A => C => C, g: B => D => D): F[C, D] = biap(fcd)(bimap(fab)(f, g))
+  def biapply2[A, B, C, D](fab: => F[A, B], fcd: => F[C, D])(f: (A, C) => C, g: (B, D) => D): F[C, D] = biap(fcd)(bimap(fab)(f.curried, g.curried))
 
   ////
   val biapplicativeSyntax = new scalaz.syntax.BiapplicativeSyntax[F] { def F = Biapplicative.this }

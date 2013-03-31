@@ -10,14 +10,13 @@ trait BiapplicativeOps[F[_, _],A, B] extends Ops[F[A, B]] {
 
   final def <<*>>[C, D](fac: F[A, C])(fabcd: F[A => B, C => D]): F[B, D] = F.biap(fac)(fabcd)
 
-  private def constFunc[X, Y]: X => Y => Y = (_: X) => (y: Y) => y
+  private def constFunc[X, Y]: (X, Y) => Y = (_: X, y: Y) => y
 
   final def *>>[C, D](fab: F[A, B], fcd: F[C, D]): F[C, D] = F.biapply2(fab, fcd)(constFunc, constFunc)
 
   final def <<*[C, D](fab: F[A, B], fcd: F[C, D]): F[A, B] = F.biapply2(fcd, fab)(constFunc, constFunc)
 
   def biliftA2[C, D, E, H](abc: A => B => C, deh: D => E => H, fad: F[A, D], fbe: F[B, E]): F[C, H] = ???
-  //  F.bimap(F.biap(fad) _ )(abc, deh)
 
   ////
 }
