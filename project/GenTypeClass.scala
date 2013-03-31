@@ -54,6 +54,7 @@ object TypeClass {
   lazy val monadPlus = TypeClass("MonadPlus", *->*, extendsList = Seq(monad, applicativePlus))
 
   lazy val bifunctor = TypeClass("Bifunctor", *^*->*)
+  lazy val biapplicative = TypeClass("Biapplicative", *^*->*, extendsList = Seq(bifunctor))
   lazy val bifoldable = TypeClass("Bifoldable", *^*->*)
   lazy val bitraverse = TypeClass("Bitraverse", *^*->*, extendsList = Seq(bifunctor, bifoldable))
   lazy val compose = TypeClass("Compose", *^*->*)
@@ -107,6 +108,7 @@ object TypeClass {
     traverse,
     traverse1,
     bifunctor,
+    biapplicative,
     bifoldable,
     bitraverse,
     catchable,
