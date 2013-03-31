@@ -18,6 +18,14 @@ trait Biapplicative[F[_, _]] extends Bifunctor[F] { self =>
     implicit def G = G0
   }
 
+
+  /**The product of Biapplicatives `F` and `G`, `[x,y]F[G[x,y],G[x,y]]`, is a Biapplicative */
+  def product[G[_, _]](implicit G0: Biapplicative[G]): Biapplicative[({type λ[α, β]=(F[α, β], G[α, β])})#λ] = new ProductBiapplicative[F, G] {
+    implicit def F = self
+
+    implicit def G = G0
+  }
+
   def bipure[A, B](a: A, b: B): F[A, B]
 
   def biap[A, B, C, D](fac: => F[A, C])(fabcd: => F[A => B, C => D]): F[B, D]

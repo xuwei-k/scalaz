@@ -124,6 +124,17 @@ private[scalaz] trait ProductBifunctor[F[_, _], G[_, _]] extends Bifunctor[({typ
     (F.bimap(fab._1)(f, g), G.bimap(fab._2)(f, g))
 }
 
+private[scalaz] trait ProductBiapplicative[F[_, _], G[_, _]] extends Biapplicative[({type λ[α, β]=(F[α, β], G[α, β])})#λ] {
+  implicit def F: Biapplicative[F]
+
+  implicit def G: Biapplicative[G]
+
+  override def bipure[A, B](a: A, b: B): (F[A, B], G[A, B]) =
+    (F.bipure(a, b), G.bipure(a, b))
+  override def biap[A, B, C, D](fac: => (F[A, C], G[A, C]))(fabcd: => (F[A => B, C => D], G[A => B, C => D])): (F[B, D], G[B, D]) =
+    (F.biap(fac._1)(fabcd._1), G.biap(fac._2)(fabcd._2))
+}
+
 private[scalaz] trait ProductBifoldable[F[_, _], G[_, _]] extends Bifoldable[({type λ[α, β]=(F[α, β], G[α, β])})#λ] {
   implicit def F: Bifoldable[F]
 
