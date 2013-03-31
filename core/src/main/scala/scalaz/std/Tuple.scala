@@ -2,11 +2,14 @@ package scalaz
 package std
 
 trait TupleInstances0 {
-  implicit def tuple2Bitraverse[A1, A2] = new Bitraverse[Tuple2] {
+
+  implicit def tuple2Bitraverse[A1, A2] = new Bitraverse[Tuple2] with Biapplicative[Tuple2]{
     override def bimap[A, B, C, D](fab: (A, B))(f: A => C, g: B => D) =
       (f(fab._1), g(fab._2))
     def bitraverseImpl[G[_]: Applicative, A, B, C, D](fab: (A, B))(f: A => G[C], g: B => G[D]) =
       Applicative[G].apply2(f(fab._1), g(fab._2))((_, _))
+    def bipure[A, B](a: A, b: B) = (a, b)
+    def biap[A, B, C, D](fac: => (A, C))(fabcd: => (A => B, C => D)): (B, D) = (fabcd._1(fac._1), fabcd._2(fac._2))
   }
 
   implicit def tuple1Semigroup[A1](implicit A1: Semigroup[A1]) = new Tuple1Semigroup[A1] {
