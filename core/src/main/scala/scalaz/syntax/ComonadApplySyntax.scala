@@ -6,6 +6,12 @@ trait ComonadApplyOps[F[_],A] extends Ops[F[A]] {
   implicit def F: ComonadApply[F]
   ////
 
+  def <@>[B](fab: F[A => B]): F[B] = F.<@>(self)(fab)
+
+  def @>[B](fb: F[B]): F[B] = F.@>(self)(fb)
+
+  def <@[B](fb: F[B]): F[A] = F.<@(self)(fb)
+
   ////
 }
 
