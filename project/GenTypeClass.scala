@@ -43,6 +43,7 @@ object TypeClass {
   lazy val cojoin = TypeClass("Cojoin", *->*, extendsList = Seq(functor))
   lazy val cobind = TypeClass("Cobind", *->*, extendsList = Seq(functor))
   lazy val comonad = TypeClass("Comonad", *->*, extendsList = Seq(cojoin, cobind))
+  lazy val comonadApply = TypeClass("ComonadApply", *->*, extendsList = Seq(comonad))
   lazy val cozip = TypeClass("Cozip", *->*)
 
   lazy val plus = TypeClass("Plus", *->*, extendsList = Seq())
@@ -97,6 +98,7 @@ object TypeClass {
     cojoin,
     cobind,
     comonad,
+    comonadApply,
     plus,
     applicativePlus,
     monadPlus,
