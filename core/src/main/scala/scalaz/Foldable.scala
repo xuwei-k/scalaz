@@ -6,7 +6,7 @@ package scalaz
  * values of that type.
  */
 ////
-trait Foldable[F[_]]  { self =>
+trait Foldable[F[_]] extends Length[F] with Each[F] with Index[F] { self =>
   ////
   /** Map each element of the structure to a [[scalaz.Monoid]], and combine the results. */
   def foldMap[A,B](fa: F[A])(f: A => B)(implicit F: Monoid[B]): B
@@ -94,6 +94,12 @@ trait Foldable[F[_]]  { self =>
     foldRight(fa, G.point(false))((a, b) => G.bind(p(a))(q => if(q) G.point(true) else b))
   /** Deforested alias for `toStream(fa).size`. */
   def count[A](fa: F[A]): Int = foldLeft(fa, 0)((b, _) => b + 1)
+
+  override def length[A](fa: F[A]): Int = count(fa)
+
+  override def index[A](fa: F[A], i: Int): Option[A] = toIndexedSeq(fa).lift(i)
+
+  override def each[A](fa: F[A])(f: A => Unit): Unit = foldLeft(fa, ())((_, a) => f(a))
   import Ordering.{GT, LT}
   import std.option.{some, none}
   /** The greatest element of `fa`, or None if `fa` is empty. */

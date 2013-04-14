@@ -11,9 +11,9 @@ trait ListInstances0 {
 }
 
 trait ListInstances extends ListInstances0 {
-  implicit val listInstance = new Traverse[List] with MonadPlus[List] with Each[List] with Index[List] with Length[List] with Zip[List] with Unzip[List] with IsEmpty[List] {
-    def each[A](fa: List[A])(f: A => Unit) = fa foreach f
-    def index[A](fa: List[A], i: Int) = {
+  implicit val listInstance = new Traverse[List] with MonadPlus[List] with Zip[List] with Unzip[List] with IsEmpty[List] {
+    override def each[A](fa: List[A])(f: A => Unit) = fa foreach f
+    override def index[A](fa: List[A], i: Int) = {
       var n = 0
       var k: Option[A] = None
       val it = fa.iterator
@@ -25,7 +25,7 @@ trait ListInstances extends ListInstances0 {
 
       k
     }
-    def length[A](fa: List[A]) = fa.length
+    override def length[A](fa: List[A]) = fa.length
     def point[A](a: => A) = scala.List(a)
     def bind[A, B](fa: List[A])(f: A => List[B]) = fa flatMap f
     def empty[A] = scala.List()

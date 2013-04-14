@@ -34,7 +34,7 @@ object TypeClass {
   lazy val unzip = TypeClass("Unzip", *->*)
   lazy val bind = TypeClass("Bind", *->*, extendsList = Seq(apply))
   lazy val monad = TypeClass("Monad", *->*, extendsList = Seq(applicative, bind))
-  lazy val foldable = TypeClass("Foldable", *->*)
+  lazy val foldable = TypeClass("Foldable", *->*, extendsList = Seq(length, each, index))
   lazy val foldable1 = TypeClass("Foldable1", *->*, extendsList = Seq(foldable))
   lazy val traverse = TypeClass("Traverse", *->*, extendsList = Seq(functor, foldable))
   lazy val traverse1 = TypeClass("Traverse1", *->*, extendsList = Seq(traverse, foldable1))
