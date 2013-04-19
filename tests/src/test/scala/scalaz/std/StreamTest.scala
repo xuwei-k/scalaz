@@ -11,6 +11,21 @@ class StreamTest extends Spec {
   checkAll(traverse.laws[Stream])
   checkAll(isEmpty.laws[Stream])
 
+  {
+    import org.scalacheck._
+    import scalaz.scalacheck.ScalaCheckBinding._
+
+    type ZipStream[A] = Stream[A] @@ Tags.Zip
+    implicit def zipStreamArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[ZipStream[A]] =
+      Functor[Arbitrary].map(implicitly[Arbitrary[Stream[A]]])(Tags.Zip)
+
+    implicit def zipStreamEqual[A](implicit A0: Equal[A]) = new Equal[ZipStream[A]] {
+      def equal(a1: ZipStream[A], a2: ZipStream[A]) = (a1 corresponds a2)(A0.equal)
+    }
+
+    checkAll(applicative.laws[ZipStream])
+  }
+
   import std.stream.streamSyntax._
   import syntax.foldable._
 
