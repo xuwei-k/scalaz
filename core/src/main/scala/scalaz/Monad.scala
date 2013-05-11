@@ -13,6 +13,11 @@ trait Monad[F[_]] extends Applicative[F] with Bind[F] { self =>
 
   override def map[A,B](fa: F[A])(f: A => B) = bind(fa)(a => point(f(a)))
 
+  def composedMonad[G[_]](implicit g: Swapable[G]): Monad[({type λ[α] = F[G[α]]})#λ] = new ComposedMonad[F, G]{
+    implicit val G: Swapable[G] = g
+    implicit val F: Monad[F] = self
+  }
+
   trait MonadLaw extends ApplicativeLaw {
     /** Lifted `point` is a no-op. */
     def rightIdentity[A](a: F[A])(implicit FA: Equal[F[A]]): Boolean = FA.equal(bind(a)(point(_: A)), a)
@@ -40,4 +45,17 @@ object Monad {
   ////
 
   ////
+}
+
+private[scalaz] trait ComposedMonad[F[_], G[_]] extends Monad[({type λ[α] = F[G[α]]})#λ]{
+  implicit val F: Monad[F]
+  implicit val G: Swapable[G]
+
+  override def point[A](a: => A) = F.point(G.point(a))
+  override def map[A, B](fa: F[G[A]])(f: A => B) = F.map(fa)(G.map(_)(f))
+  override def bind[A, B](fa: F[G[A]])(f: A => F[G[B]]) = join(map(fa)(f))
+  override def join[A](fgfga: F[G[F[G[A]]]]) =
+    F.map(
+      F.join(F.map(fgfga)(G.swap(_)))
+    )(G.join(_))
 }

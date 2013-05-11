@@ -164,6 +164,17 @@ object ScalazProperties {
     }
   }
 
+  object swapable {
+    def laws[M[_]](implicit a: Swapable[M], am: Arbitrary[M[Int]],
+                   af: Arbitrary[Int => M[Int]], ag: Arbitrary[M[Int => Int]], e: Equal[M[Int]]) = new Properties("swapable") {
+      include(monad.laws[M])
+
+      type Composed[α] = Option[M[α]]
+      implicit val optionMMonad: Monad[Composed] = Monad[Option].composedMonad[M]
+      include(monad.laws[Composed])
+    }
+  }
+
   object comonad {
     def cobindLeftIdentity[F[_], A](implicit F: Comonad[F], F0: Equal[F[A]], fa: Arbitrary[F[A]]) =
       forAll(F.comonadLaw.cobindLeftIdentity[A] _)

@@ -11,7 +11,11 @@ trait ListInstances0 {
 }
 
 trait ListInstances extends ListInstances0 {
-  implicit val listInstance = new Traverse[List] with MonadPlus[List] with Each[List] with Index[List] with Length[List] with Zip[List] with Unzip[List] with IsEmpty[List] {
+  implicit val listInstance = new Traverse[List] with MonadPlus[List] with Each[List] with Index[List] with Length[List] with Zip[List] with Unzip[List] with IsEmpty[List] with Swapable[List]{
+    def swap[A, GA](gfa: List[GA])(implicit G: Unapply[Monad, GA]): G.M[List[G.A]] = gfa match {
+      case Nil => G.TC.point(Nil)
+      case x :: xs => G.TC.bind(G(x))(y => G.TC.map(swap(xs))(ys => y :: ys))
+    }
     def each[A](fa: List[A])(f: A => Unit) = fa foreach f
     def index[A](fa: List[A], i: Int) = fa.lift.apply(i)
     def length[A](fa: List[A]) = fa.length

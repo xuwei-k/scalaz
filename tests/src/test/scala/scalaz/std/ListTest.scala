@@ -11,6 +11,7 @@ class ListTest extends Spec {
   checkAll(equal.laws[List[Int]])
   checkAll(monoid.laws[List[Int]])
   checkAll(monadPlus.strongLaws[List])
+  checkAll(swapable.laws[List])
   checkAll(traverse.laws[List])
   checkAll(isEmpty.laws[List])
   checkAll(order.laws[List[Int]])

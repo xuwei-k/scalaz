@@ -8,7 +8,13 @@ trait OptionInstances0 {
 }
 
 trait OptionInstances extends OptionInstances0 {
-  implicit val optionInstance = new Traverse[Option] with MonadPlus[Option] with Each[Option] with Index[Option] with Length[Option] with Cozip[Option] with Zip[Option] with Unzip[Option] with IsEmpty[Option] {
+  implicit val optionInstance = new Traverse[Option] with MonadPlus[Option] with Each[Option] with Index[Option] with Length[Option] with Cozip[Option] with Zip[Option] with Unzip[Option] with IsEmpty[Option] with Swapable[Option] {
+
+    def swap[A, GA](gfa: Option[GA])(implicit G: Unapply[Monad, GA]): G.M[Option[G.A]] = gfa match {
+      case Some(ga) => G.TC.map(G(ga))(Option(_))
+      case None => G.TC.point(None)
+    }
+
     def point[A](a: => A) = Some(a)
     def each[A](fa: Option[A])(f: A => Unit) = fa foreach f
     def index[A](fa: Option[A], n: Int) = if (n == 0) fa else None
