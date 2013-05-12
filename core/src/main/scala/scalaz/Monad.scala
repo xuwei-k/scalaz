@@ -13,6 +13,12 @@ trait Monad[F[_]] extends Applicative[F] with Bind[F] { self =>
 
   override def map[A,B](fa: F[A])(f: A => B) = bind(fa)(a => point(f(a)))
 
+  def compose[G[_]](implicit g: Monad[G], h: Traverse[G]): Monad[({type λ[α] = F[G[α]]})#λ] = new CompositionMonad[F, G]{
+    implicit val F = self
+    implicit val G = g
+    implicit val H = h
+  }
+
   trait MonadLaw extends ApplicativeLaw {
     /** Lifted `point` is a no-op. */
     def rightIdentity[A](a: F[A])(implicit FA: Equal[F[A]]): Boolean = FA.equal(bind(a)(point(_: A)), a)

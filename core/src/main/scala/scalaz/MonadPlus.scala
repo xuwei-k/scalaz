@@ -9,6 +9,12 @@ package scalaz
 trait MonadPlus[F[_]] extends Monad[F] with ApplicativePlus[F] { self =>
   ////
 
+  def compose[G[_]](implicit g: MonadPlus[G], h: Traverse[G]): MonadPlus[({type λ[α] = F[G[α]]})#λ] = new CompositionMonadPlus[F, G]{
+    implicit val F = self
+    implicit val G = g
+    implicit val H = h
+  }
+
   /** Remove `f`-failing `A`s in `fa`, by which we mean: in the
     * expression `filter(filter(fa)(f))(g)`, `g` will never be invoked
     * for any `a` where `f(a)` returns false.
