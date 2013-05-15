@@ -11,7 +11,13 @@ trait ListInstances0 {
 }
 
 trait ListInstances extends ListInstances0 {
-  implicit val listInstance = new Traverse[List] with MonadPlus[List] with Each[List] with Index[List] with Length[List] with Zip[List] with Unzip[List] with IsEmpty[List] {
+  implicit val listInstance = new Traverse[List] with MonadPlus[List] with Each[List] with Index[List] with Length[List] with Zip[List] with Unzip[List] with IsEmpty[List] with MonadFix[List]{
+    def fix[A](f: A => A): A = fix(f)
+    def mfix[A](f: A => List[A]): List[A] =
+      fix{a: A => f(a).head} match {
+        case Nil => Nil
+        case (h: A) :: t => h :: mfix{a: A => f(a).tail}
+      }
     def each[A](fa: List[A])(f: A => Unit) = fa foreach f
     def index[A](fa: List[A], i: Int) = fa.lift.apply(i)
     def length[A](fa: List[A]) = fa.length

@@ -50,6 +50,7 @@ object TypeClass {
 
   lazy val applicativePlus = TypeClass("ApplicativePlus", *->*, extendsList = Seq(applicative, plusEmpty))
   lazy val monadPlus = TypeClass("MonadPlus", *->*, extendsList = Seq(monad, applicativePlus))
+  lazy val monadFix = TypeClass("MonadFix", *->*, extendsList = Seq(monad))
 
   lazy val bifunctor = TypeClass("Bifunctor", *^*->*)
   lazy val bifoldable = TypeClass("Bifoldable", *^*->*)
@@ -98,6 +99,7 @@ object TypeClass {
     plus,
     applicativePlus,
     monadPlus,
+    monadFix,
     foldable,
     foldable1,
     traverse,

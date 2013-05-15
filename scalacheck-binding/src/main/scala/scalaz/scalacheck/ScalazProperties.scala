@@ -287,6 +287,25 @@ object ScalazProperties {
     }
   }
 
+  object monadFix{
+    def purity[F[_], X](implicit f: MonadFix[F], af: Arbitrary[X => X], e: Equal[F[X]]) =
+      forAll(f.monadFixLaw.purity[X] _)
+    def tightening[F[_], X, Y](implicit f: MonadFix[F], afx: Arbitrary[F[X]], afyx: Arbitrary[(Y, X) => F[Y]], e: Equal[F[Y]]) =
+      forAll(f.monadFixLaw.tightening[X, Y] _)
+    def sliding[F[_], X, Y](implicit f: MonadFix[F], axfy: Arbitrary[X => F[Y]], ayx: Arbitrary[Y => X], e: Equal[F[X]]) =
+      forAll(f.monadFixLaw.sliding[X, Y] _)
+    def nesting[F[_], X](implicit f: MonadFix[F], ax: Arbitrary[(X, X) => F[X]], e: Equal[F[X]]) =
+      forAll(f.monadFixLaw.nesting[X] _)
+
+    def laws[F[_]](implicit F: MonadFix[F], a0: Arbitrary[F[Int => Int]], a1: Arbitrary[F[Int]], e: Equal[F[Int]]) = new Properties("monadFix"){
+      include(monad.laws[F])
+      property("purity") = purity[F, Int]
+      property("tightening") = tightening[F, Int, Int]
+      property("sliding") = sliding[F, Int, Int]
+      property("nesting") = nesting[F, Int]
+    }
+  }
+
   object contravariant {
     def identity[F[_], X](implicit F: Contravariant[F], afx: Arbitrary[F[X]], ef: Equal[F[X]]) =
       forAll(F.contravariantLaw.identity[X] _)

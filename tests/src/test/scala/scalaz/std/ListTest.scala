@@ -7,6 +7,10 @@ import scalaz.scalacheck.ScalazArbitrary.NonEmptyListArbitrary
 import Id._
 import syntax.std._
 
+class ListMonadFixTest extends Spec{
+  checkAll(monadFix.laws[List])
+}
+
 class ListTest extends Spec {
   checkAll(equal.laws[List[Int]])
   checkAll(monoid.laws[List[Int]])
