@@ -4,6 +4,10 @@ package std
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 
+class StreamMonadFixTest extends Spec{
+  checkAll(monadFix.laws[Stream])
+}
+
 class StreamTest extends Spec {
   checkAll(equal.laws[Stream[Int]])
   checkAll(monoid.laws[Stream[Int]])

@@ -288,8 +288,13 @@ object ScalazProperties {
   }
 
   object monadFix{
-    def purity[F[_], X](implicit f: MonadFix[F], af: Arbitrary[X => X], e: Equal[F[X]]) =
+    import ScalaCheckBinding._
+    import syntax.functor._
+
+    def purity[F[_], X](implicit f: MonadFix[F], af: Arbitrary[X => X], e: Equal[F[X]]) = {
+      implicit val a = af.map(_.byName)
       forAll(f.monadFixLaw.purity[X] _)
+    }
     def tightening[F[_], X, Y](implicit f: MonadFix[F], afx: Arbitrary[F[X]], afyx: Arbitrary[(Y, X) => F[Y]], e: Equal[F[Y]]) =
       forAll(f.monadFixLaw.tightening[X, Y] _)
     def sliding[F[_], X, Y](implicit f: MonadFix[F], axfy: Arbitrary[X => F[Y]], ayx: Arbitrary[Y => X], e: Equal[F[X]]) =

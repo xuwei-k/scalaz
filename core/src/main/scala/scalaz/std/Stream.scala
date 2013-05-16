@@ -4,12 +4,25 @@ package std
 import annotation.tailrec
 
 trait StreamInstances {
-  implicit val streamInstance: Traverse[Stream] with MonadPlus[Stream] with Each[Stream] with Index[Stream] with Length[Stream] with Zip[Stream] with Unzip[Stream] with IsEmpty[Stream] = new Traverse[Stream] with MonadPlus[Stream] with Each[Stream] with Index[Stream] with Length[Stream] with Zip[Stream] with Unzip[Stream] with IsEmpty[Stream] {
+  implicit val streamInstance = new Traverse[Stream] with MonadPlus[Stream] with Each[Stream] with Index[Stream] with Length[Stream] with Zip[Stream] with Unzip[Stream] with IsEmpty[Stream] with MonadFix[Stream]{
     def traverseImpl[G[_], A, B](fa: Stream[A])(f: A => G[B])(implicit G: Applicative[G]): G[Stream[B]] = {
       val seed: G[Stream[B]] = G.point(Stream[B]())
 
       foldRight(fa, seed) {
         (x, ys) => G.apply2(f(x), ys)((b, bs) => b #:: bs)
+      }
+    }
+
+    override def fix[A](f: (=> A) => A): A = fix(f)
+    override def mfix[A](f: (=> A) => Stream[A]): Stream[A] = {
+      import syntax.std.function1._
+
+      val f1 = {a: A => f(a).head}.byName
+      val f2 = {a: A => f(a).tail}.byName
+
+      fix(f1) match {
+        case Stream.Empty => Stream.Empty 
+        case (h: A) #:: t => h #:: mfix(f2)
       }
     }
 

@@ -8,18 +8,17 @@ package scalaz
 trait MonadFix[F[_]] extends Monad[F] { self =>
   ////
 
-  def mfix[A](f: A => F[A]): F[A]
+  def mfix[A](f: (=> A) => F[A]): F[A]
 
   // derived functions
 
-  def fix[A](f: A => A): A
-
+  def fix[A](f: (=> A) => A): A
 
   trait MonadFixLaw extends MonadLaw {
     private[this] def p[A]: A => F[A] = x => point(x) 
 
     // mfix (return . h) = return (fix h)
-    def purity[B](f: B => B)(implicit E: Equal[F[B]]): Boolean =
+    def purity[B](f: (=> B) => B)(implicit E: Equal[F[B]]): Boolean =
       E.equal(mfix(p compose f), point(fix(f)))
 
     // mfix (\x -> a >>= \y -> f x y)    =     a >>= \y -> mfix (\x -> f x y)
@@ -30,11 +29,14 @@ trait MonadFix[F[_]] extends Monad[F] { self =>
       )
 
     // mfix (liftM h . f)   =   liftM h (mfix (f . h))
-    def sliding[A, B](f: A => F[B], h: B => A)(implicit E: Equal[F[A]]): Boolean =
+    def sliding[A, B](f: A => F[B], h: B => A)(implicit E: Equal[F[A]]): Boolean = {
+      import syntax.std.function1._
+
       E.equal(
-        mfix(((lift(h)) compose f)),
-        lift(h)(mfix(f compose h))
+        mfix{x => lift(h){f(x)} },
+        lift(h)(mfix(f compose h.byName))
       )
+    }
 
     // mfix (\x -> mfix (\y -> f x y)) = mfix (\x -> f x x)
     def nesting[A](f: (A, A) => F[A])(implicit E: Equal[F[A]]): Boolean =
