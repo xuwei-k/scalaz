@@ -12,14 +12,13 @@ trait ListInstances0 {
 
 trait ListInstances extends ListInstances0 {
   implicit val listInstance = new Traverse[List] with MonadPlus[List] with Each[List] with Index[List] with Length[List] with Zip[List] with Unzip[List] with IsEmpty[List] with MonadFix[List]{
-    override def fix[A](f: (=> A) => A): A = fix(f)
     override def mfix[A](f: (=> A) => List[A]): List[A] = {
       import syntax.std.function1._
 
-      val f1 = {a: A => f(a).head}.byName
+      val f1 = {a: A => f(a).head}.need
       val f2 = {a: A => f(a).tail}.byName
 
-      fix(f1) match {
+      fix(f1).value match {
         case Nil => Nil
         case (h: A) :: t => h :: mfix(f2)
       }

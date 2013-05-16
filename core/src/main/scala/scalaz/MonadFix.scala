@@ -12,14 +12,16 @@ trait MonadFix[F[_]] extends Monad[F] { self =>
 
   // derived functions
 
-  def fix[A](f: (=> A) => A): A
+  final def fix[A](f: (=> A) => Need[A]): Need[A] = { println("fix"); fix(f)}
 
   trait MonadFixLaw extends MonadLaw {
+    import syntax.std.function1._
     private[this] def p[A]: A => F[A] = x => point(x) 
 
     // mfix (return . h) = return (fix h)
-    def purity[B](f: (=> B) => B)(implicit E: Equal[F[B]]): Boolean =
-      E.equal(mfix(p compose f), point(fix(f)))
+    def purity[B](f: B => B)(implicit E: Equal[F[B]]): Boolean = {
+      E.equal(mfix(p compose f.byName), point(fix(f.need).value))
+    }
 
     // mfix (\x -> a >>= \y -> f x y)    =     a >>= \y -> mfix (\x -> f x y)
     def tightening[A, B](a: F[A], f: (B, A) => F[B])(implicit E: Equal[F[B]]): Boolean =
@@ -30,7 +32,6 @@ trait MonadFix[F[_]] extends Monad[F] { self =>
 
     // mfix (liftM h . f)   =   liftM h (mfix (f . h))
     def sliding[A, B](f: A => F[B], h: B => A)(implicit E: Equal[F[A]]): Boolean = {
-      import syntax.std.function1._
 
       E.equal(
         mfix{x => lift(h){f(x)} },

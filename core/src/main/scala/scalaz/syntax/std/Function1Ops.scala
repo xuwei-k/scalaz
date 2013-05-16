@@ -21,6 +21,8 @@ trait Function1Ops[T, R] extends Ops[T => R] {
 
   def byName: (=> T) => R = t => self(t)
 
+  def need: (=> T) => Need[R] = t => Need(self(t))
+
   def endo(implicit ev: R =:= T): Endo[T] =
     Endo.endo(t => ev(self(t)))
 
