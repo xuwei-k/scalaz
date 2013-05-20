@@ -19,6 +19,7 @@ class IndexedSeqTest extends Spec {
   checkAll(equal.laws[IndexedSeq[Int]])
   checkAll(monoid.laws[IndexedSeq[Int]])
   checkAll(monadPlus.strongLaws[IndexedSeq])
+  checkAll(cojoin.laws[IndexedSeq])
   checkAll(traverse.laws[IndexedSeq])
   checkAll(isEmpty.laws[IndexedSeq])
 

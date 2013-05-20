@@ -46,6 +46,8 @@ trait Syntaxes {
 
   object cojoin extends ToCojoinOps
 
+  object cobind extends ToCobindOps
+
   object comonad extends ToComonadOps
 
   object cozip extends ToCozipOps

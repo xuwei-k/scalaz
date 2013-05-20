@@ -8,7 +8,11 @@ trait OptionInstances0 {
 }
 
 trait OptionInstances extends OptionInstances0 {
-  implicit val optionInstance = new Traverse[Option] with MonadPlus[Option] with Each[Option] with Index[Option] with Length[Option] with Cozip[Option] with Zip[Option] with Unzip[Option] with IsEmpty[Option] {
+  implicit val optionInstance = new Traverse[Option] with MonadPlus[Option] with Each[Option] with Index[Option] with Length[Option] with Cozip[Option] with Zip[Option] with Unzip[Option] with IsEmpty[Option] with Cojoin[Option] with Cobind.FromCojoin[Option]{
+    def cojoin[A](a: Option[A]) = a match {
+      case None => None
+      case o @ Some(_) => Some(o)
+    }
     def point[A](a: => A) = Some(a)
     def each[A](fa: Option[A])(f: A => Unit) = fa foreach f
     def index[A](fa: Option[A], n: Int) = if (n == 0) fa else None
