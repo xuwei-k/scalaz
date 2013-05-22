@@ -9,6 +9,7 @@ class PartialFunctionTest extends Spec {
   private type PF[-A, +B] = PartialFunction[A, B]
 
   private val A = Split[PartialFunction]
+  private val B = Category[PartialFunction]
 
   private val pfnegonly: PF[Int, Int] = {case a if a < 0 => 0 - a}
   private val pfposonly: PF[Int, Int] = {case a if a >= 0 => 0 - a}
@@ -16,8 +17,8 @@ class PartialFunctionTest extends Spec {
   "split equivalence" ! prop {
     (num: Int, num2: Int) =>
       val nums = (num, num2)
-      A.split(A.id[Int], A.id[Int]).isDefinedAt(nums) must be_===(true)
-      A.split(A.id[Int], A.id[Int])(nums) must be_===(nums)
+      A.split(B.id[Int], B.id[Int]).isDefinedAt(nums) must be_===(true)
+      A.split(B.id[Int], B.id[Int])(nums) must be_===(nums)
       val definedness = for {
         l <- List(pfnegonly, pfposonly)
         r <- List(pfnegonly, pfposonly)
