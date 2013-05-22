@@ -6,6 +6,7 @@ import scalaz.scalacheck.ScalazProperties._
 import scala.math.{Ordering => SOrdering}
 
 class MapTest extends Spec {
+  checkAll(bind.laws[({type F[V] = Map[Int,V]})#F])
   checkAll(traverse.laws[({type F[V] = Map[Int,V]})#F])
   checkAll(isEmpty.laws[({type F[V] = Map[Int,V]})#F])
   checkAll(monoid.laws[Map[Int,String]])

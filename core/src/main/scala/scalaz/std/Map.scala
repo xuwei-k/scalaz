@@ -30,7 +30,10 @@ trait MapInstances extends MapInstances0 {
   /** Covariant over the value parameter, where `plus` applies the
     * `Last` semigroup to values.
     */
-  implicit def mapInstance[K] = new Traverse[({type F[V] = Map[K,V]})#F] with IsEmpty[({type F[V] = Map[K,V]})#F] {
+  implicit def mapInstance[K] = new Bind[({type F[V] = Map[K,V]})#F] with Traverse[({type F[V] = Map[K,V]})#F] with IsEmpty[({type F[V] = Map[K,V]})#F] {
+    override def map[A, B](fa: Map[K, A])(f: A => B) = fa mapValues f
+    def bind[A, B](fa: Map[K, A])(f: A => Map[K, B]): Map[K, B] =
+      fa.collect{case (k, v) if f(v).isDefinedAt(k) => k -> f(v)(k) }
     def empty[V] = Map.empty[K, V]
     def plus[V](a: Map[K, V], b: => Map[K, V]) = a ++ b
     def isEmpty[V](fa: Map[K, V]) = fa.isEmpty
