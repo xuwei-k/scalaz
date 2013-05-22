@@ -144,7 +144,7 @@ trait NullResultFunctions {
   }
 }
 
-trait NullResultInstances {
+trait NullResultInstances2 {
   implicit def NullResultSemigroup[A, B](implicit M0: Semigroup[B]): Semigroup[NullResult[A, B]] =
     new NullResultSemigroup[A, B] {
       implicit val M = M0
@@ -163,7 +163,7 @@ trait NullResultInstances {
     }
 }
 
-trait NullResultInstances0 extends NullResultInstances {
+trait NullResultInstances1 extends NullResultInstances2 {
   implicit def NullResultMonoid[A, B](implicit M0: Monoid[B]): Monoid[NullResult[A, B]] =
     new NullResultMonoid[A, B] {
       implicit val M = M0
@@ -178,7 +178,7 @@ trait NullResultInstances0 extends NullResultInstances {
     }
 }
 
-trait NullResultInstances1 extends NullResultInstances0 {
+trait NullResultInstances0 extends NullResultInstances1 {
   implicit def NullResultApplicative[X]: Applicative[({type λ[α] = NullResult[X, α]})#λ] =
     new NullResultApplicative[X] {
     }
@@ -188,7 +188,7 @@ trait NullResultInstances1 extends NullResultInstances0 {
     }
 }
 
-trait NullResultInstances2 extends NullResultInstances1 {
+trait NullResultInstances extends NullResultInstances0 {
   implicit def NullResultMonad[X]: Monad[({type λ[α] = NullResult[X, α]})#λ] =
     new NullResultMonad[X] {
     }
