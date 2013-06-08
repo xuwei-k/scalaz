@@ -187,7 +187,20 @@ object ScalazProperties {
 
     def laws[F[_]](implicit a: Cojoin[F], am: Arbitrary[F[Int]], e: Equal[F[Int]]) = new Properties("cojoin") {
       include(functor.laws[F])
-      property("cobind associative") = cobindAssociative[F, Int, Int, Int, Int]
+
+      case class Foo(i:Int)
+
+      implicit val fooEqual: Equal[Foo] = Equal.equalBy(_.i)
+
+      import scalaz.scalacheck.ScalaCheckBinding._
+
+      implicit val fooArb = Functor[Arbitrary].map(implicitly[Arbitrary[Int]])(Foo(_))
+
+      implicit def fooFunctionArb: Arbitrary[Stream[Foo] => Foo] = Arbitrary(
+        {(a: Stream[Foo]) => Foo(a.size)}
+      )
+
+      property("cobind associative") = cobindAssociative[Stream, Foo, Foo, Foo, Foo]
     }
   }
 
