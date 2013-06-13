@@ -6,6 +6,11 @@ trait MonadZeroOps[F[_],A] extends Ops[F[A]] {
   implicit def F: MonadZero[F]
   ////
 
+  def filter(f: A => Boolean) =
+    F.filter(self)(f)
+
+  def withFilter(f: A => Boolean) =
+    filter(f)
   ////
 }
 

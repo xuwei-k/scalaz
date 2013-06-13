@@ -7,17 +7,10 @@ trait MonadPlusOps[F[_],A] extends Ops[F[A]] {
   ////
   import Liskov._
 
-  def filter(f: A => Boolean) =
-    F.filter(self)(f)
-  
-  def withFilter(f: A => Boolean) =
-    filter(f)
-
   def unite[T[_], B](implicit ev: A <~< T[B], T: Foldable[T]): F[B] = {
     val ftb: F[T[B]] = Liskov.co[F, A, T[B]](ev)(self)
     F.unite[T, B](ftb)
   }
-
   ////
 }
 
