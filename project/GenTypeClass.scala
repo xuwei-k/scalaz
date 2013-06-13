@@ -35,6 +35,7 @@ object TypeClass {
   lazy val unzip = TypeClass("Unzip", *->*)
   lazy val bind = TypeClass("Bind", *->*, extendsList = Seq(apply))
   lazy val monad = TypeClass("Monad", *->*, extendsList = Seq(applicative, bind))
+  lazy val monadZero = TypeClass("MonadZero", *->*, extendsList = Seq(monad))
   lazy val foldable = TypeClass("Foldable", *->*)
   lazy val foldable1 = TypeClass("Foldable1", *->*, extendsList = Seq(foldable))
   lazy val traverse = TypeClass("Traverse", *->*, extendsList = Seq(functor, foldable))
@@ -51,7 +52,7 @@ object TypeClass {
   lazy val isEmpty = TypeClass("IsEmpty", *->*, extendsList = Seq(plusEmpty))
 
   lazy val applicativePlus = TypeClass("ApplicativePlus", *->*, extendsList = Seq(applicative, plusEmpty))
-  lazy val monadPlus = TypeClass("MonadPlus", *->*, extendsList = Seq(monad, applicativePlus))
+  lazy val monadPlus = TypeClass("MonadPlus", *->*, extendsList = Seq(monadZero, applicativePlus))
 
   lazy val bifunctor = TypeClass("Bifunctor", *^*->*)
   lazy val bifoldable = TypeClass("Bifoldable", *^*->*)
@@ -95,6 +96,7 @@ object TypeClass {
     cozip,
     bind,
     monad,
+    monadZero,
     cojoin,
     cobind,
     comonad,
