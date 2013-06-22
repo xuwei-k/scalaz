@@ -55,7 +55,7 @@ trait IdTInstances0 extends IdTInstances1 {
 }
 
 trait IdTInstances extends IdTInstances0 {
-  implicit def idTHoist: Hoist[IdT] = IdTHoist
+  implicit def idTHoist: Hoist[IdT] with FunctorTrans[IdT] = IdTHoist
 
   implicit def idTTraverse[F[_]](implicit F0: Traverse[F]): Traverse[({type λ[α] = IdT[F, α]})#λ] = new IdTTraverse[F] {
     implicit def F: Traverse[F] = F0
@@ -107,8 +107,8 @@ private[scalaz] trait IdTTraverse[F[_]] extends Traverse[({type λ[α] = IdT[F, 
   def traverseImpl[G[_] : Applicative, A, B](fa: IdT[F, A])(f: A => G[B]): G[IdT[F, B]] = fa traverse f
 }
 
-private[scalaz] object IdTHoist extends Hoist[IdT] {
-  def liftM[G[_], A](a: G[A])(implicit G: Monad[G]): IdT[G, A] = new IdT[G, A](a)
+private[scalaz] object IdTHoist extends Hoist[IdT] with FunctorTrans[IdT] {
+  def liftF[G[_], A](a: G[A])(implicit G: Functor[G]): IdT[G, A] = new IdT[G, A](a)
 
   def hoist[M[_]: Monad, N[_]](f: M ~> N) = new (({type f[x] = IdT[M, x]})#f ~> ({type f[x] = IdT[N, x]})#f) {
     def apply[A](fa: IdT[M, A]): IdT[N, A] = new IdT[N, A](

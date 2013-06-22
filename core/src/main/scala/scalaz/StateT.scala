@@ -122,7 +122,7 @@ trait StateTInstances1 extends IndexedStateTInstances {
 }
 
 trait StateTInstances0 extends StateTInstances1 {
-  implicit def StateMonadTrans[S]: Hoist[({type f[g[_], a] = StateT[g, S, a]})#f] = new StateTHoist[S] {}
+  implicit def StateMonadTrans[S]: Hoist[({type f[g[_], a] = StateT[g, S, a]})#f] with FunctorTrans[({type f[g[_], a] = StateT[g, S, a]})#f] = new StateTHoist[S] {}
 }
 
 trait StateTInstances extends StateTInstances0 {
@@ -190,13 +190,13 @@ private[scalaz] trait StateTMonadState[S, F[_]] extends MonadState[({type f[s, a
   override def gets[A](f: S => A): StateT[F, S, A] = StateT(s => F.point((s, f(s))))
 }
 
-private[scalaz] trait StateTHoist[S] extends Hoist[({type f[g[_], a] = StateT[g, S, a]})#f] {
+private[scalaz] trait StateTHoist[S] extends Hoist[({type f[g[_], a] = StateT[g, S, a]})#f] with FunctorTrans[({type f[g[_], a] = StateT[g, S, a]})#f]{
 
   type StateTF[G[_], S] = {
     type f[x] = StateT[G, S, x]
   }
 
-  def liftM[G[_], A](ga: G[A])(implicit G: Monad[G]): StateT[G, S, A] =
+  def liftF[G[_], A](ga: G[A])(implicit G: Functor[G]): StateT[G, S, A] =
     StateT(s => G.map(ga)(a => (s, a)))
 
   def hoist[M[_]: Monad, N[_]](f: M ~> N) = new (StateTF[M, S]#f ~> StateTF[N, S]#f) {

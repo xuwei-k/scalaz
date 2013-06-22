@@ -89,7 +89,7 @@ trait ListTInstances extends ListTInstances1 {
   implicit def listTEqual[F[_], A](implicit E: Equal[F[List[A]]], F: Monad[F]): Equal[ListT[F, A]] = E.contramap((_: ListT[F, A]).toList)
   implicit def listTShow[F[_], A](implicit E: Show[F[List[A]]], F: Monad[F]): Show[ListT[F, A]] = Contravariant[Show].contramap(E)((_: ListT[F, A]).toList)
 
-  implicit def listTHoist: Hoist[ListT] = new ListTHoist {}
+  implicit def listTHoist: Hoist[ListT] with FunctorTrans[ListT] = new ListTHoist {}
 }
 
 object ListT extends ListTInstances {
@@ -130,12 +130,12 @@ private[scalaz] trait ListTMonadPlus[F[_]] extends MonadPlus[({type λ[α] = Lis
   def plus[A](a: ListT[F, A], b: => ListT[F, A]): ListT[F, A] = a ++ b
 }
 
-private[scalaz] trait ListTHoist extends Hoist[ListT] {
+private[scalaz] trait ListTHoist extends Hoist[ListT] with FunctorTrans[ListT] {
   import ListT._
   
   implicit def apply[G[_] : Monad]: Monad[({type λ[α] = ListT[G, α]})#λ] = listTMonadPlus[G]
   
-  def liftM[G[_], A](a: G[A])(implicit G: Monad[G]): ListT[G, A] = fromList(G.map(a)(entry => entry :: Nil))
+  def liftF[G[_], A](a: G[A])(implicit G: Functor[G]): ListT[G, A] = fromList(G.map(a)(_ :: Nil))
   
   def hoist[M[_], N[_]](f: M ~> N)(implicit M: Monad[M]): ({type f[x] = ListT[M, x]})#f ~> ({type f[x] = ListT[N, x]})#f =
     new (({type f[x] = ListT[M, x]})#f ~> ({type f[x] = ListT[N, x]})#f) {

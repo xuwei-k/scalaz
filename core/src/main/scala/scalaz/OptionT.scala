@@ -98,7 +98,7 @@ trait OptionTInstances0 extends OptionTInstances1 {
 }
 
 trait OptionTInstances extends OptionTInstances0 {
-  implicit def optionTMonadTrans: Hoist[OptionT] = new OptionTHoist {}
+  implicit def optionTMonadTrans: Hoist[OptionT] with FunctorTrans[OptionT] = new OptionTHoist {}
 
   implicit def optionTTraverse[F[_]](implicit F0: Traverse[F]): Traverse[({type λ[α] = OptionT[F, α]})#λ] = new OptionTTraverse[F] {
     implicit def F: Traverse[F] = F0
@@ -164,8 +164,8 @@ private[scalaz] trait OptionTTraverse[F[_]] extends Traverse[({type λ[α] = Opt
   def traverseImpl[G[_] : Applicative, A, B](fa: OptionT[F, A])(f: A => G[B]): G[OptionT[F, B]] = fa traverse f
 }
 
-private[scalaz] trait OptionTHoist extends Hoist[OptionT] {
-  def liftM[G[_], A](a: G[A])(implicit G: Monad[G]): OptionT[G, A] =
+private[scalaz] trait OptionTHoist extends Hoist[OptionT] with FunctorTrans[OptionT] {
+  def liftF[G[_], A](a: G[A])(implicit G: Functor[G]): OptionT[G, A] =
     OptionT[G, A](G.map[A, Option[A]](a)((a: A) => some(a)))
 
   def hoist[M[_]: Monad, N[_]](f: M ~> N) = new (({type f[x] = OptionT[M, x]})#f ~> ({type f[x] = OptionT[N, x]})#f) {

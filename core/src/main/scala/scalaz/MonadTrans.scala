@@ -17,6 +17,26 @@ object MonadTrans {
   def apply[F[_[_], _]](implicit F: MonadTrans[F]): MonadTrans[F] = F
 }
 
+trait BindTrans[F[_[_], _]] extends MonadTrans[F] {
+  def liftB[G[_]: Bind, A](a: G[A]): F[G, A]
+
+  override def liftM[G[_]: Monad, A](a: G[A]) = liftB(a)
+}
+
+object BindTrans {
+  def apply[F[_[_], _]](implicit F: BindTrans[F]): BindTrans[F] = F
+}
+
+trait FunctorTrans[F[_[_], _]] extends BindTrans[F] {
+  def liftF[G[_]: Functor, A](a: G[A]): F[G, A]
+
+  override def liftB[G[_]: Bind, A](a: G[A]) = liftF(a)
+}
+
+object FunctorTrans {
+  def apply[F[_[_], _]](implicit F: FunctorTrans[F]): FunctorTrans[F] = F
+}
+
 trait Hoist[F[_[_], _]] extends MonadTrans[F] {
   def hoist[M[_]: Monad, N[_]](f: M ~> N): ({type f[x] = F[M, x]})#f ~> ({type f[x] = F[N, x]})#f
 }

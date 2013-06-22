@@ -90,7 +90,7 @@ trait LazyOptionTInstances0 extends LazyOptionTInstances1 {
 }
 
 trait LazyOptionTInstances extends LazyOptionTInstances0 {
-  implicit def lazyOptionTMonadTrans: Hoist[LazyOptionT] = new LazyOptionTHoist {}
+  implicit def lazyOptionTMonadTrans: Hoist[LazyOptionT] with FunctorTrans[LazyOptionT] = new LazyOptionTHoist {}
 
   implicit def lazyOptionTMonad[F[_]](implicit F0: Monad[F]): Monad[({type λ[α] = LazyOptionT[F, α]})#λ] = new LazyOptionTMonad[F] {
     implicit def F: Monad[F] = F0
@@ -141,8 +141,8 @@ private[scalaz] trait LazyOptionTMonad[F[_]] extends Monad[({type λ[α] = LazyO
   def bind[A, B](fa: LazyOptionT[F, A])(f: A => LazyOptionT[F, B]): LazyOptionT[F, B] = fa flatMap (a => f(a))
 }
 
-private[scalaz] trait LazyOptionTHoist extends Hoist[LazyOptionT] {
-  def liftM[G[_], A](a: G[A])(implicit G: Monad[G]): LazyOptionT[G, A] =
+private[scalaz] trait LazyOptionTHoist extends Hoist[LazyOptionT] with FunctorTrans[LazyOptionT] {
+  def liftF[G[_], A](a: G[A])(implicit G: Functor[G]): LazyOptionT[G, A] =
     LazyOptionT[G, A](G.map[A, LazyOption[A]](a)((a: A) => LazyOption.lazySome(a)))
 
   def hoist[M[_]: Monad, N[_]](f: M ~> N) = new (({type f[x] = LazyOptionT[M, x]})#f ~> ({type f[x] = LazyOptionT[N, x]})#f) {
