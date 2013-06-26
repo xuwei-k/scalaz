@@ -29,6 +29,10 @@ trait MonadPlus[F[_]] extends Monad[F] with ApplicativePlus[F] { self =>
     def leftZero[A](f: A => F[A])(implicit FA: Equal[F[A]]): Boolean = {
       FA.equal(bind(empty[A])(f), empty[A])
     }
+
+    def leftDistribution[A, B](fa1: F[A], fa2: F[A], f: A => F[B])(implicit FA: Equal[F[B]]): Boolean = {
+      FA.equal(bind(plus(fa1, fa2))(f), plus(bind(fa1)(f), bind(fa2)(f)))
+    }
   }
   trait StrongMonadPlusLaw extends MonadPlusLaw {
     /** `empty` short-circuits throughout its `join` tree. */
