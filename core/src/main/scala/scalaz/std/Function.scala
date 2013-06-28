@@ -69,7 +69,7 @@ trait FunctionInstances extends FunctionInstances0 {
 
   }
 
-  implicit def function1Covariant[T]: Monad[({type l[a] = (T => a)})#l] with Zip[({type l[a] = (T => a)})#l] with Unzip[({type l[a] = (T => a)})#l] with Distributive[({type l[a] = (T => a)})#l] = new Monad[({type l[a] = (T => a)})#l] with Zip[({type l[a] = (T => a)})#l] with Unzip[({type l[a] = (T => a)})#l] with Distributive[({type l[a] = (T => a)})#l] {
+  implicit def function1Covariant[T]: Monad[({type l[a] = (T => a)})#l] with ZipUnzip[({type l[a] = (T => a)})#l] with Distributive[({type l[a] = (T => a)})#l] = new Monad[({type l[a] = (T => a)})#l] with ZipUnzip[({type l[a] = (T => a)})#l] with Distributive[({type l[a] = (T => a)})#l] {
     def point[A](a: => A) = _ => a
 
     def bind[A, B](fa: T => A)(f: A => T => B) = (t: T) => f(fa(t))(t)

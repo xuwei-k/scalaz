@@ -16,6 +16,7 @@ class OptionTest extends Spec {
   checkAll("Option @@ Max", order.laws[MaxOption[Int]])
 
   checkAll("Option", monoid.laws[Option[Int]])
+  checkAll("Option", zipUnzip.laws[Option])
   checkAll("Option", monadPlus.strongLaws[Option])
   checkAll("Option", traverse.laws[Option])
   checkAll("Option", isEmpty.laws[Option])

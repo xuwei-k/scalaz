@@ -8,6 +8,7 @@ class EphemeralStreamTest extends Spec {
 
   checkAll(equal.laws[EphemeralStream[Int]])
   checkAll(monadPlus.laws[EphemeralStream])
+//  checkAll(zipUnzip.laws[EphemeralStream]) TODO error?
   checkAll(traverse.laws[EphemeralStream])
 
 }

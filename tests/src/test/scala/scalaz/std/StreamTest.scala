@@ -9,6 +9,7 @@ class StreamTest extends Spec {
   checkAll(monoid.laws[Stream[Int]])
   checkAll(monadPlus.strongLaws[Stream])
   checkAll(traverse.laws[Stream])
+  checkAll(zipUnzip.laws[Stream])
   checkAll(cojoin.laws[Stream])
   checkAll(isEmpty.laws[Stream])
 

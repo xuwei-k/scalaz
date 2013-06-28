@@ -6,6 +6,7 @@ import std.AllInstances._
 
 class NonEmptyListTest extends Spec {
   checkAll("NonEmptyList", monad.laws[NonEmptyList])
+  checkAll("NonEmptyList", zipUnzip.laws[NonEmptyList])
   checkAll("NonEmptyList", plus.laws[NonEmptyList])
   checkAll("NonEmptyList", semigroup.laws[NonEmptyList[Int]])
   checkAll("NonEmptyList", equal.laws[NonEmptyList[Int]])

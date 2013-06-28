@@ -40,6 +40,12 @@ class FunctionTest extends Spec {
 
   checkAll("Function1", contravariant.laws[({type λ[α] = (α) => B})#λ])
 
+  {
+    implicit def EqualFunction1Unit = Equal.equalBy[Int => Unit, Boolean](_ => true)
+    implicit def EqualFunction1Tuple2 = Equal.equalBy[Int => (Int, Int), (Int, Int)](_.apply(1))
+    checkAll("Function1", zipUnzip.laws[({type λ[α] = B => α})#λ])
+  }
+
   checkAll("Function1", category.laws[Function1])
 
   checkAll("Function1", comonad.laws[({type λ[α]=(Int => α)})#λ])

@@ -6,6 +6,7 @@ import Id._
 
 class IdTest extends Spec {
   checkAll(monad.laws[Id])
+//  checkAll(zipUnzip.laws[Id]) // TODO compile error?
   checkAll(traverse.laws[Id])
   checkAll(comonad.laws[Id])
 }

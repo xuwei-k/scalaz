@@ -95,6 +95,30 @@ object ScalazProperties {
     }
   }
 
+  object zipFunctor {
+    def naturality[F[_], A, B, C, D](implicit F: ZipFunctor[F], fa: Arbitrary[F[A]], fb: Arbitrary[F[B]],
+                               f: Arbitrary[A => C], g: Arbitrary[B => D], E: Equal[F[(C, D)]]) =
+      forAll(F.zipFunctorLaw.naturality[A, B, C, D] _)
+
+    def laws[F[_]](implicit F: ZipFunctor[F], fa: Arbitrary[F[Int]], f: Arbitrary[Int => Int],
+                   E0: Equal[F[Int]], E1: Equal[F[Unit]], E2: Equal[F[(Int, Int)]]) = new Properties("zipFunctor") {
+      include(functor.laws[F])
+      property("naturality") = naturality[F, Int, Int, Int, Int]
+    }
+  }
+
+  object zipUnzip {
+    def informationPreservation[F[_], A, B](implicit F: ZipUnzip[F], fa: Arbitrary[F[A]], fb: Arbitrary[F[B]],
+      E0: Equal[F[Unit]], E1: Equal[(F[A], F[B])]) =
+      forAll(F.zipUnzipLaw.informationPreservation[A, B] _)
+
+    def laws[F[_]](implicit F: ZipUnzip[F], fa: Arbitrary[F[Int]], f: Arbitrary[Int],
+                   E0: Equal[F[Unit]], E1: Equal[F[(Int, Int)]], E2: Equal[F[Int]]) = new Properties("zipUnzip") {
+      include(zipFunctor.laws[F])
+      property("informationPreservation") = informationPreservation[F, Int, Int]
+    }
+  }
+
   object invariantFunctor {
     def identity[F[_], X](implicit F: InvariantFunctor[F], afx: Arbitrary[F[X]], ef: Equal[F[X]]) =
       forAll(F.invariantFunctorLaw.invariantIdentity[X] _)

@@ -32,7 +32,9 @@ object TypeClass {
   lazy val apply: TypeClass = TypeClass("Apply", *->*, extendsList = Seq(functor))
   lazy val applicative = TypeClass("Applicative", *->*, extendsList = Seq(apply))
   lazy val zip = TypeClass("Zip", *->*)
+  lazy val zipFunctor = TypeClass("ZipFunctor", *->*, extendsList = Seq(functor, zip))
   lazy val unzip = TypeClass("Unzip", *->*)
+  lazy val zipUnzip = TypeClass("ZipUnzip", *->*, extendsList = Seq(zipFunctor, unzip))
   lazy val bind = TypeClass("Bind", *->*, extendsList = Seq(apply))
   lazy val monad = TypeClass("Monad", *->*, extendsList = Seq(applicative, bind))
   lazy val foldable = TypeClass("Foldable", *->*)
@@ -91,7 +93,9 @@ object TypeClass {
     apply,
     applicative,
     zip,
+    zipFunctor,
     unzip,
+    zipUnzip,
     cozip,
     bind,
     monad,
