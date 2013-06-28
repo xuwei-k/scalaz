@@ -42,7 +42,30 @@ trait UnionTypes {
 
 }
 
-object UnionTypes extends UnionTypes
+object UnionTypes extends UnionTypes with UnionInstances
+
+trait UnionInstances {
+  import UnionTypes._
+
+  implicit def unionEqual[A: Equal: reflect.ClassTag, B: Equal: reflect.ClassTag]: Equal[Union[t[A]#t[B]]] = 
+    Equal.equal{ (x, y) => (x.value, y.value) match{
+      case (x: A, y: A) => Equal[A].equal(x, y)
+      case (x: B, y: B) => Equal[B].equal(x, y)
+      case _            => false
+    }}
+
+  implicit def unionInstance[L: reflect.ClassTag] = new Monad[({type λ[α]=Union[t[L]#t[α]]})#λ] {
+    def point[A](a: => A) = a.union
+    override def map[A, B](fa: Union[t[L]#t[A]])(f: A => B): Union[t[L]#t[B]] = fa.value match{
+      case l: L => l.union
+      case a: A @unchecked => f(a).union
+    }
+    def bind[A, B](fa: Union[t[L]#t[A]])(f: A => Union[t[L]#t[B]]): Union[t[L]#t[B]] = fa.value match{
+      case l: L => l.union
+      case a: A @unchecked => f(a)
+    }
+  }
+}
 
 // vim: expandtab:ts=2:sw=2
 
