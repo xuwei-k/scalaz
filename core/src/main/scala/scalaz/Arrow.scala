@@ -62,6 +62,56 @@ trait Arrow[=>:[_, _]] extends Split[=>:] with Strong[=>:] with Category[=>:] { 
   def mapsnd[A, B, C](fab: (A =>: B))(f: B => C): (A =>: C) =
     <<<[A, B, C](arr(f), fab)
 
+  trait ArrowLaw extends CategoryLaw {
+    import arrowSyntax._
+    import std.function._
+
+    def arrowIdentity[A](implicit E: Equal[A =>: A]): Boolean =
+      E.equal(arr(identity), id)
+
+    def arrowComposition[A, B, C](ab: A => B, bc: B => C)(implicit E: Equal[A =>: C]): Boolean =
+      E.equal(arr(ab andThen bc), arr(ab) >>> arr(bc))
+
+    def arrowExtension[A, B, C](ab: A => B)(implicit E: Equal[(A, C) =>: (B, C)]): Boolean =
+      E.equal(arr(ab).first[C], arr(Arrow[Function1].split(ab, identity)))
+
+    def arrowFunctor[A, B, C, D](ab: A =>: B, bc: B =>: C)(implicit E: Equal[(A, D) =>: (C, D)]): Boolean =
+      E.equal((ab >>> bc).first[D], ab.first[D] >>> bc.first[D])
+
+    def arrowExchange[A, B, C, D](f: A =>: B, g: C => D)(implicit E: Equal[(A, C) =>: (B, D)]): Boolean =
+      E.equal(
+        f.first[C] >>> arr(Split[Function1].split(identity[B], g)),
+        arr(Split[Function1].split(identity[A], g)) >>> f.first[D]
+      )
+
+    def arrowUnit[A, B, C](f: A =>: B)(implicit E: Equal[(A, C) =>: B]): Boolean =
+      E.equal(f.first[C] >>> arr(fst[B, C]), arr(fst[A, C]) >>> f)
+
+    def arrowAssociation[A, B, C, D](f: A =>: B)(implicit E: Equal[((A, C), D) =>: (B, (C, D))]): Boolean =
+      E.equal(f.first[C].first[D] >>> F.arr(assoc[B, C, D]), F.arr(assoc[A, C, D]) >>> f.first[(C, D)])
+
+    private[this] def fst[A, B](p: (A, B)): A = p._1
+
+    private[this] def assoc[A, B, C](p: ((A, B), C)): (A, (B, C)) = (p._1._1, (p._1._2, p._2))
+
+    // Typeclassopedia
+    //
+    // 1 arr id  =  id
+    // 2 arr (h . g)  =  arr g >>> arr h
+    // 3 first (arr g)  =  arr (g *** id)
+    // 4 first (g >>> h)  =  first g >>> first h
+    // 5 first g >>> arr (id *** h)  =  arr (id *** h) >>> first g
+    // 6 first g >>> arr fst  =  arr fst >>> g
+    // 7 first (first g) >>> arr assoc  =  arr assoc >>> first g
+    // 8 assoc ((x,y),z) = (x,(y,z))
+                  
+    //first (arr f) = arr (first f)
+    //first (f >>> g) = first f >>> first g
+    //first f >>> arr fst = arr fst >>> f
+    //first f >>> arr (id *** g) = arr (id *** g) >>> first f
+    //first (first f) >>> arr assoc = arr assoc >>> first f
+  }
+
   ////
   val arrowSyntax = new scalaz.syntax.ArrowSyntax[=>:] { def F = Arrow.this }
 }
