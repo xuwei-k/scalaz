@@ -41,7 +41,7 @@ trait ToApplyOps0 {
 
 }
 
-trait ToApplyOps extends ToApplyOps0 with ToFunctorOps {
+trait ToApplyOps extends ToApplyOps0 with ToFunctorOps with ToZipOps {
   implicit def ToApplyOps[F[_],A](v: F[A])(implicit F0: Apply[F]) =
     new ApplyOps[F,A] { def self = v; implicit def F: Apply[F] = F0 }
 
@@ -78,7 +78,7 @@ trait ToApplyOps extends ToApplyOps0 with ToFunctorOps {
   ////
 }
 
-trait ApplySyntax[F[_]] extends FunctorSyntax[F] {
+trait ApplySyntax[F[_]] extends FunctorSyntax[F] with ZipSyntax[F] {
   implicit def ToApplyOps[A](v: F[A]): ApplyOps[F, A] = new ApplyOps[F,A] { def self = v; implicit def F: Apply[F] = ApplySyntax.this.F }
 
   def F: Apply[F]

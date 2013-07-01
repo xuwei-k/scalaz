@@ -107,7 +107,7 @@ object LazyOption extends LazyOptionFunctions with LazyOptionInstances
 trait LazyOptionInstances {
   import LazyOption._
 
-  implicit val lazyOptionInstance = new Traverse[LazyOption] with MonadPlus[LazyOption] with Cozip[LazyOption] with Zip[LazyOption] with Unzip[LazyOption] with Cojoin[LazyOption] with Cobind.FromCojoin[LazyOption]{
+  implicit val lazyOptionInstance = new Traverse[LazyOption] with MonadPlus[LazyOption] with Cozip[LazyOption] with Unzip[LazyOption] with Cojoin[LazyOption] with Cobind.FromCojoin[LazyOption]{
     def cojoin[A](a: LazyOption[A]) = a match {
       case LazyNone => LazyNone
       case o @ LazySome(_) => LazySome(() => o)
@@ -124,7 +124,7 @@ trait LazyOptionInstances {
         case -\/(a) => -\/(lazySome(a))
         case \/-(b) => \/-(lazySome(b))
       }, -\/(lazyNone))
-    def zip[A, B](a: => LazyOption[A], b: => LazyOption[B]) = a zip b
+    override def zip[A, B](a: => LazyOption[A], b: => LazyOption[B]) = a zip b
     def unzip[A, B](a: LazyOption[(A, B)]) = a.unzip
   }
 

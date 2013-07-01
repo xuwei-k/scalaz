@@ -5,11 +5,14 @@ package scalaz
  * [[scalaz.Applicative]] without `point`.
  */
 ////
-trait Apply[F[_]] extends Functor[F] { self =>
+trait Apply[F[_]] extends Functor[F] with Zip[F] { self =>
   ////
   def ap[A,B](fa: => F[A])(f: => F[A => B]): F[B]
 
   // derived functions
+
+  def zip[A, B](a: => F[A], b: => F[B]): F[(A, B)] =
+    tuple2(a, b)
 
   def traverse1[A, G[_], B](value: G[A])(f: A => F[B])(implicit G: Traverse1[G]): F[G[B]] =
     G.traverse1(value)(f)(this)
@@ -139,6 +142,11 @@ object Apply {
   @inline def apply[F[_]](implicit F: Apply[F]): Apply[F] = F
 
   ////
+
+  private[scalaz] trait FromZip[F[_]] extends Apply[F]{ self =>
+    def ap[A,B](fa: => F[A])(f: => F[A => B]): F[B] =
+      self.zipWith(f, fa)(_.apply(_))(self)
+  }
 
   ////
 }

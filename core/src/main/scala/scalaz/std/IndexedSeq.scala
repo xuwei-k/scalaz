@@ -40,7 +40,7 @@ trait IndexedSeqInstances extends IndexedSeqInstances0 {
 }
 
 trait IndexedSeqSubInstances extends IndexedSeqInstances0 with IndexedSeqSub {self =>
-  val ixSqInstance = new Traverse[IxSq] with MonadPlus[IxSq] with Each[IxSq] with Index[IxSq] with Length[IxSq] with Zip[IxSq] with Unzip[IxSq] with IsEmpty[IxSq] {
+  val ixSqInstance = new Traverse[IxSq] with MonadPlus[IxSq] with Each[IxSq] with Index[IxSq] with Length[IxSq] with Unzip[IxSq] with IsEmpty[IxSq] {
     def each[A](fa: IxSq[A])(f: A => Unit) = fa foreach f
     override def index[A](fa: IxSq[A], i: Int) = fa.lift.apply(i)
     // TODO remove after removal of Index
@@ -53,7 +53,7 @@ trait IndexedSeqSubInstances extends IndexedSeqInstances0 with IndexedSeqSub {se
     def isEmpty[A](a: IxSq[A]) = a.isEmpty
     override def map[A, B](v: IxSq[A])(f: A => B) = v map f
 
-    def zip[A, B](a: => IxSq[A], b: => IxSq[B]) = a zip b
+    override def zip[A, B](a: => IxSq[A], b: => IxSq[B]) = a zip b
     def unzip[A, B](a: IxSq[(A, B)]) = a.unzip
 
     def traverseImpl[F[_], A, B](v: IxSq[A])(f: A => F[B])(implicit F: Applicative[F]) = {
