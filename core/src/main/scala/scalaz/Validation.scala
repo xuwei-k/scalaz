@@ -110,13 +110,13 @@ sealed trait Validation[+E, +A] {
   /** Map on the success of this validation. */
   def map[B](f: A => B): Validation[E, B] = this match {
     case Success(a) => Success(f(a))
-    case Failure(e) => Failure(e)
+    case e @ Failure(_) => e
   }
 
   /** Traverse on the success of this validation. */
   def traverse[G[_] : Applicative, EE >: E, B](f: A => G[B]): G[Validation[EE, B]] = this match {
     case Success(a) => Applicative[G].map(f(a))(Success(_))
-    case Failure(e) => Applicative[G].point(Failure(e))
+    case e @ Failure(_) => Applicative[G].point(e)
   }
 
   /** Run the side-effect on the success of this validation. */
@@ -127,17 +127,17 @@ sealed trait Validation[+E, +A] {
 
   /** Apply a function in the environment of the success of this validation, accumulating errors. */
   def ap[EE >: E, B](x: => Validation[EE, A => B])(implicit E: Semigroup[EE]): Validation[EE, B] = (this, x) match {
-    case (Success(a), Success(f))   => Success(f(a))
-    case (Failure(e), Success(_))   => Failure(e)
-    case (Success(f), Failure(e))   => Failure(e)
-    case (Failure(e1), Failure(e2)) => Failure(E.append(e2, e1))
+    case (Success(a), Success(f))     => Success(f(a))
+    case (e @ Failure(_), Success(_)) => e
+    case (Success(f), e @ Failure(_)) => e
+    case (Failure(e1), Failure(e2))   => Failure(E.append(e2, e1))
   }
 
   /** Bind through the success of this validation. */
   def flatMap[EE >: E, B](f: A => Validation[EE, B]): Validation[EE, B] =
     this match {
       case Success(a) => f(a)
-      case Failure(e) => Failure(e)
+      case e @ Failure(_) => e
     }
 
   /** Fold on the success of this validation. */
@@ -301,7 +301,7 @@ sealed trait Validation[+E, +A] {
   /** Wraps the failure value in a [[scalaz.NonEmptyList]] */
   def toValidationNel: ValidationNel[E, A] =
     this match {
-      case Success(a) => Success(a)
+      case a @ Success(_) => a
       case Failure(e) => Failure(NonEmptyList(e))
     }
 
@@ -337,8 +337,8 @@ sealed trait Validation[+E, +A] {
 
 }
 
-final case class Success[E, A](a: A) extends Validation[E, A]
-final case class Failure[E, A](e: E) extends Validation[E, A]
+final case class Success[A](a: A) extends Validation[Nothing, A]
+final case class Failure[E](e: E) extends Validation[E, Nothing]
 
 object Validation extends ValidationFunctions with ValidationInstances {
 
@@ -419,7 +419,7 @@ trait ValidationInstances2 extends ValidationInstances3 {
 
     def cozip[A, B](x: Validation[L, A \/ B]) =
       x match {
-        case Failure(l) => -\/(Failure(l))
+        case l @ Failure(_) => -\/(l)
         case Success(e) => e match {
           case -\/(a) => -\/(Success(a))
           case \/-(b) => \/-(Success(b))

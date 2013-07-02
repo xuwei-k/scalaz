@@ -56,7 +56,10 @@ sealed trait LazyEither[+A, +B] {
     fold(_ => Stream(), Stream(_))
 
   def map[C](f: (=> B) => C): LazyEither[A, C] =
-    fold(lazyLeft(_), b => lazyRight(f(b)))
+    this match {
+      case a @ LazyLeft(_) => a
+      case LazyRight(b) => LazyRight(() => f(b()))
+    }
 
   def bimap[C, D](f: (=> A) => C, g: (=> B) => D): LazyEither[C, D] =
     fold(a => lazyLeft(f(a)), b => lazyRight(g(b)))
@@ -66,7 +69,7 @@ sealed trait LazyEither[+A, +B] {
     fold(a => lazyLeft(f(a)), lazyRight(_))
 
   def foreach(f: (=> B) => Unit): Unit =
-    fold(_ => (), f)
+    map(f)
 
   def flatMap[AA >: A, C](f: (=> B) => LazyEither[AA, C]): LazyEither[AA, C] =
     fold(lazyLeft(_), f)
@@ -89,9 +92,9 @@ sealed trait LazyEither[+A, +B] {
 
 }
 
-private case class LazyLeft[A, B](a: () => A) extends LazyEither[A, B]
+private final case class LazyLeft[A](a: () => A) extends LazyEither[A, Nothing]
 
-private case class LazyRight[A, B](b: () => B) extends LazyEither[A, B]
+private final case class LazyRight[B](b: () => B) extends LazyEither[Nothing, B]
 
 object LazyEither extends LazyEitherFunctions with LazyEitherInstances {
 
