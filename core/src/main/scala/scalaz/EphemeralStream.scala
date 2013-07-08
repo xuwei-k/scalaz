@@ -125,6 +125,20 @@ trait EphemeralStreamInstances {
   import std.list._
 
   implicit def ephemeralStreamEqual[A: Equal]: Equal[EphemeralStream[A]] = Equal[List[A]] contramap {(_: EphemeralStream[A]).toList}
+
+  import collection.generic.CanBuildFrom
+  import collection.mutable.{ListBuffer, Builder}
+
+  implicit def canBuildFrom[A]: CanBuildFrom[Nothing, A, EphemeralStream[A]] = new CanBuildFrom[Nothing, A, EphemeralStream[A]]{
+    def apply() = new Builder[A, EphemeralStream[A]]{
+      private[this] val underlying = new ListBuffer[A]()
+      def +=(elem: A) = {underlying += elem; this}
+      def clear() = underlying.clear()
+      def result() = EphemeralStream.apply(underlying.result(): _*)
+    }
+    def apply(from: Nothing) = apply()
+  }
+
 }
 
 trait EphemeralStreamFunctions {

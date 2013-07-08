@@ -6,6 +6,14 @@ import syntax.foldable._
 import org.specs2.matcher._
 
 class FoldableTest extends Spec with OptionMatchers {
+  "to[DList]" ! prop {
+    (xs: List[Int]) =>
+      xs.to[DList].toList must_== xs
+  }
+  "to[EphemeralStream]" ! prop {
+    (xs: List[Int]) =>
+      xs.to[EphemeralStream].to[List] must_== xs
+  }
   "maximum" ! prop {
     (xs: List[Int]) =>
       if (xs.isEmpty)

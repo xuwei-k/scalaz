@@ -79,6 +79,19 @@ trait DListInstances {
     import std.list._
     Equal[List[A]].contramap((_: DList[A]).toList)
   }
+
+  import collection.generic.CanBuildFrom
+  import collection.mutable.{ListBuffer, Builder}
+
+  implicit def canBuildFrom[A]: CanBuildFrom[Nothing, A, DList[A]] = new CanBuildFrom[Nothing, A, DList[A]]{
+    def apply() = new Builder[A, DList[A]]{
+      private[this] val underlying = new ListBuffer[A]()
+      def +=(elem: A) = {underlying += elem; this}
+      def clear() = underlying.clear()
+      def result() = DList.fromList(underlying.result())
+    }
+    def apply(from: Nothing) = apply()
+  }
 }
 
 trait DListFunctions {
