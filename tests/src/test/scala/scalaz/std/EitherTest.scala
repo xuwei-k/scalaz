@@ -30,6 +30,7 @@ class EitherTest extends Spec {
   checkAll("Either.RightProjection @@ Last", monad.laws[({type λ[α] = Either.RightProjection[Int, α] @@ Last})#λ])
 
   checkAll("Either", monad.laws[({type f[x] = Either[Int, x]})#f])
+  checkAll("Either", commutativeMonad.laws[({type f[x] = Either[Int, x]})#f])
   checkAll("Either", bifunctor.laws[Either])
   checkAll("Either", traverse.laws[({type f[x] = Either[Int, x]})#f])
   checkAll("Either", bitraverse.laws[Either])

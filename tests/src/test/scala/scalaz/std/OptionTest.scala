@@ -17,6 +17,7 @@ class OptionTest extends Spec {
 
   checkAll("Option", monoid.laws[Option[Int]])
   checkAll("Option", monadPlus.strongLaws[Option])
+  checkAll("Option", commutativeMonad.laws[Option])
   checkAll("Option", traverse.laws[Option])
   checkAll("Option", isEmpty.laws[Option])
   checkAll("Option", cojoin.laws[Option])

@@ -231,7 +231,7 @@ private[scalaz] trait KleisliHoist[R] extends Hoist[({type λ[α[_], β] = Kleis
   implicit def apply[G[_] : Monad]: Monad[({type λ[α] = Kleisli[G, R, α]})#λ] = Kleisli.kleisliMonadReader
 }
 
-private[scalaz] trait KleisliMonadPlus[F[_], R] extends MonadPlus[({type λ[α] = Kleisli[F, R, α]})#λ] with KleisliPlusEmpty[F, R] with KleisliMonad[F, R] {
+private[scalaz] trait KleisliMonadPlus[F[_], R] extends CommutativeMonad[({type λ[α] = Kleisli[F, R, α]})#λ] with MonadPlus[({type λ[α] = Kleisli[F, R, α]})#λ] with KleisliPlusEmpty[F, R] with KleisliMonad[F, R] {
   implicit def F: MonadPlus[F]
 }
 

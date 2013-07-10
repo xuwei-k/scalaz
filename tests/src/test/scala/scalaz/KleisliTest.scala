@@ -17,10 +17,10 @@ class KleisliTest extends Spec {
       (3, A.arbitrary.map(a => (_: Int) => a))
     ))
 
-  implicit def KleisliEqual[M[_]](implicit M: Equal[M[Int]]): Equal[Kleisli[M, Int, Int]] = new Equal[Kleisli[M, Int, Int]] {
-    def equal(a1: Kleisli[M, Int, Int], a2: Kleisli[M, Int, Int]): Boolean = {
-      val mb1: M[Int] = a1.run(0)
-      val mb2: M[Int] = a2.run(0)
+  implicit def KleisliEqual[M[_], A](implicit M: Equal[M[A]]): Equal[Kleisli[M, Int, A]] = new Equal[Kleisli[M, Int, A]] {
+    def equal(a1: Kleisli[M, Int, A], a2: Kleisli[M, Int, A]): Boolean = {
+      val mb1: M[A] = a1.run(0)
+      val mb2: M[A] = a2.run(0)
       M.equal(mb1, mb2)
     }
   }
@@ -32,6 +32,7 @@ class KleisliTest extends Spec {
 
   checkAll(monoid.laws[KleisliOptInt[Int]])
   checkAll(monadPlus.strongLaws[KleisliOptInt])
+  checkAll(commutativeMonad.laws[KleisliOptInt])
   checkAll(category.laws[KleisliOpt])
 
   object instances {
