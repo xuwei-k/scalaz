@@ -12,15 +12,18 @@ trait MonadFix[F[_]] extends Monad[F] { self =>
 
   // derived functions
 
-  final def fix[A](f: (=> A) => Need[A]): Need[A] = { println("fix"); fix(f)}
+  final def fix[A](f: (=> A) => A): A = {
+    lazy val a: A = f(a)
+    a
+  }
 
   trait MonadFixLaw extends MonadLaw {
     import syntax.std.function1._
     private[this] def p[A]: A => F[A] = x => point(x) 
 
     // mfix (return . h) = return (fix h)
-    def purity[B](f: B => B)(implicit E: Equal[F[B]]): Boolean = {
-      E.equal(mfix(p compose f.byName), point(fix(f.need).value))
+    def purity[B](f: (=> B) => B)(implicit E: Equal[F[B]]): Boolean = {
+      E.equal(mfix(p compose f), point(fix[B](f)))
     }
 
     // mfix (\x -> a >>= \y -> f x y)    =     a >>= \y -> mfix (\x -> f x y)

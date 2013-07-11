@@ -14,17 +14,13 @@ trait StreamInstances {
     }
 
     override def mfix[A](f: (=> A) => Stream[A]): Stream[A] = {
-      import syntax.std.function1._
-
-      println("m fix")
-
-      val f1 = {a: A => f(a).head}.need
-      val f2 = {a: A => f(a).tail}.byName
-
-      Functor[Need].map(fix(f1)){
+      lazy val value0: Stream[A] = fix[Stream[A]](a => f(a.head)) match{
         case Stream.Empty => Stream.Empty 
-        case (h: A) #:: t => h #:: mfix(f2)
-      }.value
+        case other =>
+          lazy val h #:: t = other
+          h #:: mfix[A](a => f(a).tail)
+      }
+      value0
     }
 
     def each[A](fa: Stream[A])(f: A => Unit) = fa foreach f

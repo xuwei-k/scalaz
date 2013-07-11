@@ -15,10 +15,9 @@ trait ListInstances extends ListInstances0 {
     override def mfix[A](f: (=> A) => List[A]): List[A] = {
       import syntax.std.function1._
 
-      val f1 = {a: A => f(a).head}.need
       val f2 = {a: A => f(a).tail}.byName
 
-      fix(f1).value match {
+      fix[A](a => f(a).head) match {
         case Nil => Nil
         case (h: A) :: t => h :: mfix(f2)
       }
