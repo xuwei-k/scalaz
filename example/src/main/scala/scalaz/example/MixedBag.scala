@@ -103,12 +103,13 @@ object MixedBag extends App {
   }
 
   def zipper() {
-    import scalaz.std.list
+    import scalaz.std.list._
+    import scalaz.syntax.foldable._
 
     val fileName = "abc.txt"
 
     val oldExtensionAndNewName: Option[(String, String)] = for {
-      zipper <- list.toZipper(fileName.toList)
+      zipper <- fileName.toList.toZipper
 
       // previousC from the first position rotates the focus to the last element
       zipperAtLast = zipper.previousC

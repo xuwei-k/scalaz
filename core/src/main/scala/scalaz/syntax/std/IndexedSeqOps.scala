@@ -11,11 +11,6 @@ trait IndexedSeqOps[IS[+_], A] extends Ops[IS[A]] {
   }
 
   final def intersperse(a: A): IS[A] = v.intersperse(self, a)
-  final def toNel: Option[NonEmptyList[A]] = v.toNel(self)
-
-  final def toZipper: Option[Zipper[A]] = v.toZipper(self)
-
-  final def zipperEnd: Option[Zipper[A]] = v.zipperEnd(self)
 
   final def <^>[B: Monoid](f: NonEmptyList[A] => B): B = v.<^>(self)(f)
 

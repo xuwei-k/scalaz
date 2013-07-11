@@ -114,15 +114,6 @@ trait IndexedSeqSubFunctions extends IndexedSeqSub {
   final def intersperse[A](as: IxSq[A], a: A): IxSq[A] =
     if (as.isEmpty) empty else as.init.foldRight(as.last +: empty)(_ +: a +: _)
 
-  final def toNel[A](as: IxSq[A]): Option[NonEmptyList[A]] =
-    if (as.isEmpty) None else Some(NonEmptyList.nel(as.head, as.tail.toList))
-
-  final def toZipper[A](as: IxSq[A]): Option[Zipper[A]] =
-    stream.toZipper(as.toStream)
-
-  final def zipperEnd[A](as: IxSq[A]): Option[Zipper[A]] =
-    stream.zipperEnd(as.toStream)
-
   /**
    * Returns `f` applied to the contents of `as` if non-empty, otherwise, the zero element of the `Monoid` for the type `B`.
    */

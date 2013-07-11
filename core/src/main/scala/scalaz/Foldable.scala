@@ -111,6 +111,23 @@ trait Foldable[F[_]]  { self =>
   def toIndexedSeq[A](fa: F[A]): IndexedSeq[A] = foldLeft(fa, IndexedSeq[A]())(_ :+ _)
   def toSet[A](fa: F[A]): Set[A] = foldLeft(fa, Set[A]())(_ + _)
   def toStream[A](fa: F[A]): Stream[A] = foldRight[A, Stream[A]](fa, Stream.empty)(Stream.cons(_, _))
+  def toNel[A](fa: F[A]): Option[NonEmptyList[A]] = toList(fa) match{
+    case h :: t => Some(NonEmptyList.nel(h, t))
+    case Nil => None
+  }
+  def toZipper[A](fa: F[A]): Option[Zipper[A]] = std.stream.toZipper(toStream(fa))
+  def zipperEnd[A](fa: F[A]): Option[Zipper[A]] = std.stream.zipperEnd(toStream(fa))
+  /** Run `p(a)`s left-to-right until it yields a true value,
+    * answering `Some(that)`, or `None` if nothing matched `p`.
+    */
+  def findM[A, M[_] : Monad](fa: F[A])(p: A => M[Boolean]): M[Option[A]] = {
+    def loop(as: List[A]): M[Option[A]] = as match {
+      case Nil    => Monad[M].point(None: Option[A])
+      case h :: t => Monad[M].bind(p(h))(b =>
+        if (b) Monad[M].point(Some(h): Option[A]) else loop(t))
+    }
+    loop(toList(fa))
+  }
 
   /** Whether all `A`s in `fa` yield true from `p`. */
   def all[A](fa: F[A])(p: A => Boolean): Boolean = foldRight(fa, true)(p(_) && _)

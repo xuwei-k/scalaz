@@ -8,12 +8,6 @@ import scalaz.std.{list => l}
 trait ListOps[A] extends Ops[List[A]] {
   final def intersperse(a: A): List[A] = l.intersperse(self, a)
 
-  final def toNel: Option[NonEmptyList[A]] = l.toNel(self)
-
-  final def toZipper: Option[Zipper[A]] = l.toZipper(self)
-
-  final def zipperEnd: Option[Zipper[A]] = l.zipperEnd(self)
-
   final def <^>[B: Monoid](f: NonEmptyList[A] => B): B = l.<^>(self)(f)
 
   final def takeWhileM[M[_] : Monad](p: A => M[Boolean]): M[List[A]] = l.takeWhileM(self)(p)
@@ -21,8 +15,6 @@ trait ListOps[A] extends Ops[List[A]] {
   final def takeUntilM[M[_] : Monad](p: A => M[Boolean]): M[List[A]] = l.takeUntilM(self)(p)
 
   final def filterM[M[_] : Applicative](p: A => M[Boolean]): M[List[A]] = l.filterM(self)(p)
-
-  final def findM[M[_] : Monad](p: A => M[Boolean]): M[Option[A]] = l.findM(self)(p)
 
   final def powerset: List[List[A]] = l.powerset(self)
 

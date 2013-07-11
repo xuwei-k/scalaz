@@ -115,17 +115,6 @@ trait ListFunctions {
   /** [[scala.Nil]] with a sometimes more convenient type */
   final def nil[A]: List[A] = Nil
 
-  final def toNel[A](as: List[A]): Option[NonEmptyList[A]] = as match {
-    case Nil    => None
-    case h :: t => Some(NonEmptyList.nel(h, t))
-  }
-
-  final def toZipper[A](as: List[A]): Option[Zipper[A]] =
-    stream.toZipper(as.toStream)
-
-  final def zipperEnd[A](as: List[A]): Option[Zipper[A]] =
-    stream.zipperEnd(as.toStream)
-
   /**
    * Returns `f` applied to the contents of `as` if non-empty, otherwise, the zero element of the `Monoid` for the type `B`.
    */
@@ -151,15 +140,6 @@ trait ListFunctions {
 
   final def filterM[A, M[_] : Applicative](as: List[A])(p: A => M[Boolean]): M[List[A]] =
     Applicative[M].filterM(as)(p)
-
-  /** Run `p(a)`s left-to-right until it yields a true value,
-    * answering `Some(that)`, or `None` if nothing matched `p`.
-    */
-  final def findM[A, M[_] : Monad](as: List[A])(p: A => M[Boolean]): M[Option[A]] = as match {
-    case Nil    => Monad[M].point(None: Option[A])
-    case h :: t => Monad[M].bind(p(h))(b =>
-      if (b) Monad[M].point(Some(h): Option[A]) else findM(t)(p))
-  }
 
   final def powerset[A](as: List[A]): List[List[A]] = {
     import list.listInstance

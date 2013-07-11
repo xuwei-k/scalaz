@@ -32,7 +32,7 @@ trait StringFunctions {
   /**
    * Constructs a non-empty list with the value if it is not empty, otherwise, throws an error.
    */
-  def charsNel(s:String) : Option[NonEmptyList[Char]] = list.toNel(s.toList)
+  def charsNel(s:String) : Option[NonEmptyList[Char]] = list.listInstance.toNel(s.toList)
 
   /**
    * Constructs a non-empty list with the given string if it is not empty, otherwise, returns the second argument.
