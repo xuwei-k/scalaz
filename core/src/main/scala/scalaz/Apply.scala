@@ -9,6 +9,10 @@ trait Apply[F[_]] extends Functor[F] { self =>
   ////
   def ap[A,B](fa: => F[A])(f: => F[A => B]): F[B]
 
+  /** [[https://github.com/ekmett/semigroupoids/blob/v3.1/src/Data/Functor/Bind.hs#L96-L98]] */
+  def >>[A, B](fa: F[A], fb: F[B]): F[B] =
+    map(fb)(Function.const{x: B => x}(fa))
+
   // derived functions
 
   def traverse1[A, G[_], B](value: G[A])(f: A => F[B])(implicit G: Traverse1[G]): F[G[B]] =

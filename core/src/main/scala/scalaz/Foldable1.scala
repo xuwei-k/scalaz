@@ -73,10 +73,22 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
   def minimumBy1[A, B: Order](fa: F[A])(f: A => B): A =
     (minimumOf1(fa)(a => (a, f(a)))(Order.orderBy[(A, B), B](_._2)))._1
 
-  def traverse1_[M[_], A, B](fa: F[A])(f: A => M[B])(implicit a: Apply[M], x: Semigroup[M[B]]): M[Unit] =
-    a.map(foldMap1(fa)(f))(_ => ())
 
-  def sequence1_[M[_], A, B](fa: F[M[A]])(implicit a: Apply[M], x: Semigroup[M[A]]): M[Unit] =
+  /** [[https://github.com/ekmett/semigroupoids/blob/v3.1/src/Data/Semigroup/Foldable.hs#L59]] */
+  private final case class Act[G[_], A](run: G[A])
+
+  /** [[https://github.com/ekmett/semigroupoids/blob/v3.1/src/Data/Semigroup/Foldable.hs#L61-L62]] */
+  private implicit def actSemigroup[G[_]: Apply, A]: Semigroup[Act[G, A]] =
+    new Semigroup[Act[G, A]]{
+      def append(a: Act[G, A], b: => Act[G, A]) = Act(Apply[G].>>(a.run, b.run))
+    }
+
+  /** [[https://github.com/ekmett/semigroupoids/blob/v3.1/src/Data/Semigroup/Foldable.hs#L68-L69]] */
+  def traverse1_[M[_], A, B](fa: F[A])(f: A => M[B])(implicit a: Apply[M]): M[Unit] =
+    a.map(foldMap1(fa)(f.andThen(Act(_))).run)(_ => ())
+
+  /** [[https://github.com/ekmett/semigroupoids/blob/v3.1/src/Data/Semigroup/Foldable.hs#L76-L77]] */
+  def sequence1_[M[_], A, B](fa: F[M[A]])(implicit a: Apply[M]): M[Unit] =
     traverse1_(fa)(x => x)
 
   ////
