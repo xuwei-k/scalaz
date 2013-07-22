@@ -30,7 +30,7 @@ trait ToEqualOps  {
 
 trait EqualSyntax[F]  {
   implicit def ToEqualOps(v: F): EqualOps[F] = new EqualOps[F] { def self = v; implicit def F: Equal[F] = EqualSyntax.this.F }
-  
+
   def F: Equal[F]
   ////
 

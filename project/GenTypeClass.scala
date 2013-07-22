@@ -122,7 +122,7 @@ object Kind {
   case object * extends Kind
 
   case object *->* extends Kind
-  
+
   case object *^*->* extends Kind
 }
 
@@ -263,7 +263,7 @@ trait To%sOps %s {
 
 trait %sSyntax[F] %s {
   implicit def To%sOps(v: F): %sOps[F] = new %sOps[F] { def self = v; implicit def F: %s[F] = %sSyntax.this.F }
-  
+
   def F: %s[F]
   ////
 
@@ -273,28 +273,27 @@ trait %sSyntax[F] %s {
 
       // implicits in ToXxxSyntax
       typeClassName, typeClassName, typeClassName, typeClassName,
-      
-      // trait MonadSyntax[F] extends ... { ... } 
+
+      // trait MonadSyntax[F] extends ... { ... }
       typeClassName, extendsListText("Syntax", cti = "F"),
       typeClassName, typeClassName, typeClassName, typeClassName, typeClassName,
-      
+
       typeClassName
     )
     case Kind.*->* =>
       val ToVUnapply =
-"""  implicit def To%sOpsUnapply[FA](v: FA)(implicit F0: Unapply[%s, FA]) =
-    new %sOps[F0.M,F0.A] { def self = F0(v); implicit def F: %s[F0.M] = F0.TC }
+"""  implicit final def To%sOpsUnapply[FA](v: FA)(implicit F0: Unapply[%s, FA]) =
+    new %sOps[F0.M,F0.A](F0(v))(F0.TC)
 """.format(Seq.fill(4)(typeClassName): _*)
       val ToVMA =
-"""  implicit def To%sOps[F[_],A](v: F[A])(implicit F0: %s[F]) =
-    new %sOps[F,A] { def self = v; implicit def F: %s[F] = F0 }
+"""  implicit final def To%sOps[F[_],A](v: F[A])(implicit F0: %s[F]) =
+    new %sOps[F,A](v)
 """.format(Seq.fill(4)(typeClassName) :_*)
 
     """%s
 
 /** Wraps a value `self` and provides methods related to `%s` */
-sealed abstract class %sOps[F[_],A] extends Ops[F[A]] {
-  implicit def F: %s[F]
+final class %sOps[F[_],A] private[scalaz] (override val self: F[A])(implicit private[this] val F: %s[F]) extends Ops[F[A]] {
   ////
 
   ////
@@ -312,7 +311,7 @@ trait To%sOps %s {
 }
 
 trait %sSyntax[F[_]] %s {
-  implicit def To%sOps[A](v: F[A]): %sOps[F, A] = new %sOps[F,A] { def self = v; implicit def F: %s[F] = %sSyntax.this.F }
+  implicit final def To%sOps[A](v: F[A]): %sOps[F, A] = new %sOps[F,A](v)(%sSyntax.this.F)
 
   def F: %s[F]
   ////
@@ -327,8 +326,8 @@ trait %sSyntax[F[_]] %s {
           ToVMA,
 
           typeClassName, extendsListText("Syntax", cti = "F"),
-          typeClassName, typeClassName, typeClassName, typeClassName, typeClassName, 
-          
+          typeClassName, typeClassName, typeClassName, typeClassName, typeClassName,
+
           typeClassName
         )
       case Kind.*^*->* =>
@@ -380,8 +379,8 @@ trait %sSyntax[F[_, _]] %s {
           typeClassName, extendsToSyntaxListText,
           ToVFAB,
           typeClassName, extendsListText("Syntax", cti = "F"),
-          typeClassName, typeClassName, typeClassName, typeClassName, typeClassName, 
-          
+          typeClassName, typeClassName, typeClassName, typeClassName, typeClassName,
+
           typeClassName
         )
     }

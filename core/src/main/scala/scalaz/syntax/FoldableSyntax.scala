@@ -2,8 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Foldable` */
-sealed abstract class FoldableOps[F[_],A] extends Ops[F[A]] {
-  implicit def F: Foldable[F]
+final class FoldableOps[F[_],A] private[scalaz] (override val self: F[A])(implicit private[this] val F: Foldable[F]) extends Ops[F[A]] {
   ////
   import collection.generic.CanBuildFrom
 
@@ -60,14 +59,14 @@ sealed abstract class FoldableOps[F[_],A] extends Ops[F[A]] {
 }
 
 trait ToFoldableOps0 {
-  implicit def ToFoldableOpsUnapply[FA](v: FA)(implicit F0: Unapply[Foldable, FA]) =
-    new FoldableOps[F0.M,F0.A] { def self = F0(v); implicit def F: Foldable[F0.M] = F0.TC }
+  implicit final def ToFoldableOpsUnapply[FA](v: FA)(implicit F0: Unapply[Foldable, FA]) =
+    new FoldableOps[F0.M,F0.A](F0(v))(F0.TC)
 
 }
 
 trait ToFoldableOps extends ToFoldableOps0 {
-  implicit def ToFoldableOps[F[_],A](v: F[A])(implicit F0: Foldable[F]) =
-    new FoldableOps[F,A] { def self = v; implicit def F: Foldable[F] = F0 }
+  implicit final def ToFoldableOps[F[_],A](v: F[A])(implicit F0: Foldable[F]) =
+    new FoldableOps[F,A](v)
 
   ////
 
@@ -75,7 +74,7 @@ trait ToFoldableOps extends ToFoldableOps0 {
 }
 
 trait FoldableSyntax[F[_]]  {
-  implicit def ToFoldableOps[A](v: F[A]): FoldableOps[F, A] = new FoldableOps[F,A] { def self = v; implicit def F: Foldable[F] = FoldableSyntax.this.F }
+  implicit final def ToFoldableOps[A](v: F[A]): FoldableOps[F, A] = new FoldableOps[F,A](v)(FoldableSyntax.this.F)
 
   def F: Foldable[F]
   ////
