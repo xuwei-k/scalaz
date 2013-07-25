@@ -41,4 +41,14 @@ class NonEmptyListTest extends Spec {
     import syntax.foldable1._
     nel(0, List.fill(10000000)(1)).foldRight1(_ + _) must_== 10000000
   }
+  "foreach" in {
+    {
+      import syntax.foldable._
+      for(i <- NonEmptyList(1, 2, 3)) print(i)
+    }
+    {
+      import syntax.functor._
+      for(i <- NonEmptyList(1, 2, 3)) print(i)
+    }
+  }
 }
