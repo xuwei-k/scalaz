@@ -14,7 +14,7 @@ trait StreamInstances {
       }
     }
 
-    def each[A](fa: Stream[A])(f: A => Unit) = fa foreach f
+    override def each[A](fa: Stream[A])(f: A => Unit) = fa foreach f
     override def length[A](fa: Stream[A]) = fa.length
     override def index[A](fa: Stream[A], i: Int) = {
       var n = 0

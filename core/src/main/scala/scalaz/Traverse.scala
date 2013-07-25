@@ -18,6 +18,8 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
 
   // derived functions
 
+  override def each[A](fa: F[A])(f: A => Unit): Unit = super[Foldable].each(fa)(f)
+
   /**The composition of Traverses `F` and `G`, `[x]F[G[x]]`, is a Traverse */
   def compose[G[_]](implicit G0: Traverse[G]): Traverse[({type λ[α] = F[G[α]]})#λ] = new CompositionTraverse[F, G] {
     implicit def F = self

@@ -35,6 +35,9 @@ trait Foldable[F[_]]  { self =>
     implicit def G = G0
   }
 
+  def each[A](fa: F[A])(f: A => Unit): Unit =
+    foldMap(fa)(f)(std.anyVal.unitInstance)
+
   /**Left-associative fold of a structure. */
   def foldLeft[A, B](fa: F[A], z: B)(f: (B, A) => B): B = {
     import Dual._, Endo._, syntax.std.all._

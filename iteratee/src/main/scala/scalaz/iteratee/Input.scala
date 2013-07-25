@@ -99,7 +99,7 @@ trait InputInstances {
        , el = a => f(a, z)
        , eof = z
      )
-     def each[A](fa: Input[A])(f: A => Unit) = fa foreach (a => f(a))
+     override def each[A](fa: Input[A])(f: A => Unit) = fa foreach (a => f(a))
      def plus[A](a: Input[A], b: => Input[A]): Input[A] = a.fold(
        empty = b
        , el = _ => a

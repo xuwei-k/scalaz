@@ -156,7 +156,7 @@ trait NonEmptyListInstances extends NonEmptyListInstances0 {
 
       override def cojoin[A](a: NonEmptyList[A]): NonEmptyList[NonEmptyList[A]] = a.tails
 
-      def each[A](fa: NonEmptyList[A])(f: A => Unit) = fa.list foreach f
+      override def each[A](fa: NonEmptyList[A])(f: A => Unit) = fa.list foreach f
 
       def zip[A, B](a: => NonEmptyList[A], b: => NonEmptyList[B]) = a zip b
 

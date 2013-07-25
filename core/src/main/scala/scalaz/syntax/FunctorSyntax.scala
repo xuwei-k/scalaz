@@ -8,6 +8,7 @@ sealed abstract class FunctorOps[F[_],A] extends Ops[F[A]] {
   import Leibniz.===
 
   final def map[B](f: A => B): F[B] = F.map(self)(f)
+  final def foreach(f: A => Unit): Unit = F.each(self)(f)
   final def distribute[G[_], B](f: A => G[B])(implicit D: Distributive[G]): G[F[B]] = D.distribute(self)(f)
   final def cosequence[G[_], B](implicit ev: A === G[B], D: Distributive[G]): G[F[B]] = D.distribute(self)(ev(_))
   final def cotraverse[G[_], B, C](f: F[B] => C)(implicit ev: A === G[B], D: Distributive[G]): G[C] = D.map(cosequence)(f)

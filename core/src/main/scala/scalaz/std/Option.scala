@@ -10,7 +10,7 @@ trait OptionInstances0 {
 trait OptionInstances extends OptionInstances0 {
   implicit val optionInstance = new Traverse[Option] with MonadPlus[Option] with Each[Option] with Index[Option] with Length[Option] with Cozip[Option] with Zip[Option] with Unzip[Option] with IsEmpty[Option] with Cobind[Option] {
     def point[A](a: => A) = Some(a)
-    def each[A](fa: Option[A])(f: A => Unit) = fa foreach f
+    override def each[A](fa: Option[A])(f: A => Unit) = fa foreach f
     override def index[A](fa: Option[A], n: Int) = if (n == 0) fa else None
     // TODO remove after removal of Index
     override def indexOr[A](fa: Option[A], default: => A, i: Int) = super[Traverse].indexOr(fa, default, i)

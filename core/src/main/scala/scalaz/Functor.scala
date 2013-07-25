@@ -21,6 +21,9 @@ trait Functor[F[_]] extends InvariantFunctor[F] { self =>
 
   // derived functions
 
+  def each[A](fa: F[A])(f: A => Unit): Unit =
+    map(fa)(f)
+
   def xmap[A, B](fa: F[A], f: A => B, g: B => A): F[B] =
     map(fa)(f)
 
