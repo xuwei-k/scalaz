@@ -131,6 +131,17 @@ trait Apply[F[_]] extends Functor[F] { self =>
       }
     }
 
+  trait ApplyLaw extends FunctorLaw {
+    // associative composition: (.) <$> u <.> v <.> w = u <.> (v <.> w)
+    def applyAssociateive[A, B, C, D](a: F[C => D], b: F[(A => B) => C], c: F[A => B])(implicit FD: Equal[F[D]]): Boolean =
+      FD.equal(
+         ap(ap(c)(b))(a)
+        ,ap(c)(ap(b)(map(a){x => y: ((A => B) => C) => x compose y}))
+      )
+  }
+
+  def applyLaw = new ApplyLaw {}
+
   ////
   val applySyntax = new scalaz.syntax.ApplySyntax[F] { def F = Apply.this }
 }

@@ -62,6 +62,14 @@ trait Spec
     Arbitrary(Gen.frequency[Int => Int](
       (1, Gen.value((x: Int) => x)),
       (1, Gen.value((x: Int) => x + 1)),
+      (1, Gen.value((x: Int) => x - 2)),
       (3, A.arbitrary.map(a => (_: Int) => a))
     ))
+
+  implicit def FunctionIntIntInt[A](implicit A: Arbitrary[Int => Int]): Arbitrary[(Int => Int) => Int] =
+    Arbitrary(Gen.frequency[(Int => Int) => Int](
+      (1, A.arbitrary.map(a => a => a(1))),
+      (1, A.arbitrary.map(a => a => a(2)))
+    ))
+
 }

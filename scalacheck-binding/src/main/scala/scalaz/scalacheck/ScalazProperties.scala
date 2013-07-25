@@ -126,6 +126,18 @@ object ScalazProperties {
     }
   }
 
+  object apply {
+    def applyAssociative[F[_], X, Y, Z, W](implicit f: Apply[F], afzw: Arbitrary[F[Z => W]], afxyz: Arbitrary[F[(X => Y) => Z]],
+                                           afxy: Arbitrary[F[X => Y]], e: Equal[F[W]]) =
+      forAll(f.applyLaw.applyAssociateive[X, Y, Z, W] _)
+
+    def laws[F[_]](implicit F: Apply[F], a: Arbitrary[F[Int]], af: Arbitrary[F[Int => Int]],
+                   aff: Arbitrary[F[(Int => Int) => Int]], e: Equal[F[Int]]) = new Properties("apply") {
+      include(functor.laws[F])
+      property("apply associative") = applyAssociative[F, Int, Int, Int, Int]
+    }
+  }
+
   object applicative {
     def identity[F[_], X](implicit f: Applicative[F], afx: Arbitrary[F[X]], ef: Equal[F[X]]) =
       forAll(f.applicativeLaw.identityAp[X] _)
@@ -143,8 +155,8 @@ object ScalazProperties {
       forAll(ap.applicativeLaw.mapLikeDerived[X, Y] _)
 
     def laws[F[_]](implicit F: Applicative[F], af: Arbitrary[F[Int]],
-                   aff: Arbitrary[F[Int => Int]], e: Equal[F[Int]]) = new Properties("applicative") {
-      include(functor.laws[F])
+                   aaa: Arbitrary[F[(Int => Int) => Int]], aff: Arbitrary[F[Int => Int]], e: Equal[F[Int]]) = new Properties("applicative") {
+      include(ScalazProperties.apply.laws[F])
       property("identity") = applicative.identity[F, Int]
       property("composition") = applicative.composition[F, Int, Int, Int]
       property("homomorphism") = applicative.homomorphism[F, Int, Int]
@@ -169,7 +181,7 @@ object ScalazProperties {
       forAll(M.monadLaw.apLikeDerived[X, Y] _)
 
     def laws[M[_]](implicit a: Monad[M], am: Arbitrary[M[Int]],
-                   af: Arbitrary[Int => M[Int]], ag: Arbitrary[M[Int => Int]], e: Equal[M[Int]]) = new Properties("monad") {
+                  aaa: Arbitrary[M[(Int => Int) => Int]],  af: Arbitrary[Int => M[Int]], ag: Arbitrary[M[Int => Int]], e: Equal[M[Int]]) = new Properties("monad") {
       include(applicative.laws[M])
 
       property("right identity") = monad.rightIdentity[M, Int]
@@ -297,13 +309,13 @@ object ScalazProperties {
     def rightZero[F[_], X](implicit F: MonadPlus[F], afx: Arbitrary[F[X]], ef: Equal[F[X]]) =
       forAll(F.strongMonadPlusLaw.rightZero[X] _)
 
-    def laws[F[_]](implicit F: MonadPlus[F], afx: Arbitrary[F[Int]], afy: Arbitrary[F[Int => Int]], ef: Equal[F[Int]]) = new Properties("monad plus") {
+    def laws[F[_]](implicit F: MonadPlus[F], aaa: Arbitrary[F[(Int => Int) => Int]], afx: Arbitrary[F[Int]], afy: Arbitrary[F[Int => Int]], ef: Equal[F[Int]]) = new Properties("monad plus") {
       include(monad.laws[F])
       include(plusEmpty.laws[F])
       property("empty map") = emptyMap[F, Int]
       property("left zero") = leftZero[F, Int]
     }
-    def strongLaws[F[_]](implicit F: MonadPlus[F], afx: Arbitrary[F[Int]], afy: Arbitrary[F[Int => Int]], ef: Equal[F[Int]]) = new Properties("monad plus") {
+    def strongLaws[F[_]](implicit F: MonadPlus[F], aaa: Arbitrary[F[(Int => Int) => Int]], afx: Arbitrary[F[Int]], afy: Arbitrary[F[Int => Int]], ef: Equal[F[Int]]) = new Properties("monad plus") {
       include(laws[F])
       property("right zero") = rightZero[F, Int]
     }

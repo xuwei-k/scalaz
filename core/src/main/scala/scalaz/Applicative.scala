@@ -78,7 +78,7 @@ trait Applicative[F[_]] extends Apply[F] { self =>
       F.ap(f)(F.map(fa)(a => (f: A => B) => f(a)))
   }
 
-  trait ApplicativeLaw extends FunctorLaw {
+  trait ApplicativeLaw extends ApplyLaw {
     /** `point(identity)` is a no-op. */
     def identityAp[A](fa: F[A])(implicit FA: Equal[F[A]]): Boolean =
       FA.equal(ap(fa)(point((a: A) => a)), fa)
