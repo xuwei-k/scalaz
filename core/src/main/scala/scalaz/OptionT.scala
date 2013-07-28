@@ -68,6 +68,16 @@ final case class OptionT[F[_], A](run: F[Option[A]]) {
 
   def toLeft[B](b: => B)(implicit F: Functor[F]): EitherT[F,A,B] = EitherT(F.map(run)(std.option.toLeft(_)(b)))
 
+  def orEmpty[G[_[_], _]](implicit G: MonadTrans[G], F: MonadPlus[F]): G[F, A] =
+    G.liftM(F.bind(run)(std.option.orEmpty[A, F]))
+
+  // TODO compile error. scalac bug?
+  //def toStream(implicit F: MonadPlus[F]): StreamT[F, A] = orEmpty[StreamT]
+
+  def toList(implicit F: MonadPlus[F]): ListT[F, A] = orEmpty[ListT]
+
+  def toLazyOption(implicit F: MonadPlus[F]): LazyOptionT[F, A] = orEmpty[LazyOptionT]
+
   private def mapO[B](f: Option[A] => B)(implicit F: Functor[F]) = F.map(run)(f)
 }
 
