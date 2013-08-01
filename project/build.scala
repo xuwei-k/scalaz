@@ -62,9 +62,13 @@ object build extends Build {
       Seq("-unchecked") ++ versionDepOpts
     },
 
-    scalacOptions in (Compile, doc) <++= (baseDirectory in LocalProject("scalaz")) map { bd =>
-      Seq("-sourcepath", bd.getAbsolutePath, "-doc-source-url", "https://github.com/scalaz/scalaz/tree/scalaz-seven€{FILE_PATH}.scala")
-    },
+    branch := "scalaz-seven",
+
+    scalacOptions in (Compile, doc) ++= Seq(
+      "-sourcepath", (baseDirectory in LocalProject("scalaz")).value.getAbsolutePath,
+      "-doc-source-url", s"https://github.com/scalaz/scalaz/tree/${branch.value}€{FILE_PATH}.scala",
+      "-doc-root-content", rootContent.value.getAbsolutePath
+    ),
 
     // retronym: I was seeing intermittent heap exhaustion in scalacheck based tests, so opting for determinism.
     parallelExecution in Test := false,
@@ -84,6 +88,14 @@ object build extends Build {
       if(classes.exists(_._1 != FileStatus.NoChange))
         sys.error(classes.groupBy(_._1).filterKeys(_ != FileStatus.NoChange).mapValues(_.map(_._2)).toString)
     },
+    rootContent := {
+      val rootTextTemplate = IO.read(file("doc") / "root.txt")
+      val rootText = rootTextTemplate.format(typeClassTree.value)
+      val rootFile = resourceManaged.value / "root.txt"
+      IO.write(rootFile, rootText)
+      streams.value.log.debug(rootText)
+      rootFile
+    },
     typeClasses := Seq(),
     genToSyntax <<= typeClasses map {
       (tcs: Seq[TypeClass]) =>
@@ -92,7 +104,7 @@ object build extends Build {
       objects + "\n\n" + all
     },
     typeClassTree <<= typeClasses map {
-      tcs => tcs.map(_.doc).mkString("\n")
+      tcs => tcs.map(" - " + _.doc).mkString("\n")
     },
 
     showDoc in Compile <<= (doc in Compile, target in doc in Compile) map { (_, out) =>
@@ -169,7 +181,20 @@ object build extends Build {
     settings = standardSettings ++ unidocSettings ++ Seq[Sett](
       // <https://github.com/scalaz/scalaz/issues/261>
       excludedProjects in unidoc in ScalaUnidoc += "typelevel",
-      publishArtifact := false
+      publishArtifact := false,
+      typeClassTree := {
+        Seq(
+          "core" -> TypeClass.core,
+          "xml" -> TypeClass.xml,
+          "concurrent" -> TypeClass.concurrent,
+          "effect" -> TypeClass.effect
+        ).filterNot(_._2.isEmpty).map{ case (projectName, classes) =>
+          s"\n\n'''${projectName}'''\n" +
+          classes.groupBy(_.kind).toList.sortBy(_._1.sort).map{
+            "\n\n"  + _._2.map(" - " + _.doc).mkString("\n")
+          }.mkString
+        }.mkString
+      }
     ),
     aggregate = Seq(core, concurrent, effect, example, iteratee, scalacheckBinding, tests, typelevel, xml)
   )
@@ -324,6 +349,10 @@ object build extends Build {
   lazy val typeClassTree = TaskKey[String]("type-class-tree", "Generates scaladoc formatted tree of type classes.")
 
   lazy val checkGenTypeClasses = TaskKey[Unit]("check-gen-type-classes")
+
+  lazy val rootContent = TaskKey[File]("rootContent")
+
+  lazy val branch = TaskKey[String]("branch")
 
   def generateTupleW(outputDir: File) = {
     val arities = 2 to 12

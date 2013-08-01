@@ -116,15 +116,15 @@ object TypeClass {
   def effect = Seq(liftIO, monadIO, liftControlIO, monadControlIO, resource)
 }
 
-sealed abstract class Kind
+sealed abstract class Kind(val sort: Int)
 
 object Kind {
 
-  case object * extends Kind
+  case object * extends Kind(0)
 
-  case object *->* extends Kind
+  case object *->* extends Kind(1)
   
-  case object *^*->* extends Kind
+  case object *^*->* extends Kind(2)
 }
 
 sealed trait FileStatus

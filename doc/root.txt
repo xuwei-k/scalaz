@@ -1,0 +1,42 @@
+
+'''Scalaz''': Type classes and pure functional data structures for Scala.
+
+This package, [[scalaz]], contains:
+ - type class definitions
+ - data structures
+ - related functions
+
+Type class instances and other functions related to the Scala and Java standard library
+are in scalaz.[[scalaz.std]]
+
+Implicit conversions and wrapper classes that provide a more convenient syntax for accessing
+the functionality of the library are in scalaz.[[scalaz.syntax]].
+
+'''Type Classes Index'''
+
+
+%s
+
+
+'''Data Structures Index'''
+
+ - [[scalaz.Validation]] Represent computations that may succeed or fail, accumulating multiple errors.
+ - [[scalaz.NonEmptyList]] A list containing at least one element.
+ - [[scalaz.DList]] A difference list, supporting efficient append and prepend.
+ - [[scalaz.EphemeralStream]] A stream that holds weak references to its elements, and recomputes them if needed
+   if reclaimed by the garbage collector.
+ - [[scalaz.Heap]] A priority queue, implemented with bootstrapped skew binomial heaps.
+ - [[scalaz.Endo]] Represents functions from `A => A`.
+ - [[scalaz.FingerTree]] A tree containing elements at it's leaves, and measures at the nodes. Can be adapted to
+   various purposes by choosing a different measure, for example [[scalaz.IndSeq]] and [[scalaz.OrdSeq]].
+ - [[scalaz.Lens]] Composable, functional alternative to getters and setters
+ - [[scalaz.Tree]] A multiway tree. Each node contains a single element, and a `Stream` of sub-trees.
+ - [[scalaz.TreeLoc]] A cursor over a [[scalaz.Tree]].
+ - [[scalaz.Zipper]] A functional cursor over a List.
+
+ - [[scalaz.Kleisli]] Represents a function `A => M[B]`, allowing chaining. Also known, and aliased, as `scalaz.ReaderT`.
+ - [[scalaz.StateT]] Computations that modify state.
+ - [[scalaz.WriterT]] Computations that log a value
+ - [[scalaz.OptionT]] Represents computations of type `F[Option[A]]`
+ - [[scalaz.EitherT]] Represents computations of type `F[A \/ B]`
+
