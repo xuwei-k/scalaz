@@ -22,6 +22,12 @@ trait ApplicativePlus[F[_]] extends Applicative[F] with PlusEmpty[F] { self =>
     implicit def G = G0
   }
 
+  def append[A](initial: F[A], last: => A): F[A] =
+    plus(initial, point(last))
+
+  def prepend[A](head: => A, tail: F[A]): F[A] =
+    plus(point(head), tail)
+
   /** `empty` or a non-empty list of results acquired by repeating `a`. */
   def some[A](a: F[A]): F[List[A]] = {
     lazy val y: Free.Trampoline[F[List[A]]] = z map (plus(_, point(Nil)))

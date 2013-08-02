@@ -5,7 +5,15 @@ package syntax
 sealed abstract class ApplicativePlusOps[F[_],A] extends Ops[F[A]] {
   implicit def F: ApplicativePlus[F]
   ////
+  final def append(last: => A): F[A] = F.append(self, last)
 
+  final def prepend(head: => A): F[A] = F.prepend(head, self)
+
+  /** alias for `append` */
+  final def :+(last: A): F[A] = F.append(self, last)
+
+  /** alias for `prepend` */
+  final def +:(head: A): F[A] = F.prepend(head, self)
   ////
 }
 
