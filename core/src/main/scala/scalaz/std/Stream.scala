@@ -3,7 +3,7 @@ package std
 
 
 trait StreamInstances {
-  implicit val streamInstance: Traverse[Stream] with MonadPlus[Stream] with Each[Stream] with Index[Stream] with Length[Stream] with Zip[Stream] with Unzip[Stream] with IsEmpty[Stream] with Cobind[Stream] = new Traverse[Stream] with MonadPlus[Stream] with Each[Stream] with Index[Stream] with Length[Stream] with Zip[Stream] with Unzip[Stream] with IsEmpty[Stream] with Cobind[Stream] {
+  implicit val streamInstance: Traverse[Stream] with MonadPlus[Stream] with Each[Stream] with Index[Stream] with Length[Stream] with Zip[Stream] with IsEmpty[Stream] with Cobind[Stream] = new Traverse[Stream] with MonadPlus[Stream] with Each[Stream] with Index[Stream] with Length[Stream] with Zip[Stream] with IsEmpty[Stream] with Cobind[Stream] {
     override def cojoin[A](a: Stream[A]) = a.tails.toStream.init
     def cobind[A, B](fa: Stream[A])(f: Stream[A] => B): Stream[B] = map(cojoin(fa))(f)
     def traverseImpl[G[_], A, B](fa: Stream[A])(f: A => G[B])(implicit G: Applicative[G]): G[Stream[B]] = {
@@ -46,7 +46,7 @@ trait StreamInstances {
     def isEmpty[A](s: Stream[A]) = s.isEmpty
     def point[A](a: => A) = scala.Stream(a)
     def zip[A, B](a: => Stream[A], b: => Stream[B]) = a zip b
-    def unzip[A, B](a: Stream[(A, B)]) = a.unzip
+    override def unzip[A, B](a: Stream[(A, B)]) = a.unzip
   }
 
   import Tags.Zip

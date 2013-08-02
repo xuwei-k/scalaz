@@ -13,13 +13,15 @@ package scalaz
  * @see [[scalaz.Functor.FunctorLaw]]
  */
 ////
-trait Functor[F[_]] extends InvariantFunctor[F] { self =>
+trait Functor[F[_]] extends InvariantFunctor[F] with Unzip[F] { self =>
   ////
 
   /** Lift `f` into `F` and apply to `F[A]`. */
   def map[A, B](fa: F[A])(f: A => B): F[B]
 
   // derived functions
+
+  override def unzip[A, B](f: F[(A, B)]) = (map(f)(_._1), map(f)(_._2))
 
   def xmap[A, B](fa: F[A], f: A => B, g: B => A): F[B] =
     map(fa)(f)

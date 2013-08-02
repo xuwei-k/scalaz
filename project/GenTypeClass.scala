@@ -25,7 +25,7 @@ object TypeClass {
   lazy val metricSpace = TypeClass("MetricSpace", *)
 
   lazy val invariantFunctor = TypeClass("InvariantFunctor", *->*)
-  lazy val functor = TypeClass("Functor", *->*, extendsList = Seq(invariantFunctor))
+  lazy val functor = TypeClass("Functor", *->*, extendsList = Seq(invariantFunctor, unzip))
   lazy val apply: TypeClass = TypeClass("Apply", *->*, extendsList = Seq(functor))
   lazy val applicative = TypeClass("Applicative", *->*, extendsList = Seq(apply))
   lazy val zip = TypeClass("Zip", *->*)

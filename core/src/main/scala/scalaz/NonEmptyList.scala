@@ -124,7 +124,7 @@ sealed abstract class NonEmptyListInstances0 {
 
 sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
   implicit val nonEmptyList =
-    new Traverse1[NonEmptyList] with Monad[NonEmptyList] with Plus[NonEmptyList] with Comonad[NonEmptyList] with Each[NonEmptyList] with Zip[NonEmptyList] with Unzip[NonEmptyList] with Length[NonEmptyList] {
+    new Traverse1[NonEmptyList] with Monad[NonEmptyList] with Plus[NonEmptyList] with Comonad[NonEmptyList] with Each[NonEmptyList] with Zip[NonEmptyList] with Length[NonEmptyList] {
       def traverse1Impl[G[_] : Apply, A, B](fa: NonEmptyList[A])(f: A => G[B]): G[NonEmptyList[B]] =
         fa traverse1 f
 
@@ -162,7 +162,7 @@ sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
 
       def zip[A, B](a: => NonEmptyList[A], b: => NonEmptyList[B]) = a zip b
 
-      def unzip[A, B](a: NonEmptyList[(A, B)]) = a.unzip
+      override def unzip[A, B](a: NonEmptyList[(A, B)]) = a.unzip
 
       override def length[A](a: NonEmptyList[A]): Int = a.size
     }
