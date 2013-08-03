@@ -110,12 +110,18 @@ final class NonEmptyList[+A] private[scalaz](val head: A, val tail: List[A]) {
     list.hashCode
 }
 
-object NonEmptyList extends NonEmptyListInstances with NonEmptyListFunctions {
+object NonEmptyList extends NonEmptyListInstances {
   def apply[A](h: A, t: A*): NonEmptyList[A] =
     nels(h, t: _*)
 
   def unapplySeq[A](v: NonEmptyList[A]): Option[(A, List[A])] =
     Some((v.head, v.tail))
+
+  def nel[A](h: A, t: List[A]): NonEmptyList[A] =
+    new NonEmptyList(h, t)
+
+  def nels[A](h: A, t: A*): NonEmptyList[A] =
+    nel(h, t.toList)
 }
 
 sealed abstract class NonEmptyListInstances0 {
@@ -153,7 +159,7 @@ sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
       def plus[A](a: NonEmptyList[A], b: => NonEmptyList[A]): NonEmptyList[A] = a.list <::: b
 
       def copoint[A](p: NonEmptyList[A]): A = p.head
-	
+
       def cobind[A, B](fa: NonEmptyList[A])(f: NonEmptyList[A] => B): NonEmptyList[B] = map(cojoin(fa))(f)
 
       override def cojoin[A](a: NonEmptyList[A]): NonEmptyList[NonEmptyList[A]] = a.tails
@@ -178,10 +184,3 @@ sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
     Order.orderBy[NonEmptyList[A], List[A]](_.list)(std.list.listOrder[A])
 }
 
-trait NonEmptyListFunctions {
-  def nel[A](h: A, t: List[A]): NonEmptyList[A] =
-    new NonEmptyList(h, t)
-
-  def nels[A](h: A, t: A*): NonEmptyList[A] =
-    nel(h, t.toList)
-}
