@@ -192,6 +192,8 @@ sealed abstract class LazyEitherTInstances extends LazyEitherTInstances0 {
     implicit def G = lazyEitherTTraverse[F, L]
     def iso = LazyEitherT.lazyEitherTLeftProjectionEIso2[F, L]
   }
+
+  implicit def lazyEitherTHoist[A]: Hoist[({type λ[α[_], β] = LazyEitherT[α, A, β]})#λ] = new LazyEitherTHoist[A]{}
 }
 
 trait LazyEitherTFunctions {
@@ -262,3 +264,14 @@ private[scalaz] trait LazyEitherTBitraverse[F[_]] extends Bitraverse[({type λ[�
   def bitraverseImpl[G[_]: Applicative, A, B, C, D](fab: LazyEitherT[F, A, B])(f: A => G[C], g: B => G[D]): G[LazyEitherT[F, C, D]] =
     Applicative[G].map(F.traverse(fab.run)(Bitraverse[LazyEither].bitraverseF(f, g)))(LazyEitherT.lazyEitherT(_))
 }
+
+private trait LazyEitherTHoist[A] extends Hoist[({type λ[α[_], β] = LazyEitherT[α, A, β]})#λ] {
+  def hoist[M[_], N[_]](f: M ~> N)(implicit M: Monad[M]) = new (({type λ[α] = LazyEitherT[M, A, α]})#λ ~> ({type λ[α] = LazyEitherT[N, A, α]})#λ) {
+    def apply[B](mb: LazyEitherT[M, A, B]) = LazyEitherT(f.apply(mb.run))
+  }
+
+  def liftM[M[_], B](mb: M[B])(implicit M: Monad[M]) = LazyEitherT(M.map(mb)(LazyEither.lazyRight[A](_)))
+
+  implicit def apply[M[_] : Monad] = LazyEitherT.lazyEitherTMonad
+}
+

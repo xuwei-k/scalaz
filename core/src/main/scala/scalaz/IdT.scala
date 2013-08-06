@@ -57,6 +57,8 @@ sealed abstract class IdTInstances0 extends IdTInstances1 {
 sealed abstract class IdTInstances extends IdTInstances0 {
   implicit val idTHoist: Hoist[IdT] = IdTHoist
 
+  implicit val idCohoist: Cohoist[IdT] = IdTCohoist
+
   implicit def idTTraverse[F[_]](implicit F0: Traverse[F]): Traverse[({type λ[α] = IdT[F, α]})#λ] = new IdTTraverse[F] {
     implicit def F: Traverse[F] = F0
   }
@@ -118,5 +120,15 @@ private[scalaz] object IdTHoist extends Hoist[IdT] {
 
   implicit def apply[G[_] : Monad]: Monad[({type λ[α] = IdT[G, α]})#λ] = IdT.idTMonad[G]
 }
+
+private object IdTCohoist extends Cohoist[IdT] {
+
+  def cohoist[M[_], N[_]: Comonad](f: M ~> N) = new (({type λ[α]=IdT[M, α]})#λ ~> ({type λ[α]=IdT[N, α]})#λ) {
+    def apply[A](fa: IdT[M, A]) = new IdT[N, A](f(fa.run))
+  }
+
+  def lower[G[_]: Cobind, A](a: IdT[G, A]): G[A] = a.run
+}
+
 
 // vim: set ts=4 sw=4 et:
