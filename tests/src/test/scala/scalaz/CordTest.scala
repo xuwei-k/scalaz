@@ -32,6 +32,14 @@ class CordTest extends Spec {
 
   implicit def ArbitraryCord: Arbitrary[Cord] = Functor[Arbitrary].map(implicitly[Arbitrary[String]])(Cord.stringToCord)
 
+  "issue 371" in {
+    import std.stream._, std.list._, std.anyVal._
+    import syntax.show._
+
+    val list = List.fill(1000000)(Stream.fill(5)(0))
+    list.shows must_== list.map(_.mkString("Stream(",",",")")).mkString("[", ",", "]")
+  }
+
   checkAll(monoid.laws[Cord])
   checkAll(equal.laws[Cord])
 }
