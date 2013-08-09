@@ -1,155 +1,96 @@
 package scalaz
 
 import collection.immutable.IndexedSeq
+import collection.generic.CanBuildFrom
 
 import std.anyVal._
 import std.string._
-import std.indexedSeq.indexedSeqMonoid
+import std.vector._
+import syntax.foldable._
 
 /**
- * A `Cord` is a purely functional data structure for efficiently
- * storing and manipulating `String`s that are potentially very long.
- * Very similar to `Rope[Char]`, but with better constant factors and a
- * simpler interface since it's specialized for `String`s.
  */
-final case class Cord(self: FingerTree[Int, String]) {
+final case class Cord(private val self: Vector[String]){
 
   import Cord.{stringToCord => _, _}
 
-  private def rangeError(i: Int) = sys.error("Index out of range: " + i + " >= " + self.measure)
-
   /**
-    * Returns the character at the given position. Throws an error if the index is out of range.
-    * Time complexity: O(log N)
-    */
-  def apply(i: Int): Char = {
-    val (a, b) = self.split(_ > i)
-    b.viewl.headOption.map(_(i - a.measure)).getOrElse(rangeError(i))
-  }
-
-  /**
-   * Splits this `Cord` in two at the given position.
-   * Time complexity: O(log N)
+   * Returns the number of characters in this `Cord`.
    */
-  def split(i: Int): (Cord, Cord) = {
-    val (l, mid, r) = self.split1(_ > i)
-    val (midl, midr) = mid.splitAt(i - l.measure)
-    (cord(l :+ midl), cord(midr +: r))
-  }
+  def length: Int = self.foldMap(_.length)
 
   /**
    * Returns the number of characters in this `Cord`.
-   * Time complexity: O(1)
    */
-  def length: Int = self.measure
-
-  /**
-   * Returns the number of characters in this `Cord`.
-   * Time complexity: O(1)
-   */
-  def size: Int = self.measure
+  def size: Int = length
 
   /**
    * Appends another `Cord` to the end of this one.
-   * Time complexity: O(log (min N M)) where M and N are the lengths of the two `Cord`s.
    */
-  def ++(xs: Cord): Cord = cord(self <++> xs.self)
+  def ++(xs: Cord): Cord = cord(self ++ xs.self)
 
   /**
    * Appends a `String` to the end of this `Cord`.
-   * Time complexity: O(1)
    */
-  def :+(x: => String): Cord = cord(self :+ x)
+  def :+(x: String): Cord = cord(self :+ x)
 
   /**
    * Prepends a `String` to the beginning of this `Cord`.
-   * Time complexity: O(1)
    */
-  def +:(x: => String): Cord = cord(x +: self)
-
-  /**
-   * Prepends a `Char` to the beginning of this `Cord`.
-   * Time complexity: O(1)
-   */
-  def -:(x: => Char): Cord = cord(x.toString +: self)
-
-  /**
-   * Appends a `Char` to the end of this `Cord`.
-   * Time complexity: O(1)
-   */
-  def :-(x: => Char): Cord = cord(self :+ x.toString)
-
-  /**
-   * Removes the first character of this `Cord`.
-   * Time complexity: O(1)
-   */
-  def tail: Cord = drop(1)
-
-  /**
-   * Removes the last character of this `Cord`.
-   * Time complexity: O(1)
-   */
-  def init: Cord = take(self.measure - 1)
-
-  /**
-   * Removes the first `n` characters from the front of this `Cord`.
-   * Time complexity: O(min N (N - n))
-   */
-  def drop(n: Int): Cord = split(n)._2
-
-  /**
-   * Returns the first `n` characters at the front of this `Cord`.
-   * Time complexity: O(min N (N - n))
-   */
-  def take(n: Int): Cord = split(n)._1
+  def +:(x: String): Cord = cord(x +: self)
 
   /**
    * Modifies each character in this `Cord` by the given function.
-   * Time complexity: O(N)
    */
-  def map[B](f: Char => Char): Cord = cord(self map (_ map f))
+  def map(f: Char => Char): Cord = cord(self map (_ map f))
 
-  def toList: List[Char] = toIndexedSeq.toList
-  def toStream: Stream[Char] = toIndexedSeq.toStream
-  def toIndexedSeq: IndexedSeq[Char] = self.foldMap(_.toIndexedSeq)
+  def to[F[_]](implicit C: CanBuildFrom[Nothing, Char, F[Char]]): F[Char] =
+    self.foldLeft(C()){(buf, vector) =>
+      vector.foreach(buf += _)
+      buf
+    }.result
+
+  def toList: List[Char] = to[List]
+
+  def toStream: Stream[Char] = to[Stream]
+
   override def toString: String = {
-    val sb = new StringBuilder(self.measure)
+    val sb = new StringBuilder()
     self foreach (sb ++= _)
     sb.toString
   }
 
   /** Transforms each character to a `Cord` according to the given function and concatenates them all into one `Cord`. */
-  def flatMap[B](f: Char => Cord): Cord = toIndexedSeq.foldLeft(Cord())((as, a) => as ++ f(a))
+  def flatMap(f: Char => Cord): Cord =
+    cord(self.flatMap(_.flatMap(f(_).self)))
 }
 
 object Cord {
-  private def cord[A](v: FingerTree[Int, String]): Cord = new Cord(v)
+  private def cord[A](v: Vector[String]): Cord = new Cord(v)
 
-  implicit def stringToCord(s: String): Cord = cord(FingerTree.single[Int, String](s))
+  implicit def stringToCord(s: String): Cord = cord(Vector(s))
 
-  lazy val empty: Cord = apply()
+  val empty: Cord = apply()
 
-  def apply(as: Cord*): Cord = as.foldLeft(cord(FingerTree.empty))(_ ++ _)
+  def apply(as: Cord*): Cord = as.foldLeft(empty)(_ ++ _)
 
-  def fromStrings[A](as: Seq[String]): Cord = cord(as.foldLeft(FingerTree.empty[Int, String](sizer))((x, y) => x :+ y))
-
-  implicit val sizer: Reducer[String, Int] = UnitReducer((a: String) => a.length)
+  def fromStrings[A](as: Iterable[String]): Cord = cord(as.toVector)
 
   def mkCord(sep: Cord, as: Cord*): Cord =
     if (as.length > 0)
       as.tail.foldLeft(as.head)(_ ++ sep ++ _)
     else
-      Cord()
+      empty
 
-  implicit lazy val CordShow: Show[Cord] = new Show[Cord] {
+  implicit val CordInstance: Show[Cord] = new Show[Cord] {
     override def show(x: Cord) = x
     override def shows(x: Cord) = x.toString
   }
-  implicit lazy val CordMonoid: Monoid[Cord] = new Monoid[Cord] {
+  implicit val CordMonoid: Monoid[Cord] = new Monoid[Cord] {
     def zero = empty
     def append(x: Cord, y: => Cord) = x ++ y
   }
-  implicit lazy val CordEqual: Equal[Cord] = new Equal[Cord] {
-    def equal(x: Cord, y: Cord) = Equal[FingerTree[Int, String]].equal(x.self, y.self)
+  implicit val CordEqual: Equal[Cord] = new Equal[Cord] {
+    def equal(x: Cord, y: Cord) = Equal[Vector[String]].equal(x.self, y.self)
   }
 }

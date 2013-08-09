@@ -269,8 +269,8 @@ sealed abstract class Validation[+E, +A] extends Product with Serializable {
   /** Show for a validation value. */
   def show[EE >: E, AA >: A](implicit SE: Show[EE], SA: Show[AA]): Cord =
     this match {
-      case Failure(e) => ("Failure(": Cord) ++ Show[EE].show(e) :- ')'
-      case Success(a) => ("Success(": Cord) ++ Show[AA].show(a) :- ')'
+      case Failure(e) => ("Failure(": Cord) ++ Show[EE].show(e) :+ ")"
+      case Success(a) => ("Success(": Cord) ++ Show[AA].show(a) :+ ")"
     }
 
   /** If `this` and `that` are both success, or both a failure, combine them with the provided `Semigroup` for each. Otherwise, return the success. Alias for `+|+` */
