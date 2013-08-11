@@ -3,7 +3,23 @@ package scalaz.syntax
 import annotation.tailrec
 import scalaz.{Applicative, Monoid, NonEmptyList, \/}
 
-trait IdOps[A] extends Ops[A] {
+sealed trait IdOpsDeprecated[A] extends Ops[A]{
+  @deprecated("use scalaz.syntax.either._", "7.1")
+  def left[B]: (A \/ B) =
+    \/.left(self)
+
+  @deprecated("use scalaz.syntax.either._", "7.1")
+  def right[B]: (B \/ A) =
+    \/.right(self)
+
+  @deprecated("use scalaz.syntax.nel._", "7.1")
+  final def wrapNel: NonEmptyList[A] =
+    NonEmptyList(self)
+}
+
+sealed trait IdOpsWithDeprecated[A] extends IdOps[A] with IdOpsDeprecated[A]
+
+sealed trait IdOps[A] extends Ops[A]{
   /**Returns `self` if it is non-null, otherwise returns `d`. */
   final def ??(d: => A)(implicit ev: Null <:< A): A =
     if (self == null) d else self
@@ -25,18 +41,6 @@ trait IdOps[A] extends Ops[A] {
 
   final def squared: (A, A) =
     (self, self)
-
-  @deprecated("use scalaz.syntax.either._", "7.1")
-  def left[B]: (A \/ B) =
-    \/.left(self)
-
-  @deprecated("use scalaz.syntax.either._", "7.1")
-  def right[B]: (B \/ A) =
-    \/.right(self)
-
-  @deprecated("use scalaz.syntax.nel._", "7.1")
-  final def wrapNel: NonEmptyList[A] =
-    NonEmptyList(self)
 
   /**
    * @return the result of pf(value) if defined, otherwise the the Zero element of type B.
@@ -77,6 +81,12 @@ trait IdOps[A] extends Ops[A] {
 
 trait ToIdOps {
   implicit def ToIdOps[A](a: A): IdOps[A] = new IdOps[A] {
+    def self: A = a
+  }
+}
+
+trait ToIdOpsWithDeprecated {
+  implicit def ToIdOpsWithDeprecated[A](a: A): IdOpsWithDeprecated[A] = new IdOpsWithDeprecated[A] {
     def self: A = a
   }
 }
