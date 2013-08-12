@@ -86,6 +86,23 @@ trait ListInstances extends ListInstances0 {
 
   }
 
+  import Tags.Zip
+
+  type ZipList[A] = List[A] @@ Tags.Zip
+
+  implicit val listZipApply: Apply[ZipList] = new Apply[ZipList] {
+    def ap[A, B](fa: => ZipList[A])(f: => ZipList[A => B]) = {
+      @tailrec
+      def loop(fa0: List[A], f0: List[A => B], acc: Vector[B]): List[B] =
+        if (f0.isEmpty || fa0.isEmpty) acc.toList
+        else loop(fa0.tail, f0.tail, acc :+ (f0.head)(fa0.head))
+
+      Zip(loop(fa, f, Vector()))
+    }
+
+    def map[A, B](fa: ZipList[A])(f: A => B) = Zip(fa map f)
+  }
+
   implicit def listMonoid[A]: Monoid[List[A]] = new Monoid[List[A]] {
     def append(f1: List[A], f2: => List[A]) = f1 ::: f2
     def zero: List[A] = Nil
