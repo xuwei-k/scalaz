@@ -222,6 +222,12 @@ sealed abstract class FreeInstances extends TrampolineInstances with SinkInstanc
       override def map[A, B](fa: Free[S, A])(f: A => B) = fa map f
       def bind[A, B](a: Free[S, A])(f: A => Free[S, B]) = a flatMap f
     }
+
+  implicit val freeMonadTrans: MonadTrans[Free] = new MonadTrans[Free] {
+    implicit def apply[G[_]: Monad] = freeMonad[G]
+    def liftM[G[_], A](a: G[A])(implicit G: Monad[G]) =
+      Suspend(Monad[G].map(a)(Return[G, A](_)))
+  }
 }
 
 trait FreeFunctions {
