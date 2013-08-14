@@ -871,8 +871,14 @@ sealed abstract class ==>>[A, B] {
 }
 
 object ==>> extends MapInstances with MapFunctions {
-  private[scalaz] final case class Tip[A, B]() extends ==>>[A, B] {
+  private[this] case object Empty extends (Nothing ==>> Nothing){
     val size = 0
+  }
+
+  private[scalaz] object Tip{
+    def unapply[A, B](a: A ==>> B): Boolean = a eq Empty
+
+    def apply[A, B](): A ==>> B = Empty.asInstanceOf[A ==>> B]
   }
 
   private[scalaz] final case class Bin[A, B](k: A, v: B, l: A ==>> B, r: A ==>> B) extends ==>>[A, B] {
