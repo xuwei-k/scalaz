@@ -58,11 +58,12 @@ trait IdOps[A] extends Ops[A] {
   }
 
   final def doWhileM[M[_]](f: A => M[A], p: A => M[Boolean])(implicit M: Monad[M]): M[A] = {
-    def loop(value: A): M[A] = M.bind(f(value)){ x =>
-      M.bind(p(x)){
-        if(_) loop(x) else M.point(x)
-      }
-    }
+    import M.monadSyntax._
+    def loop(value: A): M[A] = for{
+      x  <- f(value)
+      pp <- p(x)
+      r  <- if(pp) loop(x) else M.point(x)
+    } yield r
     loop(self)
   }
 
