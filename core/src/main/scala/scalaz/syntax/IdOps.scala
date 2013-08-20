@@ -1,7 +1,7 @@
 package scalaz.syntax
 
 import annotation.tailrec
-import scalaz.{Applicative, Monoid, NonEmptyList, \/}
+import scalaz.{Applicative, Monoid, NonEmptyList, \/, Monad}
 
 trait IdOps[A] extends Ops[A] {
   /**Returns `self` if it is non-null, otherwise returns `d`. */
@@ -53,6 +53,13 @@ trait IdOps[A] extends Ops[A] {
     def loop(value: A): A = {
       val x = f(value)
       if (p(x)) loop(x) else x
+    }
+    loop(self)
+  }
+
+  final def doWhileM[M[_]](f: A => M[A], p: A => Boolean)(implicit M: Monad[M]): M[A] = {
+    def loop(value: A): M[A] = M.bind(f(value)){x =>
+      if(p(x)) loop(x) else M.point(x)
     }
     loop(self)
   }
