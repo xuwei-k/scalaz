@@ -57,9 +57,11 @@ trait IdOps[A] extends Ops[A] {
     loop(self)
   }
 
-  final def doWhileM[M[_]](f: A => M[A], p: A => Boolean)(implicit M: Monad[M]): M[A] = {
-    def loop(value: A): M[A] = M.bind(f(value)){x =>
-      if(p(x)) loop(x) else M.point(x)
+  final def doWhileM[M[_]](f: A => M[A], p: A => M[Boolean])(implicit M: Monad[M]): M[A] = {
+    def loop(value: A): M[A] = M.bind(f(value)){ x =>
+      M.bind(p(x)){
+        if(_) loop(x) else M.point(x)
+      }
     }
     loop(self)
   }
