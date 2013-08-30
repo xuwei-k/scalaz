@@ -331,8 +331,8 @@ sealed abstract class TheseInstances0 extends TheseInstances1 {
 
 sealed abstract class TheseInstances1 {
 
-  implicit def TheseInstance1[L]: Traverse[({type l[a] = L \&/ a})#l] with Cobind[({type l[a] = L \&/ a})#l] =
-    new Traverse[({type l[a] = L \&/ a})#l] with Cobind[({type l[a] = L \&/ a})#l] {
+  implicit def TheseInstance1[L]: Traverse[({type l[a] = L \&/ a})#l] with Cobind[({type l[a] = L \&/ a})#l] with Optional[({type l[a] = L \&/ a})#l] =
+    new Traverse[({type l[a] = L \&/ a})#l] with Cobind[({type l[a] = L \&/ a})#l] with Optional[({type l[a] = L \&/ a})#l] {
       def traverseImpl[G[_] : Applicative, A, B](fa: L \&/ A)(f: A => G[B]) =
         fa traverse f
 
@@ -341,6 +341,16 @@ sealed abstract class TheseInstances1 {
 
       override def foldRight[A, B](fa: L \&/ A, z: => B)(f: (A, => B) => B) =
         fa.foldRight(z)(f)
+
+      override def map[A, B](fa: L \&/ A)(f: A => B) =
+        fa map f
+
+      def pextract[B, A](fa: L \&/ A): (L \&/ B) \/ A =
+        fa match {
+          case \&/.This(a)    => -\/(\&/.This(a))
+          case \&/.That(b)    => \/-(b)
+          case \&/.Both(a, b) => \/-(b)
+        }
 
       def cobind[A, B](fa: L \&/ A)(f: (L \&/ A) => B): L \&/ B =
         \&/.That(f(fa))
