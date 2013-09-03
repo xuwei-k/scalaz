@@ -472,4 +472,31 @@ object ScalazProperties {
     }
   }
 
+  object bijectionT {
+    def law1[F[_], G[_], A, B](B: BijectionT[F, G, A, B])(implicit AA: Arbitrary[A], EA: Equal[A], EFB: Equal[F[B]]) =
+      forAll(B.bijectionTLaw.law1 _)
+    def law2[F[_], G[_], A, B](B: BijectionT[F, G, A, B])(implicit AB: Arbitrary[B], EGA: Equal[G[A]], EB: Equal[B]) =
+      forAll(B.bijectionTLaw.law2 _)
+    def laws[F[_], G[_], A, B](B: BijectionT[F, G, A, B])(implicit AA: Arbitrary[A], AB: Arbitrary[B],
+      EA: Equal[A], EB: Equal[B], EGA: Equal[G[A]], EFB: Equal[F[B]]) =
+      new Properties("bijectionT") {
+        property("law1") = law1[F, G, A, B](B)
+        property("law2") = law2[F, G, A, B](B)
+      }
+  }
+
+  object bijection {
+    import BijectionT.Bijection
+
+    def law3[A, B](B: Bijection[A, B])(implicit AA: Arbitrary[A], EA: Equal[A]) =
+      forAll(B.bijectionLaw.law3 _)
+    def law4[A, B](B: Bijection[A, B])(implicit AB: Arbitrary[B], EB: Equal[B]) =
+      forAll(B.bijectionLaw.law4 _)
+    def laws[A, B](B: Bijection[A, B])(implicit AA: Arbitrary[A], AB: Arbitrary[B], EA: Equal[A], EB: Equal[B]) =
+      new Properties("bijection") {
+        include(bijectionT.laws[Id, Id, A, B](B))
+        property("law3") = law3[A, B](B)
+        property("law4") = law4[A, B](B)
+      }
+  }
 }
