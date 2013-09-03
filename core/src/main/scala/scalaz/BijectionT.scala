@@ -54,6 +54,23 @@ final class BijectionT[F[_], G[_], A, B] private[scalaz](_to: A => F[B], _from: 
   /** alias for `andThen` */
   def >=>[C](that: BijectionT[F, G, B, C])(implicit M: Bind[F], GM: Bind[G]): BijectionT[F, G, A, C] = andThen(that)
 
+  trait BijectionTLaw {
+    // TODO better law names
+    def law1(A1: A, A2: A)(implicit EA: Equal[A], EFB: Equal[F[B]]) =
+      EA.equal(A1, A2) == EFB.equal(to(A1), to(A2))
+    def law2(B1: B, B2: B)(implicit EGA: Equal[G[A]], EB: Equal[B]) =
+      EB.equal(B1, B2) == EGA.equal(from(B1), from(B2))
+  }
+
+  trait BijectionLaw {
+    def law3(A: A)(implicit E: Equal[A], evF: F[B] =:= Id[B], evG: G[A] =:= Id[A]) =
+      E.equal(A, from(to(A)))
+    def law4(B: B)(implicit E: Equal[B], evF: F[B] =:= Id[B], evG: G[A] =:= Id[A]) =
+      E.equal(B, to(from(B)))
+  }
+
+  def bijectionTLaw = new BijectionTLaw {}
+  def bijectionLaw = new BijectionLaw {}
 }
 object BijectionT extends BijectionTInstances with BijectionTFunctions
 
