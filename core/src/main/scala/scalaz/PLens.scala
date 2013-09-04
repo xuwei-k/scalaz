@@ -408,12 +408,8 @@ trait PLensFunctions extends PLensInstances with PLensFamilyFunctions {
     }
 
   def listNthPLens[A](n: Int): List[A] @?> A =
-    if(n < 0)
-      nil
-    else if(n == 0)
-      listHeadPLens
-    else
-      listNthPLens(n - 1) compose listTailPLens
+    plens(l =>
+      l.lift(n) map (a => Store(x => l patch (n, List(x), 1), a)))
 
   def listLookupByPLens[K, V](p: K => Boolean): List[(K, V)] @?> V = {
     @annotation.tailrec
@@ -460,12 +456,8 @@ trait PLensFunctions extends PLensInstances with PLensFamilyFunctions {
     }
 
   def streamNthPLens[A](n: Int): Stream[A] @?> A =
-    if(n < 0)
-      nil
-    else if(n == 0)
-      streamHeadPLens
-    else
-      streamNthPLens(n - 1) compose streamTailPLens
+    plens(s =>
+      s.lift(n) map (a => Store(x => s patch (n, Stream(x), 1), a)))
 
   def streamLookupByPLens[K, V](p: K => Boolean): Stream[(K, V)] @?> V = {
     @annotation.tailrec
