@@ -10,6 +10,26 @@ import org.scalacheck.Prop.forAll
 object DievTest extends SpecLite {
   val random = new Random()
 
+  "toEStream" ! forAll {
+    list: List[Int] =>
+    val diev = Diev.fromValuesSeq(list)
+    diev.toEStream.toList must_=== diev.toList
+  }
+
+  "length" ! forAll {
+    set: Set[Int] =>
+    val list = set.toList.sorted
+    val diev = Diev.fromValuesSeq(list)
+    diev.length must_=== list.length
+  }
+
+  "foldRight" ! forAll {
+    set: Set[Int] =>
+    val list = set.toList.sorted
+    val diev = Diev.fromValuesSeq(list)
+    diev.foldRight(List[Int]())(_ :: _) must_=== list.foldRight(List[Int]())(_ :: _)
+  }
+
   "insert order makes no difference" ! forAll {
     (list: List[Int]) => {
       val shuffledList = random.shuffle(list)
@@ -53,4 +73,11 @@ object DievTest extends SpecLite {
 
   checkAll(equal.laws[Diev[Int]])
   checkAll(monoid.laws[Diev[Int]])
+
+  {
+    import org.scalacheck._
+    val listArb = Arbitrary(Gen.listOf(Gen.choose(-1000, 1000)))
+    implicit val dievArb = dievArbitrary[Int](listArb, implicitly)
+    checkAll(foldable.laws[Diev])
+  }
 }

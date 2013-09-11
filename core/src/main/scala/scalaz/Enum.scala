@@ -8,6 +8,8 @@ package scalaz
 trait Enum[F] extends Order[F] { self =>
   ////
 
+  import annotation.tailrec
+
   def succ(a: F): F
   def pred(a: F): F
 
@@ -149,6 +151,39 @@ trait Enum[F] extends Order[F] { self =>
       else
         suspend(fromToLT(if(lessThan(a, z)) succ(a) else pred(a), z) map (a :: _))
     fromToLT(a, z).run
+  }
+
+  /** equivalence to `fromToL(a, z).size` but more efficient */
+  def distance(a: F, z: F): Int = foldl(a, z, 0)((sum, _) => sum + 1)
+
+  /** equivalence to `fromToL(a, b).foldRight(z)(f)` but more efficient */
+  def foldr[A](a: F, b: F, z: A)(f: (F, A) => A): A = {
+    @tailrec
+    def go(start: F, end: F, acc: A): A =
+      if(lessThan(start, end))
+        go(start, pred(end), f(end, acc))
+      else
+        f(end, acc)
+
+    if(lessThan(a, b))
+      go(a, b, z)
+    else
+      go(b, a, z)
+  }
+
+  /** equivalence to `fromToL(a, b).foldLeft(z)(f)` but more efficient */
+  def foldl[A](a: F, b: F, z: A)(f: (A, F) => A): A = {
+    @tailrec
+    def go(start: F, end: F, acc: A): A =
+      if(lessThan(start, end))
+        go(succ(start), end, f(acc, start))
+      else
+        f(acc, start)
+
+    if(lessThan(a, b))
+      go(a, b, z)
+    else
+      go(b, a, z)
   }
 
   def fromStepTo(n: Int, a: F, z: F): EphemeralStream[F] = {

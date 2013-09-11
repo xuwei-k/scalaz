@@ -3,6 +3,7 @@ package scalaz
 import scala.annotation.tailrec
 import scala.collection.mutable.ListBuffer
 import syntax.enum._
+import std.vector._
 
 /**
  * Implementation of a Discrete Interval Encoding Tree [[http://web.engr.oregonstate.edu/~erwig/diet/]] that
@@ -37,9 +38,15 @@ sealed abstract class Diev[A] {
 
   def foldLeft[B](z: B)(f: (B, A) => B): B
 
+  def foldRight[B](z: B)(f: (A, B) => B): B
+
   def toSet(): Set[A]
 
   def toList(): List[A]
+
+  def toEStream: EphemeralStream[A]
+
+  def length: Int
 }
 
 object DievInterval {
@@ -117,7 +124,7 @@ trait DievImplementation {
           val adjacentAfterResult = between.adjacentAfter(correctedInterval)
           construct(
             startPosition,
-            Vector((intervals(startPosition)._1.min(correctedInterval._1), adjacentAfterResult.map(intervals(_)._2).getOrElse(correctedInterval._2))), 
+            Vector((intervals(startPosition)._1.min(correctedInterval._1), adjacentAfterResult.map(intervals(_)._2).getOrElse(correctedInterval._2))),
             adjacentAfterResult.map(_ + 1).orElse(after).getOrElse(intervals.size)
           )
         }
@@ -125,7 +132,7 @@ trait DievImplementation {
           val adjacentBeforeResult = earlyBound.adjacentBefore(correctedInterval)
           construct(
             adjacentBeforeResult.orElse(before.map(_ + 1)).getOrElse(0),
-            Vector((adjacentBeforeResult.map(intervals(_)._1).getOrElse(correctedInterval._1), intervals(endPosition)._2.max(correctedInterval._2))), 
+            Vector((adjacentBeforeResult.map(intervals(_)._1).getOrElse(correctedInterval._1), intervals(endPosition)._2.max(correctedInterval._2))),
             endPosition + 1
           )
         }
@@ -197,9 +204,19 @@ trait DievImplementation {
       }
     }
 
+    def foldRight[B](z: B)(f: (A, B) => B): B =
+      intervals.foldRight(z){(interval, z1) =>
+        EA.foldr(interval._1, interval._2, z1)(f)
+      }
+
     def toSet(): Set[A] = foldLeft[Set[A]](Set[A]())(_ + _)
 
     def toList(): List[A] = foldLeft[ListBuffer[A]](new ListBuffer())(_ += _).toList
+
+    def toEStream: EphemeralStream[A] =
+      intervals.foldLeft(EphemeralStream[A]()){case (acc, (start, end)) => acc ++ (start |=> end)}
+
+    def length: Int = Foldable[Vector].foldMap(intervals){case (a, b) => EA.distance(a, b)}
 
     override def toString(): String = intervals.foldLeft(new StringBuilder().append("("))(_.append(_)).append(")").toString
   }
@@ -220,6 +237,17 @@ sealed abstract class DievInstances extends DievImplementation {
   import std.tuple._, std.vector._
 
   implicit def dievEqual[A: Equal]: Equal[Diev[A]] = Equal.equalBy[Diev[A], Vector[(A, A)]](_.intervals)(std.vector.vectorEqual[(A, A)])
+
+  implicit val dievInstance0: Foldable[Diev] = new Foldable[Diev] {
+    override def foldLeft[A, B](fa: Diev[A], z: B)(f: (B, A) => B) =
+      fa.foldLeft(z)(f)
+    def foldRight[A, B](fa: Diev[A], z: => B)(f: (A, => B) => B) =
+      fa.foldRight(z)((a, b) => f(a, b))
+    def foldMap[A, B](fa: Diev[A])(f: A => B)(implicit M: Monoid[B]) =
+      fa.foldLeft(M.zero)((b, a) => M.append(b, f(a)))
+    override def length[A](fa: Diev[A]) =
+      fa.length
+  }
 
   implicit def dievMonoid[A: Enum]: Monoid[Diev[A]] = new Monoid[Diev[A]] {
     def append(f1: Diev[A], f2: => Diev[A]) = f1 ++ f2
