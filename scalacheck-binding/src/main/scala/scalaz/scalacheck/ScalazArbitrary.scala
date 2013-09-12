@@ -107,7 +107,7 @@ object ScalazArbitrary {
   implicit def TreeLocArbitrary[A](implicit a: Arbitrary[A]): Arbitrary[TreeLoc[A]] =
     Apply[Arbitrary].apply4(
       arb[Tree[A]],
-      arb[Stream[Tree[A]]],
+      arb[TreeLoc.TreeForest[A]],
       arb[Stream[Tree[A]]],
       arb[Stream[(Stream[Tree[A]], A, Stream[Tree[A]])]]
     )(TreeLoc.loc)
