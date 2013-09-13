@@ -30,19 +30,19 @@ trait SetInstances {
    *
    * If `Equal[A].equalIsNatural == true`, than `Any#==` is used.
    */
-  implicit def setOrder[A: Order]: Order[Set[A]] = new Order[Set[A]] {
-    def order(a1: Set[A], a2: Set[A]) = {
+  private def setSubOrder[A: Order, CC[A] <: Set[A]]: Order[CC[A]] = new Order[CC[A]] {
+    def order(a1: CC[A], a2: CC[A]) = {
       import anyVal._
       import scala.math.Ordering.Implicits._
       implicit val o = Order[A].toScalaOrdering
       implicit val so = Order.fromScalaOrdering(seqDerivedOrdering[Seq, A])
       Order[Int].order(a1.size, a2.size) match {
-        case EQ => Order.orderBy((s: Set[A]) => s.toSeq.sorted).order(a1, a2)
+        case EQ => Order.orderBy((s: CC[A]) => s.toSeq.sorted).order(a1, a2)
         case x => x
       }
     }
 
-    override def equal(a1: Set[A], a2: Set[A]) = {
+    override def equal(a1: CC[A], a2: CC[A]) = {
       if (equalIsNatural) a1 == a2
       else {
         implicit val x = Order[A].toScalaOrdering
@@ -54,6 +54,11 @@ trait SetInstances {
     }
     override val equalIsNatural: Boolean = Equal[A].equalIsNatural
   }
+
+  import collection.immutable.TreeSet
+
+  implicit def setOrder[A: Order]: Order[Set[A]] = setSubOrder[A, Set]
+  implicit def treeSetOrder[A: Order]: Order[TreeSet[A]] = setSubOrder[A, TreeSet]
 
   implicit def setMonoid[A]: Monoid[Set[A]] = new Monoid[Set[A]] {
     def append(f1: Set[A], f2: => Set[A]) = f1 ++ f2
