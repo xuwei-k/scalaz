@@ -167,6 +167,14 @@ sealed abstract class EphemeralStreamInstances {
       this.foldRight(fa, M.zero)((a, b) => M.append(f(a), b))
     override def foldLeft[A, B](fa: EphemeralStream[A], z: B)(f: (B, A) => B) =
       fa.foldLeft(z)(b => a => f(b, a))
+    override def foldMap1Opt[A, B](fa: EphemeralStream[A])(f: A => B)(implicit F: Semigroup[B]) =
+      if(fa.isEmpty) None
+      else Some(foldLeft(fa.tail(), f(fa.head()))((b, a) => F.append(b, f(a))))
+    override def foldMapLeft1Opt[A, B](fa: EphemeralStream[A])(z: A => B)(f: (B, A) => B) =
+      if(fa.isEmpty) None
+      else Some(foldLeft(fa.tail(), z(fa.head()))(f))
+    override def foldl1Opt[A](fa: EphemeralStream[A])(f: A => A => A) =
+      foldLeft1Opt(fa)(Function.uncurried(f))
     def traverseImpl[G[_], A, B](fa: EphemeralStream[A])(f: A => G[B])(implicit G: Applicative[G]): G[EphemeralStream[B]] = {
       val seed: G[EphemeralStream[B]] = G.point(EphemeralStream[B]())
 
