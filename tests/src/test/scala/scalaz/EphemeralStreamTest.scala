@@ -103,4 +103,12 @@ class EphemeralStreamTest extends Spec {
     val infiniteStream = EphemeralStream.iterate(true)(identity)
     Foldable[EphemeralStream].foldRight(infiniteStream, true)(_ || _) must be_===(true)
   }
+
+  "foldMap1Opt" ! prop { xs: EphemeralStream[Int] =>
+    import syntax.foldable._
+    val f = Vector(_: Int)
+    val v = xs.foldMap1Opt(f)
+    if(xs.isEmpty) v must be_===(None)
+    else v must be_===(Some(xs.foldMap(f)))
+  }
 }
