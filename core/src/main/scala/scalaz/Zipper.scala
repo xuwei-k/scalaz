@@ -359,7 +359,7 @@ object Zipper extends ZipperInstances with ZipperFunctions
 sealed abstract class ZipperInstances {
   import Zipper._
 
-  implicit val zipperInstance = new Traverse[Zipper] with Applicative[Zipper] with Comonad[Zipper] {
+  implicit val zipperInstance = new Traverse[Zipper] with Foldable1[Zipper] with Applicative[Zipper] with Comonad[Zipper] {
     override def cojoin[A](a: Zipper[A]): Zipper[Zipper[A]] =
       a.positions
     def cobind[A, B](fa: Zipper[A])(f: Zipper[A] => B): Zipper[B] =
@@ -372,8 +372,23 @@ sealed abstract class ZipperInstances {
       fa.foldRight(z)(f)
     override def foldLeft[A, B](fa: Zipper[A], z: B)(f: (B, A) => B): B =
       fa.foldLeft(z)(f)
-    override def foldMap[A, B](fa: Zipper[A])(f: A => B)(implicit F: Monoid[B]) =
-      fa.foldLeft(F.zero)((b, a) => F.append(b, f(a)))
+    override def foldMap1[A, B](fa: Zipper[A])(f: A => B)(implicit F: Semigroup[B]) = {
+      import std.stream._
+      val G = Foldable[Stream]
+      val acc = G.foldMap1Opt(fa.lefts.reverse)(f) match {
+        case Some(x) => F.append(x, f(fa.focus))
+        case None => f(fa.focus)
+      }
+      G.foldLeft(fa.rights, acc)((b, a) => F.append(b, f(a)))
+    }
+    override def foldMapRight1[A, B](fa: Zipper[A])(z: A => B)(f: (A, => B) => B) = {
+      import std.stream._
+      val acc = fa.rights.reverseIterator.toList match {
+        case h :: t => f(fa.focus, t.foldLeft(z(h))((b, a) => f(a, b)))
+        case Nil => z(fa.focus)
+      }
+      fa.lefts.foldLeft(acc)((b, a) => f(a, b))
+    }
     def point[A](a: => A): Zipper[A] =
       zipper(Stream.continually(a), a, Stream.continually(a))
     def ap[A, B](fa: => Zipper[A])(f: => Zipper[A => B]): Zipper[B] =
