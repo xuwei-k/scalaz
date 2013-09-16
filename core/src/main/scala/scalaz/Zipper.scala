@@ -332,11 +332,30 @@ final case class Zipper[+A](lefts: Stream[A], focus: A, rights: Stream[A]) {
   def deleteRightCOr[AA >: A](z: => Zipper[AA]): Zipper[AA] =
     deleteRightC getOrElse z
 
-  def traverse[G[_] : Applicative, B](f: A => G[B]): G[Zipper[B]] = {
+  private def streamTraverse1Opt[G[_], A, B](fa: Stream[A])(f: A => G[B])(implicit G: Apply[G])  = {
+    import std.stream._, syntax.traverse1._
+    fa match {
+      case head #:: tail => Some(
+        tail match {
+          case Stream.Empty => G.map(f(head))(Stream(_))
+          case b #:: bs => G.apply2(f(head), OneAnd(b, bs).traverse1(f)) {
+            case (h1, OneAnd(h2, t)) => h1 #:: h2 #:: t
+          }
+        }
+      )
+      case Stream.Empty => None
+    }
+  }
+
+  def traverse[G[_]: Apply, B](f: A => G[B]): G[Zipper[B]] = {
+    import std.option._, std.stream._, syntax.traverse1._
     val z = (Zipper.zipper(_: Stream[B], _: B, _: Stream[B])).curried
-    val G = Applicative[G]
-    import std.stream.streamInstance
-    G.apF(G.apF(G.map(Traverse[Stream].traverse[G, A, B](lefts.reverse)(f))(s => z(s.reverse)))(f(focus)))(Traverse[Stream].traverse[G, A, B](rights)(f))
+    val G = Apply[Option].compose[G]
+    G.apF(
+      G.apF(
+        G.map(streamTraverse1Opt(lefts.reverse)(f))(s => z(s.reverse))
+      )(Option(f(focus)))
+    )(streamTraverse1Opt(rights)(f)).getOrElse(sys.error("Zipper.traverse1"))
   }
 
   def ap[B](f: => Zipper[A => B]): Zipper[B] = {
@@ -359,15 +378,23 @@ object Zipper extends ZipperInstances with ZipperFunctions
 sealed abstract class ZipperInstances {
   import Zipper._
 
-  implicit val zipperInstance = new Traverse[Zipper] with Applicative[Zipper] with Comonad[Zipper] {
+  implicit val zipperInstance = new Traverse1[Zipper] with Applicative[Zipper] with Comonad[Zipper] {
     override def cojoin[A](a: Zipper[A]): Zipper[Zipper[A]] =
       a.positions
     def cobind[A, B](fa: Zipper[A])(f: Zipper[A] => B): Zipper[B] =
       map(cojoin(fa))(f)
     def copoint[A](p: Zipper[A]): A =
       p.focus
-    def traverseImpl[G[_] : Applicative, A, B](za: Zipper[A])(f: A => G[B]): G[Zipper[B]] =
+    def traverse1Impl[G[_] : Apply, A, B](za: Zipper[A])(f: A => G[B]): G[Zipper[B]] =
       za traverse f
+    def foldMapRight1[A, B](fa: scalaz.Zipper[A])(z: A => B)(f: (A, => B) => B): B = {
+      import std.stream._
+      val acc = fa.rights match {
+        case h #:: t => Foldable[Stream].foldRight(t, z(h))(f)
+        case Stream.Empty => z(fa.focus)
+      }
+      fa.lefts.foldLeft(acc)((b, a) => f(a, b))
+    }
     override def foldRight[A, B](fa: Zipper[A], z: => B)(f: (A, => B) => B): B =
       fa.foldRight(z)(f)
     override def foldLeft[A, B](fa: Zipper[A], z: B)(f: (B, A) => B): B =
