@@ -121,6 +121,15 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
     } yield e.head)._2
   }
 
+  def align[A, B](fa: F[A], fb: F[B]): F[A \&/ B] =
+    if(length(fa) > length(fb)) zipWithL(fa, fb) {
+      case (a, Some(b)) => \&/.Both(a, b)
+      case (a, None   ) => \&/.This(a)
+    } else zipWithL(fb, fa) {
+      case (b, Some(a)) => \&/.Both(a, b)
+      case (b, None   ) => \&/.That(b)
+    }
+
   def zipWith[A,B,C](fa: F[A], fb: F[B])(f: (A, Option[B]) => C): (List[B], F[C]) =
     runTraverseS(fa, toList(fb))(a => for {
       bs <- State.get
