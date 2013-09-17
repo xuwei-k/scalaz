@@ -115,5 +115,16 @@ class TraverseTest extends Spec {
         import syntax.monoid._
         Endo(Traverse[List].reverse[Int]).multiply(2).apply(is) must be_===(is)
     }
+
+    "align" ! prop { (xs: List[Int], ys: List[Int]) =>
+      val a = Traverse[List].align(xs, ys)
+      a must be_===(\&/.alignList(xs, ys))
+      a.length must be_===(xs.length max ys.length)
+      a.takeWhile(_.isBoth).length must be_===(xs.length min ys.length)
+      if(xs.length > ys.length)
+        a.dropWhile(_.isBoth).forall(_.isThis) must be_===(true)
+      else
+        a.dropWhile(_.isBoth).forall(_.isThat) must be_===(true)
+    }
   }
 }
