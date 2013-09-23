@@ -13,6 +13,7 @@ class TheseTest extends Spec {
   checkAll(cobind.laws[TheseInt])
   checkAll(traverse.laws[TheseInt])
   checkAll(equal.laws[Int \&/ Int])
+  checkAll(monoid.laws[Int \&/ Int])
   checkAll(bitraverse.laws[\&/])
 
   implicit def ephemeralStreamShow[A: Show]: Show[EphemeralStream[A]] =

@@ -353,6 +353,8 @@ sealed abstract class TheseInstances0 extends TheseInstances1 {
 
 sealed abstract class TheseInstances1 {
 
+  import \&/.{This, That, Both, These}
+
   implicit def TheseInstance1[L]: Traverse[({type l[a] = L \&/ a})#l] with Cobind[({type l[a] = L \&/ a})#l] =
     new Traverse[({type l[a] = L \&/ a})#l] with Cobind[({type l[a] = L \&/ a})#l] {
       def traverseImpl[G[_] : Applicative, A, B](fa: L \&/ A)(f: A => G[B]) =
@@ -366,6 +368,24 @@ sealed abstract class TheseInstances1 {
 
       def cobind[A, B](fa: L \&/ A)(f: (L \&/ A) => B): L \&/ B =
         \&/.That(f(fa))
+    }
+
+  // does not satisfy the monoid law !
+  // https://github.com/pchiusano/fpinscala/blob/171cea2857/answers/src/main/scala/fpinscala/monoids/Monoid.scala#L302-L316
+  implicit def theseMonoid[A, B](implicit A: Monoid[A], B: Monoid[B]): Monoid[These[A, B]] =
+    new Monoid[These[A, B]] {
+      def append(x: These[A, B], y: => These[A, B]) = (x, y) match {
+        case (This(a1), This(a2)) => This(A.append(a1, a2))
+        case (That(b1), That(b2)) => That(B.append(b1, b2))
+        case (That(b), This(a)) => Both(a, b)
+        case (This(a), That(b)) => Both(a, b)
+        case (Both(a1, b), This(a)) => Both(A.append(a1, a), b)
+        case (Both(a, b1), That(b)) => Both(a, B.append(b1, b))
+        case (This(a1), Both(a, b)) => Both(A.append(a1, a), b)
+        case (That(b), Both(a, b1)) => Both(a, B.append(b1, b))
+        case (Both(a1, b1), Both(a2, b2)) => Both(A.append(a1, a2), B.append(b1, b2))
+      }
+      val zero = Both(A.zero, B.zero)
     }
 
   implicit def TheseEqual[A, B](implicit EA: Equal[A], EB: Equal[B]): Equal[A \&/ B] =
