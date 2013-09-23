@@ -9,6 +9,8 @@ package scalaz
 trait Foldable1[F[_]] extends Foldable[F] { self =>
   ////
 
+  import collection.generic.CanBuildFrom
+
   /**The product of Foldable1 `F` and `G`, `[x](F[x], G[x]])`, is a Foldable1 */
   def product[G[_]](implicit G0: Foldable1[G]): Foldable1[({type λ[α] = (F[α], G[α])})#λ] = new ProductFoldable1[F, G] {
     implicit def F = self
@@ -41,6 +43,16 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
       case (None, r) => some(z(r))
       case (Some(l), r) => some(f(l, r))
     }.getOrElse(sys.error("foldMapLeft1"))
+  }
+
+  def nel[A](fa: F[A]): NonEmptyList[A] = {
+    val OneAnd(head, tail) = oneAnd[List, A](fa)
+    NonEmptyList.nel(head, tail)
+  }
+
+  def oneAnd[G[_], A](fa: F[A])(implicit c: CanBuildFrom[Nothing, A, G[A]]): OneAnd[G, A] = {
+    val (head, builder) = foldMapLeft1(fa)(a => (a, c())){case (acc, a) => acc._2 += a; acc }
+    OneAnd(head, builder.result)
   }
 
   /**Left-associative fold of a structure. */
