@@ -4,12 +4,16 @@ package std
 import std.AllInstances._
 import org.scalacheck.Arbitrary, Arbitrary.arbitrary
 import scalaz.scalacheck.ScalazProperties._
+import scalaz.scalacheck.ScalazArbitrary._
 import scala.math.{Ordering => SOrdering}
+import scala.collection.immutable.SortedMap
 
 class MapTest extends Spec {
   checkAll(traverse.laws[({type F[V] = Map[Int,V]})#F])
   checkAll(isEmpty.laws[({type F[V] = Map[Int,V]})#F])
   checkAll(monoid.laws[Map[Int,String]])
+  checkAll(monoid.laws[SortedMap[Int,String]])
+  checkAll(equal.laws[SortedMap[Int,String]])
   checkAll(order.laws[Map[Int,String]])
   checkAll(equal.laws[Map[Int,String]])
 

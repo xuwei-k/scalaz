@@ -1,6 +1,8 @@
 package scalaz
 package std
 
+import scala.collection.immutable.SortedMap
+
 sealed trait MapInstances0 {
   private[std] trait MapEqual[K, V] extends Equal[Map[K, V]] {
     implicit def OK: Order[K]
@@ -16,6 +18,19 @@ sealed trait MapInstances0 {
       }
     }
     override val equalIsNatural: Boolean = Equal[K].equalIsNatural && Equal[V].equalIsNatural
+  }
+
+  implicit def sortedMapEqual[K, V](implicit V: Equal[V]): Equal[SortedMap[K, V]] = new Equal[SortedMap[K, V]] {
+
+    override def equal(a1: SortedMap[K, V], a2: SortedMap[K, V]): Boolean = {
+      import set._
+      implicit val E = Order.fromScalaOrdering(a1.ordering)
+      Equal[Set[K]].equal(a1.keySet, a2.keySet) && {
+        a1.forall {
+          case (k, v) => a2.get(k).exists(v2 => V.equal(v, v2))
+        }
+      }
+    }
   }
 
   implicit def mapEqual[K: Order, V: Equal]: Equal[Map[K, V]] = new MapEqual[K, V] {
@@ -39,6 +54,13 @@ trait MapInstances extends MapInstances0 {
       import G.functorSyntax._
       list.listInstance.traverseImpl(m.toList)({ case (k, v) => f(v) map (k -> _) }) map (_.toMap)
     }
+  }
+
+  implicit def sortedMapMonoid[A : scala.Ordering,B : Semigroup] = new Monoid[SortedMap[A,B]]{
+    def append(f1: SortedMap[A, B], f2: => SortedMap[A, B]): SortedMap[A, B] =
+      mapMonoid[A,B].append(f1,f2).asInstanceOf[SortedMap[A,B]]
+
+    def zero: SortedMap[A, B] = SortedMap.empty[A,B]
   }
 
   /** Map union monoid, unifying values with `V`'s `append`. */

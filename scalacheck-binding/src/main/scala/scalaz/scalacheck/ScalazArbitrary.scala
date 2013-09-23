@@ -4,6 +4,7 @@ package scalacheck
 import java.math.BigInteger
 import org.scalacheck.{Gen, Arbitrary}
 import collection.mutable.ArraySeq
+import collection.immutable.SortedMap
 
 /**
  * Instances of {@link scalacheck.Arbitrary} for many types in Scalaz.
@@ -246,6 +247,10 @@ object ScalazArbitrary {
 
   implicit def heapArbitrary[A](implicit O: Order[A], A: Arbitrary[List[A]]) = {
     Functor[Arbitrary].map(A)(as => Heap.fromData(as))
+  }
+
+  implicit def sortedMapArbitrary[A, B](implicit A: Arbitrary[List[(A, B)]], O: scala.Ordering[A]): Arbitrary[SortedMap[A, B]] = {
+    Functor[Arbitrary].map(A)(as => SortedMap(as: _*))
   }
 
   implicit def insertionMapArbitrary[A, B](implicit A: Arbitrary[List[(A, B)]]): Arbitrary[InsertionMap[A, B]] = {
