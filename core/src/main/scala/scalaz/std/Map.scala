@@ -4,11 +4,11 @@ package std
 import scala.collection.immutable.SortedMap
 
 sealed trait MapInstances0 {
-  private[std] trait MapEqual[K, V] extends Equal[Map[K, V]] {
+  private[std] trait MapEqual[K, V, CC[K, V] <: Map[K, V]] extends Equal[CC[K, V]] {
     implicit def OK: Order[K]
     implicit def OV: Equal[V]
 
-    override def equal(a1: Map[K, V], a2: Map[K, V]): Boolean = {
+    override def equal(a1: CC[K, V], a2: CC[K, V]): Boolean = {
       import set._
       if (equalIsNatural) a1 == a2
       else Equal[Set[K]].equal(a1.keySet, a2.keySet) && {
@@ -20,20 +20,12 @@ sealed trait MapInstances0 {
     override val equalIsNatural: Boolean = Equal[K].equalIsNatural && Equal[V].equalIsNatural
   }
 
-  implicit def sortedMapEqual[K, V](implicit V: Equal[V]): Equal[SortedMap[K, V]] = new Equal[SortedMap[K, V]] {
-
-    override def equal(a1: SortedMap[K, V], a2: SortedMap[K, V]): Boolean = {
-      import set._
-      implicit val E = Order.fromScalaOrdering(a1.ordering)
-      Equal[Set[K]].equal(a1.keySet, a2.keySet) && {
-        a1.forall {
-          case (k, v) => a2.get(k).exists(v2 => V.equal(v, v2))
-        }
-      }
-    }
+  implicit def sortedMapEqual[K: Order, V: Equal]: Equal[SortedMap[K, V]] = new MapEqual[K, V, SortedMap] {
+    def OK = Order[K]
+    def OV = Equal[V]
   }
 
-  implicit def mapEqual[K: Order, V: Equal]: Equal[Map[K, V]] = new MapEqual[K, V] {
+  implicit def mapEqual[K: Order, V: Equal]: Equal[Map[K, V]] = new MapEqual[K, V, Map] {
     def OK = Order[K]
     def OV = Equal[V]
   }
@@ -56,19 +48,25 @@ trait MapInstances extends MapInstances0 {
     }
   }
 
-  implicit def sortedMapMonoid[A : scala.Ordering,B : Semigroup] = new Monoid[SortedMap[A,B]]{
-    def append(f1: SortedMap[A, B], f2: => SortedMap[A, B]): SortedMap[A, B] =
-      mapMonoid[A,B].append(f1,f2).asInstanceOf[SortedMap[A,B]]
-
-    def zero: SortedMap[A, B] = SortedMap.empty[A,B]
-  }
+  implicit def sortedMapMonoid[K: scala.Ordering, V: Semigroup]: Monoid[SortedMap[K, V]] =
+    new MapSubMonoid[K, V, SortedMap]{
+      def add(m: SortedMap[K, V], kv: (K, V)) = m + kv
+      def zero = SortedMap()
+    }
 
   /** Map union monoid, unifying values with `V`'s `append`. */
-  implicit def mapMonoid[K, V: Semigroup]: Monoid[Map[K, V]] = new Monoid[Map[K, V]] {
-    def zero = Map[K, V]()
-    def append(m1: Map[K, V], m2: => Map[K, V]) = {
+  implicit def mapMonoid[K, V: Semigroup]: Monoid[Map[K, V]] =
+    new MapSubMonoid[K, V, Map] {
+      def add(m: Map[K, V], kv: (K, V)) = m + kv
+      def zero = Map()
+    }
+
+  private abstract class MapSubMonoid[K, V: Semigroup, CC[K, V] <: Map[K, V]] extends Monoid[CC[K, V]] {
+    protected def add(m: CC[K, V], kv: (K, V)): CC[K, V]
+
+    override def append(m1: CC[K, V], m2: => CC[K, V]) = {
       // Eagerly consume m2 as the value is used more than once.
-      val m2Instance: Map[K, V] = m2
+      val m2Instance = m2
       // semigroups are not commutative, so order may matter.
       val (from, to, semigroup) = {
         if (m1.size > m2Instance.size) (m2Instance, m1, Semigroup[V].append(_: V, _: V))
@@ -76,7 +74,7 @@ trait MapInstances extends MapInstances0 {
       }
 
       from.foldLeft(to) {
-        case (to, (k, v)) => to + (k -> to.get(k).map(semigroup(_, v)).getOrElse(v))
+        case (to, (k, v)) => add(to, (k, to.get(k).map(semigroup(_, v)).getOrElse(v)))
       }
     }
   }
@@ -87,7 +85,7 @@ trait MapInstances extends MapInstances0 {
                   case (k, v) => Cord(K show k, "->", V show v)
                 }: _*) :+ "]")
 
-  implicit def mapOrder[K: Order, V: Order]: Order[Map[K, V]] = new Order[Map[K, V]] with MapEqual[K, V] {
+  implicit def mapOrder[K: Order, V: Order]: Order[Map[K, V]] = new Order[Map[K, V]] with MapEqual[K, V, Map] {
     def OK = Order[K]
     def OV = Equal[V]
     def order(x: Map[K, V], y: Map[K, V]): Ordering = {
