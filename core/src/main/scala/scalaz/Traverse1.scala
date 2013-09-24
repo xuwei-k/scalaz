@@ -25,6 +25,12 @@ trait Traverse1[F[_]] extends Traverse[F] with Foldable1[F] { self =>
       def G = G0
     }
 
+  def compose[G[_]](implicit G0: Traverse1[G]): Traverse1[({type λ[α] = F[G[α]]})#λ] =
+    new CompositionTraverse1[F, G] {
+      def F = self
+      def G = G0
+    }
+
   /** Transform `fa` using `f`, collecting all the `G`s with `ap`. */
   def traverse1Impl[G[_]:Apply,A,B](fa: F[A])(f: A => G[B]): G[F[B]]
 
