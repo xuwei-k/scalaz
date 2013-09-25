@@ -235,7 +235,11 @@ object ScalazProperties {
                                                F: Traverse[F], N: Applicative[N], M: Applicative[M], MN: Equal[(M[F[B]], N[F[B]])]): Prop =
       forAll(F.traverseLaw.parallelFusion[N, M, A, B] _)
 
-    def laws[F[_]](implicit fa: Arbitrary[F[Int]], F: Traverse[F], EF: Equal[F[Int]]) =
+    private[scalaz] val option2list = new (Option ~> List) {
+      def apply[A](a: Option[A]) = a.toList
+    }
+
+    def laws[F[_]](implicit fa: Arbitrary[F[Int]], fma: Arbitrary[F[Option[Int]]], F: Traverse[F], EF: Equal[F[Int]]) =
       new Properties("traverse") {
         include(functor.laws[F])
         include(foldable.laws[F])
@@ -247,6 +251,7 @@ object ScalazProperties {
         property("purity.stream") = purity[F, Stream, Int]
 
         property("sequential fusion") = sequentialFusion[F, Option, List, Int, Int, Int]
+        property("naturality") = naturality[F, List, Option, Int](option2list)
         // TODO naturality, parallelFusion
       }
   }
@@ -262,7 +267,8 @@ object ScalazProperties {
   }
 
   object bitraverse {
-    def laws[F[_, _]](implicit fa: Arbitrary[F[Int,Int]], F: Bitraverse[F], EF: Equal[F[Int, Int]]) =
+    def laws[F[_, _]](implicit fa: Arbitrary[F[Int,Int]], fma1: Arbitrary[F[Option[Int], Int]],
+      fma2: Arbitrary[F[Int, Option[Int]]], F: Bitraverse[F], EF: Equal[F[Int, Int]]) =
       new Properties("bitraverse") {
         private implicit val left = F.leftTraverse[Int]
         private implicit val right = F.rightTraverse[Int]
@@ -380,7 +386,7 @@ object ScalazProperties {
                                                F: Traverse1[F], N: Apply[N], M: Apply[M], MN: Equal[(M[F[B]], N[F[B]])]): Prop =
       forAll(F.traverse1Law.parallelFusion1[N, M, A, B] _)
 
-    def laws[F[_]](implicit fa: Arbitrary[F[Int]], F: Traverse1[F], EF: Equal[F[Int]]) =
+    def laws[F[_]](implicit fa: Arbitrary[F[Int]], fma: Arbitrary[F[Option[Int]]], F: Traverse1[F], EF: Equal[F[Int]]) =
       new Properties("traverse1") {
         include(traverse.laws[F])
         include(foldable1.laws[F])
@@ -389,6 +395,7 @@ object ScalazProperties {
         import std.list._, std.option._, std.stream._, std.anyVal._
 
         property("sequential fusion (1)") = sequentialFusion1[F, Option, List, Int, Int, Int]
+        property("naturality1") = naturality1[F, List, Option, Int](traverse.option2list)
         // TODO naturality1, parallelFusion1
       }
   }
