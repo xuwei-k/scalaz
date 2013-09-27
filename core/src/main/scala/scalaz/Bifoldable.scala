@@ -70,6 +70,20 @@ trait Bifoldable[F[_, _]]  { self =>
       bifoldRight(fa, z)((_, b) => b)(f)
   }
 
+  trait BifoldableLaw {
+    import std.vector._
+
+    def leftFMConsistent[A: Equal, B: Equal](fa: F[A, B]): Boolean =
+      Equal[Vector[B \/ A]].equal(bifoldMap[A, B, Vector[B \/ A]](fa)(a => Vector(\/-(a)))(b => Vector(-\/(b))),
+                                  bifoldLeft(fa, Vector.empty[B \/ A])(_ :+ \/-(_))(_ :+ -\/(_)))
+
+    def rightFMConsistent[A: Equal, B: Equal](fa: F[A, B]): Boolean =
+      Equal[Vector[B \/ A]].equal(bifoldMap[A, B, Vector[B \/ A]](fa)(a => Vector(\/-(a)))(b => Vector(-\/(b))),
+                                  bifoldRight(fa, Vector.empty[B \/ A])(\/-(_) +: _)(-\/(_) +: _))
+  }
+
+  def bifoldableLaw = new BifoldableLaw {}
+
   ////
   val bifoldableSyntax = new scalaz.syntax.BifoldableSyntax[F] { def F = Bifoldable.this }
 }
