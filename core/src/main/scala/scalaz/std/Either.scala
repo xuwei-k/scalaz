@@ -48,18 +48,25 @@ sealed trait EitherInstances0 {
 }
 
 trait EitherInstances extends EitherInstances0 {
-  implicit val eitherInstance = new Bitraverse[Either] {
+  implicit val eitherInstance: Bitraverse1[Either] = new Bitraverse1[Either] {
     override def bimap[A, B, C, D](fab: Either[A, B])
                                   (f: A => C, g: B => D) = fab match {
       case Left(a)  => Left(f(a))
       case Right(b) => Right(g(b))
     }
 
-    def bitraverseImpl[G[_] : Applicative, A, B, C, D](fab: Either[A, B])
+    def bitraverse1Impl[G[_] : Apply, A, B, C, D](fab: Either[A, B])
                                                   (f: A => G[C], g: B => G[D]) = fab match {
-      case Left(a)  => Applicative[G].map(f(a))(b => Left(b))
-      case Right(b) => Applicative[G].map(g(b))(d => Right(d))
+      case Left(a)  => Functor[G].map(f(a))(b => Left(b))
+      case Right(b) => Functor[G].map(g(b))(d => Right(d))
     }
+
+    def bifoldMap1[A, B, M: Semigroup](fa: Either[A, B])(f: A => M)(g: B => M) =
+      fa.fold(f, g)
+
+    def bifoldMapRight1[A, B, C](fa: Either[A, B])(l: A => C, r: B => C)
+                                (f: (A, => C) => C)(g: (B, => C) => C): C =
+      fa.fold(l, r)
   }
 
   /** Right biased monad */

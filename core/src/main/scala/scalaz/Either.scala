@@ -370,13 +370,25 @@ sealed abstract class DisjunctionInstances2 extends DisjunctionInstances3 {
 }
 
 sealed abstract class DisjunctionInstances3 {
-  implicit val DisjunctionInstances3 : Bitraverse[\/] = new Bitraverse[\/] {
+  implicit val DisjunctionInstances3 : Bitraverse1[\/] = new Bitraverse1[\/] {
     override def bimap[A, B, C, D](fab: A \/ B)
                                   (f: A => C, g: B => D) = fab bimap (f, g)
 
-    def bitraverseImpl[G[_] : Applicative, A, B, C, D](fab: A \/ B)
+    def bitraverse1Impl[G[_] : Apply, A, B, C, D](fab: A \/ B)
                                                   (f: A => G[C], g: B => G[D]) =
       fab.bitraverse(f, g)
+
+    def bifoldMap1[A, B, M: Semigroup](fa: A \/ B)(f: A => M)(g: B => M) =
+      fa match {
+        case -\/(a) => f(a)
+        case \/-(b) => g(b)
+      }
+
+    def bifoldMapRight1[A, B, C](fa: A \/ B)(l: A => C, r: B => C)(f: (A, => C) => C)(g: (B, => C) => C): C =
+      fa match {
+        case -\/(a) => l(a)
+        case \/-(b) => r(b)
+      }
   }
 }
 

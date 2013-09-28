@@ -2,11 +2,15 @@ package scalaz
 package std
 
 sealed trait TupleInstances0 {
-  implicit def tuple2Bitraverse[A1, A2] = new Bitraverse[Tuple2] {
+  implicit val tuple2Bitraverse1: Bitraverse1[Tuple2] = new Bitraverse1[Tuple2] {
     override def bimap[A, B, C, D](fab: (A, B))(f: A => C, g: B => D) =
       (f(fab._1), g(fab._2))
-    def bitraverseImpl[G[_]: Applicative, A, B, C, D](fab: (A, B))(f: A => G[C], g: B => G[D]) =
-      Applicative[G].apply2(f(fab._1), g(fab._2))((_, _))
+    def bitraverse1Impl[G[_]: Apply, A, B, C, D](fab: (A, B))(f: A => G[C], g: B => G[D]) =
+      Apply[G].apply2(f(fab._1), g(fab._2))((_, _))
+    def bifoldMap1[A, B, M](fa: (A, B))(f: A => M)(g: B => M)(implicit M: Semigroup[M]) =
+      M.append(f(fa._1), g(fa._2))
+    def bifoldMapRight1[A, B, C](fa: (A, B))(l: A => C, r: B => C)(f: (A, => C) => C)(g: (B, => C) => C) =
+      f(fa._1, r(fa._2))
   }
 
   implicit def tuple1Semigroup[A1](implicit A1: Semigroup[A1]): Semigroup[Tuple1[A1]] = new Tuple1Semigroup[A1] {

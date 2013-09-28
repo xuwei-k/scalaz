@@ -39,7 +39,7 @@ trait Bifoldable[F[_, _]]  { self =>
   }
 
   // derived functions
-  def bifoldMap1[A,B,M](fa: F[A,B])(f: A => M)(g: B => M)(implicit F: Semigroup[M]): Option[M] = {
+  def bifoldMap1Opt[A,B,M](fa: F[A,B])(f: A => M)(g: B => M)(implicit F: Semigroup[M]): Option[M] = {
     import std.option._
     bifoldMap(fa)(a => some(f(a)))(b => some(g(b)))
   }

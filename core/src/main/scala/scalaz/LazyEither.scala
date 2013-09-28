@@ -164,15 +164,22 @@ sealed abstract class LazyEitherInstances {
      fa.fold(e => -\/(LazyEither.lazyLeft(e)), a => \/-(a))
   }
 
-  implicit val lazyEitherBitraverse: Bitraverse[LazyEither] = new Bitraverse[LazyEither] {
+  implicit val lazyEitherBitraverse: Bitraverse1[LazyEither] = new Bitraverse1[LazyEither] {
     override def bimap[A, B, C, D](fab: LazyEither[A, B])(f: A => C, g: B => D) =
       fab.map(x => g(x)).left.map(x => f(x))
 
-    def bitraverseImpl[G[_] : Applicative, A, B, C, D](fab: LazyEither[A, B])
-                                                  (f: A => G[C], g: B => G[D]): G[LazyEither[C, D]] =
+    def bifoldMap1[A, B, M: Semigroup](fa: LazyEither[A, B])(f: A => M)(g: B => M) =
+      fa.fold(a => f(a), b => g(b))
+
+    def bifoldMapRight1[A, B, C](fa: LazyEither[A,B])(l: A => C, r: B => C)
+                                (f: (A, => C) => C)(g: (B, => C) => C) =
+      fa.fold(a => l(a), b => r(b))
+
+    def bitraverse1Impl[G[_] : Apply, A, B, C, D](fab: LazyEither[A, B])
+                                                 (f: A => G[C], g: B => G[D]): G[LazyEither[C, D]] =
       fab.fold(
-        a => Applicative[G].map(f(a))(b => LazyEither.lazyLeft[D](b)),
-        b => Applicative[G].map(g(b))(d => LazyEither.lazyRight[C](d))
+        a => Functor[G].map(f(a))(c => LazyEither.lazyLeft[D](c)),
+        b => Functor[G].map(g(b))(d => LazyEither.lazyRight[C](d))
       )
   }
 }

@@ -53,6 +53,8 @@ object TypeClass {
   lazy val bifunctor = TypeClass("Bifunctor", *^*->*)
   lazy val bifoldable = TypeClass("Bifoldable", *^*->*)
   lazy val bitraverse = TypeClass("Bitraverse", *^*->*, extendsList = Seq(bifunctor, bifoldable))
+  lazy val bifoldable1 = TypeClass("Bifoldable1", *^*->*, extendsList = Seq(bifoldable))
+  lazy val bitraverse1 = TypeClass("Bitraverse1", *^*->*, extendsList = Seq(bitraverse, bifoldable1))
   lazy val compose = TypeClass("Compose", *^*->*)
   lazy val catchable = TypeClass("Catchable", *->*, extendsList = Seq())
   lazy val nondeterminism = TypeClass("Nondeterminism", *->*, extendsList = Seq(monad))
@@ -103,6 +105,8 @@ object TypeClass {
     bifunctor,
     bifoldable,
     bitraverse,
+    bifoldable1,
+    bitraverse1,
     catchable,
     nondeterminism,
     compose,

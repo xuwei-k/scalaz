@@ -433,13 +433,20 @@ sealed abstract class ValidationInstances2 extends ValidationInstances3 {
 }
 
 sealed abstract class ValidationInstances3 {
-  implicit val ValidationInstances0 : Bitraverse[Validation] = new Bitraverse[Validation] {
+  implicit val ValidationInstances0 : Bitraverse1[Validation] = new Bitraverse1[Validation] {
     override def bimap[A, B, C, D](fab: Validation[A, B])
                                   (f: A => C, g: B => D) = fab bimap (f, g)
 
-    def bitraverseImpl[G[_] : Applicative, A, B, C, D](fab: Validation[A, B])
+    def bitraverse1Impl[G[_] : Apply, A, B, C, D](fab: Validation[A, B])
                                                   (f: A => G[C], g: B => G[D]) =
       fab.bitraverse(f, g)
+
+    def bifoldMap1[A, B, M](fa: Validation[A, B])(f: A => M)(g: B => M)(implicit M: Semigroup[M]) =
+      fa.fold(f, g)
+
+    def bifoldMapRight1[A, B, C](fa: Validation[A, B])(l: A => C, r: B => C)
+                                (f: (A, => C) => C)(g: (B, => C) => C) =
+      fa.fold(l, r)
   }
 
   implicit def ValidationApplicative[L: Semigroup]: Applicative[({type l[a] = Validation[L, a]})#l] = new Applicative[({type l[a] = Validation[L, a]})#l] {

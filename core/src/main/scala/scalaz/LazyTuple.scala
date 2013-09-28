@@ -82,11 +82,17 @@ trait LazyTupleFunctions {
 }
 
 sealed abstract class LazyTuple2Instances0 {
-  implicit def lazyTuple2Instance[A1, A2] = new Bitraverse[LazyTuple2] {
+  implicit val lazyTuple2Instance: Bitraverse1[LazyTuple2] = new Bitraverse1[LazyTuple2] {
     override def bimap[A, B, C, D](fab: LazyTuple2[A, B])(f: A => C, g: B => D): LazyTuple2[C, D] = LazyTuple.lazyTuple2(f(fab._1), g(fab._2))
-    def bitraverseImpl[G[_]: Applicative, A, B, C, D](fab: LazyTuple2[A, B])(f: A => G[C], g: B => G[D]): G[LazyTuple2[C, D]] = {
-      Applicative[G].apply2(f(fab._1), g(fab._2))(LazyTuple.lazyTuple2(_, _))
-    }
+    def bitraverse1Impl[G[_]: Apply, A, B, C, D](fab: LazyTuple2[A, B])(f: A => G[C], g: B => G[D]): G[LazyTuple2[C, D]] =
+      Apply[G].apply2(f(fab._1), g(fab._2))(LazyTuple.lazyTuple2(_, _))
+
+    def bifoldMap1[A, B, M](fab: LazyTuple2[A, B])(f: A => M)(g: B => M)(implicit M: Semigroup[M]) =
+      M.append(f(fab._1), g(fab._2))
+
+    def bifoldMapRight1[A, B, C](fab: LazyTuple2[A, B])(l: A => C, r: B => C)
+                                (f: (A, => C) => C)(g: (B, => C) => C) =
+      f(fab._1, r(fab._2))
   }
 
   implicit def lazyTuple2Semigroup[A1, A2](implicit A1: Semigroup[A1], A2: Semigroup[A2]): Semigroup[LazyTuple2[A1, A2]] = new LazyTuple2Semigroup[A1, A2] {

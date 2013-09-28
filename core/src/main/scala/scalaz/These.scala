@@ -331,19 +331,27 @@ sealed abstract class TheseInstances0 extends TheseInstances1 {
         \&/.That(a)
     }
 
-  implicit val TheseBitraverse: Bitraverse[\&/] =
-    new Bitraverse[\&/] {
+  implicit val TheseBitraverse1: Bitraverse1[\&/] =
+    new Bitraverse1[\&/] {
       override def bimap[A, B, C, D](fab: A \&/ B)(f: A => C, g: B => D) =
         fab.bimap(f, g)
 
-      override def bifoldMap[A, B, M](fa: A \&/ B)(f: A => M)(g: B => M)(implicit F: Monoid[M]) =
+      override def bifoldMap1[A, B, M: Semigroup](fa: A \&/ B)(f: A => M)(g: B => M) =
         fa.bifoldMap(f)(g)
 
       override def bifoldRight[A, B, C](fa: A \&/ B, z: => C)(f: (A, => C) => C)(g: (B, => C) => C) =
         fa.bifoldRight(z)(f)(g)
 
-      def bitraverseImpl[G[_] : Applicative, A, B, C, D](fab: A \&/ B)(f: A => G[C], g: B => G[D]) =
+      def bitraverse1Impl[G[_] : Apply, A, B, C, D](fab: A \&/ B)(f: A => G[C], g: B => G[D]) =
         fab.bitraverse(f, g)
+
+      def bifoldMapRight1[A, B, C](fa: A \&/ B)(l: A => C, r: B => C)(f: (A, => C) => C)(g: (B, => C) => C): C =
+        fa match{
+          case \&/.This(a)    => l(a)
+          case \&/.That(b)    => r(b)
+          case \&/.Both(a, b) => f(a, r(b))
+        }
+
     }
 
 }
