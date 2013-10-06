@@ -80,7 +80,7 @@ trait Konst[A] {
 //trait On[P[_,_], F[_]] {
 //  type Apply[A, B] = P[F[A], F[B]]
 //}
-//
-//trait Distributes[F[_], G[_]] {
-//  def apply[A](f: F[G[A]]): G[F[A]]
-//}
+
+trait Distributes[F[_], G[_]] {
+  def apply[A](f: F[G[A]]): G[F[A]]
+}
