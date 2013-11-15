@@ -17,6 +17,13 @@ object ScalazArbitrary {
 
   private def arb[A: Arbitrary]: Arbitrary[A] = implicitly[Arbitrary[A]]
 
+  /** workaround for [[https://github.com/rickynils/scalacheck/issues/75]] */
+  implicit def arbOption[T](implicit a: Arbitrary[T]): Arbitrary[Option[T]] =
+    Arbitrary(frequency(
+      (5, arbitrary[T].map(Some(_))),
+      (1, Gen.value(None))
+    ))
+
   /** @since 7.0.3 */
   implicit def theseArb[A: Arbitrary, B: Arbitrary]: Arbitrary[A \&/ B] =
     Arbitrary(Gen.oneOf(
