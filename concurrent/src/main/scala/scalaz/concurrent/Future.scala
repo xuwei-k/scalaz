@@ -10,6 +10,7 @@ import scalaz.Free.Trampoline
 import scalaz.Trampoline
 import scalaz.syntax.monad._
 import scalaz.{\/, -\/, \/-}
+import scalaz.Reader
 
 import scala.concurrent.SyncVar
 import scala.concurrent.duration._
@@ -194,7 +195,7 @@ sealed abstract class Future[+A] {
    * and attempts to cancel the running computation.
    * This implementation will not block the future's execution thread
    */
-  def timed(timeoutInMillis: Long)(implicit scheduler:ScheduledExecutorService): Future[Throwable \/ A] =  
+  def timed(timeoutInMillis: Long): FutureR[Throwable \/ A] = { scheduler =>
     //instead of run this though chooseAny, it is run through simple primitive, 
     //as we are never interested in results of timeout callback, and this is more resource savvy
     async[Throwable \/ A] { cb =>
@@ -212,11 +213,10 @@ sealed abstract class Future[+A] {
       
       runAsyncInterruptibly(a => if(done.compareAndSet(false,true)) cb(\/-(a)), cancel) 
     }
-    
+  }
     
 
-  def timed(timeout: Duration)(implicit scheduler:ScheduledExecutorService =
-      Strategy.DefaultTimeoutScheduler): Future[Throwable \/ A] = timed(timeout.toMillis)
+  def timed(timeout: Duration): FutureR[Throwable \/ A] = timed(timeout.toMillis)
 
   /**
    * Returns a `Future` that delays the execution of this `Future` by the duration `t`.
@@ -374,4 +374,6 @@ object Future {
    */
   def gatherUnordered[A](fs: Seq[Future[A]]): Future[List[A]] =
     futureInstance.gatherUnordered(fs)
+
+  type FutureR[+A] = ScheduledExecutorService => Future[A]
 }

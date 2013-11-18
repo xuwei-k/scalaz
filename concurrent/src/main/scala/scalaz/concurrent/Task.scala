@@ -3,7 +3,7 @@ package scalaz.concurrent
 import java.util.concurrent.{ScheduledExecutorService, ConcurrentLinkedQueue, ExecutorService, Executors}
 import java.util.concurrent.atomic.{AtomicBoolean, AtomicInteger}
 
-import scalaz.{Catchable, Nondeterminism, Traverse, \/, -\/, \/-}
+import scalaz.{Catchable, Nondeterminism, Traverse, \/, -\/, \/-, Reader}
 import scalaz.syntax.monad._
 import scalaz.std.list._
 import scalaz.Free.Trampoline
@@ -11,6 +11,9 @@ import scalaz.Trampoline
 
 import collection.JavaConversions._
 import scala.concurrent.duration._
+
+import Task.TaskR
+import scalaz.std.function._
 
 /*
  * `Task[A]` is a `scalaz.concurrent.Future[Throwable \/ A]`,
@@ -138,11 +141,10 @@ class Task[+A](val get: Future[Throwable \/ A]) {
    * A `Task` which returns a `TimeoutException` after `timeoutInMillis`,
    * and attempts to cancel the running computation.
    */
-  def timed(timeoutInMillis: Long)(implicit scheduler:ScheduledExecutorService): Task[A] =
-    new Task(get.timed(timeoutInMillis).map(_.join))
+  def timed(timeoutInMillis: Long): TaskR[A] =
+    get.timed(timeoutInMillis).andThen(future => new Task(future.map(_.join)))
 
-  def timed(timeout: Duration)(implicit scheduler:ScheduledExecutorService =
-  Strategy.DefaultTimeoutScheduler): Task[A] = timed(timeout.toMillis)
+  def timed(timeout: Duration): TaskR[A] = timed(timeout.toMillis)
 
   /**
    * Retries this task if it fails, once for each element in `delays`,
@@ -307,5 +309,7 @@ object Task {
   /** Utility function - evaluate `a` and catch and return any exceptions. */
   def Try[A](a: => A): Throwable \/ A =
     try \/-(a) catch { case e: Exception => -\/(e) }
+
+  type TaskR[+A] = ScheduledExecutorService => Task[A]
 }
 
