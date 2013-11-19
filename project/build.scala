@@ -43,13 +43,13 @@ object build extends Build {
     enableCrossBuild = true
   )
 
-  val latestScala211PreRelease = "2.11.0-M5"
+  val latestScala211PreRelease = "2.11.0-M7"
   def scalaCheckVersion = "1.10.1"
 
   lazy val standardSettings: Seq[Sett] = Defaults.defaultSettings ++ sbtrelease.ReleasePlugin.releaseSettings ++ Seq[Sett](
     organization := "org.scalaz",
 
-    scalaVersion := "2.10.2",
+    scalaVersion := "2.11.0-M7",
     crossScalaVersions := Seq("2.9.3", "2.10.2"),
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     scalaBinaryVersion in update := (
@@ -62,7 +62,7 @@ object build extends Build {
         else
           // does not contain -deprecation (because of ClassManifest)
           // contains -language:postfixOps (because 1+ as a parameter to a higher-order function is treated as a postfix op)
-          Seq("-feature", "-language:implicitConversions", "-language:higherKinds", "-language:existentials", "-language:postfixOps")
+          Seq("-feature", "-language:implicitConversions", "-language:higherKinds", "-language:existentials", "-language:postfixOps", "-Xexperimental")
 
       Seq("-unchecked") ++ versionDepOpts
     },
@@ -182,11 +182,11 @@ object build extends Build {
   // http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.scala-lang.modules%22%20
   val coreModuleDependencies211 = List[(String, ScalaVersion => String)] (
     "scala-parser-combinators" -> {
-      case _ => "1.0.0-RC3"
+      case _ => "1.0.0-RC4"
     }
     ,
     "scala-xml"                -> {
-      case _ => "1.0.0-RC5"
+      case _ => "1.0.0-RC6"
     }
   )
 
@@ -203,7 +203,7 @@ object build extends Build {
         val version = ScalaVersion(scalaVersion.value)
         if (version.isModularised)
           coreModuleDependencies211 map {
-            case (a, v) => "org.scala-lang.modules" %% a % v(version) intransitive()
+            case (a, v) => "org.scala-lang.modules" % (a + "_2.11.0-M6") % v(version) intransitive()
           }
         else Nil
       },
@@ -285,7 +285,7 @@ object build extends Build {
     dependencies = Seq(core, concurrent, typelevel, xml, iteratee),
     settings     = standardSettings ++ Seq[Sett](
       name := "scalaz-scalacheck-binding",
-      libraryDependencies += "org.scalacheck" %% "scalacheck" % scalaCheckVersion,
+//      libraryDependencies += "org.scalacheck" %% "scalacheck" % scalaCheckVersion,
       osgiExport("scalaz.scalacheck")
     )
   )
@@ -296,8 +296,8 @@ object build extends Build {
     dependencies = Seq(core, iteratee, concurrent, effect, typelevel, xml, scalacheckBinding % "test"),
     settings = standardSettings ++Seq[Sett](
       name := "scalaz-tests",
-      publishArtifact := false,
-      libraryDependencies += "org.scalacheck" %% "scalacheck" % scalaCheckVersion % "test"
+      publishArtifact := false
+//      libraryDependencies += "org.scalacheck" %% "scalacheck" % scalaCheckVersion % "test"
     )
   )
 
