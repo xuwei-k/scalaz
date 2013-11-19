@@ -158,7 +158,6 @@ object Cord {
     def zero = empty
     def append(x: Cord, y: => Cord) = x ++ y
   }
-  implicit lazy val CordEqual: Equal[Cord] = new Equal[Cord] {
-    def equal(x: Cord, y: Cord) = Equal[FingerTree[Int, String]].equal(x.self, y.self)
-  }
+  implicit lazy val CordEqual: Equal[Cord] =
+    (x, y) => Equal[FingerTree[Int, String]].equal(x.self, y.self)
 }

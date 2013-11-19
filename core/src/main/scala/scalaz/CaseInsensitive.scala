@@ -38,9 +38,7 @@ sealed abstract class CaseInsensitiveInstances {
     }
 
   implicit def CaseInsensitiveOrder[A: Order]: Order[CaseInsensitive[A]] =
-    new Order[CaseInsensitive[A]] {
-      def order(a: CaseInsensitive[A], b: CaseInsensitive[A]) = Order[A].order(a.foldedCase, b.foldedCase)
-    }
+    (a, b) => Order[A].order(a.foldedCase, b.foldedCase)
 
   implicit def CaseInsensitiveShow[A: Show]: Show[CaseInsensitive[A]] =
     new Show[CaseInsensitive[A]] {

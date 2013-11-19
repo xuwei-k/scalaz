@@ -8,8 +8,8 @@ trait IterableInstances {
   }
 
   /** Lexicographical ordering */
-  implicit def iterableOrder[A](implicit A: Order[A]): Order[Iterable[A]] = new Order[Iterable[A]] {
-    def order(a1: Iterable[A], a2: Iterable[A]): Ordering = {
+  implicit def iterableOrder[A](implicit A: Order[A]): Order[Iterable[A]] =
+    (a1, a2) => {
       import scalaz.Ordering._
       val i1 = a1.iterator
       val i2 = a2.iterator
@@ -25,7 +25,6 @@ trait IterableInstances {
       }
       anyVal.booleanInstance.order(i1.hasNext, i2.hasNext)
     }
-  }
 
   @deprecated("Length is deprecated, use Foldable#length instead", "7.1")
   implicit def iterableLength: Length[Iterable] = new Length[Iterable] {
@@ -40,8 +39,8 @@ trait IterableInstances {
     }
   }
 
-  implicit def iterableEqual[CC[X] <: Iterable[X], A: Equal]: Equal[CC[A]] = new Equal[CC[A]] {
-    def equal(a1: CC[A], a2: CC[A]) = {
+  implicit def iterableEqual[CC[X] <: Iterable[X], A: Equal]: Equal[CC[A]] =
+    (a1, a2) => {
       val i1 = a1.iterator
       val i2 = a2.iterator
       var b = false
@@ -57,7 +56,6 @@ trait IterableInstances {
 
       !(b || i1.hasNext || i2.hasNext)
     }
-  }
 
   implicit def iterableSubtypeFoldable[I[X] <: Iterable[X]]: Foldable[I] = new Foldable[I] {
     def foldMap[A,B](fa: I[A])(f: A => B)(implicit F: Monoid[B]) = foldRight(fa, F.zero)((x,y) => Monoid[B].append(f(x), y))

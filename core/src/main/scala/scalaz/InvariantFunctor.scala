@@ -53,8 +53,8 @@ object InvariantFunctor {
 
   /** Semigroup is an invariant functor. */
   implicit val semigroupInvariantFunctor: InvariantFunctor[Semigroup] = new InvariantFunctor[Semigroup] {
-    def xmap[A, B](ma: Semigroup[A], f: A => B, g: B => A): Semigroup[B] = new Semigroup[B] {
-      def append(x: B, y: => B): B = f(ma.append(g(x), g(y)))
+    def xmap[A, B](ma: Semigroup[A], f: A => B, g: B => A): Semigroup[B] = {
+      (x, y) => f(ma.append(g(x), g(y)))
     }
   }
 

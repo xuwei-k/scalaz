@@ -378,10 +378,7 @@ sealed abstract class ValidationInstances extends ValidationInstances0 {
 
 sealed abstract class ValidationInstances0 extends ValidationInstances1 {
 
-  implicit def ValidationOrder[E: Order, A: Order]: Order[Validation[E, A]] = new Order[Validation[E, A]] {
-    def order(f1: Validation[E, A], f2: Validation[E, A]) =
-      f1 compare f2
-  }
+  implicit def ValidationOrder[E: Order, A: Order]: Order[Validation[E, A]] = _ compare _
 
   implicit def ValidationMonoid[E: Semigroup, A: Monoid]: Monoid[Validation[E, A]] =
     new Monoid[Validation[E, A]] {
@@ -393,20 +390,12 @@ sealed abstract class ValidationInstances0 extends ValidationInstances1 {
 }
 
 sealed abstract class ValidationInstances1 extends ValidationInstances2 {
-  implicit def ValidationEqual[E: Equal, A: Equal]: Equal[Validation[E, A]] =
-      new Equal[Validation[E, A]] {
-        def equal(a1: Validation[E, A], a2: Validation[E, A]) =
-          a1 === a2
-      }
+  implicit def ValidationEqual[E: Equal, A: Equal]: Equal[Validation[E, A]] = _ === _
 
   implicit def ValidationShow[E: Show, A: Show]: Show[Validation[E, A]] =
     Show.show(_.show)
 
-  implicit def ValidationSemigroup[E: Semigroup, A: Semigroup]: Semigroup[Validation[E, A]] =
-    new Semigroup[Validation[E, A]] {
-      def append(a1: Validation[E, A], a2: => Validation[E, A]) =
-        a1 +++ a2
-    }
+  implicit def ValidationSemigroup[E: Semigroup, A: Semigroup]: Semigroup[Validation[E, A]] = _ +++ _
 }
 
 sealed abstract class ValidationInstances2 extends ValidationInstances3 {

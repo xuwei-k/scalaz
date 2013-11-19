@@ -74,25 +74,20 @@ object Order {
     def contramap[A, B](r: Order[A])(f: B => A): Order[B] = r.contramap(f)
   }
 
-  def fromScalaOrdering[A](implicit O: SOrdering[A]): Order[A] = new Order[A] {
-    def order(a1: A, a2: A) = std.anyVal.intInstance.order(O.compare(a1, a2), 0)
-  }
+  def fromScalaOrdering[A](implicit O: SOrdering[A]): Order[A] =
+    (a1, a2) => std.anyVal.intInstance.order(O.compare(a1, a2), 0)
 
   /** Alias for `Order[B] contramap f`, with inferred `B`. */
   def orderBy[A, B: Order](f: A => B): Order[A] = Order[B] contramap f
 
   /** Derive from an `order` function. */
-  def order[A](f: (A, A) => Ordering): Order[A] = new Order[A] {
-    def order(a1: A, a2: A) = f(a1, a2)
-  }
+  def order[A](f: (A, A) => Ordering): Order[A] = f(_, _)
 
   implicit def orderMonoid[A] = new Monoid[Order[A]] {
-    def zero: Order[A] = new Order[A] {
-      def order(x: A, y: A): Ordering = Monoid[Ordering].zero
-    }
-    def append(f1: Order[A], f2: => Order[A]): Order[A] = new Order[A] {
-      def order(x: A, y: A): Ordering = Semigroup[Ordering].append(f1.order(x, y), f2.order(x, y))
-    }
+    def zero: Order[A] = (x, y) => Monoid[Ordering].zero
+
+    def append(f1: Order[A], f2: => Order[A]): Order[A] =
+      (x, y) => Semigroup[Ordering].append(f1.order(x, y), f2.order(x, y))
   }
 
   ////

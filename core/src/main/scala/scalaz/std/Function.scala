@@ -65,9 +65,8 @@ trait FunctionInstances extends FunctionInstances0 {
       () => G.map(fa)(a => f(a)())
   }
 
-  implicit def function0Equal[R: Equal] = new Equal[() => R] {
-    def equal(a1: () => R, a2: () => R) = Equal[R].equal(a1(), a2())
-  }
+  implicit def function0Equal[R: Equal]: Equal[() => R] =
+    (a1, a2) => Equal[R].equal(a1(), a2())
 
   implicit val function1Instance = new Arrow[Function1] with Category[Function1] with Choice[Function1] {
     def arr[A, B](f: A => B) = f

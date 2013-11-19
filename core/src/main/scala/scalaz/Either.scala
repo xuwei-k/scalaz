@@ -320,11 +320,7 @@ sealed abstract class DisjunctionInstances extends DisjunctionInstances0 {
 }
 
 sealed abstract class DisjunctionInstances0 extends DisjunctionInstances1 {
-  implicit def DisjunctionOrder[A: Order, B: Order]: Order[A \/ B] =
-    new Order[A \/ B] {
-      def order(a1: A \/ B, a2: A \/ B) =
-        a1 compare a2
-    }
+  implicit def DisjunctionOrder[A: Order, B: Order]: Order[A \/ B] = _ compare _
 
   implicit def DisjunctionMonoid[A: Semigroup, B: Monoid]: Monoid[A \/ B] =
     new Monoid[A \/ B] {
@@ -336,20 +332,12 @@ sealed abstract class DisjunctionInstances0 extends DisjunctionInstances1 {
 }
 
 sealed abstract class DisjunctionInstances1 extends DisjunctionInstances2 {
-  implicit def DisjunctionEqual[A: Equal, B: Equal]: Equal[A \/ B] =
-    new Equal[A \/ B] {
-      def equal(a1: A \/ B, a2: A \/ B) =
-        a1 === a2
-    }
+  implicit def DisjunctionEqual[A: Equal, B: Equal]: Equal[A \/ B] = _ === _
 
   implicit def DisjunctionShow[A: Show, B: Show]: Show[A \/ B] =
     Show.show(_.show)
 
-  implicit def DisjunctionSemigroup[A: Semigroup, B: Semigroup]: Semigroup[A \/ B] =
-    new Semigroup[A \/ B] {
-      def append(a1: A \/ B, a2: => A \/ B) =
-        a1 +++ a2
-    }
+  implicit def DisjunctionSemigroup[A: Semigroup, B: Semigroup]: Semigroup[A \/ B] = _ +++ _
 }
 
 sealed abstract class DisjunctionInstances2 extends DisjunctionInstances3 {
