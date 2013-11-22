@@ -173,7 +173,7 @@ object build extends Build {
     base = file("."),
     settings = standardSettings ++ unidocSettings ++ Seq[Sett](
       // <https://github.com/scalaz/scalaz/issues/261>
-      excludedProjects in unidoc in ScalaUnidoc += "typelevel",
+//      excludedProjects in unidoc in ScalaUnidoc += "typelevel",
       publishArtifact := false
     ),
     aggregate = Seq(core, concurrent, effect, example, iteratee, scalacheckBinding, tests, typelevel, xml)
