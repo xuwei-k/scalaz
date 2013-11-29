@@ -5,13 +5,16 @@ package scalaz
  * Profunctors are covariant on the right and contravariant on the left.
  */
 ////
-trait Profunctor[=>:[_, _]]  { self =>
+trait Profunctor[=>:[_, _]] extends BiinvariantFunctor[=>:] { self =>
   ////
   /** Contramap on `A`. */
   def mapfst[A, B, C](fab: (A =>: B))(f: C => A): (C =>: B)
 
   /** Functor map on `B`. */
   def mapsnd[A, B, C](fab: (A =>: B))(f: B => C): (A =>: C)
+
+  def bixmap[A, B, C, D](fab: A =>: B, ac: A => C, ca: C => A, bd: B => D, db: D => B): C =>: D =
+    mapsnd(mapfst(fab)(ca))(bd)
 
   protected[this] trait SndCovariant[C] extends Functor[({type λ[α] = C =>: α})#λ] {
     override def map[A, B](fa: C =>: A)(f: A => B) = mapsnd(fa)(f)

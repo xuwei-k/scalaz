@@ -22,7 +22,7 @@ sealed trait ToBifunctorOps0 {
   
 }
 
-trait ToBifunctorOps extends ToBifunctorOps0 {
+trait ToBifunctorOps extends ToBifunctorOps0 with ToBiinvariantFunctorOps {
   
   implicit def ToBifunctorOps[F[_, _],A, B](v: F[A, B])(implicit F0: Bifunctor[F]) =
       new BifunctorOps[F,A, B](v)
@@ -37,7 +37,7 @@ trait ToBifunctorOps extends ToBifunctorOps0 {
   ////
 }
 
-trait BifunctorSyntax[F[_, _]]  {
+trait BifunctorSyntax[F[_, _]] extends BiinvariantFunctorSyntax[F] {
   implicit def ToBifunctorOps[A, B](v: F[A, B]): BifunctorOps[F, A, B] = new BifunctorOps[F, A, B](v)(BifunctorSyntax.this.F)
 
   def F: Bifunctor[F]

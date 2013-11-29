@@ -5,11 +5,14 @@ package scalaz
  * A type giving rise to two unrelated [[scalaz.Functor]]s.
  */
 ////
-trait Bifunctor[F[_, _]]  { self =>
+trait Bifunctor[F[_, _]] extends BiinvariantFunctor[F] { self =>
   ////
 
   /** `map` over both type parameters. */
   def bimap[A, B, C, D](fab: F[A, B])(f: A => C, g: B => D): F[C, D]
+
+  def bixmap[A, B, C, D](fab: F[A, B], ac: A => C, ca: C => A, bd: B => D, db: D => B): F[C, D] =
+    bimap[A, B, C, D](fab)(ac, bd)
 
   /**The composition of Bifunctors `F` and `G`, `[x,y]F[G[x,y],G[x,y]]`, is a Bifunctor */
   def compose[G[_, _]](implicit G0: Bifunctor[G]): Bifunctor[({type λ[α, β]=F[G[α, β], G[α, β]]})#λ] = new CompositionBifunctor[F, G] {

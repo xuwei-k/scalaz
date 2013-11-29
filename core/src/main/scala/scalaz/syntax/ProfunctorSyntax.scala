@@ -26,7 +26,7 @@ sealed trait ToProfunctorOps0 {
   
 }
 
-trait ToProfunctorOps extends ToProfunctorOps0 {
+trait ToProfunctorOps extends ToProfunctorOps0 with ToBiinvariantFunctorOps {
   
   implicit def ToProfunctorOps[F[_, _],A, B](v: F[A, B])(implicit F0: Profunctor[F]) =
       new ProfunctorOps[F,A, B](v)
@@ -41,7 +41,7 @@ trait ToProfunctorOps extends ToProfunctorOps0 {
   ////
 }
 
-trait ProfunctorSyntax[F[_, _]]  {
+trait ProfunctorSyntax[F[_, _]] extends BiinvariantFunctorSyntax[F] {
   implicit def ToProfunctorOps[A, B](v: F[A, B]): ProfunctorOps[F, A, B] = new ProfunctorOps[F, A, B](v)(ProfunctorSyntax.this.F)
 
   def F: Profunctor[F]

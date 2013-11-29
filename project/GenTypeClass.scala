@@ -50,7 +50,8 @@ object TypeClass {
   lazy val applicativePlus = TypeClass("ApplicativePlus", *->*, extendsList = Seq(applicative, plusEmpty))
   lazy val monadPlus = TypeClass("MonadPlus", *->*, extendsList = Seq(monad, applicativePlus))
 
-  lazy val bifunctor = TypeClass("Bifunctor", *^*->*)
+  lazy val biinvariantFunctor = TypeClass("BiinvariantFunctor", *^*->*)
+  lazy val bifunctor = TypeClass("Bifunctor", *^*->*, extendsList = Seq(biinvariantFunctor))
   lazy val bifoldable = TypeClass("Bifoldable", *^*->*)
   lazy val bitraverse = TypeClass("Bitraverse", *^*->*, extendsList = Seq(bifunctor, bifoldable))
   lazy val compose = TypeClass("Compose", *^*->*)
@@ -59,7 +60,7 @@ object TypeClass {
   lazy val category = TypeClass("Category", *^*->*, extendsList = Seq(compose))
   lazy val choice = TypeClass("Choice", *^*->*, extendsList = Seq(category))
   lazy val split = TypeClass("Split", *^*->*, extendsList = Seq(compose))
-  lazy val profunctor = TypeClass("Profunctor", *^*->*, extendsList = Seq())
+  lazy val profunctor = TypeClass("Profunctor", *^*->*, extendsList = Seq(biinvariantFunctor))
   lazy val arrow = TypeClass("Arrow", *^*->*, extendsList = Seq(split, profunctor, category))
 
   lazy val liftIO = TypeClass("LiftIO", *->*, pack = Seq("scalaz", "effect"))
@@ -100,6 +101,7 @@ object TypeClass {
     foldable1,
     traverse,
     traverse1,
+    biinvariantFunctor,
     bifunctor,
     bifoldable,
     bitraverse,
