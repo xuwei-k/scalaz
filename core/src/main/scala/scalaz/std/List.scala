@@ -95,6 +95,19 @@ trait ListInstances extends ListInstances0 {
         case _::t => a :: cojoin(t)
       }
 
+    private[this] def mapAccum[A, B, C](as: List[A], c: C, f: (C, A) => (C, B)): (C, List[B]) =
+      as.foldLeft((c, Nil: List[B])){ case ((c, bs), a) =>
+        val (c0, b) = f(c, a)
+        (c0, b :: bs)
+      }
+
+    override def mapAccumL[C, A, B](as: List[A], c: C)(f: (C, A) => (C, B)): (C, List[B]) = {
+      val (c0, list) = mapAccum(as, c, f)
+      (c0, list.reverse)
+    }
+
+    override def mapAccumR[C, A, B](as: List[A], c: C)(f: (C, A) => (C, B)): (C, List[B]) =
+      mapAccum(as.reverse, c, f)
   }
 
   implicit def listMonoid[A]: Monoid[List[A]] = new Monoid[List[A]] {
@@ -243,23 +256,17 @@ trait ListFunctions {
     go(as, Nil)
   }
 
-  private[this] def mapAccum[A, B, C](as: List[A])(c: C, f: (C, A) => (C, B)): (C, List[B]) =
-    as.foldLeft((c, Nil: List[B])){ case ((c, bs), a) =>
-      val (c0, b) = f(c, a)
-      (c0, b :: bs)
-    }
-
   /** All of the `B`s, in order, and the final `C` acquired by a
     * stateful left fold over `as`. */
-  final def mapAccumLeft[A, B, C](as: List[A])(c: C, f: (C, A) => (C, B)): (C, List[B]) = {
-    val (c0, list) = mapAccum(as)(c, f)
-    (c0, list.reverse)
-  }
+  @deprecated("use Traverse[List].mapAccumL instead", "7.1")
+  final def mapAccumLeft[A, B, C](as: List[A])(c: C, f: (C, A) => (C, B)): (C, List[B]) =
+    list.listInstance.mapAccumL(as, c)(f)
 
   /** All of the `B`s, in order `as`-wise, and the final `C` acquired
     * by a stateful right fold over `as`. */
+  @deprecated("use Traverse[List].mapAccumR instead", "7.1")
   final def mapAccumRight[A, B, C](as: List[A])(c: C, f: (C, A) => (C, B)): (C, List[B]) =
-    mapAccum(as.reverse)(c, f)
+    list.listInstance.mapAccumR(as, c)(f)
 
   /** `[as, as.tail, as.tail.tail, ..., Nil]` */
   final def tailz[A](as: List[A]): List[List[A]] = as match {

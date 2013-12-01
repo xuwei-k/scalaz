@@ -38,8 +38,10 @@ final class IndexedSeqOps[IS[+_], A](self: IS[A], v: scalaz.std.IndexedSeqSubFun
 
   final def groupWhen(p: (A, A) => Boolean): IS[IS[A]] = v.groupWhen(self)(p)
 
+  @deprecated("use Traverse#mapAccumL instead", "7.1")
   final def mapAccumLeft[B, C](c: C, f: (C, A) => (C, B)): (C, IS[B]) = v.mapAccumLeft(self)(c, f)
 
+  @deprecated("use Traverse#mapAccumR instead", "7.1")
   final def mapAccumRight[B, C](c: C, f: (C, A) => (C, B)): (C, IS[B]) = v.mapAccumRight(self)(c, f)
 
   final def tailz: IS[IS[A]] = v.tailz(self)

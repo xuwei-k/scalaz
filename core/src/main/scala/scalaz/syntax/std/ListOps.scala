@@ -40,8 +40,10 @@ final class ListOps[A](self: List[A]) {
 
   final def groupWhen(p: (A, A) => Boolean): List[List[A]] = l.groupWhen(self)(p)
 
+  @deprecated("use Traverse[List].mapAccumL instead", "7.1")
   final def mapAccumLeft[B, C](c: C, f: (C, A) => (C, B)): (C, List[B]) = l.mapAccumLeft(self)(c, f)
 
+  @deprecated("use Traverse[List].mapAccumR instead", "7.1")
   final def mapAccumRight[B, C](c: C, f: (C, A) => (C, B)): (C, List[B]) = l.mapAccumRight(self)(c, f)
 
   final def tailz: List[List[A]] = l.tailz(self)

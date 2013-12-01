@@ -93,6 +93,20 @@ trait IndexedSeqSubInstances extends IndexedSeqInstances0 with IndexedSeqSub {se
           bs.drop(sizeA).map(b => f(\&/.That(b)))
       }
     }
+
+    override def mapAccumL[C, A, B](as: IxSq[A], c: C)(f: (C, A) => (C, B)): (C, IxSq[B]) =
+      as.foldLeft((c, empty[B])){(acc, a) => acc match {
+        case (c, v) => f(c, a) match {
+          case (c, b) => (c, v :+ b)
+        }}
+      }
+
+    override def mapAccumR[C, A, B](as: IxSq[A], c: C)(f: (C, A) => (C, B)): (C, IxSq[B]) =
+      as.foldRight((c, empty[B])){(a, acc) => acc match {
+        case (c, v) => f(c, a) match {
+          case (c, b) => (c, b +: v)
+        }}
+      }
   }
 
   implicit def ixSqMonoid[A]: Monoid[IxSq[A]] = new Monoid[IxSq[A]] {
@@ -218,6 +232,7 @@ trait IndexedSeqSubFunctions extends IndexedSeqSub {
 
   /** All of the `B`s, in order, and the final `C` acquired by a
     * stateful left fold over `as`. */
+  @deprecated("use Traverse#mapAccumL instead", "7.1")
   final def mapAccumLeft[A, B, C](as: IxSq[A])(c: C, f: (C, A) => (C, B)): (C, IxSq[B]) =
     as.foldLeft((c, empty[B])){(acc, a) => acc match {
       case (c, v) => f(c, a) match {
@@ -227,6 +242,7 @@ trait IndexedSeqSubFunctions extends IndexedSeqSub {
 
   /** All of the `B`s, in order `as`-wise, and the final `C` acquired
     * by a stateful right fold over `as`. */
+  @deprecated("use Traverse#mapAccumR instead", "7.1")
   final def mapAccumRight[A, B, C](as: IxSq[A])(c: C, f: (C, A) => (C, B)): (C, IxSq[B]) =
     as.foldRight((c, empty[B])){(a, acc) => acc match {
       case (c, v) => f(c, a) match {
