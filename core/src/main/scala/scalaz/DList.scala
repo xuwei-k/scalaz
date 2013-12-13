@@ -14,9 +14,9 @@ import std.function._
  * making it very useful for append-heavy uses, such as logging and
  * pretty printing.
  */
-final class DList[A] private[scalaz](f: (List[A]) => Trampoline[List[A]]) {
+final class DList[A] private[scalaz](f: List[A] => Trampoline[List[A]]) {
   import DList._
-  def apply(xs: => List[A]): Trampoline[List[A]] = f(xs)
+  def apply(xs: List[A]): Trampoline[List[A]] = f(xs)
 
   /** Convert to a normal list. */
   def toList: List[A] = apply(List()).run
@@ -90,9 +90,9 @@ sealed abstract class DListInstances {
 }
 
 trait DListFunctions {
-  def mkDList[A](f: (List[A]) => Trampoline[List[A]]): DList[A] =
+  def mkDList[A](f: List[A] => Trampoline[List[A]]): DList[A] =
     new DList[A](f)
-  def DL[A](f: (=> List[A]) => List[A]): DList[A] = mkDList(xs => return_(f(xs)))
+  def DL[A](f: List[A] => List[A]): DList[A] = mkDList(xs => return_(f(xs)))
   def fromList[A](as: => List[A]): DList[A] =
     DL(bs => as ++ bs)
   def concat[A](xs: List[DList[A]]): DList[A] =
