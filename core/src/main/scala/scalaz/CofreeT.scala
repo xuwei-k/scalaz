@@ -1,6 +1,30 @@
 package scalaz
 
-final case class CofreeT[F[_], W[_], A](run: W[CofreeF[F, A, CofreeT[F, W, A]]])
+final case class CofreeT[F[_], W[_], A](run: W[CofreeF[F, A, CofreeT[F, W, A]]]){
+
+  def map[B](f: A => B)(implicit F: Functor[F], W: Functor[W]): CofreeT[F, W, B] =
+    CofreeT(W.map(run)(_.bimap(f)(_.map(f))))
+
+  def cobind[B](f: CofreeT[F, W, A] => B)(implicit F: Functor[F], W: Comonad[W]): CofreeT[F, W, B] =
+    CofreeT(W.cobind(run)(w =>
+      CofreeF(f(CofreeT(w)), F.map(W.copoint(w).tail)(_.cobind(f)))
+    ))
+
+  def traverse[G[_], B](f: A => G[B])(implicit G: Applicative[G], F: Traverse[F], W: Traverse[W]): G[CofreeT[F, W, B]] =
+    G.map(W.traverse(run)(
+      _.bitraverse(f)(_.traverse(f))
+    ))(CofreeT.apply)
+
+  def foldMap[B](f: A => B)(implicit F: Foldable[F], W: Foldable[W], B: Monoid[B]): B =
+    W.foldMap(run)(_.bifoldMap(f)(_.foldMap(f)))
+
+  def copoint(implicit W: Comonad[W]): A =
+    W.copoint(run).head
+
+  def trans[G[_]](f: F ~> G)(implicit W: Functor[W], F: Functor[F]): CofreeT[G, W, A] =
+    CofreeT(W.map(run)(_.map(_.trans(f)).trans(f)))
+
+}
 
 object CofreeT extends CofreeTInstances{
 
@@ -54,37 +78,30 @@ sealed abstract class CofreeTInstances1{
 private trait CofreeTFunctor[F[_], W[_]] extends Functor[({type λ[α] = CofreeT[F, W, α]})#λ]{
   implicit def F: Functor[F]
   implicit def W: Functor[W]
-  override final def map[A, B](fa: CofreeT[F, W, A])(f: A => B): CofreeT[F, W, B] =
-    CofreeT(W.map(fa.run)(_.bimap(f)(map(_)(f))))
+  override final def map[A, B](fa: CofreeT[F, W, A])(f: A => B): CofreeT[F, W, B] = fa.map(f)
 }
 
 private trait CofreeTComonad[F[_], W[_]] extends Comonad[({type λ[α] = CofreeT[F, W, α]})#λ] with CofreeTFunctor[F, W]{
   implicit def W: Comonad[W]
 
-  def copoint[A](fa: CofreeT[F, W, A]): A = W.copoint(fa.run).head
+  def copoint[A](fa: CofreeT[F, W, A]) = fa.copoint
 
-  def cobind[A, B](fa: CofreeT[F, W, A])(f: CofreeT[F, W, A] => B): CofreeT[F, W, B] =
-    CofreeT(W.cobind(fa.run)(w =>
-      CofreeF(f(CofreeT(w)), F.map(W.copoint(w).tail)(cobind(_)(f)))
-    ))
+  def cobind[A, B](fa: CofreeT[F, W, A])(f: CofreeT[F, W, A] => B): CofreeT[F, W, B] = fa.cobind(f)
 }
 
 private trait CofreeTFoldable[F[_], W[_]] extends Foldable.FromFoldMap[({type λ[α] = CofreeT[F, W, α]})#λ]{
   implicit def F: Foldable[F]
-  def W: Foldable[W]
+  implicit def W: Foldable[W]
 
-  override final def foldMap[A, B: Monoid](fa: CofreeT[F, W, A])(f: A => B): B =
-    W.foldMap(fa.run)(_.bifoldMap(f)(foldMap(_)(f)))
+  override final def foldMap[A, B: Monoid](fa: CofreeT[F, W, A])(f: A => B) =
+    fa.foldMap(f)
 }
 
 private trait CofreeTTraverse[F[_], W[_]] extends Traverse[({type λ[α] = CofreeT[F, W, α]})#λ] with CofreeTFoldable[F, W] with CofreeTFunctor[F, W]{
   implicit def F: Traverse[F]
-  def W: Traverse[W]
+  implicit def W: Traverse[W]
 
-  override def traverseImpl[G[_], A, B](fa: CofreeT[F, W, A])(f: A => G[B])(implicit G: Applicative[G]): G[CofreeT[F, W, B]] =
-    G.map(W.traverse(fa.run)(
-      _.bitraverse(f)(traverse(_)(f))
-    ))(CofreeT.apply)
+  override def traverseImpl[G[_], A, B](fa: CofreeT[F, W, A])(f: A => G[B])(implicit G: Applicative[G]) = fa.traverse(f)
 }
 
 private class CofreeTComonadTrans[F[_]] extends ComonadTrans[({type λ[α[_], β] = CofreeT[F, α, β]})#λ]{

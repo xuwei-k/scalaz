@@ -4,6 +4,9 @@ package scalaz
  * [[https://github.com/ekmett/free/blob/b229616f69/src/Control/Comonad/Trans/Cofree.hs#L50-L52]]
  */
 final case class CofreeF[F[_], A, B](head: A, tail: F[B]){
+  def map[C](f: B => C)(implicit F: Functor[F]): CofreeF[F, A, C] =
+    copy(tail = F.map(tail)(f))
+
   def bimap[C, D](f: A => C)(g: B => D)(implicit F: Functor[F]): CofreeF[F, C, D] =
     CofreeF(f(head), F.map(tail)(g))
 
@@ -17,6 +20,9 @@ final case class CofreeF[F[_], A, B](head: A, tail: F[B]){
 
   def bitraverse[C, D, G[_]](f: A => G[C])(g: B => G[D])(implicit G: Applicative[G], F: Traverse[F]): G[CofreeF[F, C, D]] =
     G.apply2(f(head), F.traverse(tail)(g))(CofreeF.apply)
+
+  private[scalaz] def trans[G[_]](f: F ~> G): CofreeF[G, A, B] =
+    copy(tail = f(tail))
 }
 
 object CofreeF extends CofreeFInstances
@@ -68,9 +74,9 @@ sealed abstract class CofreeFInstances0{
 }
 
 private trait CofreeFFunctor[F[_], X] extends Functor[({type λ[α] = CofreeF[F, X, α]})#λ]{
-  def F: Functor[F]
+  implicit def F: Functor[F]
 
-  override final def map[A, B](fa: CofreeF[F, X, A])(f: A => B) = fa.copy(tail = F.map(fa.tail)(f))
+  override final def map[A, B](fa: CofreeF[F, X, A])(f: A => B) = fa.map(f)
 }
 
 private trait CofreeFFoldable[F[_], X] extends Foldable.FromFoldMap[({type λ[α] = CofreeF[F, X, α]})#λ]{
