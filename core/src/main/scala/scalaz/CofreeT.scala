@@ -2,7 +2,11 @@ package scalaz
 
 final case class CofreeT[F[_], W[_], A](run: W[CofreeF[F, A, CofreeT[F, W, A]]])
 
-object CofreeT extends CofreeTInstances
+object CofreeT extends CofreeTInstances{
+
+  final def coiterT[F[_], W[_], A](wa: W[A])(f: W[A] => F[W[A]])(implicit F: Functor[F], W: Comonad[W]): CofreeT[F, W, A] =
+    CofreeT(W.cobind(wa)(w => CofreeF(W.copoint(w), F.map(f(w))(coiterT(_)(f)))))
+}
 
 sealed abstract class CofreeTInstances extends CofreeTInstances0{
   implicit def cofreeTComonad[F[_]: Functor, W[_]: Comonad]: Comonad[({type λ[α] = CofreeT[F, W, α]})#λ] =
