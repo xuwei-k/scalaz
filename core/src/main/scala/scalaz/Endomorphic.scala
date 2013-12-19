@@ -38,7 +38,7 @@ sealed abstract class EndomorphicInstances extends EndomorphicInstances0 {
     endomorphicMonoid[({type λ[α, β] = Cokleisli[F, α, β]})#λ, A]
 }
 
-sealed abstract class EndomorphicInstances0 {
+sealed abstract class EndomorphicInstances0 extends EndomorphicInstances1 {
 
   implicit def endomorphicSemigroup[=>:[_, _], A](implicit G: Compose[=>:]): Semigroup[Endomorphic[=>:, A]] =
     new EndomorphicSemigroup[=>:, A] {
@@ -51,6 +51,19 @@ sealed abstract class EndomorphicInstances0 {
   implicit def cokleisliEndoSemigroup[F[_]: Cobind, A]: Semigroup[Endomorphic[({type λ[α, β] = Cokleisli[F, α, β]})#λ, A]] =
     endomorphicSemigroup[({type λ[α, β] = Cokleisli[F, α, β]})#λ, A]
 
+  implicit def kleisliEndoInvariantFunctor[F[_]: Functor]: InvariantFunctor[({type l[a] = Endomorphic[({type λ[α, β] = Kleisli[F, α, β]})#λ, a]})#l] =
+    endomorphicInvariantFunctor[({type λ[α, β] = Kleisli[F, α, β]})#λ]
+
+  implicit def cokleisliEndoInvariantFunctor[F[_]: Functor]: InvariantFunctor[({type l[a] = Endomorphic[({type λ[α, β] = Cokleisli[F, α, β]})#λ, a]})#l] =
+    endomorphicInvariantFunctor[({type λ[α, β] = Cokleisli[F, α, β]})#λ]
+}
+
+sealed abstract class EndomorphicInstances1 {
+  implicit def endomorphicInvariantFunctor[F[_, _]](implicit F: Profunctor[F]): InvariantFunctor[({type λ[α] = Endomorphic[F, α]})#λ] =
+    new InvariantFunctor[({type λ[α] = Endomorphic[F, α]})#λ] {
+      def xmap[A, B](fa: Endomorphic[F, A], f: A => B, g: B => A) =
+        Endomorphic(F.mapsnd(F.mapfst(fa.run)(g))(f))
+    }
 }
 
 private trait EndomorphicSemigroup[=>:[_, _], A] extends Semigroup[Endomorphic[=>:, A]] {
