@@ -51,7 +51,7 @@ object build extends Build {
 
     scalaVersion := "2.10.2",
     crossScalaVersions := Seq("2.9.3", "2.10.2", latestScala211PreRelease),
-    resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
+    resolvers += Opts.resolver.sonatypeSnapshots,
     scalaBinaryVersion in update := (
       if (scalaVersion.value == "2.11.0-SNAPSHOT") latestScala211PreRelease else scalaBinaryVersion.value
     ),
@@ -207,6 +207,7 @@ object build extends Build {
           }
         else Nil
       },
+      libraryDependencies += "com.chuusai" % "shapeless" % "2.0.0-SNAPSHOT" cross CrossVersion.full changing(),
       sourceGenerators in Compile <+= buildInfo,
       buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
       buildInfoPackage := "scalaz",

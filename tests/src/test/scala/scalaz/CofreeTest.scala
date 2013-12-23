@@ -16,14 +16,6 @@ object CofreeTest extends SpecLite {
   type CofreeStream[A] = Cofree[Stream, A]
   type OneAndStream[A] = OneAnd[Stream, A]
 
-  implicit val lazyOptionEqualNat = new (Equal ~> ({type λ[α] = Equal[LazyOption[α]]})#λ){
-    def apply[A](a: Equal[A]) = LazyOption.lazyOptionEqual(a)
-  }
-
-  implicit val streamEqualNat = new (Equal ~> ({type λ[α] = Equal[Stream[α]]})#λ){
-    def apply[A](a: Equal[A]) = std.stream.streamEqual(a)
-  }
-
   val oneAndStreamCofreeLazyOptionIso: OneAndStream <~> CofreeLazyOption =
     new IsoFunctorTemplate[OneAndStream, CofreeLazyOption] {
       def to[A](fa: OneAndStream[A]) =

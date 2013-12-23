@@ -144,13 +144,15 @@ sealed abstract class CofreeInstances0 extends CofreeInstances1 {
       def G = implicitly
     }
 
-  implicit def cofreeEqual[A, F[_]](implicit A: Equal[A], F: Equal ~> ({type λ[α] = Equal[F[α]]})#λ): Equal[Cofree[F, A]] =
+  implicit def cofreeEqual[A, F[_]](implicit A: Equal[A], F: shapeless.Lazy[Equal[F[Cofree[F, A]]]]): Equal[Cofree[F, A]] =
     Equal.equal{ (a, b) =>
-      A.equal(a.head, b.head) && F(cofreeEqual[A, F]).equal(a.tail, b.tail)
+      A.equal(a.head, b.head) && F.value.equal(a.tail, b.tail)
     }
 
-  implicit def cofreeZipEqual[A, F[_]](implicit A: Equal[A], F: Equal ~> ({type λ[α] = Equal[F[α]]})#λ): Equal[CofreeZip[F, A]] =
-    Tag.subst(cofreeEqual[A, F])
+  implicit def cofreeZipEqual[A, F[_]](implicit A: Equal[A], F: shapeless.Lazy[Equal[F[CofreeZip[F, A]]]]): Equal[CofreeZip[F, A]] =
+    Tags.Zip.subst(
+      cofreeEqual[A, F](A, shapeless.Lazy(F.value.contramap(Tags.Zip.subst)))
+    )
 }
 
 sealed abstract class CofreeInstances extends CofreeInstances0 {
