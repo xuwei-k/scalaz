@@ -212,6 +212,17 @@ sealed abstract class EphemeralStreamInstances {
   import std.list._
 
   implicit def ephemeralStreamEqual[A: Equal]: Equal[EphemeralStream[A]] = Equal[List[A]] contramap {(_: EphemeralStream[A]).toList}
+
+  implicit val ephemeralStreamZip: Applicative[({type λ[α] = EphemeralStream[α] @@ Tags.Zip})#λ] =
+    new Applicative[({type λ[α] = EphemeralStream[α] @@ Tags.Zip})#λ] {
+      override def map[A, B](fa: EphemeralStream[A] @@ Tags.Zip)(f: A => B) =
+        Tags.Zip(fa map f)
+      def point[A](a: => A) =
+        Tags.Zip(EphemeralStream.iterate(a)(x => x))
+      def ap[A, B](fa: => EphemeralStream[A] @@ Tags.Zip)(f: => EphemeralStream[A => B] @@ Tags.Zip) =
+        if(fa.isEmpty || f.isEmpty) Tags.Zip(EphemeralStream.emptyEphemeralStream[B])
+        else Tags.Zip(EphemeralStream.cons(f.head().apply(fa.head()), ap(Tags.Zip(fa.tail()))(Tags.Zip(f.tail()))))
+    }
 }
 
 trait EphemeralStreamFunctions {

@@ -5,6 +5,7 @@ import scalaz.scalacheck.ScalazArbitrary._
 import std.AllInstances._
 import syntax.contravariant._
 import org.scalacheck.Prop.forAll
+import org.scalacheck.Arbitrary
 
 object EphemeralStreamTest extends SpecLite {
 
@@ -14,6 +15,19 @@ object EphemeralStreamTest extends SpecLite {
   checkAll(zip.laws[EphemeralStream])
   checkAll(align.laws[EphemeralStream])
   checkAll(cobind.laws[EphemeralStream])
+
+  {
+    implicit def arb[A: Arbitrary] = Tags.Zip.subst(implicitly[Arbitrary[EphemeralStream[A]]])
+    implicit def equal[A: Equal] = Tags.Zip.subst(Equal[EphemeralStream[A]].contramap[EphemeralStream[A]](_.take(1000)))
+
+    checkAll(applicative.laws[({type λ[α] = EphemeralStream[α] @@ Tags.Zip})#λ])
+  }
+
+  "zip" ! forAll{ (a: EphemeralStream[Int], b: EphemeralStream[Int]) =>
+    Zip[EphemeralStream].zip(a, b) must_===(
+      Applicative[({type λ[α] = EphemeralStream[α] @@ Tags.Zip})#λ].tuple2(Tags.Zip(a), Tags.Zip(b))
+    )
+  }
 
   implicit def ephemeralStreamShow[A: Show]: Show[EphemeralStream[A]] =
     Show[List[A]].contramap(_.toList)
