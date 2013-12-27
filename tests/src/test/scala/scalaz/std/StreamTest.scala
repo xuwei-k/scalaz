@@ -3,7 +3,7 @@ package std
 
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
-import org.scalacheck.Prop
+import org.scalacheck.Arbitrary
 import org.scalacheck.Prop.forAll
 
 object StreamTest extends SpecLite {
@@ -15,6 +15,19 @@ object StreamTest extends SpecLite {
   checkAll(isEmpty.laws[Stream])
   checkAll(zip.laws[Stream])
   checkAll(align.laws[Stream])
+
+  {
+    implicit def arb[A: Arbitrary] = Tags.Zip.subst(implicitly[Arbitrary[Stream[A]]])
+    implicit def equal[A: Equal] = Tags.Zip.subst(Equal[Stream[A]].contramap[Stream[A]](_.take(1000)))
+
+    checkAll(applicative.laws[({type λ[α] = Stream[α] @@ Tags.Zip})#λ])
+  }
+
+  "zip" ! forAll{ (a: Stream[Int], b: Stream[Int]) =>
+    Zip[Stream].zip(a, b) must_===(
+      Applicative[({type λ[α] = Stream[α] @@ Tags.Zip})#λ].tuple2(Tags.Zip(a), Tags.Zip(b))
+    )
+  }
 
   import std.stream.streamSyntax._
   import syntax.foldable._
