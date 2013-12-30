@@ -2,6 +2,8 @@ package scalaz
 package std
 package math
 
+import _root_.java.math.MathContext.UNLIMITED
+
 trait BigDecimalInstances {
   implicit val bigDecimalInstance: Monoid[BigDecimal] with Enum[BigDecimal] with Show[BigDecimal] = new Monoid[BigDecimal] with Enum[BigDecimal] with Show[BigDecimal] {
     override def shows(f: BigDecimal) = f.toString
@@ -23,9 +25,10 @@ trait BigDecimalInstances {
   import Tags.Multiplication
 
   implicit val BigDecimalMultiplicationNewType: Monoid[BigDecimal @@ Multiplication] = new Monoid[BigDecimal @@ Multiplication] {
-    def append(f1: BigDecimal @@ Multiplication, f2: => BigDecimal @@ Multiplication) = Multiplication(f1 * f2)
+    def append(f1: BigDecimal @@ Multiplication, f2: => BigDecimal @@ Multiplication) =
+      Multiplication(BigDecimal(f1.bigDecimal.multiply(f2.bigDecimal, UNLIMITED)))
 
-    def zero = Multiplication(1)
+    val zero = Multiplication(BigDecimal(1))
   }
 }
 
