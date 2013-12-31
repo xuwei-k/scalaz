@@ -15,10 +15,10 @@ trait BigDecimalInstances {
 
     def order(x: BigDecimal, y: BigDecimal) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
 
-    def succ(b: BigDecimal) = b.bigDecimal.add(new JavaBigDecimal(1), UNLIMITED)
-    def pred(b: BigDecimal) = b.bigDecimal.subtract(new JavaBigDecimal(1), UNLIMITED)
-    override def succn(a: Int, b: BigDecimal) = b.bigDecimal.add(new JavaBigDecimal(a), UNLIMITED)
-    override def predn(a: Int, b: BigDecimal) = b.bigDecimal.subtract(new JavaBigDecimal(a), UNLIMITED)
+    def succ(b: BigDecimal) = b.bigDecimal.add(JavaBigDecimal.valueOf(1), UNLIMITED)
+    def pred(b: BigDecimal) = b.bigDecimal.subtract(JavaBigDecimal.valueOf(1), UNLIMITED)
+    override def succn(a: Int, b: BigDecimal) = b.bigDecimal.add(JavaBigDecimal.valueOf(a), UNLIMITED)
+    override def predn(a: Int, b: BigDecimal) = b.bigDecimal.subtract(JavaBigDecimal.valueOf(a), UNLIMITED)
     override def min = None
     override def max = None
   }
