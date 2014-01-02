@@ -31,6 +31,21 @@ object BitraverseTest extends SpecLite {
     Bifoldable[\/].rightFoldable.foldMap(42.left[Int])(identity) must_===(0)
   }
 
+  "bitraverseS, bitraversalS, runBitraverseS does not blow stack" in {
+    val N = 100000
+    val F = new Bitraverse[({type λ[α, β] = List[α \/ β]})#λ]{
+      def bitraverseImpl[G[_]: Applicative, A, B, C, D](fab: List[A \/ B])(f: A => G[C], g: B => G[D]) =
+        Traverse[List].traverseImpl(fab)(Bitraverse[\/].bitraverseF(f, g))
+    }
+    val s = List.tabulate(N)(n =>
+      if(n % 2 == 0) \/-(State.modify((_: Int) + 1))
+      else -\/(State.modify((_: Int) + 3))
+    )
+    F.bitraverseS(s)(identity)(identity).exec(0) must_=== N * 2
+    F.bitraversalS[Int].run(s)(identity)(identity).exec(0) must_=== N * 2
+    F.runBitraverseS(s, 0)(identity)(identity)._1 must_=== N * 2
+  }
+
 }
 
 // vim: expandtab:ts=2:sw=2
