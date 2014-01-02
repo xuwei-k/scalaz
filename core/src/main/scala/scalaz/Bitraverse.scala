@@ -58,13 +58,16 @@ trait Bitraverse[F[_, _]] extends Bifunctor[F] with Bifoldable[F] { self =>
     new Bitraversal[G]
 
   def bitraversalS[S]: Bitraversal[({type f[x]=State[S,x]})#f] =
-    new Bitraversal[({type f[x]=State[S,x]})#f]()(StateT.stateMonad)
+    new Bitraversal[({type f[x]=State[S,x]})#f]()(StateT.stateMonad){
+      override def run[A, B, C, D](fa: F[A, B])(f: A => State[S, C])(g: B => State[S, D]) =
+        bitraverseS(fa)(f)(g)
+    }
 
   def bitraverse[G[_]:Applicative,A,B,C,D](fa: F[A,B])(f: A => G[C])(g: B => G[D]): G[F[C, D]] =
     bitraversal[G].run(fa)(f)(g)
 
   def bitraverseS[S,A,B,C,D](fa: F[A,B])(f: A => State[S,C])(g: B => State[S,D]): State[S,F[C, D]] =
-    bitraversalS[S].run(fa)(f)(g)
+    traverseSTrampoline[S, Id.Id, A, B, C, D](fa)(f)(g)
 
   def runBitraverseS[S,A,B,C,D](fa: F[A,B], s: S)(f: A => State[S,C])(g: B => State[S,D]): (S, F[C, D]) =
     bitraverseS(fa)(f)(g)(s)
