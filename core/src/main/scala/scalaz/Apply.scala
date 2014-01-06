@@ -17,7 +17,7 @@ trait Apply[F[_]] extends Functor[F] { self =>
     G.traverse1(value)(f)(this)
 
   def sequence1[A, G[_]: Traverse1](as: G[F[A]]): F[G[A]] =
-    traverse1(as)(a => a)
+    traverse1(as)(conforms)
 
   /**The composition of Applys `F` and `G`, `[x]F[G[x]]`, is a Apply */
   def compose[G[_]](implicit G0: Apply[G]): Apply[({type λ[α] = F[G[α]]})#λ] = new CompositionApply[F, G] {

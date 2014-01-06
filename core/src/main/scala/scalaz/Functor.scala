@@ -89,7 +89,7 @@ trait Functor[F[_]] extends InvariantFunctor[F] { self =>
 
   trait FunctorLaw extends InvariantFunctorLaw {
     /** The identity function, lifted, is a no-op. */
-    def identity[A](fa: F[A])(implicit FA: Equal[F[A]]): Boolean = FA.equal(map(fa)(x => x), fa)
+    def identity[A](fa: F[A])(implicit FA: Equal[F[A]]): Boolean = FA.equal(map(fa)(conforms), fa)
 
     /**
      * A series of maps may be freely rewritten as a single map on a

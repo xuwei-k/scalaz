@@ -15,8 +15,8 @@ sealed abstract class IsomorphismsLow0 extends IsomorphismsLow1 {
 
   /**Set isomorphism is reflexive */
   implicit def isoRefl[A]: A <=> A = new (A <=> A) {
-    def to: A => A = a => a
-    def from: A => A = a => a
+    def to: A => A = conforms[A]
+    def from: A => A = conforms[A]
   }
 
   /**Natural isomorphism is reflexive */

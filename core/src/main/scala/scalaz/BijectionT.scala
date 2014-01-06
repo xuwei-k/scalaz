@@ -73,7 +73,7 @@ trait BijectionTFunctions {
     bijection(a => PF.point(t(a)), a => PG.point(f(a)))
 
   def bijectionId[F[_], G[_], A](implicit PF: Applicative[F], PG: Applicative[G]): BijectionT[F, G, A, A] =
-    liftBijection(x => x, x => x)
+    liftBijection(conforms, conforms)
 
   def curryB[A, B, C]: Bijection[(A, B) => C, A => B => C] =
     bijection[Id, Id, (A, B) => C, A => B => C](_.curried, Function.uncurried(_))

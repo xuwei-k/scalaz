@@ -75,7 +75,7 @@ trait LeibnizFunctions {
    * We rely on subtyping to enable this to work for any Leibniz arrow
    */
   implicit def witness[A, B](f: A === B): A => B =
-    f.subst[({type λ[X] = A => X})#λ](identity)
+    f.subst[({type λ[X] = A => X})#λ](conforms)
 
   implicit def subst[A, B](a: A)(implicit f: A === B): B = f.subst[Id](a)
 

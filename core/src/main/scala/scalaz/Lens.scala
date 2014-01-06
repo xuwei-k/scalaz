@@ -243,7 +243,7 @@ trait LensFamilyFunctions {
 
   /** The identity lens family for a given pair of objects */
   def lensFamilyId[A1, A2]: LensFamily[A1, A2, A1, A2] =
-    lensFamily(IndexedStore(identity, _))
+    lensFamily(IndexedStore(conforms, _))
 
   /** A lens family that discards the choice of right or left from disjunction */
   def codiagLensFamily[A1, A2]: LensFamily[A1 \/ A1, A2 \/ A2, A1, A2] =
@@ -315,7 +315,7 @@ trait LensFunctions extends LensFamilyFunctions {
 
   /** The identity lens for a given object */
   def lensId[A]: Lens[A, A] =
-    lens(Store(identity, _))
+    lens(Store(conforms, _))
 
   /** The trivial lens that can retrieve Unit from anything */
   def trivialLens[A]: Lens[A, Unit] =

@@ -48,7 +48,7 @@ trait EndoFunctions {
   final def constantEndo[A](a: => A): Endo[A] = endo[A](_ => a)
 
   /** Alias for `Monoid[Endo[A]].zero`. */
-  final def idEndo[A]: Endo[A] = endo[A](a => a)
+  final def idEndo[A]: Endo[A] = endo[A](conforms)
 
   import Isomorphism.{IsoSet, IsoFunctorTemplate}
 

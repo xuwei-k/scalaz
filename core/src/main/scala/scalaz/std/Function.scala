@@ -76,7 +76,7 @@ trait FunctionInstances extends FunctionInstances0 {
 
     def compose[A, B, C](f: B => C, g: A => B) = f compose g
 
-    def id[A]: A => A = a => a
+    def id[A]: A => A = conforms[A]
 
     def choice[A, B, C](f: => A => C, g: => B => C): (A \/ B) => C = {
       case -\/(a) => f(a)

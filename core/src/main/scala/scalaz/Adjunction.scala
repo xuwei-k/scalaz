@@ -9,10 +9,10 @@ package scalaz
 abstract class Adjunction[F[_], G[_]](implicit val F: Functor[F], val G: Functor[G]) { self =>
 
   /** Puts a value into the monad. */
-  def unit[A](a: => A): G[F[A]] = leftAdjunct(a)(x => x)
+  def unit[A](a: => A): G[F[A]] = leftAdjunct(a)(conforms)
 
   /** Extracts a value out of the comonad. */
-  def counit[A](a: F[G[A]]): A = rightAdjunct(a)(x => x)
+  def counit[A](a: F[G[A]]): A = rightAdjunct(a)(conforms)
 
   /** Every `F`-algebra maps to a `G`-coalgebra. */
   def leftAdjunct[A, B](a: => A)(f: F[A] => B): G[B] = G.map(unit(a))(f)
@@ -49,7 +49,7 @@ abstract class Adjunction[F[_], G[_]](implicit val F: Functor[F], val G: Functor
     def copoint[A](a: F[G[A]]) = counit(a)
     def cobind[A,B](a: F[G[A]])(f: F[G[A]] => B): F[G[B]] = F.map(a)(leftAdjunct(_)(f))
     def map[A,B](a: F[G[A]])(f: A => B) = cobind(a)(x => f(counit(x)))
-    override def cojoin[A](a: F[G[A]]) = cobind(a)(x => x)
+    override def cojoin[A](a: F[G[A]]) = cobind(a)(conforms)
   }
 
   import Adjunction.-|

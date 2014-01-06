@@ -161,7 +161,7 @@ sealed abstract class NullResultInstances extends NullResultInstances0 {
 
   implicit val nullResultArrow: Arrow[NullResult] = new Arrow[NullResult] {
     def id[A] =
-      NullResult.lift(identity)
+      NullResult.lift(conforms)
     override def compose[A, B, C](f: NullResult[B, C], g: NullResult[A, B]): NullResult[A, C] =
       f compose g
     override def split[A, B, C, D](f: NullResult[A, B], g: NullResult[C, D]) =

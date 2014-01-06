@@ -73,7 +73,7 @@ sealed abstract class Finger[V, A] {
 
   def measure: V
 
-  def toList: List[A] = map(x => x)(Reducer.ListReducer[A]).measure
+  def toList: List[A] = map(conforms)(Reducer.ListReducer[A]).measure
 
   private[scalaz] def split1(pred: V => Boolean, accV: V): (Option[Finger[V, A]], A, Option[Finger[V, A]])
 }
@@ -837,7 +837,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
     (_, pr, m, sf) => sf.reverseIterator ++ m.reverseIterator.flatMap(_.reverseIterator) ++ pr.reverseIterator)
 
   /** Convert the leaves of the tree to a `scala.Stream` */
-  def toStream: Stream[A] = map(x => x)(Reducer.StreamReducer[A]).measure
+  def toStream: Stream[A] = map(conforms)(Reducer.StreamReducer[A]).measure
 
   /** Convert the leaves of the tree to a `scala.List` */
   def toList: List[A] = toStream.toList

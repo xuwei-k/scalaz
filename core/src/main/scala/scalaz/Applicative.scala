@@ -37,7 +37,7 @@ trait Applicative[F[_]] extends Apply[F] { self =>
     G.traverse(value)(f)(this)
 
   def sequence[A, G[_]: Traverse](as: G[F[A]]): F[G[A]] =
-    traverse(as)(a => a)
+    traverse(as)(conforms)
 
   import std.list._
 

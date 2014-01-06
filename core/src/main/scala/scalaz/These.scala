@@ -98,7 +98,7 @@ sealed abstract class \&/[+A, +B] extends Product with Serializable {
     }
 
   def leftMap[C](f: A => C): (C \&/ B) =
-    bimap(f, identity)
+    bimap(f, conforms)
 
   def bitraverse[F[_]: Apply, C, D](f: A => F[C], g: B => F[D]): F[C \&/ D] =
     this match {
@@ -113,7 +113,7 @@ sealed abstract class \&/[+A, +B] extends Product with Serializable {
     }
 
   def map[D](g: B => D): (A \&/ D) =
-    bimap(identity, g)
+    bimap(conforms, g)
 
   def traverse[F[_]: Applicative, AA >: A, D](g: B => F[D]): F[AA \&/ D] =
     this match {

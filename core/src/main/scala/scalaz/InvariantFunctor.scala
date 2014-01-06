@@ -35,7 +35,7 @@ trait InvariantFunctor[F[_]]  { self =>
   trait InvariantFunctorLaw {
 
     def invariantIdentity[A](fa: F[A])(implicit FA: Equal[F[A]]): Boolean =
-      FA.equal(xmap[A, A](fa, x => x, x => x), fa)
+      FA.equal(xmap[A, A](fa, conforms, conforms), fa)
 
     def invariantComposite[A, B, C](fa: F[A], f1: A => B, g1: B => A, f2: B => C, g2: C => B)(implicit FC: Equal[F[C]]): Boolean =
       FC.equal(xmap(xmap(fa, f1, g1), f2, g2), xmap(fa, f2 compose f1, g1 compose g2))

@@ -61,7 +61,7 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
   override def foldMapLeft1Opt[A, B](fa: F[A])(z: A => B)(f: (B, A) => B): Option[B] = Some(foldMapLeft1(fa)(z)(f))
   override def foldl1Opt[A](fa: F[A])(f: A => A => A): Option[A] = Some(foldl1(fa)(f))
 
-  def fold1[M: Semigroup](t: F[M]): M = foldMap1[M, M](t)(identity)
+  def fold1[M: Semigroup](t: F[M]): M = foldMap1[M, M](t)(conforms)
 
   import Ordering.{GT, LT}
 
