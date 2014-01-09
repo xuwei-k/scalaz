@@ -28,18 +28,17 @@ sealed abstract class EphemeralStream[A] {
   }
 
   def toList: List[A] = {
-    def lcons(xs: => List[A])(x: => A) = x :: xs
-    foldLeft(Nil: List[A])(lcons _).reverse
+    foldLeft(Nil: List[A])((xs, x) => x :: xs).reverse
   }
 
   def foldRight[B](z: => B)(f: (=> A) => (=> B) => B): B =
     if (isEmpty) z else f(head())(tail().foldRight(z)(f))
 
-  def foldLeft[B](z: => B)(f: (=> B) => (=> A) => B): B = {
+  def foldLeft[B](z: B)(f: (B, => A) => B): B = {
     var t = this
     var acc = z
     while (!t.isEmpty) {
-      acc = f(acc)(t.head())
+      acc = f(acc, t.head())
       t = t.tail()
     }
     acc
@@ -66,10 +65,8 @@ sealed abstract class EphemeralStream[A] {
   def map[B](f: A => B): EphemeralStream[B] =
     flatMap(x => EphemeralStream(f(x)))
 
-  def length = {
-    def addOne(c: => Int)(a: => A) = 1 + c
-    foldLeft(0)(addOne _)
-  }
+  def length: Int =
+    foldLeft(0)((c, _) => 1 + c)
 
   def tails: EphemeralStream[EphemeralStream[A]] =
     if (isEmpty) EphemeralStream(emptyEphemeralStream)
@@ -87,10 +84,8 @@ sealed abstract class EphemeralStream[A] {
       Monad[M].bind(p(hh))(if (_) Monad[M].point(Some(hh)) else tail() findM p)
     }
 
-  def reverse: EphemeralStream[A] = {
-    def lcons(xs: => List[A])(x: => A) = x :: xs
-    apply(foldLeft(Nil: List[A])(lcons _) : _*)
-  }
+  def reverse: EphemeralStream[A] =
+    apply(foldLeft(Nil: List[A])((xs, x) => x :: xs) : _*)
 
   def zip[B](b: => EphemeralStream[B]): EphemeralStream[(A, B)] =
     if(isEmpty || b.isEmpty)
@@ -187,7 +182,7 @@ sealed abstract class EphemeralStreamInstances {
     override def foldMap[A, B](fa: EphemeralStream[A])(f: A => B)(implicit M: Monoid[B]) =
       this.foldRight(fa, M.zero)((a, b) => M.append(f(a), b))
     override def foldLeft[A, B](fa: EphemeralStream[A], z: B)(f: (B, A) => B) =
-      fa.foldLeft(z)(b => a => f(b, a))
+      fa.foldLeft(z)((b, a) => f(b, a))
     override def zipWithL[A, B, C](fa: EphemeralStream[A], fb: EphemeralStream[B])(f: (A, Option[B]) => C) = {
       if(fa.isEmpty) emptyEphemeralStream
       else {
