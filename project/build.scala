@@ -164,6 +164,7 @@ object build extends Build {
         }
         </developers>
       )
+    ,incOptions := incOptions.value.withNameHashing(true)
   ) ++ osgiSettings ++ Seq[Sett](
     OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
   )
