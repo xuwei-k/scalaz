@@ -7,5 +7,5 @@ jdk:
   - oraclejdk7
   - openjdk6
 
-script: sbt ++$TRAVIS_SCALA_VERSION check-gen-type-classes test
+script: ./inc-compile-test.sh
 
