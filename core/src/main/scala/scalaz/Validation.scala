@@ -308,6 +308,12 @@ sealed abstract class Validation[+E, +A] extends Product with Serializable {
       case Failure(e) => Failure(NonEmptyList(e))
     }
 
+  def liftFail[F[+_]](implicit F: Applicative[F]): Validation[F[E], A] =
+    this match {
+      case a @ Success(_) => a
+      case Failure(e) => Failure(F.point(e))
+    }
+
   /** Convert to a disjunction. */
   def disjunction: (E \/ A) =
     this match {

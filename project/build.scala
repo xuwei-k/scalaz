@@ -100,6 +100,8 @@ object build extends Build {
       tcs => tcs.map(_.doc).mkString("\n")
     },
 
+    incOptions := incOptions.value.withNameHashing(true),
+
     showDoc in Compile <<= (doc in Compile, target in doc in Compile) map { (_, out) =>
       val index = out / "index.html"
       if (index.exists()) Desktop.getDesktop.open(out / "index.html")
