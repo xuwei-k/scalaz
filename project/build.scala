@@ -24,6 +24,8 @@ import sbtbuildinfo.Plugin._
 import sbtunidoc.Plugin._
 import sbtunidoc.Plugin.UnidocKeys._
 
+import com.github.mdr.ascii.layout
+
 object build extends Build {
   type Sett = Def.Setting[_]
 
@@ -90,6 +92,11 @@ object build extends Build {
         sys.error(classes.groupBy(_._1).filterKeys(_ != FileStatus.NoChange).mapValues(_.map(_._2)).toString)
     },
     typeClasses := Seq(),
+    classDiagram := {
+      val classes = typeClasses.value.toList
+      val g = layout.Graph(classes, classes.flatMap(c => c.extendsList.map(_ -> c)))
+      layout.Layouter.renderGraph(g)
+    },
     genToSyntax <<= typeClasses map {
       (tcs: Seq[TypeClass]) =>
       val objects = tcs.map(tc => "object %s extends To%sSyntax".format(Util.initLower(tc.name), tc.name)).mkString("\n")
@@ -320,6 +327,8 @@ object build extends Build {
   }
 
   lazy val genTypeClasses = TaskKey[Seq[(FileStatus, File)]]("gen-type-classes")
+
+  lazy val classDiagram = TaskKey[String]("class-diagram")
 
   lazy val typeClasses = TaskKey[Seq[TypeClass]]("type-classes")
 

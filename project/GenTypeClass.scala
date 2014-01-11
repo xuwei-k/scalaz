@@ -10,6 +10,12 @@ case class TypeClass(name: String, kind: Kind, pack: Seq[String] = Seq("scalaz")
   def packageString = pack.mkString(".")
   def fqn = (pack :+ name).mkString(".")
   def doc = "[[" + fqn + "]]" + (if (extendsList.nonEmpty) " extends " + extendsList.map(tc => "[[" + tc.fqn + "]]").mkString(" with ") else "")
+  override def toString = name
+  override def equals(other: Any) = other match {
+    case that: TypeClass => this.name == that.name
+    case _ => false
+  }
+  override def hashCode = name.##
 }
 
 object TypeClass {
