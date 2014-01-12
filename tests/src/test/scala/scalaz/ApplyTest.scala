@@ -44,4 +44,19 @@ object ApplyTest extends SpecLite {
   "<*>" in {
     some(9) <*> some({(_: Int) + 3}) must_===(some(12))
   }
+
+  "ApplyBuilder" ! forAll { (a: ValidationNel[String, Int], b: ValidationNel[String, Long], c: ValidationNel[String, String]) =>
+    import syntax.ApplyBuilder._
+    val F = Apply[({type λ[α] = ValidationNel[String, α]})#λ]
+
+    %(a, b).tupled             must_===  F.tuple2(a, b)
+    %%(a, b, c).tupled         must_===  F.tuple3(a, b, c)
+    %%%(a, b, c, a).tupled     must_===  F.tuple4(a, b, c, a)
+    %%%%(a, b, c, a, b).tupled must_===  F.tuple5(a, b, c, a, b)
+
+    %(a, b).run(Tuple2.apply)             must_===  F.tuple2(a, b)
+    %%(a, b, c).run(Tuple3.apply)         must_===  F.tuple3(a, b, c)
+    %%%(a, b, c, a).run(Tuple4.apply)     must_===  F.tuple4(a, b, c, a)
+    %%%%(a, b, c, a, b).run(Tuple5.apply) must_===  F.tuple5(a, b, c, a, b)
+  }
 }
