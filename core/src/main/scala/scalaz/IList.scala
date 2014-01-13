@@ -417,14 +417,13 @@ sealed abstract class IList[A] extends Product with Serializable {
 
 }
 
-// In order to get exhaustiveness checking and a sane unapply in both 2.9 and 2.10 it seems
-// that we need to use bare case classes. Sorry. Suggestions welcome.
-final case class INil[A]() extends IList[A]
+sealed abstract case class INil[A] private() extends IList[A]
+object INil extends INil[Nothing]{
+  def apply[A](): IList[A] = this.asInstanceOf[IList[A]]
+}
 final case class ICons[A](head: A, tail: IList[A]) extends IList[A]
 
 object IList extends IListInstances with IListFunctions{
-  private[this] val nil: IList[Nothing] = INil()
-
   def apply[A](as: A*): IList[A] =
     as.foldRight(empty[A])(ICons(_, _))
 
@@ -432,7 +431,7 @@ object IList extends IListInstances with IListFunctions{
     ICons(a, empty)
 
   def empty[A]: IList[A] =
-    nil.asInstanceOf[IList[A]]
+    INil()
 
   def fromList[A](as: List[A]): IList[A] =
     as.foldRight(empty[A])(ICons(_, _))
