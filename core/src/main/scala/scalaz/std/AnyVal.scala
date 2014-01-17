@@ -11,6 +11,8 @@ trait AnyValInstances {
 
     def append(f1: Unit, f2: => Unit) = ()
 
+    override val appendF = super.appendF
+
     def zero = ()
 
     def order(x: Unit, y: Unit) = Ordering.EQ
@@ -52,11 +54,15 @@ trait AnyValInstances {
     object conjunction extends Monoid[Boolean] {
       def append(f1: Boolean, f2: => Boolean) = f1 && f2
 
+      override val appendF = super.appendF
+
       def zero: Boolean = true
     }
 
     object disjunction extends Monoid[Boolean] {
       def append(f1: Boolean, f2: => Boolean) = f1 || f2
+
+      override val appendF = super.appendF
 
       def zero = false
     }
@@ -67,6 +73,8 @@ trait AnyValInstances {
 
   implicit val booleanDisjunctionNewTypeInstance: Monoid[Boolean @@ Disjunction] with Enum[Boolean @@ Disjunction] = new Monoid[Boolean @@ Disjunction] with Enum[Boolean @@ Disjunction] {
     def append(f1: Boolean @@ Disjunction, f2: => Boolean @@ Disjunction) = Disjunction(f1 || f2)
+
+    override val appendF = super.appendF
 
     def zero: Boolean @@ Disjunction = Disjunction(false)
 
@@ -88,6 +96,8 @@ trait AnyValInstances {
 
   implicit val booleanConjunctionNewTypeInstance: Monoid[Boolean @@ Conjunction] with Enum[Boolean @@ Conjunction] = new Monoid[Boolean @@ Conjunction] with Enum[Boolean @@ Conjunction] {
     def append(f1: Boolean @@ Conjunction, f2: => Boolean @@ Conjunction) = Conjunction(f1 && f2)
+
+    override val appendF = super.appendF
 
     def zero: Boolean @@ Conjunction = Conjunction(true)
 
@@ -112,6 +122,8 @@ trait AnyValInstances {
 
     def append(f1: Byte, f2: => Byte) = (f1 + f2).toByte
 
+    override val appendF = super.appendF
+
     def zero: Byte = 0
 
     def order(x: Byte, y: Byte) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
@@ -130,6 +142,8 @@ trait AnyValInstances {
 
   implicit val byteMultiplicationNewType: Monoid[Byte @@ Multiplication] with Enum[Byte @@ Multiplication] = new Monoid[Byte @@ Multiplication] with Enum[Byte @@ Multiplication] {
     def append(f1: Byte @@ Multiplication, f2: => Byte @@ Multiplication) = Multiplication((f1 * f2).toByte)
+
+    override val appendF = super.appendF
 
     def zero: Byte @@ Multiplication = Multiplication(1)
 
@@ -156,6 +170,8 @@ trait AnyValInstances {
 
     def append(f1: Char, f2: => Char) = (f1 + f2).toChar
 
+    override val appendF = super.appendF
+
     def zero: Char = 0
 
     def order(x: Char, y: Char) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
@@ -172,6 +188,8 @@ trait AnyValInstances {
 
   implicit val charMultiplicationNewType: Monoid[Char @@ Multiplication] with Enum[Char @@ Multiplication] = new Monoid[Char @@ Multiplication] with Enum[Char @@ Multiplication] {
     def append(f1: Char @@ Multiplication, f2: => Char @@ Multiplication) = Multiplication((f1 * f2).toChar)
+
+    override val appendF = super.appendF
 
     def zero: Char @@ Multiplication = Multiplication(1)
 
@@ -197,6 +215,8 @@ trait AnyValInstances {
 
     def append(f1: Short, f2: => Short) = (f1 + f2).toShort
 
+    override val appendF = super.appendF
+
     def zero: Short = 0
 
     def order(x: Short, y: Short) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
@@ -213,6 +233,8 @@ trait AnyValInstances {
 
   implicit val shortMultiplicationNewType: Monoid[Short @@ Multiplication] with Enum[Short @@ Multiplication] = new Monoid[Short @@ Multiplication] with Enum[Short @@ Multiplication] {
     def append(f1: Short @@ Multiplication, f2: => Short @@ Multiplication) = Multiplication((f1 * f2).toShort)
+
+    override val appendF = super.appendF
 
     def zero: Short @@ Multiplication = Multiplication(1)
 
@@ -235,6 +257,8 @@ trait AnyValInstances {
     override def shows(f: Int) = f.toString
 
     def append(f1: Int, f2: => Int) = f1 + f2
+
+    override val appendF = super.appendF
 
     def zero: Int = 0
 
@@ -259,6 +283,8 @@ trait AnyValInstances {
   implicit val intMultiplicationNewType: Monoid[Int @@ Multiplication] with Enum[Int @@ Multiplication] = new Monoid[Int @@ Multiplication] with Enum[Int @@ Multiplication] {
     def append(f1: Int @@ Multiplication, f2: => Int @@ Multiplication) = Multiplication(f1 * f2)
 
+    override val appendF = super.appendF
+
     def zero: Int @@ Multiplication = Multiplication(1)
 
     def succ(b: Int @@ Multiplication) = Multiplication(Enum[Int].succ(b))
@@ -281,6 +307,8 @@ trait AnyValInstances {
 
     def append(f1: Long, f2: => Long) = f1 + f2
 
+    override val appendF = super.appendF
+
     def zero: Long = 0L
 
     def order(x: Long, y: Long) = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
@@ -297,6 +325,8 @@ trait AnyValInstances {
 
   implicit val longMultiplicationNewType: Monoid[Long @@ Multiplication] with Enum[Long @@ Multiplication] = new Monoid[Long @@ Multiplication] with Enum[Long @@ Multiplication] {
     def append(f1: Long @@ Multiplication, f2: => Long @@ Multiplication) = Multiplication(f1 * f2)
+
+    override val appendF = super.appendF
 
     def zero: Long @@ Multiplication = Multiplication(1)
 

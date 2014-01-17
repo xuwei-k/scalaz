@@ -915,10 +915,10 @@ sealed abstract class MapInstances extends MapInstances0 {
   implicit def mapShow[A: Show, B: Show]: Show[==>>[A, B]] =
     Contravariant[Show].contramap(Show[List[(A, B)]])(_.toAscList)
 
-  implicit def mapEqual[A: Equal, B: Equal]: Equal[A ==>> B] = 
+  implicit def mapEqual[A: Equal, B: Equal]: Equal[A ==>> B] =
     new MapEqual[A, B] {def A = implicitly; def B = implicitly}
 
-  implicit def mapOrder[A: Order, B: Order]: Order[A ==>> B] = 
+  implicit def mapOrder[A: Order, B: Order]: Order[A ==>> B] =
     new Order[A ==>> B] with MapEqual[A, B] {
       def A = implicitly
       def B = implicitly
@@ -927,12 +927,12 @@ sealed abstract class MapInstances extends MapInstances0 {
     }
 
   implicit def mapUnion[A, B](implicit A: Order[A], B: Semigroup[B]): Monoid[A ==>> B] =
-    Monoid.instance((l, r) => (l unionWith r)(B.append(_, _)), Tip())
+    Monoid.instance((l, r) => (l unionWith r)(B.appendStrictF), Tip())
 
   implicit def mapIntersection[A, B](implicit A: Order[A], B: Semigroup[B]
                                    ): Semigroup[(A ==>> B) @@ Tags.Conjunction] =
     Tag.subst(Semigroup.instance((l, r) =>
-      (l intersectionWith r)(B.append(_, _))))
+      (l intersectionWith r)(B.appendStrictF)))
 
   implicit def mapCovariant[S]: Traverse[({type λ[α] = ==>>[S, α]})#λ] =
     new Traverse[({type λ[α] = ==>>[S, α]})#λ] {

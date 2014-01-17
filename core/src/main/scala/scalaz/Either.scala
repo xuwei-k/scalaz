@@ -213,12 +213,12 @@ sealed abstract class \/[+A, +B] extends Product with Serializable {
   def +++[AA >: A, BB >: B](x: => AA \/ BB)(implicit M1: Semigroup[BB], M2: Semigroup[AA]): AA \/ BB =
     this match {
       case -\/(a1) => x match {
-        case -\/(a2) => -\/(M2.append(a1, a2))
+        case -\/(a2) => -\/(M2.appendStrict(a1, a2))
         case \/-(_) => this
       }
       case \/-(b1) => x match {
         case b2 @ -\/(_) => b2
-        case \/-(b2) => \/-(M1.append(b1, b2))
+        case \/-(b2) => \/-(M1.appendStrict(b1, b2))
       }
     }
 

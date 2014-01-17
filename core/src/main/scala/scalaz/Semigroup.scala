@@ -21,6 +21,12 @@ trait Semigroup[F]  { self =>
    */
   def append(f1: F, f2: => F): F
 
+  def appendStrict(f1: F, f2: F): F = append(f1, f2)
+
+  def appendF: (F, => F) => F = append(_, _)
+
+  def appendStrictF: (F, F) => F = appendStrict(_, _)
+
   // derived functions
   protected[this] trait SemigroupCompose extends Compose[({type λ[α, β]=F})#λ] {
     def compose[A, B, C](f: F, g: F) = append(f, g)

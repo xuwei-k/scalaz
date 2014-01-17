@@ -533,6 +533,7 @@ sealed abstract class IListInstances extends IListInstance0 {
   implicit def monoid[A]: Monoid[IList[A]] =
     new Monoid[IList[A]] {
       def append(f1: IList[A], f2: => IList[A]) = f1 ++ f2
+      override def appendStrict(f1: IList[A], f2: IList[A]) = f1 ++ f2
       def zero: IList[A] = empty
     }
 

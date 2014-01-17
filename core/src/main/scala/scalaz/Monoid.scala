@@ -29,7 +29,7 @@ trait Monoid[F] extends Semigroup[F] { self =>
    * For `n = 2`, `append(append(zero, value), value)`
    */
   def multiply(value: F, n: Int): F =
-    Stream.fill(n)(value).foldLeft(zero)((a,b) => append(a,b))
+    Stream.fill(n)(value).foldLeft(zero)(appendStrictF)
 
   /** Whether `a` == `zero`. */
   def isMZero(a: F)(implicit eq: Equal[F]): Boolean =
@@ -89,13 +89,14 @@ object Monoid {
   def instance[A](f: (A, => A) => A, z: A): Monoid[A] = new Monoid[A] {
     def zero = z
     def append(f1: A, f2: => A): A = f(f1,f2)
+    override val appendF = f
   }
 
   @deprecated("use Semigroup.applySemigroup", "7.1")
   trait ApplicativeSemigroup[F[_], M] extends Semigroup[F[M]] {
     implicit def F: Applicative[F]
     implicit def M: Semigroup[M]
-    def append(x: F[M], y: => F[M]): F[M] = F.lift2[M, M, M]((m1, m2) => M.append(m1, m2))(x, y)
+    def append(x: F[M], y: => F[M]): F[M] = F.lift2[M, M, M](M.appendStrictF)(x, y)
   }
 
   private trait ApplicativeMonoid[F[_], M] extends Monoid[F[M]] with Semigroup.ApplySemigroup[F, M] {

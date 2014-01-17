@@ -160,7 +160,7 @@ sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
       def plus[A](a: NonEmptyList[A], b: => NonEmptyList[A]): NonEmptyList[A] = a.list <::: b
 
       def copoint[A](p: NonEmptyList[A]): A = p.head
-	
+
       def cobind[A, B](fa: NonEmptyList[A])(f: NonEmptyList[A] => B): NonEmptyList[B] = map(cojoin(fa))(f)
 
       override def cojoin[A](a: NonEmptyList[A]): NonEmptyList[NonEmptyList[A]] = a.tails
@@ -181,6 +181,7 @@ sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
 
   implicit def nonEmptyListSemigroup[A]: Semigroup[NonEmptyList[A]] = new Semigroup[NonEmptyList[A]] {
     def append(f1: NonEmptyList[A], f2: => NonEmptyList[A]) = f1 append f2
+    override def appendStrict(f1: NonEmptyList[A], f2: NonEmptyList[A]) = f1 append f2
   }
 
   implicit def nonEmptyListShow[A: Show]: Show[NonEmptyList[A]] =

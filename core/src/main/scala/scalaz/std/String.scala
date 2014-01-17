@@ -5,6 +5,9 @@ trait StringInstances {
   implicit object stringInstance extends Monoid[String] with Show[String] with Equal[String] with Order[String] with IsEmpty[({ type λ[α] = String })#λ] {
     type SA[α] = String
     def append(f1: String, f2: => String) = f1 + f2
+    override def appendStrict(f1: String, f2: String) = f1 + f2
+    override val appendF = super.appendF
+    override val appendStrictF = super.appendStrictF
     def zero: String = ""
     override def show(f: String) = '"' + f + '"'
     def order(x: String, y: String) = Ordering.fromInt(x.compareTo(y))

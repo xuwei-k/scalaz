@@ -8,7 +8,13 @@ trait BigInts {
 
     def append(f1: BigInt, f2: => BigInt): BigInt = f1 + f2
 
-    def zero: BigInt = 0L
+    override def appendStrict(f1: BigInt, f2: BigInt): BigInt = f1 + f2
+
+    override val appendF = super.appendF
+
+    override val appendStrictF = super.appendStrictF
+
+    val zero: BigInt = 0L
 
     def order(x: BigInt, y: BigInt): Ordering = if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
 
@@ -26,6 +32,12 @@ trait BigInts {
     override def shows(f: scalaz.@@[BigInt, Multiplication]) = f.toString
 
     def append(f1: BigInt @@ Multiplication, f2: => BigInt @@ Multiplication): BigInt @@ Multiplication = Multiplication(f1 * f2)
+
+    override def appendStrict(f1: BigInt @@ Multiplication, f2: BigInt @@ Multiplication): BigInt @@ Multiplication = Multiplication(f1 * f2)
+
+    override val appendF = super.appendF
+
+    override val appendStrictF = super.appendStrictF
 
     def zero: BigInt @@ Multiplication = Multiplication(1)
 

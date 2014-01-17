@@ -96,8 +96,17 @@ trait ListInstances extends ListInstances0 {
 
   }
 
+  private[this] val _appendStrictF: (List[AnyRef], List[AnyRef]) => List[AnyRef] =
+    (_: List[AnyRef]) ::: (_: List[AnyRef])
+
+  private[this] val _appendF: (List[AnyRef], => List[AnyRef]) => List[AnyRef] =
+    (f1, f2) => f1 ::: f2
+
   implicit def listMonoid[A]: Monoid[List[A]] = new Monoid[List[A]] {
     def append(f1: List[A], f2: => List[A]) = f1 ::: f2
+    override def appendStrict(f1: List[A], f2: List[A]) = f1 ::: f2
+    override val appendStrictF = _appendStrictF.asInstanceOf[(List[A], List[A]) => List[A]]
+    override val appendF = _appendF.asInstanceOf[(List[A], => List[A]) => List[A]]
     def zero: List[A] = Nil
   }
 
