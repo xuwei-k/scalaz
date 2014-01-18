@@ -108,6 +108,20 @@ object EphemeralStreamTest extends SpecLite {
     Foldable[EphemeralStream].foldRight(infiniteStream, true)(_ || _) must_===(true)
   }
 
+  "no stack overflow infinite stream `zipWith` and `zip`" in {
+    val n = 100000
+    val infinite = EphemeralStream.iterate(1)(conforms)
+    val finite = EphemeralStream.iterate(0)(conforms).take(n)
+
+    Zip[EphemeralStream].zip(infinite, infinite).take(n).toList must_=== List.fill(n)((1, 1))
+    Zip[EphemeralStream].zip(infinite, finite  ).toList must_=== List.fill(n)((1, 0))
+    Zip[EphemeralStream].zip(finite  , infinite).toList must_=== List.fill(n)((0, 1))
+
+    Zip[EphemeralStream].zipWith(infinite, infinite)(Tuple2.apply).take(n).toList must_=== List.fill(n)((1, 1))
+    Zip[EphemeralStream].zipWith(infinite, finite  )(Tuple2.apply).toList must_=== List.fill(n)((1, 0))
+    Zip[EphemeralStream].zipWith(finite  , infinite)(Tuple2.apply).toList must_=== List.fill(n)((0, 1))
+  }
+
   "zipL" in {
     val size = 100
     val infinite = EphemeralStream.iterate(0)(_ + 1)
