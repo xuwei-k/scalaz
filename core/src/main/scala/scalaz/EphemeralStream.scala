@@ -178,6 +178,15 @@ sealed abstract class EphemeralStreamInstances {
     def point[A](a: => A) = EphemeralStream(a)
     def empty[A] = EphemeralStream()
     def zip[A, B](a: => EphemeralStream[A], b: => EphemeralStream[B]) = a zip b
+    override def zipWith[A, B, C](a: => EphemeralStream[A], b: => EphemeralStream[B])(f: (A, B) => C)(implicit F: Functor[EphemeralStream]) = {
+      def go(aa: => EphemeralStream[A], bb: => EphemeralStream[B]): EphemeralStream[C] = {
+        if(aa.isEmpty || bb.isEmpty)
+          emptyEphemeralStream
+        else
+          cons(f(aa.head(), bb.head()), go(aa.tail(), bb.tail()))
+      }
+      go(a, b)
+    }
     def unzip[A, B](a: EphemeralStream[(A, B)]) = a.unzip
     def alignWith[A, B, C](f: A \&/ B => C) =
       (a, b) =>
