@@ -20,5 +20,36 @@ trait ToMapOps {
   import scalaz.std.{map => dict}
 
   implicit def ToMapOpsFromMap[K, V](m: Map[K, V]): MapOps[Map, dict.BuildKeyConstraint, K, V] = new MapOps[Map, dict.BuildKeyConstraint, K, V](m)(dict)
+
+  implicit def ToInvariantFunctorOpsMap[A, B](v: Map[A, B])(implicit F0: InvariantFunctor[({type λ[α] = Map[A, α]})#λ]) =
+    new InvariantFunctorOps[({type λ[α] = Map[A, α]})#λ, B](v)
+
+  implicit def ToFunctorOpsMap[A, B](v: Map[A, B])(implicit F0: Functor[({type λ[α] = Map[A, α]})#λ]) =
+    new FunctorOps[({type λ[α] = Map[A, α]})#λ, B](v)
+
+  implicit def ToAlignOpsMap[A, B](v: Map[A, B])(implicit F0: Align[({type λ[α] = Map[A, α]})#λ]) =
+    new AlignOps[({type λ[α] = Map[A, α]})#λ, B](v)
+
+  implicit def ToTraverseOpsMap[A, B](v: Map[A, B])(implicit F0: Traverse[({type λ[α] = Map[A, α]})#λ]) =
+    new TraverseOps[({type λ[α] = Map[A, α]})#λ, B](v)
+
+  implicit def ToFoldableOpsMap[A, B](v: Map[A, B])(implicit F0: Foldable[({type λ[α] = Map[A, α]})#λ]) =
+    new FoldableOps[({type λ[α] = Map[A, α]})#λ, B](v)
+
+  implicit def ToApplyOpsMap[A, B](v: Map[A, B])(implicit F0: Apply[({type λ[α] = Map[A, α]})#λ]) =
+    new ApplyOps[({type λ[α] = Map[A, α]})#λ, B](v)
+
+  implicit def ToBindOpsMap[A, B](v: Map[A, B])(implicit F0: Bind[({type λ[α] = Map[A, α]})#λ]) =
+    new BindOps[({type λ[α] = Map[A, α]})#λ, B](v)
+
+  implicit def ToPlusOpsMap[A, B](v: Map[A, B])(implicit F0: Plus[({type λ[α] = Map[A, α]})#λ]) =
+    new PlusOps[({type λ[α] = Map[A, α]})#λ, B](v)
+
+  implicit def ToPlusEmptyOpsMap[A, B](v: Map[A, B])(implicit F0: PlusEmpty[({type λ[α] = Map[A, α]})#λ]) =
+    new PlusEmptyOps[({type λ[α] = Map[A, α]})#λ, B](v)
+
+  implicit def ToIsEmptyOpsMap[A, B](v: Map[A, B])(implicit F0: IsEmpty[({type λ[α] = Map[A, α]})#λ]) =
+    new IsEmptyOps[({type λ[α] = Map[A, α]})#λ, B](v)
+
 }
 
