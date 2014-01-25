@@ -563,6 +563,11 @@ sealed abstract class IListInstances extends IListInstance0 {
 
       override def mapAccumR[S, A, B](fa: IList[A], z: S)(f: (S, A) => (S, B)) =
         fa.mapAccumRight(z, f)
+
+      override def unite[T[_], A](value: IList[T[A]])(implicit T: Foldable[T]) =
+        value.foldRight(empty[A])((ta, as) =>
+          T.foldRight(ta, as)(_ :: _)
+        )
     }
 
 

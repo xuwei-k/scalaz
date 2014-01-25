@@ -395,4 +395,8 @@ object IListTest extends SpecLite {
     ns.zipWithIndex.toList must_=== ns.toList.zipWithIndex
   }
 
+  "unite" ! forAll { ns: IList[IList[Int]] =>
+    MonadPlus[IList].unite(ns) must_=== Bind[IList].join(ns)
+  }
+
 }
