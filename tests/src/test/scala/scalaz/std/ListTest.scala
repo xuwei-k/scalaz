@@ -117,4 +117,8 @@ object ListTest extends SpecLite {
         (c :+ a, f(a))) must_===(xs.reverse, xs.map(f))
   }
 
+  "unite" ! forAll { xs: List[List[Int]] =>
+    xs.flatten must_=== MonadPlus[List].unite(xs)
+  }
+
 }

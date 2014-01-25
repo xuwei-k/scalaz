@@ -94,6 +94,10 @@ trait ListInstances extends ListInstances0 {
         case _::t => a :: cojoin(t)
       }
 
+    override def unite[T[_], A](value: List[T[A]])(implicit T: Foldable[T]) =
+      value.reverse.foldLeft(List[A]())((as, ta) =>
+        T.foldRight(ta, as)(_ :: _)
+      )
   }
 
   implicit def listMonoid[A]: Monoid[List[A]] = new Monoid[List[A]] {
