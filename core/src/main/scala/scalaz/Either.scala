@@ -371,6 +371,18 @@ sealed abstract class DisjunctionInstances2 extends DisjunctionInstances3 {
     override def foldRight[A, B](fa: L \/ A, z: => B)(f: (A, => B) => B) =
       fa.foldRight(z)(f)
 
+    override def foldLeft[A, B](fa: L \/ A, z: B)(f: (B, A) => B) =
+      fa match {
+        case \/-(a) => f(z, a)
+        case -\/(_) => z
+      }
+
+    override def foldMap[A, B](fa: L \/ A)(f: A => B)(implicit M: Monoid[B]) =
+      fa match {
+        case \/-(a) => f(a)
+        case -\/(_) => M.zero
+      }
+
     def cozip[A, B](x: L \/ (A \/ B)) =
       x match {
         case l @ -\/(_) => -\/(l)
@@ -392,13 +404,71 @@ sealed abstract class DisjunctionInstances2 extends DisjunctionInstances3 {
 }
 
 sealed abstract class DisjunctionInstances3 {
-  implicit val DisjunctionInstances3 : Bitraverse[\/] = new Bitraverse[\/] {
+  implicit val DisjunctionInstances3 : Bitraverse[\/] = new Bitraverse[\/] { self =>
     override def bimap[A, B, C, D](fab: A \/ B)
                                   (f: A => C, g: B => D) = fab bimap (f, g)
 
     def bitraverseImpl[G[_] : Applicative, A, B, C, D](fab: A \/ B)
                                                   (f: A => G[C], g: B => G[D]) =
       fab.bitraverse(f, g)
+
+    override def bifoldRight[A, B, C](fab: A \/ B, z: => C)(f: (A, => C) => C)(g: (B, => C) => C) =
+      fab match {
+        case \/-(b) => g(b, z)
+        case -\/(a) => f(a, z)
+      }
+
+    override def bifoldLeft[A, B, C](fab: A \/ B, z: C)(f: (C, A) => C)(g: (C, B) => C) =
+      fab match {
+        case \/-(b) => g(z, b)
+        case -\/(a) => f(z, a)
+      }
+
+    override def bifoldMap[A, B, M: Monoid](fab: A \/ B)(f: A => M)(g: B => M) =
+      fab.fold(f, g)
+
+    override def bifoldMap1[A, B, M: Semigroup](fab: A \/ B)(f: A => M)(g: B => M) =
+      Some(fab.fold(f, g))
+
+    override def leftMap[A, B, C](fab: A \/ B)(f: A => C) =
+      fab leftMap f
+
+    override def rightMap[A, B, C](fab: A \/ B)(f: B => C) =
+      fab map f
+
+    override def rightTraverse[X] = \/.DisjunctionInstances2[X]
+
+    override def rightFunctor[X] = \/.DisjunctionInstances2[X]
+
+    override def rightFoldable[X] = \/.DisjunctionInstances2[X]
+
+    override def leftFunctor[X] = leftTraverse[X]
+
+    override def leftFoldable[X] = leftTraverse[X]
+
+    override def leftTraverse[X] = new LeftTraverse[\/, X] {
+      val F = self
+
+      override def map[A, B](fa: A \/ X)(f: A => B) = fa leftMap f
+
+      override def foldMap[A, B](fa: A \/ X)(f: A => B)(implicit M: Monoid[B]) =
+        fa match {
+          case \/-(_) => M.zero
+          case -\/(a) => f(a)
+        }
+
+      override def foldLeft[A, B](fa: A \/ X, z: B)(f: (B, A) => B) =
+        fa match {
+          case \/-(_) => z
+          case -\/(a) => f(z, a)
+        }
+
+      override def foldRight[A, B](fa: A \/ X, z: => B)(f: (A, => B) => B) =
+        fa match {
+          case \/-(_) => z
+          case -\/(a) => f(a, z)
+        }
+    }
   }
 }
 
