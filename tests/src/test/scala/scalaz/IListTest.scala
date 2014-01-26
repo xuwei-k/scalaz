@@ -310,8 +310,17 @@ object IListTest extends SpecLite {
     ss.sortBy(f).toList must_=== ss.toList.sortBy(f)
   }
 
+  "sortBy Int" ! forAll { a: IList[Int] =>
+    a.sortBy(- _).toList must_=== a.toList.sortBy(- _)
+    a.sortBy(_.toHexString).toList must_=== a.toList.sortBy(_.toHexString)
+  }
+
   "sorted" ! forAll { (ss: IList[String]) =>
     ss.sorted.toList must_=== ss.toList.sorted
+  }
+
+  "sorted Int" ! forAll { a: IList[Int] =>
+    a.sorted.toList must_=== a.toList.sorted
   }
 
   "span" ! forAll { (ns: IList[Int], f: Int => Boolean) =>

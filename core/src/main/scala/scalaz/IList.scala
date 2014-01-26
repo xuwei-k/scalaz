@@ -294,8 +294,26 @@ sealed abstract class IList[A] extends Product with Serializable {
   def slice(from: Int, until: Int): IList[A] =
     drop(from).take((until max 0)- (from max 0))
 
-  def sortBy[B](f: A => B)(implicit B: Order[B]): IList[A] =
-    IList(toList.sortBy(f)(B.toScalaOrdering): _*)
+  def sortBy[B](f: A => B)(implicit B: Order[B]): IList[A] = {
+    val len = length
+    val array = new Array[AnyRef](len)
+    var i = 0
+    var list = this
+    while(i < len){
+      val ICons(h, t) = list
+      array(i) = h.asInstanceOf[AnyRef]
+      list = t
+      i += 1
+    }
+    java.util.Arrays.sort(array, (B.toScalaOrdering on f).asInstanceOf[java.util.Comparator[Any]])
+    var acc = empty[A]
+    i = len - 1
+    while(0 <= i){
+      acc = ICons(array(i).asInstanceOf[A], acc)
+      i -= 1
+    }
+    acc
+  }
 
   def sorted(implicit ev: Order[A]): IList[A] =
     sortBy(conforms)
