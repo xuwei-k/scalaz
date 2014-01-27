@@ -98,6 +98,17 @@ sealed abstract class Free[S[_], A] {
     go2(this)
   }
 
+  final def interpret[M[_], N[_]](f: N ~> M)(implicit M: Monad[M], N: this.type <:< FreeC[N, A]): M[A] = {
+    def go(a: FreeC[N, A]): M[A] = a.resume match {
+      case \/-(c) => M.point(c)
+      case -\/(c) => M.bind(f(c.fi))(x => go(c.k(x)))
+    }
+    go(N(this))
+  }
+
+  final def interpretId[M[_]](implicit M: Monad[M], N: this.type <:< FreeC[M, A]): M[A] =
+    interpret(NaturalTransformation.refl[M])
+
   /**
    * Runs to completion, using a function that maps the resumption from `S` to a monad `M`.
    * @since 7.0.1
@@ -311,6 +322,9 @@ trait FreeFunctions {
   /** Suspends a value within a functor in a single step. */
   def liftF[S[_], A](value: => S[A])(implicit S: Functor[S]): Free[S, A] =
     Suspend(S.map(value)(Return[S, A]))
+
+  def freeC[S[_], A](value: S[A]): FreeC[S, A] =
+    liftF[({type λ[α]=Coyoneda[S, α]})#λ, A](Coyoneda(value))
 
   /** A trampoline step that doesn't do anything. */
   def pause: Trampoline[Unit] =
