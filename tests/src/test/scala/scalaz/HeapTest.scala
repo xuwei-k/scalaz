@@ -12,6 +12,9 @@ object HeapTest extends SpecLite {
 
   def pred(i: Int) = i % 2 == 0
 
+  implicit def headShow[A: Show]: Show[Heap[A]] =
+    Contravariant[Show].contramap(Show[List[A]])(_.toList)
+
   "order maintained for toList" ! forAll {
     (a: Heap[Int]) => a.toList must_===(a.toList.sorted)
   }
@@ -37,5 +40,32 @@ object HeapTest extends SpecLite {
       lt.forall(_ < x) must_===(true)
       eq.forall(_ == x) must_===(true)
       gt.forall(_ > x) must_===(true)
+  }
+
+  "size" ! forAll { a: Heap[Int] =>
+    a.size must_=== a.toList.size
+  }
+
+  "minimum" ! forAll { a: Heap[Int] =>
+    if(a.isEmpty){
+      a.minimum.mustThrowA[RuntimeException]
+    }else{
+      a.minimum must_=== a.toList.min
+    }
+  }
+
+  "map" ! forAll { a: Heap[Int] =>
+    val f = (_: Int) + 1
+    a.map(f).toList must_=== a.toList.map(f).sorted
+  }
+
+  "union" ! forAll { (a: Heap[Int], b: Heap[Int]) =>
+    a.union(b).toList must_=== (a.toList ::: b.toList).sorted
+  }
+
+  "traverse" ! forAll { a: Heap[Int] =>
+    a.traverse(Option.apply) must_=== Option(a)
+    val f = (_: Int) + 1
+    a.traverse[Id.Id, Int](f) must_=== a.map(f)
   }
 }
