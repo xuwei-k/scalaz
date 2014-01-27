@@ -218,7 +218,8 @@ object Heap extends HeapInstances with HeapFunctions {
       case z                => z
     }
 
-    def rezip[A]: ForestZipper[A] => Forest[A] = {
+    @annotation.tailrec
+    def rezip[A](xs: ForestZipper[A]): Forest[A] = xs match {
       case (Stream(), xs)   => xs
       case (x #:: path, xs) => rezip((path, x #:: xs))
     }
@@ -240,8 +241,8 @@ object Heap extends HeapInstances with HeapFunctions {
       }
     }
 
-    def minZp[A](leq: (A, A) => Boolean):
-    (ForestZipper[A], ForestZipper[A]) => ForestZipper[A] = {
+    @annotation.tailrec
+    def minZp[A](leq: (A, A) => Boolean)(lo: ForestZipper[A], z: ForestZipper[A]): ForestZipper[A] = (lo, z) match {
       case (lo, (_, Stream())) => lo
       case (lo, z)             => minZp(leq)(if (leq(rootZ(lo), rootZ(z))) lo else z, rightZ(z))
     }
@@ -300,8 +301,8 @@ object Heap extends HeapInstances with HeapFunctions {
         }
       }
 
-    def splitForest[A]:
-    (Int, Forest[A], Forest[A], Forest[A]) => (Forest[A], Forest[A], Forest[A]) = {
+    @annotation.tailrec
+    def splitForest[A](r: Int, zs: Forest[A], ts: Forest[A], f: Forest[A]): (Forest[A], Forest[A], Forest[A]) = (r, zs, ts, f) match {
       case (0, zs, ts, f)                  => (zs, ts, f)
       case (1, zs, ts, Stream(t))          => (zs, t #:: ts, Stream())
       case (1, zs, ts, t1 #:: t2 #:: f)    =>
@@ -320,7 +321,8 @@ object Heap extends HeapInstances with HeapFunctions {
     def skewMeld[A](f: (A, A) => Boolean, ts: Forest[A], tsp: Forest[A]) =
       unionUniq(f)(uniqify(f)(ts), uniqify(f)(tsp))
 
-    def ins[A](f: (A, A) => Boolean, t: Tree[Ranked[A]]): Forest[A] => Forest[A] = {
+    @annotation.tailrec
+    def ins[A](f: (A, A) => Boolean, t: Tree[Ranked[A]])(xs: Forest[A]): Forest[A] = xs match {
       case Stream()    => Stream(t)
       case (tp #:: ts) => if (rank(t) < rank(tp)) t #:: tp #:: ts
       else
@@ -396,12 +398,14 @@ trait HeapFunctions {
 
   /**Create a heap consisting of multiple copies of the same value. O(log n) */
   def replicate[A: Order](a: A, i: Int): Heap[A] = {
+    @annotation.tailrec
     def f(x: Heap[A], y: Int): Heap[A] =
       if (y % 2 == 0) f(x union x, y / 2)
       else
       if (y == 1) x
       else
         g(x union x, (y - 1) / 2, x)
+    @annotation.tailrec
     def g(x: Heap[A], y: Int, z: Heap[A]): Heap[A] =
       if (y % 2 == 0) g(x union x, y / 2, z)
       else
