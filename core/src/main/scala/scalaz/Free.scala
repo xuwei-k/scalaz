@@ -260,6 +260,11 @@ sealed abstract class FreeInstances2 extends FreeInstances3 {
       def F = implicitly
       def F0 = implicitly
     }
+
+  implicit def freeMonadPlus[F[_]: ApplicativePlus]: MonadPlus[({type λ[α] = Free[F, α]})#λ] =
+    new FreeMonadPlus[F] {
+      def F = implicitly
+    }
 }
 
 sealed abstract class FreeInstances1 extends FreeInstances2 {
@@ -280,10 +285,8 @@ sealed abstract class FreeInstances0 extends FreeInstances1 {
 // to Free to be part of the implicit scope.
 sealed abstract class FreeInstances extends FreeInstances0 with TrampolineInstances with SinkInstances with SourceInstances {
   implicit def freeMonad[S[_]:Functor]: Monad[({type f[x] = Free[S, x]})#f] =
-    new Monad[({type f[x] = Free[S, x]})#f] {
-      def point[A](a: => A) = Return(a)
-      override def map[A, B](fa: Free[S, A])(f: A => B) = fa map f
-      def bind[A, B](a: Free[S, A])(f: A => Free[S, B]) = a flatMap f
+    new FreeMonad[S] {
+      def F = implicitly
     }
 
   implicit def freeEqual[F[_], A](implicit A: Equal[A], N: Equal ~> ({type λ[α] = Equal[F[α]]})#λ, F: Functor[F]): Equal[Free[F, A]] =
@@ -375,3 +378,19 @@ private sealed abstract class FreeTraverse1[F[_]] extends Traverse1[({type λ[α
       case \/-(r) => G.map(f(r))(Return(_))
     }
 }
+
+
+private sealed trait FreeMonad[F[_]] extends Monad[({type λ[α] = Free[F, α]})#λ] {
+  implicit def F: Functor[F]
+  def point[A](a: => A) = Return(a)
+  override final def map[A, B](fa: Free[F, A])(f: A => B) = fa map f
+  def bind[A, B](a: Free[F, A])(f: A => Free[F, B]) = a flatMap f
+}
+
+private sealed trait FreeMonadPlus[F[_]] extends MonadPlus[({type λ[α] = Free[F, α]})#λ] with FreeMonad[F] {
+  implicit def F: ApplicativePlus[F]
+
+  def empty[A] = Suspend(F.empty[Free[F, A]])
+  def plus[A](a: Free[F, A], b: => Free[F, A]) = Suspend(F.plus(F.point(a), F.point(b)))
+}
+
