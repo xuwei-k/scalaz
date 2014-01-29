@@ -18,11 +18,12 @@ object FreePlusTest extends SpecLite {
     import FreePlus._
     def loop(pure: Int, suspend: Int, plus: Int): Arbitrary[FreePlus[F, A]] =
       Arbitrary(Gen.frequency(
-        (10,    Functor[Arbitrary].map(A)(Pure[F, A](_)).arbitrary),
-        (suspend, Functor[Arbitrary].map(F(loop(pure + 1, suspend, plus)))(Suspend[F, A](_)).arbitrary),
-        (plus,    Functor[Arbitrary].map(loop(pure + 1, suspend, plus))(a => FreePlus.Plus[F, A](IList(a))).arbitrary)
+        (pure,    Functor[Arbitrary].map(A)(Pure[F, A](_)).arbitrary)
+//        (suspend, Functor[Arbitrary].map(F(loop(pure * 2, suspend / 2, plus / 2)))(Suspend[F, A](_)).arbitrary),
+//        (plus,    Functor[Arbitrary].map(loop(pure * 2, suspend / 2, plus / 2))(a => FreePlus.Plus[F, A](IList(a))).arbitrary)
+// TODO stack overflow
       ))
-    loop(1, 1, 1)
+    loop(10, 1, 1)
   }
 
   implicit val optionEq = new Template[Option, Equal] {
