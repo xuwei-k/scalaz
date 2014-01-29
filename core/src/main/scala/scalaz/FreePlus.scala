@@ -30,14 +30,14 @@ sealed abstract class FreePlus[F[_], A] {
   }
 
   final def plus(that: FreePlus[F, A])(implicit F: Functor[F]): FreePlus[F, A] = (this.resume, that.resume) match {
-    case (Right3(INil()), _             ) => that
-    case (_             , Right3(INil())) => this
-    case (Right3(a)     , Right3(b)     ) => Plus(a ::: b)
-    case (_             , _             ) => Plus(this :: that :: IList.empty)
+    case (Right3(a)     , Left3(b)  ) => Plus(a :+ Pure[F, A](b))
+    case (Left3(a)      , Right3(b) ) => Plus(Pure[F, A](a) +: b)
+    case (Right3(a)     , Right3(b) ) => Plus(a ::: b)
+    case (_             , _         ) => Plus(this :: that :: IList.empty)
   }
   
   @annotation.tailrec
-  final def resume(implicit F: Functor[F]): Either3[A, F[FreePlus[F, A]], IList[FreePlus[F, A]]] = this match { 
+  final def resume(implicit F: Functor[F]): Either3[A, F[FreePlus[F, A]], IList[FreePlus[F, A]]] = this match {
     case Pure(a)    => Left3(a)
     case Suspend(a) => Middle3(a)
     case Plus(a)    => Right3(a)
