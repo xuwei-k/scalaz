@@ -10,11 +10,14 @@ import scalaz.scalacheck.ScalazArbitrary._
 
 object FreeTest extends SpecLite {
 
-  implicit def freeArb[F[_], A](implicit A: Arbitrary[A], F: Arbitrary ~> ({type λ[α] = Arbitrary[F[α]]})#λ): Arbitrary[Free[F, A]] =
-    Arbitrary(Gen.oneOf(
-      Functor[Arbitrary].map(A)(Return[F, A](_)).arbitrary,
-      Functor[Arbitrary].map(F(freeArb[F, A]))(Suspend[F, A](_)).arbitrary
-    ))
+  implicit def freeArb[F[_], A](implicit A: Arbitrary[A], F: Arbitrary ~> ({type λ[α] = Arbitrary[F[α]]})#λ): Arbitrary[Free[F, A]] = {
+    def loop(pure: Int, suspend: Int): Arbitrary[Free[F, A]] =
+      Arbitrary(Gen.frequency(
+        (pure, Functor[Arbitrary].map(A)(Return[F, A](_)).arbitrary),
+        (suspend, Functor[Arbitrary].map(F(loop(pure + 1, suspend)))(Suspend[F, A](_)).arbitrary)
+      ))
+    loop(1, 1)
+  }
 
   private trait Template[F[_], G[_]] extends (G ~> ({type λ[α] = G[F[α]]})#λ) {
     override final def apply[A](a: G[A]) = lift(a)
