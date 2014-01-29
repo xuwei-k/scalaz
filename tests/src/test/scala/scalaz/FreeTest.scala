@@ -49,6 +49,7 @@ object FreeTest extends SpecLite {
     checkAll(equal.laws[PairOpt[Int]])
 
     checkAll(traverse.laws[BinaryTree])
+    checkAll(monad.laws[BinaryTree])
     checkAll(equal.laws[BinaryTree[Int]])
   }
 
@@ -65,6 +66,7 @@ object FreeTest extends SpecLite {
     }
 
     checkAll(traverse1.laws[FreeOneAndOpt])
+    checkAll(monad.laws[FreeOneAndOpt])
     checkAll(equal.laws[FreeOneAndOpt[Int]])
   }
 
