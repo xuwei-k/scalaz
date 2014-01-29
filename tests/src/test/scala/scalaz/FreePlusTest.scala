@@ -19,7 +19,7 @@ object FreePlusTest extends SpecLite {
     def loop(pure: Int, suspend: Int, plus: Int): Arbitrary[FreePlus[F, A]] =
       Arbitrary(Gen.frequency(
         (pure,    Functor[Arbitrary].map(A)(Pure[F, A](_)).arbitrary)
-//        (suspend, Functor[Arbitrary].map(F(loop(pure * 2, suspend / 2, plus / 2)))(Suspend[F, A](_)).arbitrary),
+       ,(suspend, Functor[Arbitrary].map(F(loop(pure * 2, suspend / 2, plus / 2)))(Suspend[F, A](_)).arbitrary)
 //        (plus,    Functor[Arbitrary].map(loop(pure * 2, suspend / 2, plus / 2))(a => FreePlus.Plus[F, A](IList(a))).arbitrary)
 // TODO stack overflow
       ))
@@ -31,7 +31,10 @@ object FreePlusTest extends SpecLite {
   }
 
   implicit val optionArb = new Template[Option, Arbitrary] {
-    def lift[A: Arbitrary] = implicitly[Arbitrary[Option[A]]]
+    def lift[A: Arbitrary] = Arbitrary(Gen.frequency(
+      (1, None)
+//      (1, Functor[Arbitrary].map(implicitly[Arbitrary[A]])(Option.apply).arbitrary)
+    ))
   }
 
   checkAll(monadPlus.laws[FreePlusOption])
