@@ -14,7 +14,7 @@ sealed abstract class FreeT[F[_], M[_], A]{
 
   def flatMap[B](f: A => FreeT[F, M, B])(implicit F: Functor[F], M: Monad[M]): FreeT[F, M, B] =
     Cont(this, f)
-    
+
   import syntax.functor._
 
   def map[B](f: A => B)(implicit F: Functor[F], M: Monad[M]): FreeT[F, M, B] =
@@ -59,30 +59,35 @@ object FreeT extends FreeTInstances {
 
   }
 
-  implicit def freeFEqual[F[_], A, B](implicit A: Equal[A], FB: Equal[F[B]]): Equal[FreeF[F, A, B]] =
-    Equal.equal{ 
+  implicit def freeFEqual0[F[_], A, B](implicit A: Equal[A], FB: Equal[F[B]]): Equal[FreeF[F, A, B]] =
+    Equal.equal{
       case (Pure(a), Pure(b))             => A.equal(a, b)
       case (Free(a: F[B]), Free(b: F[B])) => FB.equal(a, b)
       case _                              => false
     }
 
-
   implicit def freeTEqual[F[_], M[_], A](implicit
     F: Functor[F],
     M: Monad[M],
     A: Equal[A],
-    ME: Equal ~> ({type l[a] = Equal[M[FreeF[F, a, FreeT[F, M, a]]]]})#l
+    M0: Equal ~> ({type l[a] = Equal[M[a]]})#l,
+    M1: Equal ~> ({type l[a] = Equal[FreeF[F, A, a]]})#l
   ): Equal[FreeT[F, M, A]] = {
     Equal.equal{ (aa, bb) =>
-      ME(A).equal(aa.run, bb.run) 
+      M0(M1(freeTEqual[F, M, A])).equal(aa.run, bb.run)
     }
   }
 
-  trait Template[F[_], G[_]] extends (G ~> ({type λ[α] = G[F[α]]})#λ) {
-    override final def apply[A](a: G[A]) = lift(a)
-
-    def lift[A: G]: G[F[A]]
-  }
+  implicit def freeFEq[F[_], A](implicit
+    A: Equal[A],
+    F: Equal ~> ({type l[a] = Equal[F[a]]})#l
+  ): Equal ~> ({type l[a] = Equal[FreeT.FreeF[F, A, a]]})#l =
+    new (Equal ~> ({type l[a] = Equal[FreeT.FreeF[F, A, a]]})#l){
+      def apply[B](b: Equal[B]) = {
+        implicit val fbEq = F(b)
+        FreeT.freeFEqual0[F, A, B]
+      }
+    }
 
   implicit def freeFFunctor[F[_], X](implicit F: Functor[F]): Functor[({type λ[α]=FreeF[F, X, α]})#λ] =
     new Functor[({type λ[α]=FreeF[F, X, α]})#λ]{

@@ -9,13 +9,14 @@ import scalaz.scalacheck.ScalazArbitrary._
 
 object FreeTTest extends SpecLite {
 
-  type FreeTOptOpt[A] = FreeT[Option, Option, A]
-
   implicit def freeArb[F[_], A](implicit A: Arbitrary[A], F: Arbitrary ~> ({type λ[α] = Arbitrary[F[α]]})#λ): Arbitrary[Free[F, A]] =
   Arbitrary(Gen.frequency(
     (1, Functor[Arbitrary].map(A)(Free.Return[F, A](_)).arbitrary),
     (1, Functor[Arbitrary].map(F(freeArb[F, A]))(Free.Suspend[F, A](_)).arbitrary)
   ))
+
+  implicit def freeTArb[F[_], M[_], A](implicit A: Arbitrary[M[Free[F, A]]], F: Functor[F], M: Monad[M]): Arbitrary[FreeT[F, M, A]] =
+    Functor[Arbitrary].map(A)(FreeT.fromFree[F, M, A](_))
 
   trait Template[G[_], F[_]] extends (G ~> ({type λ[α] = G[F[α]]})#λ) {
     override final def apply[A](a: G[A]) = lift(a)
@@ -26,18 +27,29 @@ object FreeTTest extends SpecLite {
   implicit val optEq = new Template[Equal, Option]{
     def lift[A: Equal] = implicitly
   }
-    
+
   implicit val optArb = new Template[Arbitrary, Option]{
     def lift[A: Arbitrary] = implicitly
   }
 
-  implicit def freeTArb[F[_], M[_], A](implicit A: Arbitrary[M[Free[F, A]]], F: Functor[F], M: Monad[M]): Arbitrary[FreeT[F, M, A]] =
-    Functor[Arbitrary].map(A)(FreeT.fromFree[F, M, A](_))
-
-  {
-    implicit def freeTOptOptEq: Equal[FreeT[Option, Option, Int]] = Equal.equal((a,b) => a.run == b.run)
-
-    checkAll(monad.laws[FreeTOptOpt])
+  implicit val listEq = new Template[Equal, List]{
+    def lift[A: Equal] = implicitly
   }
+
+  implicit val listArb = new Template[Arbitrary, List]{
+    def lift[A](implicit A: Arbitrary[A]) = Arbitrary(
+      Gen.choose(0, 3).flatMap(Gen.listOfN(_, A.arbitrary)) // avoid stack overflow
+    )
+  }
+
+  type FreeTOptOpt[A]   = FreeT[Option, Option, A]
+  type FreeTOptList[A]  = FreeT[Option, List, A]
+  type FreeTListOpt[A]  = FreeT[List, Option, A]
+  type FreeTListList[A]  = FreeT[List, List, A]
+
+  checkAll("FreeT[Option, Option, _]", monad.laws[FreeTOptOpt])
+  checkAll("FreeT[Option, List, _]"  , monad.laws[FreeTOptList])
+  checkAll("FreeT[List, Option, _]"  , monad.laws[FreeTListOpt])
+  checkAll("FreeT[List, List, _]"    , monad.laws[FreeTListList])
 }
 
