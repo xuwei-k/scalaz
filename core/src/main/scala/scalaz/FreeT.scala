@@ -88,9 +88,7 @@ sealed abstract class FreeTInstances {
 object FreeT extends FreeTInstances {
   sealed abstract class FreeF[F[_], +A, +B]
   final case class Pure[F[_], A](a: A) extends FreeF[F, A, Nothing]
-  final case class Free[F[_], B](w: F[B]) extends FreeF[F, Nothing, B]{
-
-  }
+  final case class Free[F[_], B](w: F[B]) extends FreeF[F, Nothing, B]
 
   implicit def freeFEqual0[F[_], A, B](implicit A: Equal[A], FB: Equal[F[B]]): Equal[FreeF[F, A, B]] =
     Equal.equal{
@@ -134,6 +132,9 @@ object FreeT extends FreeTInstances {
 
   def fromFreeId[F[_], A](m: scalaz.Free[F, A])(implicit F: Functor[F]): FreeT[F, Id.Id, A] =
     fromFree[F, Id.Id, A](m)
+
+  def suspend[F[_], M[_], A](m: => FreeT[F, M, A])(implicit F: Applicative[F], M: Monad[M]): FreeT[F, M, A] =
+    FreeT(M.point(Free[F, FreeT[F, M, A]](F.point(m))))
 
   def fromFree[F[_], M[_], A](m: M[scalaz.Free[F, A]])(implicit F: Functor[F], M: Monad[M]): FreeT[F, M, A] = {
     def loop(f: scalaz.Free[F, A]): FreeF[F, A, FreeT[F, M, A]] = f.resume match{
