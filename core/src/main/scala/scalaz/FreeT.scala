@@ -24,6 +24,28 @@ sealed abstract class FreeT[F[_], M[_], A]{
         case Free(w) => Free(w.map(_.map(f)))
       }
     )
+
+  /*
+  https://github.com/ekmett/free/blob/v4.4/src/Control/Monad/Trans/Free.hs#L167
+
+  iterT :: (Functor f, Monad m) => (f (m a) -> m a) -> FreeT f m a -> m a
+  iterT f (FreeT m) = do
+    val <- m
+    case fmap (iterT f) val of
+        Pure x -> return x
+        Free y -> f y
+  */
+  def iterT(f: F[M[A]] => M[A])(implicit F: Functor[F], M: Monad[M]): M[A] = {
+    import syntax.bind._
+    for{
+      v <- run
+      x <- FreeT.freeFFunctor[F, A].map(v)(_.iterT(f)) match {
+        case Pure(x) => M.point(x)
+        case Free(y) => f(y)
+      }
+    }yield x
+  }
+
 }
 
 
