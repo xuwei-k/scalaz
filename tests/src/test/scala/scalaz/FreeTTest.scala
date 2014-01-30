@@ -1,6 +1,7 @@
 package scalaz
 
 import org.scalacheck.{Arbitrary, Gen}
+import org.scalacheck.Prop.forAll
 import Isomorphism._
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
@@ -8,6 +9,16 @@ import scalaz.scalacheck.ScalaCheckBinding._
 import scalaz.scalacheck.ScalazArbitrary._
 
 object FreeTTest extends SpecLite {
+
+  implicit def freeEqual[F[_], A](implicit A: Equal[A], N: Equal ~> ({type λ[α] = Equal[F[α]]})#λ, F: Functor[F]): Equal[Free[F, A]] =
+    Equal.equal{ (aa, bb) =>
+      (aa.resume, bb.resume) match {
+        case (\/-(a), \/-(b)) => A.equal(a, b)
+        case (-\/(a), -\/(b)) => N(freeEqual[F, A]).equal(a, b)
+        case (\/-(_), -\/(_)) => false
+        case (-\/(_), \/-(_)) => false
+      }
+    }
 
   implicit def freeArb[F[_], A](implicit A: Arbitrary[A], F: Arbitrary ~> ({type λ[α] = Arbitrary[F[α]]})#λ): Arbitrary[Free[F, A]] =
   Arbitrary(Gen.frequency(
@@ -51,5 +62,10 @@ object FreeTTest extends SpecLite {
   checkAll("FreeT[Option, List, _]"  , monad.laws[FreeTOptList])
   checkAll("FreeT[List, Option, _]"  , monad.laws[FreeTListOpt])
   checkAll("FreeT[List, List, _]"    , monad.laws[FreeTListList])
+
+  property("FreeT[F, Id, A] is Free[F, A]") = forAll{ a: Free[List, Int] =>
+    implicit val s = Show.showA[Free[List, Int]]
+    FreeT.fromFree[List, Id.Id, Int](a).toFree must_=== a
+  }
 }
 

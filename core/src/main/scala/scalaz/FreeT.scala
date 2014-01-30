@@ -25,6 +25,17 @@ sealed abstract class FreeT[F[_], M[_], A]{
       }
     )
 
+  final def toFree(implicit F: Functor[F], e: this.type <:< FreeT[F, Id.Id, A]): scalaz.Free[F, A] = {
+    e(this).run match {
+      case Pure(a) => scalaz.Free.Return[F, A](a)
+//      case Free(w) => scalaz.Free.liftF[F, FreeT[F, Id.Id, A]](w).flatMap(_.toFree)
+      case Free(w) => scalaz.Free.Suspend(F.map(w)(_.toFree))
+    }
+  }
+
+  // TODO hoistFreeT ,transFreeT
+  // https://github.com/ekmett/free/blob/v4.4/src/Control/Monad/Trans/Free.hs#L180-L188
+
   /*
   https://github.com/ekmett/free/blob/v4.4/src/Control/Monad/Trans/Free.hs#L167
 
