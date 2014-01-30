@@ -132,6 +132,9 @@ object FreeT extends FreeTInstances {
 
   import scalaz.{Free => ScalazFree}
 
+  def fromFreeId[F[_], A](m: scalaz.Free[F, A])(implicit F: Functor[F]): FreeT[F, Id.Id, A] =
+    fromFree[F, Id.Id, A](m)
+
   def fromFree[F[_], M[_], A](m: M[scalaz.Free[F, A]])(implicit F: Functor[F], M: Monad[M]): FreeT[F, M, A] = {
     def loop(f: scalaz.Free[F, A]): FreeF[F, A, FreeT[F, M, A]] = f.resume match{
       case -\/(s) =>
