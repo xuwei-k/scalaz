@@ -67,5 +67,24 @@ object FreeTTest extends SpecLite {
     implicit val s = Show.showA[Free[List, Int]]
     FreeT.fromFree[List, Id.Id, Int](a).toFree must_=== a
   }
+
+  property("no stack overflow") = {
+    import scalaz.Free.Trampoline
+
+    val n = 100000
+
+    def isEven(xs: List[Int]): Trampoline[Boolean] =
+      if (xs.isEmpty) Trampoline.done(true) else Trampoline.suspend(isOdd(xs.tail))
+    def isOdd(xs: List[Int]): Trampoline[Boolean] =
+      if (xs.isEmpty) Trampoline.done(false) else Trampoline.suspend(isEven(xs.tail))
+
+    def foo = FreeT.fromFree[Function0, Id.Id, Boolean](isEven((1 to n).toList))
+
+    FreeT.fromFree((1 to n).map(x => scalaz.Free.liftF(Option(x))).toList).iterT(_ getOrElse Nil) must_=== (1 to n).toList
+    foo.toFree.run must_=== true
+    foo.map(x => !x).toFree.run must_=== false
+
+//    FreeT.fromFree[Function0, Id.Id, Boolean](isEven((1 to 100000).toList)).iterT(_()) must_=== true
+  }
 }
 
