@@ -53,15 +53,38 @@ object FreeTTest extends SpecLite {
     )
   }
 
-  type FreeTOptOpt[A]   = FreeT[Option, Option, A]
-  type FreeTOptList[A]  = FreeT[Option, List, A]
-  type FreeTListOpt[A]  = FreeT[List, Option, A]
-  type FreeTListList[A]  = FreeT[List, List, A]
+  implicit val oneAndOptEq = new Template[Equal, OneAndOpt]{
+    def lift[A: Equal] = implicitly
+  }
 
-  checkAll("FreeT[Option, Option, _]", monadPlus.laws[FreeTOptOpt])
-  checkAll("FreeT[Option, List, _]"  , monadPlus.laws[FreeTOptList])
-  checkAll("FreeT[List, Option, _]"  , monadPlus.laws[FreeTListOpt])
-  checkAll("FreeT[List, List, _]"    , monadPlus.laws[FreeTListList])
+  implicit val oneAndOptArb = new Template[Arbitrary, OneAndOpt]{
+    def lift[A: Arbitrary] = implicitly
+  }
+
+  type OneAndOpt[A] = OneAnd[Option, A]
+
+  type FreeTOneAndOptList[A]   = FreeT[OneAndOpt, List, A]
+  type FreeTOneAndOptOpt[A]    = FreeT[OneAndOpt, Option, A]
+  type FreeTOptOneAndOpt[A]    = FreeT[Option, OneAndOpt, A]
+  type FreeTListOneAndOpt[A]   = FreeT[List, OneAndOpt, A]
+
+  type FreeTOptOpt[A]          = FreeT[Option, Option, A]
+  type FreeTOptList[A]         = FreeT[Option, List, A]
+  type FreeTListOpt[A]         = FreeT[List, Option, A]
+  type FreeTListList[A]        = FreeT[List, List, A]
+
+  checkAll("FreeT[OneAndOpt, List, _]"     , monadPlus.laws[FreeTOneAndOptList])
+  checkAll("FreeT[OneAndOpt, Option, _]"   , monadPlus.laws[FreeTOneAndOptOpt])
+
+  checkAll("FreeT[Option, OneAndOpt, _]"   , monad.laws[FreeTOptOneAndOpt])
+  checkAll("FreeT[Option, OneAndOpt, _]"   , plus.laws[FreeTOptOneAndOpt])
+  checkAll("FreeT[List, OneAndOpt, _]"     , monad.laws[FreeTListOneAndOpt])
+  checkAll("FreeT[List, OneAndOpt, _]"     , plus.laws[FreeTListOneAndOpt])
+
+  checkAll("FreeT[Option, Option, _]"      , monadPlus.laws[FreeTOptOpt])
+  checkAll("FreeT[Option, List, _]"        , monadPlus.laws[FreeTOptList])
+  checkAll("FreeT[List, Option, _]"        , monadPlus.laws[FreeTListOpt])
+  checkAll("FreeT[List, List, _]"          , monadPlus.laws[FreeTListList])
 
   property("FreeT[F, Id, A] is Free[F, A]") = forAll{ a: Free[List, Int] =>
     implicit val s = Show.showA[Free[List, Int]]
