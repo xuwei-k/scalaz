@@ -33,8 +33,17 @@ sealed abstract class FreeT[F[_], M[_], A]{
     }
   }
 
-  // TODO hoistFreeT ,transFreeT
   // https://github.com/ekmett/free/blob/v4.4/src/Control/Monad/Trans/Free.hs#L180-L188
+
+  // hoistFreeT :: (Monad m, Functor f) => (forall a. m a -> n a) -> FreeT f m b -> FreeT f n b
+  // hoistFreeT mh = FreeT . mh . liftM (fmap (hoistFreeT mh)) . runFreeT
+  def hoist[N[_]](f: M ~> N)(implicit M: Monad[M], F: Functor[F]): FreeT[F, N, A] =
+    FreeT(f(run.map(freeFFunctor[F, A].map(_)(_.hoist(f)))))
+
+  // transFreeT :: (Monad m, Functor g) => (forall a. f a -> g a) -> FreeT f m b -> FreeT g m b
+  // transFreeT nt = FreeT . liftM (fmap (transFreeT nt) . transFreeF nt) . runFreeT
+  def trans[G[_]](f: F ~> G)(implicit M: Monad[M], F: Functor[F], G: Functor[G]): FreeT[G, M, A] =
+    FreeT(M.map(run)(freeFFunctor[F, A].map(_)(_.trans(f)).trans(f)))
 
   /*
   https://github.com/ekmett/free/blob/v4.4/src/Control/Monad/Trans/Free.hs#L167
@@ -86,7 +95,12 @@ sealed abstract class FreeTInstances {
 }
 
 object FreeT extends FreeTInstances {
-  sealed abstract class FreeF[F[_], +A, +B]
+  sealed abstract class FreeF[F[_], +A, +B]{
+    final def trans[G[_]](f: F ~> G): FreeF[G, A, B] = this match {
+      case a @ Pure(_) => a.asInstanceOf[FreeF[G, A, B]]
+      case Free(w)     => Free(f(w))
+    }
+  }
   final case class Pure[F[_], A](a: A) extends FreeF[F, A, Nothing]
   final case class Free[F[_], B](w: F[B]) extends FreeF[F, Nothing, B]
 
