@@ -102,5 +102,17 @@ object FreeTTest extends SpecLite {
 
     foo.toFree.run must_=== true
   }
+
+  property("fib") = {
+    type T = FreeT[Function0, Id.Id, Int]
+
+    def fib(n: Int): T =
+      if (n < 2) FreeT.fromFreeId(Trampoline.done(n)) else for {
+        x <- FreeT.suspend(fib(n - 1))
+        y <- FreeT.suspend(fib(n - 2))
+      } yield (x + y)
+
+    fib(30).toFree.run must_=== 832040
+  }
 }
 
