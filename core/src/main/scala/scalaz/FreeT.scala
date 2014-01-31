@@ -75,16 +75,17 @@ sealed abstract class FreeT[F[_], M[_], A]{
 sealed abstract class FreeTInstances {
   import FreeT._
 
-  implicit def freeTMonad[F[_], M[_]](implicit F: Functor[F], M: Monad[M]): Monad[({type λ[α]=FreeT[F, M, α]})#λ] =
-    new Monad[({type λ[α]=FreeT[F, M, α]})#λ] {
-      def point[A](a: => A) =
-        FreeT(M.point(FreeT.Pure(a)))
+  implicit def freeTMonad[F[_]: Functor, M[_]: Monad]: Monad[({type λ[α]=FreeT[F, M, α]})#λ] =
+    new FreeTMonad[F, M] {
+      def F = implicitly
+      def M = implicitly
+    }
 
-      def bind[A, B](fa: FreeT[F, M, A])(f: A => FreeT[F, M, B]) =
-        fa flatMap f
-
-      override def map[A, B](fa: FreeT[F, M, A])(f: A => B) =
-        fa map f
+  implicit def freeTPlus[F[_]: Functor, M[_]: Monad: Plus]: Plus[({type λ[α]=FreeT[F, M, α]})#λ] =
+    new FreeTPlus[F, M] {
+      def F = implicitly
+      def M = implicitly
+      def M0 = implicitly
     }
 
   implicit def freeTMonadTrans[F[_]: Functor]: MonadTrans[({type λ[α[_], β]=FreeT[F, α, β]})#λ] =
@@ -106,6 +107,12 @@ object FreeT extends FreeTInstances {
   }
   final case class Pure[F[_], A](a: A) extends FreeF[F, A, Nothing]
   final case class Free[F[_], B](w: F[B]) extends FreeF[F, Nothing, B]
+
+  implicit def freeTMonadPlus[F[_]: Functor, M[_]: MonadPlus]: MonadPlus[({type λ[α]=FreeT[F, M, α]})#λ] =
+    new FreeTMonadPlus[F, M] {
+      def F = implicitly
+      def M = implicitly
+    }
 
   implicit def freeFEqual0[F[_], A, B](implicit A: Equal[A], FB: Equal[F[B]]): Equal[FreeF[F, A, B]] =
     Equal.equal{
@@ -169,4 +176,34 @@ object FreeT extends FreeTInstances {
   final case class Cont[F[_], M[_], A, B](a: FreeT[F, M, B], f: B => FreeT[F, M, A]) extends FreeT[F, M, A]
 
   def apply[F[_], M[_], A](a: M[FreeT.FreeF[F, A, FreeT[F, M, A]]]): FreeT[F, M, A] = Return(a)
+}
+
+private trait FreeTMonad[F[_], M[_]] extends Monad[({type λ[α]=FreeT[F, M, α]})#λ] {
+  implicit def F: Functor[F]
+  implicit def M: Monad[M]
+
+  def point[A](a: => A) =
+    FreeT(M.point(FreeT.Pure(a)))
+
+  def bind[A, B](fa: FreeT[F, M, A])(f: A => FreeT[F, M, B]) =
+    fa flatMap f
+
+  override final def map[A, B](fa: FreeT[F, M, A])(f: A => B) =
+    fa map f
+}
+
+private trait FreeTPlus[F[_], M[_]] extends Plus[({type λ[α]=FreeT[F, M, α]})#λ] {
+  implicit def F: Functor[F]
+  implicit def M: Monad[M]
+  def M0: Plus[M]
+
+  override def plus[A](a: FreeT[F, M, A], b: => FreeT[F, M, A]) = FreeT(M0.plus(a.run, b.run))
+}
+
+private trait FreeTMonadPlus[F[_], M[_]] extends MonadPlus[({type λ[α]=FreeT[F, M, α]})#λ] with FreeTMonad[F, M] with FreeTPlus[F, M] {
+  implicit def F: Functor[F]
+  implicit def M: MonadPlus[M]
+  def M0: Plus[M] = M
+
+  override def empty[A] = FreeT(M.empty)
 }

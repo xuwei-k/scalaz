@@ -58,10 +58,10 @@ object FreeTTest extends SpecLite {
   type FreeTListOpt[A]  = FreeT[List, Option, A]
   type FreeTListList[A]  = FreeT[List, List, A]
 
-  checkAll("FreeT[Option, Option, _]", monad.laws[FreeTOptOpt])
-  checkAll("FreeT[Option, List, _]"  , monad.laws[FreeTOptList])
-  checkAll("FreeT[List, Option, _]"  , monad.laws[FreeTListOpt])
-  checkAll("FreeT[List, List, _]"    , monad.laws[FreeTListList])
+  checkAll("FreeT[Option, Option, _]", monadPlus.laws[FreeTOptOpt])
+  checkAll("FreeT[Option, List, _]"  , monadPlus.laws[FreeTOptList])
+  checkAll("FreeT[List, Option, _]"  , monadPlus.laws[FreeTListOpt])
+  checkAll("FreeT[List, List, _]"    , monadPlus.laws[FreeTListList])
 
   property("FreeT[F, Id, A] is Free[F, A]") = forAll{ a: Free[List, Int] =>
     implicit val s = Show.showA[Free[List, Int]]
