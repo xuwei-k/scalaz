@@ -33,16 +33,19 @@ sealed abstract class FreeT[F[_], M[_], A]{
     }
   }
 
+  final def free(f: M ~> Id.Id)(implicit M: Monad[M], F: Functor[F]): scalaz.Free[F, A] =
+    hoist(f).toFree
+
   // https://github.com/ekmett/free/blob/v4.4/src/Control/Monad/Trans/Free.hs#L180-L188
 
   // hoistFreeT :: (Monad m, Functor f) => (forall a. m a -> n a) -> FreeT f m b -> FreeT f n b
   // hoistFreeT mh = FreeT . mh . liftM (fmap (hoistFreeT mh)) . runFreeT
-  def hoist[N[_]](f: M ~> N)(implicit M: Monad[M], F: Functor[F]): FreeT[F, N, A] =
+  final def hoist[N[_]](f: M ~> N)(implicit M: Monad[M], F: Functor[F]): FreeT[F, N, A] =
     FreeT(f(run.map(freeFFunctor[F, A].map(_)(_.hoist(f)))))
 
   // transFreeT :: (Monad m, Functor g) => (forall a. f a -> g a) -> FreeT f m b -> FreeT g m b
   // transFreeT nt = FreeT . liftM (fmap (transFreeT nt) . transFreeF nt) . runFreeT
-  def trans[G[_]](f: F ~> G)(implicit M: Monad[M], F: Functor[F], G: Functor[G]): FreeT[G, M, A] =
+  final def trans[G[_]](f: F ~> G)(implicit M: Monad[M], F: Functor[F], G: Functor[G]): FreeT[G, M, A] =
     FreeT(M.map(run)(freeFFunctor[F, A].map(_)(_.trans(f)).trans(f)))
 
   /*
