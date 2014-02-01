@@ -418,6 +418,20 @@ sealed abstract class IList[A] extends Product with Serializable {
     updated0(index, this, empty)
   }
 
+  def withFilter(f: A => Boolean): WithFilter =
+    new WithFilter(f)
+
+  final class WithFilter(f: A => Boolean) {
+    def map[B](g: A => B): IList[B] =
+      foldRight(IList.empty[B])((x, xs) => if(f(x)) g(x) :: xs else xs)
+
+    def flatMap[B](g: A => IList[B]): IList[B] =
+      foldRight(IList.empty[B])((x, xs) => if(f(x)) g(x) ++ xs else xs)
+
+    def withFilter(g: A => Boolean): WithFilter =
+      new WithFilter(x => f(x) && g(x))
+  }
+
   // many other zip variants; see Traverse#zip*
 
   def zip[B](b: => IList[B]): IList[(A, B)] = {

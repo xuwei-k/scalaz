@@ -392,6 +392,22 @@ object IListTest extends SpecLite {
     ns.unzip.bimap(_.toList, _.toList) must_=== ns.toList.unzip
   }
 
+  "withFilter" ! forAll { (ns1: IList[Int], ns2: IList[Int], f1: Int => Boolean, f2: Int => Boolean) =>
+    val a = ns1.withFilter(f1)
+    val b = ns1.filter(f1)
+    a.map(_ + 1) must_=== b.map(_ + 1)
+    a.flatMap(x => IList(x, x + 1)) must_=== b.flatMap(x => IList(x, x + 1))
+    a.withFilter(f2).map(_ - 1) must_=== b.filter(f2).map(_ - 1)
+
+    val z1 = for{
+      x <- ns1; if f1(x); y <- ns2; if f2(y); if f2(x)
+    }yield (x + y)
+    val z2 = for{
+      x <- ns1.toList; if f1(x); y <- ns2.toList; if f2(y); if f2(x)
+    }yield (x + y)
+    z1.toList must_=== z2
+  }
+
   // widen is tested by toMap and unzip
   // zip is tested by zip laws
 
