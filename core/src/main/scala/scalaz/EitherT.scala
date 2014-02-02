@@ -57,7 +57,7 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
 
   /** Run the given function on the left value. */
   def leftMap[C](f: A => C)(implicit F: Functor[F]): EitherT[F, C, B] =
-    bimap(f, identity)
+    bimap(f, conforms)
 
   /** Binary functor traverse on this disjunction. */
   def bitraverse[G[_], C, D](f: A => G[C], g: B => G[D])(implicit F: Traverse[F], G: Applicative[G]): G[EitherT[F, C, D]] =

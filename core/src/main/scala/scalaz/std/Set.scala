@@ -30,7 +30,7 @@ trait SetInstances {
    *
    * If `Equal[A].equalIsNatural == true`, than `Any#==` is used.
    */
-  implicit def setOrder[A: Order]: Order[Set[A]] = new Order[Set[A]] {
+  implicit def setOrder[A: Order]: Order[Set[A]] = new AbstractOrder[Set[A]] {
     def order(a1: Set[A], a2: Set[A]) = {
       import anyVal._
       import scala.math.Ordering.Implicits._
@@ -55,12 +55,12 @@ trait SetInstances {
     override val equalIsNatural: Boolean = Equal[A].equalIsNatural
   }
 
-  implicit def setMonoid[A]: Monoid[Set[A]] = new Monoid[Set[A]] {
+  implicit def setMonoid[A]: Monoid[Set[A]] = new AbstractMonoid[Set[A]] {
     def append(f1: Set[A], f2: => Set[A]) = f1 ++ f2
     def zero: Set[A] = Set[A]()
   }
 
-  implicit def setShow[A: Show]: Show[Set[A]] = new Show[Set[A]] {
+  implicit def setShow[A: Show]: Show[Set[A]] = new AbstractShow[Set[A]] {
     override def show(as: Set[A]) = Cord("Set(", Cord.mkCord(",", as.map(Show[A].show).toSeq:_*), ")")
   }
 

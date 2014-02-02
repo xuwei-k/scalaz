@@ -39,6 +39,8 @@ trait Compose[=>:[_, _]]  { self =>
   val composeSyntax = new scalaz.syntax.ComposeSyntax[=>:] { def F = Compose.this }
 }
 
+private abstract class AbstractCompose[=>:[_, _]] extends Compose[=>:]
+
 object Compose {
   @inline def apply[F[_, _]](implicit F: Compose[F]): Compose[F] = F
 

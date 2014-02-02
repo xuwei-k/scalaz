@@ -15,6 +15,8 @@ trait MonadIO[F[_]] extends LiftIO[F] with Monad[F] { self =>
   val monadIOSyntax = new scalaz.syntax.effect.MonadIOSyntax[F] { def F = MonadIO.this }
 }
 
+private abstract class AbstractMonadIO[F[_]] extends MonadIO[F]
+
 object MonadIO {
   @inline def apply[F[_]](implicit F: MonadIO[F]): MonadIO[F] = F
 

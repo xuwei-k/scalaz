@@ -18,6 +18,8 @@ trait LiftControlIO[F[_]]  { self =>
   val liftControlIOSyntax = new scalaz.syntax.effect.LiftControlIOSyntax[F] { def F = LiftControlIO.this }
 }
 
+private abstract class AbstractLiftControlIO[F[_]] extends LiftControlIO[F]
+
 object LiftControlIO {
   @inline def apply[F[_]](implicit F: LiftControlIO[F]): LiftControlIO[F] = F
 

@@ -27,6 +27,8 @@ trait Catchable[F[_]]  { self =>
   val catchableSyntax = new scalaz.syntax.CatchableSyntax[F] { def F = Catchable.this }
 }
 
+private abstract class AbstractCatchable[F[_]] extends Catchable[F]
+
 object Catchable {
   @inline def apply[F[_]](implicit F: Catchable[F]): Catchable[F] = F
 

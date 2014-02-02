@@ -98,7 +98,7 @@ sealed abstract class \&/[+A, +B] extends Product with Serializable {
     }
 
   def leftMap[C](f: A => C): (C \&/ B) =
-    bimap(f, identity)
+    bimap(f, conforms)
 
   def bitraverse[F[_]: Apply, C, D](f: A => F[C], g: B => F[D]): F[C \&/ D] =
     this match {
@@ -113,7 +113,7 @@ sealed abstract class \&/[+A, +B] extends Product with Serializable {
     }
 
   def map[D](g: B => D): (A \&/ D) =
-    bimap(identity, g)
+    bimap(conforms, g)
 
   def traverse[F[_]: Applicative, AA >: A, D](g: B => F[D]): F[AA \&/ D] =
     this match {
@@ -326,7 +326,7 @@ sealed abstract class TheseInstances extends TheseInstances0 {
 sealed abstract class TheseInstances0 extends TheseInstances1 {
 
   implicit def TheseInstance0[L: Semigroup]: Monad[({type l[a] = L \&/ a})#l] =
-    new Monad[({type l[a] = L \&/ a})#l] {
+    new AbstractMonad[({type l[a] = L \&/ a})#l] {
       override def map[A, B](x: L \&/ A)(f: A => B) =
         x map f
 
@@ -338,7 +338,7 @@ sealed abstract class TheseInstances0 extends TheseInstances1 {
     }
 
   implicit val TheseBitraverse: Bitraverse[\&/] =
-    new Bitraverse[\&/] {
+    new AbstractBitraverse[\&/] {
       override def bimap[A, B, C, D](fab: A \&/ B)(f: A => C, g: B => D) =
         fab.bimap(f, g)
 

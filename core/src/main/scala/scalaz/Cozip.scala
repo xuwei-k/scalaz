@@ -29,6 +29,8 @@ trait Cozip[F[_]]  { self =>
   val cozipSyntax = new scalaz.syntax.CozipSyntax[F] { def F = Cozip.this }
 }
 
+private abstract class AbstractCozip[F[_]] extends Cozip[F]
+
 object Cozip {
   @inline def apply[F[_]](implicit F: Cozip[F]): Cozip[F] = F
 

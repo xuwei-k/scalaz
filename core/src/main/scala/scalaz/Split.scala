@@ -15,6 +15,8 @@ trait Split[=>:[_, _]] extends Compose[=>:] { self =>
   val splitSyntax = new scalaz.syntax.SplitSyntax[=>:] { def F = Split.this }
 }
 
+private abstract class AbstractSplit[=>:[_, _]] extends Split[=>:]
+
 object Split {
   @inline def apply[F[_, _]](implicit F: Split[F]): Split[F] = F
 

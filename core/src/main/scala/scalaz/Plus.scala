@@ -24,7 +24,7 @@ trait Plus[F[_]]  { self =>
 
   def plus[A](a: F[A], b: => F[A]): F[A]
 
-  def semigroup[A]: Semigroup[F[A]] = new Semigroup[F[A]] {
+  def semigroup[A]: Semigroup[F[A]] = new AbstractSemigroup[F[A]] {
     def append(f1: F[A], f2: => F[A]): F[A] = plus(f1, f2)
   }
 
@@ -36,6 +36,8 @@ trait Plus[F[_]]  { self =>
   ////
   val plusSyntax = new scalaz.syntax.PlusSyntax[F] { def F = Plus.this }
 }
+
+private abstract class AbstractPlus[F[_]] extends Plus[F]
 
 object Plus {
   @inline def apply[F[_]](implicit F: Plus[F]): Plus[F] = F

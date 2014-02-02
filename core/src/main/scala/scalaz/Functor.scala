@@ -68,7 +68,7 @@ trait Functor[F[_]] extends InvariantFunctor[F] { self =>
     * is contravariant.
     */
   def icompose[G[_]](implicit G0: Contravariant[G]): Contravariant[({type λ[α] = F[G[α]]})#λ] =
-    new Contravariant[({type λ[α] = F[G[α]]})#λ] {
+    new AbstractContravariant[({type λ[α] = F[G[α]]})#λ] {
       def contramap[A, B](fa: F[G[A]])(f: B => A) =
         self.map(fa)(ga => G0.contramap(ga)(f))
     }
@@ -89,7 +89,7 @@ trait Functor[F[_]] extends InvariantFunctor[F] { self =>
 
   trait FunctorLaw extends InvariantFunctorLaw {
     /** The identity function, lifted, is a no-op. */
-    def identity[A](fa: F[A])(implicit FA: Equal[F[A]]): Boolean = FA.equal(map(fa)(x => x), fa)
+    def identity[A](fa: F[A])(implicit FA: Equal[F[A]]): Boolean = FA.equal(map(fa)(conforms), fa)
 
     /**
      * A series of maps may be freely rewritten as a single map on a
@@ -101,6 +101,8 @@ trait Functor[F[_]] extends InvariantFunctor[F] { self =>
   ////
   val functorSyntax = new scalaz.syntax.FunctorSyntax[F] { def F = Functor.this }
 }
+
+private abstract class AbstractFunctor[F[_]] extends Functor[F]
 
 object Functor {
   @inline def apply[F[_]](implicit F: Functor[F]): Functor[F] = F

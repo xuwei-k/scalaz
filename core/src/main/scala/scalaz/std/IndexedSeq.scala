@@ -98,12 +98,12 @@ trait IndexedSeqSubInstances extends IndexedSeqInstances0 with IndexedSeqSub {se
     }
   }
 
-  implicit def ixSqMonoid[A]: Monoid[IxSq[A]] = new Monoid[IxSq[A]] {
+  implicit def ixSqMonoid[A]: Monoid[IxSq[A]] = new AbstractMonoid[IxSq[A]] {
     def append(f1: IxSq[A], f2: => IxSq[A]) = f1 ++ f2
     def zero: IxSq[A] = empty
   }
 
-  implicit def ixSqShow[A: Show]: Show[IxSq[A]] = new Show[IxSq[A]] {
+  implicit def ixSqShow[A: Show]: Show[IxSq[A]] = new AbstractShow[IxSq[A]] {
     import Cord._
     override def show(as: IxSq[A]) =
       Cord("[", mkCord(",", as.map(Show[A].show(_)):_*), "]")

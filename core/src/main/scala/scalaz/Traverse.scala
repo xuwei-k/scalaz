@@ -102,7 +102,7 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
 
   /** Traverse with `State`. */
   def sequenceS[S,A](fga: F[State[S,A]]): State[S,F[A]] =
-    traverseS(fga)(x => x)
+    traverseS(fga)(conforms)
 
   /** A version of `sequence` that infers the nested type constructor. */
   final def sequenceU[A](self: F[A])(implicit G: Unapply[Applicative, A]): G.M[F[G.A]] /*G[F[A]] */ = {
@@ -199,6 +199,8 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
   ////
   val traverseSyntax = new scalaz.syntax.TraverseSyntax[F] { def F = Traverse.this }
 }
+
+private abstract class AbstractTraverse[F[_]] extends Traverse[F]
 
 object Traverse {
   @inline def apply[F[_]](implicit F: Traverse[F]): Traverse[F] = F

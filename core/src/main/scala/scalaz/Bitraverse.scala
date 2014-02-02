@@ -95,7 +95,7 @@ trait Bitraverse[F[_, _]] extends Bifunctor[F] with Bifoldable[F] { self =>
   def bifoldLShape[A,B,C](fa: F[A,B], z: C)(f: (C,A) => C)(g: (C,B) => C): (C, F[Unit, Unit]) =
     runBitraverseS(fa, z)(a => State.modify(f(_,a)))(b => State.modify(g(_,b)))
 
-  def bisequence[G[_] : Applicative, A, B](x: F[G[A], G[B]]): G[F[A, B]] = bitraverseImpl(x)(fa => fa, fb => fb)
+  def bisequence[G[_] : Applicative, A, B](x: F[G[A], G[B]]): G[F[A, B]] = bitraverseImpl(x)(conforms, conforms)
 
   override def bifoldLeft[A,B,C](fa: F[A, B], z: C)(f: (C, A) => C)(g: (C, B) => C): C =
     bifoldLShape(fa, z)(f)(g)._1
@@ -109,6 +109,8 @@ trait Bitraverse[F[_, _]] extends Bifunctor[F] with Bifoldable[F] { self =>
   ////
   val bitraverseSyntax = new scalaz.syntax.BitraverseSyntax[F] { def F = Bitraverse.this }
 }
+
+private abstract class AbstractBitraverse[F[_, _]] extends Bitraverse[F]
 
 object Bitraverse {
   @inline def apply[F[_, _]](implicit F: Bitraverse[F]): Bitraverse[F] = F

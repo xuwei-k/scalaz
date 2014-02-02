@@ -36,6 +36,8 @@ trait Profunctor[=>:[_, _]]  { self =>
   val profunctorSyntax = new scalaz.syntax.ProfunctorSyntax[=>:] { def F = Profunctor.this }
 }
 
+private abstract class AbstractProfunctor[=>:[_, _]] extends Profunctor[=>:]
+
 object Profunctor {
   @inline def apply[F[_, _]](implicit F: Profunctor[F]): Profunctor[F] = F
 
@@ -49,7 +51,7 @@ object Profunctor {
   def DownStar[F[_],D,C](f: F[D] => C): DownStar[F,D,C] = Tag[F[D] => C, DownStarF](f)
 
   implicit def upStarProfunctor[F[_]:Functor]: Profunctor[({type λ[α,β]=UpStar[F,α,β]})#λ] =
-    new Profunctor[({type λ[α,β] = UpStar[F,α,β]})#λ] {
+    new AbstractProfunctor[({type λ[α,β] = UpStar[F,α,β]})#λ] {
       def mapfst[A,B,C](h: UpStar[F,A,B])(f: C => A): UpStar[F,C,B] =
         UpStar(h compose f)
       def mapsnd[A,B,C](h: UpStar[F,A,B])(f: B => C): UpStar[F,A,C] =
@@ -57,7 +59,7 @@ object Profunctor {
     }
 
   implicit def downStarProfunctor[F[_]:Functor]: Profunctor[({type λ[α,β]=DownStar[F,α,β]})#λ] =
-    new Profunctor[({type λ[α,β]=DownStar[F,α,β]})#λ] {
+    new AbstractProfunctor[({type λ[α,β]=DownStar[F,α,β]})#λ] {
       def mapfst[A,B,C](h: DownStar[F,A,B])(f: C => A): DownStar[F,C,B] =
         DownStar(fa => h(Functor[F].map(fa)(f)))
       def mapsnd[A,B,C](h: DownStar[F,A,B])(f: B => C): DownStar[F,A,C] =
@@ -65,12 +67,12 @@ object Profunctor {
     }
 
   implicit def upStarFunctor[F[_]:Functor,D]: Functor[({type λ[α]=UpStar[F,D,α]})#λ] =
-    new Functor[({type λ[α]=UpStar[F,D,α]})#λ] {
+    new AbstractFunctor[({type λ[α]=UpStar[F,D,α]})#λ] {
       def map[A,B](m: UpStar[F,D,A])(f: A => B) = upStarProfunctor[F].mapsnd(m)(f)
     }
 
   implicit def downStarFunctor[F[_],D]: Functor[({type λ[α]=DownStar[F,D,α]})#λ] =
-    new Functor[({type λ[α]=DownStar[F,D,α]})#λ] {
+    new AbstractFunctor[({type λ[α]=DownStar[F,D,α]})#λ] {
       def map[A,B](f: DownStar[F,D,A])(k: A => B) = DownStar(k compose f)
     }
   ////

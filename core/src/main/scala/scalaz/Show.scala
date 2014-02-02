@@ -18,6 +18,8 @@ trait Show[F]  { self =>
   val showSyntax = new scalaz.syntax.ShowSyntax[F] { def F = Show.this }
 }
 
+private abstract class AbstractShow[F] extends Show[F]
+
 object Show {
   @inline def apply[F](implicit F: Show[F]): Show[F] = F
 

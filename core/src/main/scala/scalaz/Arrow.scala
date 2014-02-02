@@ -19,7 +19,7 @@ trait Arrow[=>:[_, _]] extends Split[=>:] with Profunctor[=>:] with Category[=>:
   def first[A, B, C](f: (A =>: B)): ((A, C) =>: (B, C))
 
   override def covariantInstance[C]: Applicative[({type λ[α] = (C =>: α)})#λ] =
-    new Applicative[({type λ[α] = (C =>: α)})#λ] with SndCovariant[C] {
+    new AbstractApplicative[({type λ[α] = (C =>: α)})#λ] with SndCovariant[C] {
       def point[A](a: => A): C =>: A = arr(_ => a)
       def ap[A, B](fa: => (C =>: A))(f: => (C =>: (A => B))): (C =>: B) = <<<(arr((y: (A => B, A)) => y._1(y._2)), combine(f, fa))
     }
@@ -68,6 +68,8 @@ trait Arrow[=>:[_, _]] extends Split[=>:] with Profunctor[=>:] with Category[=>:
   ////
   val arrowSyntax = new scalaz.syntax.ArrowSyntax[=>:] { def F = Arrow.this }
 }
+
+private abstract class AbstractArrow[=>:[_, _]] extends Arrow[=>:]
 
 object Arrow {
   @inline def apply[F[_, _]](implicit F: Arrow[F]): Arrow[F] = F

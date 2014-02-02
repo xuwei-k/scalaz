@@ -164,7 +164,7 @@ sealed abstract class LazyEitherInstances {
      fa.fold(e => -\/(LazyEither.lazyLeft(e)), a => \/-(a))
   }
 
-  implicit val lazyEitherBitraverse: Bitraverse[LazyEither] = new Bitraverse[LazyEither] {
+  implicit val lazyEitherBitraverse: Bitraverse[LazyEither] = new AbstractBitraverse[LazyEither] {
     override def bimap[A, B, C, D](fab: LazyEither[A, B])(f: A => C, g: B => D) =
       fab.map(x => g(x)).left.map(x => f(x))
 

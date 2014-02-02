@@ -14,7 +14,7 @@ trait Cobind[F[_]] extends Functor[F] { self =>
 
   /** Also known as `duplicate` */
   def cojoin[A](fa: F[A]): F[F[A]] =
-    cobind(fa)(fa => fa)
+    cobind(fa)(conforms)
 
   // derived functions
 
@@ -32,6 +32,8 @@ trait Cobind[F[_]] extends Functor[F] { self =>
   ////
   val cobindSyntax = new scalaz.syntax.CobindSyntax[F] { def F = Cobind.this }
 }
+
+private abstract class AbstractCobind[F[_]] extends Cobind[F]
 
 object Cobind {
   @inline def apply[F[_]](implicit F: Cobind[F]): Cobind[F] = F

@@ -3,12 +3,12 @@ package std
 
 trait IterableInstances {
 
-  implicit def iterableShow[CC[X] <: Iterable[X], A: Show]: Show[CC[A]] = new Show[CC[A]] {
+  implicit def iterableShow[CC[X] <: Iterable[X], A: Show]: Show[CC[A]] = new AbstractShow[CC[A]] {
     override def show(as: CC[A]) = "[" +: Cord.mkCord(",", as.map(Show[A].show(_)).toSeq:_*) :+ "]"
   }
 
   /** Lexicographical ordering */
-  implicit def iterableOrder[A](implicit A: Order[A]): Order[Iterable[A]] = new Order[Iterable[A]] {
+  implicit def iterableOrder[A](implicit A: Order[A]): Order[Iterable[A]] = new AbstractOrder[Iterable[A]] {
     def order(a1: Iterable[A], a2: Iterable[A]): Ordering = {
       import scalaz.Ordering._
       val i1 = a1.iterator
@@ -40,7 +40,7 @@ trait IterableInstances {
     }
   }
 
-  implicit def iterableEqual[CC[X] <: Iterable[X], A: Equal]: Equal[CC[A]] = new Equal[CC[A]] {
+  implicit def iterableEqual[CC[X] <: Iterable[X], A: Equal]: Equal[CC[A]] = new AbstractEqual[CC[A]] {
     def equal(a1: CC[A], a2: CC[A]) = {
       val i1 = a1.iterator
       val i2 = a2.iterator
@@ -59,7 +59,7 @@ trait IterableInstances {
     }
   }
 
-  implicit def iterableSubtypeFoldable[I[X] <: Iterable[X]]: Foldable[I] = new Foldable[I] {
+  implicit def iterableSubtypeFoldable[I[X] <: Iterable[X]]: Foldable[I] = new AbstractFoldable[I] {
     def foldMap[A,B](fa: I[A])(f: A => B)(implicit F: Monoid[B]) = foldRight(fa, F.zero)((x,y) => Monoid[B].append(f(x), y))
 
     def foldRight[A, B](fa: I[A], b: => B)(f: (A, => B) => B) = fa.foldRight(b)(f(_, _))

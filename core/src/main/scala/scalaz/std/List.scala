@@ -100,12 +100,12 @@ trait ListInstances extends ListInstances0 {
 
   }
 
-  implicit def listMonoid[A]: Monoid[List[A]] = new Monoid[List[A]] {
+  implicit def listMonoid[A]: Monoid[List[A]] = new AbstractMonoid[List[A]] {
     def append(f1: List[A], f2: => List[A]) = f1 ::: f2
     def zero: List[A] = Nil
   }
 
-  implicit def listShow[A: Show]: Show[List[A]] = new Show[List[A]] {
+  implicit def listShow[A: Show]: Show[List[A]] = new AbstractShow[List[A]] {
     override def show(as: List[A]) = {
       def commaSep(rest: List[A], acc: Cord): Cord =
         rest match {
@@ -300,7 +300,7 @@ private trait ListEqual[A] extends Equal[List[A]] {
   override def equal(a1: List[A], a2: List[A]) = (a1 corresponds a2)(Equal[A].equal)
 }
 
-private trait ListOrder[A] extends Order[List[A]] with ListEqual[A] {
+private trait ListOrder[A] extends AbstractOrder[List[A]] with ListEqual[A] {
   implicit def A: Order[A]
 
   import Ordering._

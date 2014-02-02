@@ -15,14 +15,14 @@ trait Category[=>:[_, _]] extends Compose[=>:] { self =>
   def id[A]: A =>: A
 
   /** `monoid`, but universally quantified. */
-  def empty: PlusEmpty[({type λ[α]=(α =>: α)})#λ] = new PlusEmpty[({type λ[α]=(α =>: α)})#λ] with ComposePlus {
+  def empty: PlusEmpty[({type λ[α]=(α =>: α)})#λ] = new AbstractPlusEmpty[({type λ[α]=(α =>: α)})#λ] with ComposePlus {
     def empty[A] = id
   }
 
   /** The endomorphism monoid, where `zero`=`id` and
     * `append`=`compose`.
     */
-  def monoid[A]: Monoid[A =>: A] = new Monoid[A =>: A] with ComposeSemigroup[A] {
+  def monoid[A]: Monoid[A =>: A] = new AbstractMonoid[A =>: A] with ComposeSemigroup[A] {
     def zero = id
   }
 
@@ -44,6 +44,8 @@ trait Category[=>:[_, _]] extends Compose[=>:] { self =>
   ////
   val categorySyntax = new scalaz.syntax.CategorySyntax[=>:] { def F = Category.this }
 }
+
+private abstract class AbstractCategory[=>:[_, _]] extends Category[=>:]
 
 object Category {
   @inline def apply[F[_, _]](implicit F: Category[F]): Category[F] = F

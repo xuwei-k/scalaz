@@ -347,11 +347,11 @@ object Heap extends HeapInstances with HeapFunctions {
 }
 
 sealed abstract class HeapInstances {
-  implicit val heapInstance = new Foldable[Heap] with Foldable.FromFoldr[Heap] {
+  implicit val heapInstance: Foldable[Heap] = new AbstractFoldable[Heap] with Foldable.FromFoldr[Heap] {
     def foldRight[A, B](fa: Heap[A], z: => B)(f: (A, => B) => B) = fa.foldRight(z)(f)
   }
 
-  implicit def heapMonoid[A]: Monoid[Heap[A]] = new Monoid[Heap[A]] {
+  implicit def heapMonoid[A]: Monoid[Heap[A]] = new AbstractMonoid[Heap[A]] {
     def append(f1: Heap[A], f2: => Heap[A]) = f1 union f2
     def zero = Heap.Empty.apply
   }

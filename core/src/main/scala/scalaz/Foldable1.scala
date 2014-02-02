@@ -68,7 +68,7 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
   override def foldMapLeft1Opt[A, B](fa: F[A])(z: A => B)(f: (B, A) => B): Option[B] = Some(foldMapLeft1(fa)(z)(f))
   override def foldl1Opt[A](fa: F[A])(f: A => A => A): Option[A] = Some(foldl1(fa)(f))
 
-  def fold1[M: Semigroup](t: F[M]): M = foldMap1[M, M](t)(identity)
+  def fold1[M: Semigroup](t: F[M]): M = foldMap1[M, M](t)(conforms)
 
   import Ordering.{GT, LT}
 
@@ -144,6 +144,8 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
   ////
   val foldable1Syntax = new scalaz.syntax.Foldable1Syntax[F] { def F = Foldable1.this }
 }
+
+private abstract class AbstractFoldable1[F[_]] extends Foldable1[F]
 
 object Foldable1 {
   @inline def apply[F[_]](implicit F: Foldable1[F]): Foldable1[F] = F

@@ -218,6 +218,8 @@ trait Enum[F] extends Order[F] { self =>
   val enumSyntax = new scalaz.syntax.EnumSyntax[F] { def F = Enum.this }
 }
 
+private abstract class AbstractEnum[F] extends Enum[F]
+
 object Enum {
   @inline def apply[F](implicit F: Enum[F]): Enum[F] = F
 

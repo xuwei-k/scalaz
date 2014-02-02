@@ -11,7 +11,7 @@ import Id._
   * from [[scalaz.Distributive]] give rise to `([a]T[A[a]]) ~>
   * ([a]A[T[a]])`, for varying `A` and `T` constraints.
   */
-trait NaturalTransformation[-F[_], +G[_]] {
+abstract class NaturalTransformation[-F[_], +G[_]] {
   self =>
   def apply[A](fa: F[A]): G[A]
 

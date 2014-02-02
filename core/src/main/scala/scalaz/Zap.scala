@@ -3,7 +3,7 @@ package scalaz
 import Id._
 
 /** Functors that annihilate each other. */
-trait Zap[F[_], G[_]] { self =>
+abstract class Zap[F[_], G[_]] { self =>
   def zapWith[A, B, C](fa: F[A], gb: G[B])(f: (A, B) => C): C
   def zap[A, B](f: F[A => B], g: G[A]): B = zapWith(f, g)(_(_))
   def flip: Zap[G, F] = new Zap[G, F] {

@@ -65,6 +65,8 @@ trait Order[F] extends Equal[F] { self =>
   val orderSyntax = new scalaz.syntax.OrderSyntax[F] { def F = Order.this }
 }
 
+private abstract class AbstractOrder[F] extends Order[F]
+
 object Order {
   @inline def apply[F](implicit F: Order[F]): Order[F] = F
 

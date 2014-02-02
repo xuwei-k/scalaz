@@ -123,6 +123,8 @@ trait Nondeterminism[F[_]] extends Monad[F] { self =>
   val nondeterminismSyntax = new scalaz.syntax.NondeterminismSyntax[F] { def F = Nondeterminism.this }
 }
 
+private abstract class AbstractNondeterminism[F[_]] extends Nondeterminism[F]
+
 object Nondeterminism {
   @inline def apply[F[_]](implicit F: Nondeterminism[F]): Nondeterminism[F] = F
 

@@ -81,6 +81,8 @@ trait Bifoldable[F[_, _]]  { self =>
   val bifoldableSyntax = new scalaz.syntax.BifoldableSyntax[F] { def F = Bifoldable.this }
 }
 
+private abstract class AbstractBifoldable[F[_, _]] extends Bifoldable[F]
+
 object Bifoldable {
   @inline def apply[F[_, _]](implicit F: Bifoldable[F]): Bifoldable[F] = F
 

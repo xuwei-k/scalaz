@@ -25,6 +25,8 @@ trait IsEmpty[F[_]] extends PlusEmpty[F] { self =>
   val isEmptySyntax = new scalaz.syntax.IsEmptySyntax[F] { def F = IsEmpty.this }
 }
 
+private abstract class AbstractIsEmpty[F[_]] extends IsEmpty[F]
+
 object IsEmpty {
   @inline def apply[F[_]](implicit F: IsEmpty[F]): IsEmpty[F] = F
 

@@ -37,7 +37,7 @@ trait Applicative[F[_]] extends Apply[F] { self =>
     G.traverse(value)(f)(this)
 
   def sequence[A, G[_]: Traverse](as: G[F[A]]): F[G[A]] =
-    traverse(as)(a => a)
+    traverse(as)(conforms)
 
   import std.list._
 
@@ -71,7 +71,7 @@ trait Applicative[F[_]] extends Apply[F] { self =>
   }
 
   /** An `Applicative` for `F` in which effects happen in the opposite order. */
-  def flip: Applicative[F] = new Applicative[F] {
+  def flip: Applicative[F] = new AbstractApplicative[F] {
     val F = Applicative.this
     def point[A](a: => A) = F.point(a)
     def ap[A,B](fa: => F[A])(f: => F[A => B]): F[B] =
@@ -101,6 +101,8 @@ trait Applicative[F[_]] extends Apply[F] { self =>
   ////
   val applicativeSyntax = new scalaz.syntax.ApplicativeSyntax[F] { def F = Applicative.this }
 }
+
+private abstract class AbstractApplicative[F[_]] extends Applicative[F]
 
 object Applicative {
   @inline def apply[F[_]](implicit F: Applicative[F]): Applicative[F] = F

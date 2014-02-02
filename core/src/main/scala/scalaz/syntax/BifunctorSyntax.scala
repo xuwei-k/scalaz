@@ -7,12 +7,12 @@ final class BifunctorOps[F[_, _],A, B] private[syntax](val self: F[A, B])(implic
   import Liskov.<~<
 
   final def bimap[C, D](f: A => C, g: B => D): F[C, D] = F.bimap(self)(f, g)
-  final def :->[D](g: B => D): F[A, D] = F.bimap(self)(a => a, g)
-  final def <-:[C](f: A => C): F[C, B] = F.bimap(self)(f, b => b)
+  final def :->[D](g: B => D): F[A, D] = F.bimap(self)(conforms, g)
+  final def <-:[C](f: A => C): F[C, B] = F.bimap(self)(f, conforms)
   final def <:>[C](f: A => C)(implicit z: B <~< C): F[C, C] = F.bimap(self)(f, z)
   final def umap[C](f: A => C)(implicit ev: F[A, B] =:= F[A, A]): F[C, C] = F.umap(ev(self))(f)
-  final def rightMap[D](g: B => D): F[A, D] = F.bimap(self)(a => a, g)
-  final def leftMap[C](f: A => C): F[C, B] = F.bimap(self)(f, b => b)
+  final def rightMap[D](g: B => D): F[A, D] = F.bimap(self)(conforms, g)
+  final def leftMap[C](f: A => C): F[C, B] = F.bimap(self)(f, conforms)
   ////
 }
 

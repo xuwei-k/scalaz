@@ -22,7 +22,7 @@ trait Bind[F[_]] extends Apply[F] { self =>
 
   /** Sequence the inner `F` of `FFA` after the outer `F`, forming a
    * single `F[A]`. */
-  def join[A](ffa: F[F[A]]) = bind(ffa)(a => a)
+  def join[A](ffa: F[F[A]]) = bind(ffa)(conforms)
 
   // derived functions
 
@@ -55,6 +55,8 @@ trait Bind[F[_]] extends Apply[F] { self =>
   ////
   val bindSyntax = new scalaz.syntax.BindSyntax[F] { def F = Bind.this }
 }
+
+private abstract class AbstractBind[F[_]] extends Bind[F]
 
 object Bind {
   @inline def apply[F[_]](implicit F: Bind[F]): Bind[F] = F

@@ -124,7 +124,7 @@ sealed abstract class NullArgumentInstances extends NullArgumentInstances0 {
       implicit val M = M0
     }
 
-  implicit val nullArgumentCategory: Split[NullArgument] with Profunctor[NullArgument] = new Split[NullArgument] with Profunctor[NullArgument] {
+  implicit val nullArgumentCategory: Split[NullArgument] with Profunctor[NullArgument] = new AbstractSplit[NullArgument] with Profunctor[NullArgument] {
     override def compose[A, B, C](f: NullArgument[B, C], g: NullArgument[A, B]): NullArgument[A, C] =
       f compose g
     override def split[A, B, C, D](f: NullArgument[A, B], g: NullArgument[C, D]) =
@@ -135,7 +135,7 @@ sealed abstract class NullArgumentInstances extends NullArgumentInstances0 {
       r map f
   }
 
-  implicit def nullArgumentMonad[X]: Monad[({type λ[α] = NullArgument[X, α]})#λ] = new Monad[({type λ[α] = NullArgument[X, α]})#λ] {
+  implicit def nullArgumentMonad[X]: Monad[({type λ[α] = NullArgument[X, α]})#λ] = new AbstractMonad[({type λ[α] = NullArgument[X, α]})#λ] {
     override def ap[A, B](a: => NullArgument[X, A])(f: => NullArgument[X, A => B]) =
       a ap f
     override def map[A, B](a: NullArgument[X, A])(f: A => B) =
@@ -146,7 +146,7 @@ sealed abstract class NullArgumentInstances extends NullArgumentInstances0 {
       a flatMap f
   }
 
-  implicit def nullArgumentContravariant[X]: Contravariant[({type λ[α] = NullArgument[α, X]})#λ] = new Contravariant[({type λ[α] = NullArgument[α, X]})#λ] {
+  implicit def nullArgumentContravariant[X]: Contravariant[({type λ[α] = NullArgument[α, X]})#λ] = new AbstractContravariant[({type λ[α] = NullArgument[α, X]})#λ] {
     override def contramap[A, B](a: NullArgument[A, X])(f: B => A) =
       a contramap f
   }

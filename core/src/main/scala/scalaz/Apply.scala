@@ -17,7 +17,7 @@ trait Apply[F[_]] extends Functor[F] { self =>
     G.traverse1(value)(f)(this)
 
   def sequence1[A, G[_]: Traverse1](as: G[F[A]]): F[G[A]] =
-    traverse1(as)(a => a)
+    traverse1(as)(conforms)
 
   /**The composition of Applys `F` and `G`, `[x]F[G[x]]`, is a Apply */
   def compose[G[_]](implicit G0: Apply[G]): Apply[({type λ[α] = F[G[α]]})#λ] = new CompositionApply[F, G] {
@@ -123,7 +123,7 @@ trait Apply[F[_]] extends Functor[F] { self =>
 
   /** Add a unit to any Apply to form an Applicative. */
   def applyApplicative: Applicative[({type λ[α] = F[α] \/ α})#λ] =
-    new Applicative[({type λ[α] = F[α] \/ α})#λ] {
+    new AbstractApplicative[({type λ[α] = F[α] \/ α})#λ] {
       // transliterated from semigroupoids 3.0.2, thanks edwardk
       def point[A](a: => A) = \/-(a)
       def ap[A, B](a: => F[A] \/ A)(f: => F[A => B] \/ (A => B)) = (f, a) match {
@@ -145,6 +145,8 @@ trait Apply[F[_]] extends Functor[F] { self =>
   ////
   val applySyntax = new scalaz.syntax.ApplySyntax[F] { def F = Apply.this }
 }
+
+private abstract class AbstractApply[F[_]] extends Apply[F]
 
 object Apply {
   @inline def apply[F[_]](implicit F: Apply[F]): Apply[F] = F

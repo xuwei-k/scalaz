@@ -36,6 +36,8 @@ trait Equal[F]  { self =>
   val equalSyntax = new scalaz.syntax.EqualSyntax[F] { def F = Equal.this }
 }
 
+private abstract class AbstractEqual[F] extends Equal[F]
+
 object Equal {
   @inline def apply[F](implicit F: Equal[F]): Equal[F] = F
 

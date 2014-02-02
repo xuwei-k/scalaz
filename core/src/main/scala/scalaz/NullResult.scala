@@ -159,9 +159,9 @@ sealed abstract class NullResultInstances extends NullResultInstances0 {
       implicit val M = M0
     }
 
-  implicit val nullResultArrow: Arrow[NullResult] = new Arrow[NullResult] {
+  implicit val nullResultArrow: Arrow[NullResult] = new AbstractArrow[NullResult] {
     def id[A] =
-      NullResult.lift(identity)
+      NullResult.lift(conforms)
     override def compose[A, B, C](f: NullResult[B, C], g: NullResult[A, B]): NullResult[A, C] =
       f compose g
     override def split[A, B, C, D](f: NullResult[A, B], g: NullResult[C, D]) =
@@ -176,7 +176,7 @@ sealed abstract class NullResultInstances extends NullResultInstances0 {
       r.first
   }
 
-  implicit def nullResultMonad[X]: Monad[({type λ[α] = NullResult[X, α]})#λ] = new Monad[({type λ[α] = NullResult[X, α]})#λ] {
+  implicit def nullResultMonad[X]: Monad[({type λ[α] = NullResult[X, α]})#λ] = new AbstractMonad[({type λ[α] = NullResult[X, α]})#λ] {
     override def map[A, B](a: NullResult[X, A])(f: A => B) =
       a map f
     override def ap[A, B](a: => NullResult[X, A])(f: => NullResult[X, A => B]) =
@@ -187,7 +187,7 @@ sealed abstract class NullResultInstances extends NullResultInstances0 {
       a flatMap f
   }
 
-  implicit def nullResultContravariant[X]: Contravariant[({type λ[α] = NullResult[α, X]})#λ] = new Contravariant[({type λ[α] = NullResult[α, X]})#λ] {
+  implicit def nullResultContravariant[X]: Contravariant[({type λ[α] = NullResult[α, X]})#λ] = new AbstractContravariant[({type λ[α] = NullResult[α, X]})#λ] {
     override def contramap[A, B](a: NullResult[A, X])(f: B => A) =
       a contramap f
   }

@@ -16,7 +16,7 @@ object Ran {
   import Id._
 
   implicit def ranFunctor[G[_], H[_]]: Functor[({type λ[α] = Ran[G, H, α]})#λ] =
-    new Functor[({type λ[α] = Ran[G, H, α]})#λ] {
+    new AbstractFunctor[({type λ[α] = Ran[G, H, α]})#λ] {
       def map[A,B](r: Ran[G, H, A])(f: A => B) = r map f
     }
 
@@ -36,7 +36,7 @@ object Ran {
    * `toRan` and `fromRan` witness an adjunction from `Compose[G,_,_]` to `Ran[G,_,_]`.
    */
   def fromRan[G[_], H[_], K[_], B](k: K[G[B]])(s: K ~> ({type λ[α] = Ran[G, H, α]})#λ): H[B] =
-    s(k)(x => x)
+    s(k)(conforms)
 
   def adjointToRan[F[_], G[_], A](f: F[A])(implicit A: Adjunction[F, G]): Ran[G, Id, A] =
     new Ran[G, Id, A] {
@@ -53,7 +53,7 @@ object Ran {
 
   /** This is the natural transformation that defines a right Kan extension. */
   def gran[G[_], H[_], A](r: Ran[G, H, G[A]]): H[A] =
-    r(a => a)
+    r(conforms)
 }
 
 /** The left Kan extension of `H` along `G` */
@@ -91,12 +91,12 @@ object Lan {
   import Id._
 
   implicit def lanFunctor[F[_], G[_]]: Functor[({type λ[α] = Lan[F,G,α]})#λ] =
-    new Functor[({type λ[α] = Lan[F,G,α]})#λ] {
+    new AbstractFunctor[({type λ[α] = Lan[F,G,α]})#λ] {
       def map[A,B](lan: Lan[F,G,A])(g: A => B) = lan map g
     }
 
   implicit def lanApplicative[G[_]:Functor, H[_]:Applicative]: Applicative[({type λ[α]=Lan[G,H,α]})#λ] =
-    new Applicative[({type λ[α] = Lan[G,H,α]})#λ] {
+    new AbstractApplicative[({type λ[α] = Lan[G,H,α]})#λ] {
       def point[A](a: => A) = new Lan[G,H,A] {
         type I = Unit
         val v = Applicative[H].point(())

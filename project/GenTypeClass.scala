@@ -124,7 +124,7 @@ object Kind {
   case object * extends Kind
 
   case object *->* extends Kind
-  
+
   case object *^*->* extends Kind
 }
 
@@ -243,6 +243,8 @@ trait $typeClassName[$classifiedType] $extendsLikeList { self =>
   $syntaxMember
 }
 
+private abstract class Abstract${typeClassName}[$classifiedType] extends $typeClassName[$classifiedTypeIdent]
+
 object $typeClassName {
   @inline def apply[$classifiedTypeF](implicit F: $typeClassName[F]): $typeClassName[F] = F
 
@@ -275,7 +277,7 @@ trait To${typeClassName}Ops $extendsToSyntaxListText {
 
 trait ${typeClassName}Syntax[F] ${extendsListText("Syntax", cti = "F")} {
   implicit def To${typeClassName}Ops(v: F): ${typeClassName}Ops[F] = new ${typeClassName}Ops[F](v)(${typeClassName}Syntax.this.F)
-  
+
   def F: ${typeClassName}[F]
   ////
 

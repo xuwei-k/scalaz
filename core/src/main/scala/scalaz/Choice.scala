@@ -18,6 +18,8 @@ trait Choice[=>:[_, _]] extends Category[=>:] { self =>
   val choiceSyntax = new scalaz.syntax.ChoiceSyntax[=>:] { def F = Choice.this }
 }
 
+private abstract class AbstractChoice[=>:[_, _]] extends Choice[=>:]
+
 object Choice {
   @inline def apply[F[_, _]](implicit F: Choice[F]): Choice[F] = F
 

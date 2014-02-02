@@ -224,7 +224,7 @@ sealed abstract class OneAndInstances extends OneAndInstances0 {
     }
 
   implicit def oneAndOrder[F[_], A](implicit A: Order[A], FA: Order[F[A]]): Order[OneAnd[F, A]] =
-    new Order[OneAnd[F, A]] with OneAndEqual[F, A] {
+    new AbstractOrder[OneAnd[F, A]] with OneAndEqual[F, A] {
       def OA = A
       def OFA = FA
       def order(a1: OneAnd[F, A], a2: OneAnd[F, A]) =
@@ -251,13 +251,13 @@ sealed abstract class OneAndInstances extends OneAndInstances0 {
     }
 
   implicit def oneAndZip[F[_]: Zip]: Zip[({type λ[α] = OneAnd[F, α]})#λ] =
-    new Zip[({type λ[α] = OneAnd[F, α]})#λ] {
+    new AbstractZip[({type λ[α] = OneAnd[F, α]})#λ] {
       def zip[A, B](a: => OneAnd[F, A], b: => OneAnd[F, B]) =
         OneAnd((a.head, b.head), Zip[F].zip(a.tail, b.tail))
     }
 
   implicit def oneAndUnzip[F[_]: Unzip]: Unzip[({type λ[α] = OneAnd[F, α]})#λ] =
-    new Unzip[({type λ[α] = OneAnd[F, α]})#λ] {
+    new AbstractUnzip[({type λ[α] = OneAnd[F, α]})#λ] {
       def unzip[A, B](a: OneAnd[F, (A, B)]) = {
         val (fa, fb) = Unzip[F].unzip(a.tail)
         (OneAnd(a.head._1, fa), OneAnd(a.head._2, fb))

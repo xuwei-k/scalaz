@@ -70,7 +70,7 @@ final case class UnwriterT[F[_], U, A](run: F[(U, A)]) { self =>
     }))
 
   def leftMap[C](f: U => C)(implicit F: Functor[F]): UnwriterT[F, C, A] =
-    bimap(f, identity)
+    bimap(f, conforms)
 
   def bitraverse[G[_], C, D](f: U => G[C], g: A => G[D])(implicit G: Applicative[G], F: Traverse[F]) =
     G.map(F.traverse[G, (U, A), (C, D)](run) {

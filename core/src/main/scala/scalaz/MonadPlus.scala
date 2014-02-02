@@ -53,6 +53,8 @@ trait MonadPlus[F[_]] extends Monad[F] with ApplicativePlus[F] { self =>
   val monadPlusSyntax = new scalaz.syntax.MonadPlusSyntax[F] { def F = MonadPlus.this }
 }
 
+private abstract class AbstractMonadPlus[F[_]] extends MonadPlus[F]
+
 object MonadPlus {
   @inline def apply[F[_]](implicit F: MonadPlus[F]): MonadPlus[F] = F
 

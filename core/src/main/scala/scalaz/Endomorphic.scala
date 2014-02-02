@@ -26,7 +26,7 @@ trait EndomorphicFunctions {
 sealed abstract class EndomorphicInstances extends EndomorphicInstances0 {
 
   implicit def endomorphicMonoid[=>:[_, _], A](implicit G: Category[=>:]): Monoid[Endomorphic[=>:, A]] =
-    new Monoid[Endomorphic[=>:, A]] with EndomorphicSemigroup[=>:, A] {
+    new AbstractMonoid[Endomorphic[=>:, A]] with EndomorphicSemigroup[=>:, A] {
       val F = G
       def zero: Endomorphic[=>:, A] = Endomorphic(G.id)
     }

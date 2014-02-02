@@ -28,6 +28,8 @@ trait Comonad[F[_]] extends Cobind[F] { self =>
   val comonadSyntax = new scalaz.syntax.ComonadSyntax[F] { def F = Comonad.this }
 }
 
+private abstract class AbstractComonad[F[_]] extends Comonad[F]
+
 object Comonad {
   @inline def apply[F[_]](implicit F: Comonad[F]): Comonad[F] = F
 

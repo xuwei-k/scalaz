@@ -63,11 +63,11 @@ trait Foldable[F[_]]  { self =>
   /**Left-associative, monadic fold of a structure. */
   def foldLeftM[G[_], A, B](fa: F[A], z: B)(f: (B, A) => G[B])(implicit M: Monad[G]): G[B] =
     foldRight[A, B => G[B]](fa, M.point(_))((a, b) => w => M.bind(f(w, a))(b))(z)
-  
-  /** Combine the elements of a structure using a monoid. */
-  def fold[M: Monoid](t: F[M]): M = foldMap[M, M](t)(x => x)
 
-  /** Strict traversal in an applicative functor `M` that ignores the result of `f`. */  
+  /** Combine the elements of a structure using a monoid. */
+  def fold[M: Monoid](t: F[M]): M = foldMap[M, M](t)(conforms)
+
+  /** Strict traversal in an applicative functor `M` that ignores the result of `f`. */
   def traverse_[M[_], A, B](fa: F[A])(f: A => M[B])(implicit a: Applicative[M]): M[Unit] =
     foldLeft(fa, a.pure(()))((x, y) => a.ap(f(y))(a.map(x)(_ => _ => ())))
 
@@ -81,11 +81,11 @@ trait Foldable[F[_]]  { self =>
 
   /** Strict sequencing in an applicative functor `M` that ignores the value in `fa`. */
   def sequence_[M[_], A](fa: F[M[A]])(implicit a: Applicative[M]): M[Unit] =
-    traverse_(fa)(x => x)
+    traverse_(fa)(conforms)
 
   /** `sequence_` specialized to `State` **/
   def sequenceS_[S, A](fga: F[State[S, A]]): State[S, Unit] =
-    traverseS_(fga)(x => x)
+    traverseS_(fga)(conforms)
 
   /**Curried version of `foldRight` */
   final def foldr[A, B](fa: F[A], z: => B)(f: A => (=> B) => B): B = foldRight(fa, z)((a, b) => f(a)(b))
@@ -106,7 +106,7 @@ trait Foldable[F[_]]  { self =>
   def foldl1Opt[A](fa: F[A])(f: A => A => A): Option[A] = foldLeft(fa, None: Option[A])((optA, a) => optA map (aa => f(aa)(a)) orElse Some(a))
 
   /**Curried version of `foldRightM` */
-  final def foldrM[G[_], A, B](fa: F[A], z: => B)(f: A => ( => B) => G[B])(implicit M: Monad[G]): G[B] = 
+  final def foldrM[G[_], A, B](fa: F[A], z: => B)(f: A => ( => B) => G[B])(implicit M: Monad[G]): G[B] =
     foldRightM(fa, z)((a, b) => f(a)(b))
 
   /**Curried version of `foldLeftM` */
@@ -136,7 +136,7 @@ trait Foldable[F[_]]  { self =>
 
   /** Unbiased sum of monoidal values. */
   @deprecated("use `fold`, it has the exact same signature and implementation", "7.1")
-  def foldMapIdentity[A](fa: F[A])(implicit F: Monoid[A]): A = foldMap(fa)(a => a)
+  def foldMapIdentity[A](fa: F[A])(implicit F: Monoid[A]): A = foldMap(fa)(conforms)
   def toList[A](fa: F[A]): List[A] = foldLeft(fa, scala.List[A]())((t, h) => h :: t).reverse
   def toIndexedSeq[A](fa: F[A]): IndexedSeq[A] = foldLeft(fa, IndexedSeq[A]())(_ :+ _)
   def toSet[A](fa: F[A]): Set[A] = foldLeft(fa, Set[A]())(_ + _)
@@ -323,6 +323,8 @@ trait Foldable[F[_]]  { self =>
   ////
   val foldableSyntax = new scalaz.syntax.FoldableSyntax[F] { def F = Foldable.this }
 }
+
+private abstract class AbstractFoldable[F[_]] extends Foldable[F]
 
 object Foldable {
   @inline def apply[F[_]](implicit F: Foldable[F]): Foldable[F] = F

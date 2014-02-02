@@ -24,7 +24,7 @@ sealed abstract class LiskovInstances {
   import Liskov._
 
   /**Subtyping forms a category */
-  implicit val liskov: Category[<~<] = new Category[<~<] {
+  implicit val liskov: Category[<~<] = new AbstractCategory[<~<] {
     def id[A]: (A <~< A) = refl[A]
 
     def compose[A, B, C](bc: B <~< C, ab: A <~< B): (A <~< C) = trans(bc, ab)
@@ -52,7 +52,7 @@ trait LiskovFunctions {
   /**We can witness equality by using it to convert between types */
   implicit def witness[A, B](lt: A <~< B): A => B = {
     type f[-X] = X => B
-    lt.subst[f](identity)
+    lt.subst[f](conforms)
   }
 
   /**Subtyping is reflexive */

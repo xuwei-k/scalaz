@@ -47,6 +47,8 @@ trait Bifunctor[F[_, _]]  { self =>
   val bifunctorSyntax = new scalaz.syntax.BifunctorSyntax[F] { def F = Bifunctor.this }
 }
 
+private abstract class AbstractBifunctor[F[_, _]] extends Bifunctor[F]
+
 object Bifunctor {
   @inline def apply[F[_, _]](implicit F: Bifunctor[F]): Bifunctor[F] = F
 

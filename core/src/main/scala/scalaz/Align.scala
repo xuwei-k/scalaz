@@ -19,7 +19,7 @@ trait Align[F[_]] extends Functor[F] { self =>
   }
 
   def align[A, B](a: F[A], b: F[B]): F[A \&/ B] =
-    alignWith[A, B, A \&/ B](identity)(a, b)
+    alignWith[A, B, A \&/ B](conforms)(a, b)
 
   def padWith[A, B, C](f: (Option[A], Option[B]) => C): (F[A], F[B]) => F[C] =
     alignWith(t => {
@@ -61,6 +61,8 @@ trait Align[F[_]] extends Functor[F] { self =>
   ////
   val alignSyntax = new scalaz.syntax.AlignSyntax[F] { def F = Align.this }
 }
+
+private abstract class AbstractAlign[F[_]] extends Align[F]
 
 object Align {
   @inline def apply[F[_]](implicit F: Align[F]): Align[F] = F

@@ -46,7 +46,7 @@ trait Traverse1[F[_]] extends Traverse[F] with Foldable1[F] { self =>
     traverse1Impl(fa)(f)
 
   def sequence1[G[_]:Apply,A](fga: F[G[A]]): G[F[A]] =
-    traverse1Impl[G, G[A], A](fga)(identity)
+    traverse1Impl[G, G[A], A](fga)(conforms)
 
   trait Traverse1Law extends TraverseLaw {
     /** Traversal through the [[scalaz.Id]] effect is equivalent to
@@ -92,6 +92,8 @@ trait Traverse1[F[_]] extends Traverse[F] with Foldable1[F] { self =>
   ////
   val traverse1Syntax = new scalaz.syntax.Traverse1Syntax[F] { def F = Traverse1.this }
 }
+
+private abstract class AbstractTraverse1[F[_]] extends Traverse1[F]
 
 object Traverse1 {
   @inline def apply[F[_]](implicit F: Traverse1[F]): Traverse1[F] = F

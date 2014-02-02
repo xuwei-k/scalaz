@@ -321,7 +321,7 @@ sealed abstract class DisjunctionInstances extends DisjunctionInstances0 {
 
 sealed abstract class DisjunctionInstances0 extends DisjunctionInstances1 {
   implicit def DisjunctionOrder[A: Order, B: Order]: Order[A \/ B] =
-    new Order[A \/ B] {
+    new AbstractOrder[A \/ B] {
       def order(a1: A \/ B, a2: A \/ B) =
         a1 compare a2
       override def equal(a1: A \/ B, a2: A \/ B) =
@@ -329,7 +329,7 @@ sealed abstract class DisjunctionInstances0 extends DisjunctionInstances1 {
     }
 
   implicit def DisjunctionMonoid[A: Semigroup, B: Monoid]: Monoid[A \/ B] =
-    new Monoid[A \/ B] {
+    new AbstractMonoid[A \/ B] {
       def append(a1: A \/ B, a2: => A \/ B) =
         a1 +++ a2
       def zero =
@@ -339,7 +339,7 @@ sealed abstract class DisjunctionInstances0 extends DisjunctionInstances1 {
 
 sealed abstract class DisjunctionInstances1 extends DisjunctionInstances2 {
   implicit def DisjunctionEqual[A: Equal, B: Equal]: Equal[A \/ B] =
-    new Equal[A \/ B] {
+    new AbstractEqual[A \/ B] {
       def equal(a1: A \/ B, a2: A \/ B) =
         a1 === a2
     }
@@ -348,7 +348,7 @@ sealed abstract class DisjunctionInstances1 extends DisjunctionInstances2 {
     Show.show(_.show)
 
   implicit def DisjunctionSemigroup[A: Semigroup, B: Semigroup]: Semigroup[A \/ B] =
-    new Semigroup[A \/ B] {
+    new AbstractSemigroup[A \/ B] {
       def append(a1: A \/ B, a2: => A \/ B) =
         a1 +++ a2
     }
@@ -392,7 +392,7 @@ sealed abstract class DisjunctionInstances2 extends DisjunctionInstances3 {
 }
 
 sealed abstract class DisjunctionInstances3 {
-  implicit val DisjunctionInstances3 : Bitraverse[\/] = new Bitraverse[\/] {
+  implicit val DisjunctionInstances3 : Bitraverse[\/] = new AbstractBitraverse[\/] {
     override def bimap[A, B, C, D](fab: A \/ B)
                                   (f: A => C, g: B => D) = fab bimap (f, g)
 

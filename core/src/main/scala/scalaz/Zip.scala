@@ -39,7 +39,7 @@ trait Zip[F[_]]  { self =>
     apzip(f.getOrZ(_), a)
 
   def ap(implicit F: Functor[F]): Apply[F] =
-    new Apply[F] {
+    new AbstractApply[F] {
       def ap[A, B](fa: => F[A])(f: => F[A => B]) =
         zipWith(fa, f)((a, g) => g(a))
       def map[A, B](fa: F[A])(f: A => B) =
@@ -65,6 +65,8 @@ trait Zip[F[_]]  { self =>
   ////
   val zipSyntax = new scalaz.syntax.ZipSyntax[F] { def F = Zip.this }
 }
+
+private abstract class AbstractZip[F[_]] extends Zip[F]
 
 object Zip {
   @inline def apply[F[_]](implicit F: Zip[F]): Zip[F] = F

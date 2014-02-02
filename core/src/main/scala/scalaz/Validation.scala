@@ -322,8 +322,8 @@ sealed abstract class Validation[+E, +A] extends Product with Serializable {
   /** Run a disjunction function and back to validation again. Alias for `disjunctioned` */
   def @\/[EE, AA](k: (E \/ A) => (EE \/ AA)): Validation[EE, AA] =
     disjunctioned(k)
-    
-  /** 
+
+  /**
    * Return a Validation formed by the application of a partial function across the
    * success of this value:
    * {{{
@@ -386,7 +386,7 @@ sealed abstract class ValidationInstances0 extends ValidationInstances1 {
   }
 
   implicit def ValidationMonoid[E: Semigroup, A: Monoid]: Monoid[Validation[E, A]] =
-    new Monoid[Validation[E, A]] {
+    new AbstractMonoid[Validation[E, A]] {
       def append(a1: Validation[E, A], a2: => Validation[E, A]) =
         a1 +++ a2
       def zero =
@@ -441,7 +441,7 @@ sealed abstract class ValidationInstances2 extends ValidationInstances3 {
 }
 
 sealed abstract class ValidationInstances3 {
-  implicit val ValidationInstances0 : Bitraverse[Validation] = new Bitraverse[Validation] {
+  implicit val ValidationInstances0 : Bitraverse[Validation] = new AbstractBitraverse[Validation] {
     override def bimap[A, B, C, D](fab: Validation[A, B])
                                   (f: A => C, g: B => D) = fab bimap (f, g)
 
@@ -450,7 +450,7 @@ sealed abstract class ValidationInstances3 {
       fab.bitraverse(f, g)
   }
 
-  implicit def ValidationApplicative[L: Semigroup]: Applicative[({type l[a] = Validation[L, a]})#l] = new Applicative[({type l[a] = Validation[L, a]})#l] {
+  implicit def ValidationApplicative[L: Semigroup]: Applicative[({type l[a] = Validation[L, a]})#l] = new AbstractApplicative[({type l[a] = Validation[L, a]})#l] {
     override def map[A, B](fa: Validation[L, A])(f: A => B) =
       fa map f
 

@@ -64,6 +64,8 @@ trait Unzip[F[_]]  { self =>
   val unzipSyntax = new scalaz.syntax.UnzipSyntax[F] { def F = Unzip.this }
 }
 
+private abstract class AbstractUnzip[F[_]] extends Unzip[F]
+
 object Unzip {
   @inline def apply[F[_]](implicit F: Unzip[F]): Unzip[F] = F
 

@@ -34,7 +34,7 @@ object Leibniz extends LeibnizInstances with LeibnizFunctions{
 sealed abstract class LeibnizInstances {
   import Leibniz._
 
-  implicit val leibniz: Category[===] = new Category[===] {
+  implicit val leibniz: Category[===] = new AbstractCategory[===] {
     def id[A]: (A === A) = refl[A]
 
     def compose[A, B, C](bc: B === C, ab: A === B) = bc compose ab
@@ -75,7 +75,7 @@ trait LeibnizFunctions {
    * We rely on subtyping to enable this to work for any Leibniz arrow
    */
   implicit def witness[A, B](f: A === B): A => B =
-    f.subst[({type λ[X] = A => X})#λ](identity)
+    f.subst[({type λ[X] = A => X})#λ](conforms)
 
   implicit def subst[A, B](a: A)(implicit f: A === B): B = f.subst[Id](a)
 

@@ -25,20 +25,20 @@ object CaseInsensitive extends CaseInsensitiveInstances {
 
 sealed abstract class CaseInsensitiveInstances {
   implicit def CaseInsensitiveMonoid[A: FoldCase : Monoid]: Monoid[CaseInsensitive[A]] =
-    new Monoid[CaseInsensitive[A]] {
+    new AbstractMonoid[CaseInsensitive[A]] {
       def zero = CaseInsensitive.mk(Monoid[A].zero, Monoid[A].zero)
       def append(a: CaseInsensitive[A], b: => CaseInsensitive[A]) =
         CaseInsensitive.mk(Semigroup[A].append(a.original, b.original), Semigroup[A].append(a.foldedCase, b.foldedCase))
     }
 
   implicit def CaseInsensitiveEqual[A: Equal]: Equal[CaseInsensitive[A]] =
-    new Equal[CaseInsensitive[A]] {
+    new AbstractEqual[CaseInsensitive[A]] {
       def equal(a: CaseInsensitive[A], b: CaseInsensitive[A]) =
         Equal[A].equal(a.foldedCase, b.foldedCase)
     }
 
   implicit def CaseInsensitiveOrder[A: Order]: Order[CaseInsensitive[A]] =
-    new Order[CaseInsensitive[A]] {
+    new AbstractOrder[CaseInsensitive[A]] {
       def order(a: CaseInsensitive[A], b: CaseInsensitive[A]) = Order[A].order(a.foldedCase, b.foldedCase)
     }
 

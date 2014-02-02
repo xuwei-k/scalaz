@@ -21,7 +21,7 @@ sealed abstract class EndoInstances {
 
   /** Endo forms a monoid where `zero` is the identity endomorphism
     * and `append` composes the underlying functions. */
-  implicit def endoInstance[A]: Monoid[Endo[A]] = new Monoid[Endo[A]] {
+  implicit def endoInstance[A]: Monoid[Endo[A]] = new AbstractMonoid[Endo[A]] {
     def append(f1: Endo[A], f2: => Endo[A]) = f1 compose f2
     def zero = Endo.idEndo
   }
@@ -48,7 +48,7 @@ trait EndoFunctions {
   final def constantEndo[A](a: => A): Endo[A] = endo[A](_ => a)
 
   /** Alias for `Monoid[Endo[A]].zero`. */
-  final def idEndo[A]: Endo[A] = endo[A](a => a)
+  final def idEndo[A]: Endo[A] = endo[A](conforms)
 
   import Isomorphism.{IsoSet, IsoFunctorTemplate}
 

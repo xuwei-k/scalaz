@@ -864,7 +864,7 @@ private trait Tuple8Monoid[A1, A2, A3, A4, A5, A6, A7, A8] extends Monoid[(A1, A
   def zero: (A1, A2, A3, A4, A5, A6, A7, A8) = (_1.zero, _2.zero, _3.zero, _4.zero, _5.zero, _6.zero, _7.zero, _8.zero)
 }
 
-private trait Tuple1Monad extends Monad[Tuple1] {
+private abstract class Tuple1Monad extends AbstractMonad[Tuple1] {
   def bind[A, B](fa: Tuple1[A])(f: A => Tuple1[B]) = f(fa._1)
   def point[A](a: => A) = Tuple1(a)
 }
@@ -873,7 +873,7 @@ private trait Tuple1Monad extends Monad[Tuple1] {
 // TupleN forms a Monad if the element types other than the last are Monoids.
 
 
-private trait Tuple2Monad[A1] extends Monad[({type f[x] = (A1, x)})#f] with Tuple2Functor[A1] {
+private abstract class Tuple2Monad[A1] extends AbstractMonad[({type f[x] = (A1, x)})#f] with Tuple2Functor[A1] {
   implicit def _1 : Monoid[A1]
   def bind[A, B](fa: (A1, A))(f: A => (A1, B)) = {
     val t = f(fa._2)
@@ -882,7 +882,7 @@ private trait Tuple2Monad[A1] extends Monad[({type f[x] = (A1, x)})#f] with Tupl
   }
   def point[A](a: => A) = (_1.zero, a)
 }
-private trait Tuple3Monad[A1, A2] extends Monad[({type f[x] = (A1, A2, x)})#f] with Tuple3Functor[A1, A2] {
+private abstract class Tuple3Monad[A1, A2] extends AbstractMonad[({type f[x] = (A1, A2, x)})#f] with Tuple3Functor[A1, A2] {
   implicit def _1 : Monoid[A1]
   implicit def _2 : Monoid[A2]
   def bind[A, B](fa: (A1, A2, A))(f: A => (A1, A2, B)) = {
@@ -893,7 +893,7 @@ private trait Tuple3Monad[A1, A2] extends Monad[({type f[x] = (A1, A2, x)})#f] w
 
   def point[A](a: => A) = (_1.zero, _2.zero, a)
 }
-private trait Tuple4Monad[A1, A2, A3] extends Monad[({type f[x] = (A1, A2, A3, x)})#f] with Tuple4Functor[A1, A2, A3] {
+private abstract class Tuple4Monad[A1, A2, A3] extends AbstractMonad[({type f[x] = (A1, A2, A3, x)})#f] with Tuple4Functor[A1, A2, A3] {
   implicit def _1 : Monoid[A1]
   implicit def _2 : Monoid[A2]
   implicit def _3 : Monoid[A3]
@@ -904,7 +904,7 @@ private trait Tuple4Monad[A1, A2, A3] extends Monad[({type f[x] = (A1, A2, A3, x
   }
   def point[A](a: => A) = (_1.zero, _2.zero, _3.zero, a)
 }
-private trait Tuple5Monad[A1, A2, A3, A4] extends Monad[({type f[x] = (A1, A2, A3, A4, x)})#f] with Tuple5Functor[A1, A2, A3, A4] {
+private abstract class Tuple5Monad[A1, A2, A3, A4] extends AbstractMonad[({type f[x] = (A1, A2, A3, A4, x)})#f] with Tuple5Functor[A1, A2, A3, A4] {
   implicit def _1 : Monoid[A1]
   implicit def _2 : Monoid[A2]
   implicit def _3 : Monoid[A3]
@@ -916,7 +916,7 @@ private trait Tuple5Monad[A1, A2, A3, A4] extends Monad[({type f[x] = (A1, A2, A
   }
   def point[A](a: => A) = (_1.zero, _2.zero, _3.zero, _4.zero, a)
 }
-private trait Tuple6Monad[A1, A2, A3, A4, A5] extends Monad[({type f[x] = (A1, A2, A3, A4, A5, x)})#f] with Tuple6Functor[A1, A2, A3, A4, A5] {
+private abstract class Tuple6Monad[A1, A2, A3, A4, A5] extends AbstractMonad[({type f[x] = (A1, A2, A3, A4, A5, x)})#f] with Tuple6Functor[A1, A2, A3, A4, A5] {
   implicit def _1 : Monoid[A1]
   implicit def _2 : Monoid[A2]
   implicit def _3 : Monoid[A3]
@@ -929,7 +929,7 @@ private trait Tuple6Monad[A1, A2, A3, A4, A5] extends Monad[({type f[x] = (A1, A
   }
   def point[A](a: => A) = (_1.zero, _2.zero, _3.zero, _4.zero, _5.zero, a)
 }
-private trait Tuple7Monad[A1, A2, A3, A4, A5, A6] extends Monad[({type f[x] = (A1, A2, A3, A4, A5, A6, x)})#f] with Tuple7Functor[A1, A2, A3, A4, A5, A6] {
+private abstract class Tuple7Monad[A1, A2, A3, A4, A5, A6] extends AbstractMonad[({type f[x] = (A1, A2, A3, A4, A5, A6, x)})#f] with Tuple7Functor[A1, A2, A3, A4, A5, A6] {
   implicit def _1 : Monoid[A1]
   implicit def _2 : Monoid[A2]
   implicit def _3 : Monoid[A3]
@@ -944,7 +944,7 @@ private trait Tuple7Monad[A1, A2, A3, A4, A5, A6] extends Monad[({type f[x] = (A
 
   def point[A](a: => A) = (_1.zero, _2.zero, _3.zero, _4.zero, _5.zero, _6.zero, a)
 }
-private trait Tuple8Monad[A1, A2, A3, A4, A5, A6, A7] extends Monad[({type f[x] = (A1, A2, A3, A4, A5, A6, A7, x)})#f] with Tuple8Functor[A1, A2, A3, A4, A5, A6, A7] {
+private abstract class Tuple8Monad[A1, A2, A3, A4, A5, A6, A7] extends AbstractMonad[({type f[x] = (A1, A2, A3, A4, A5, A6, A7, x)})#f] with Tuple8Functor[A1, A2, A3, A4, A5, A6, A7] {
   implicit def _1 : Monoid[A1]
   implicit def _2 : Monoid[A2]
   implicit def _3 : Monoid[A3]

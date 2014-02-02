@@ -48,7 +48,7 @@ sealed trait EitherInstances0 {
 }
 
 trait EitherInstances extends EitherInstances0 {
-  implicit val eitherInstance = new Bitraverse[Either] {
+  implicit val eitherInstance: Bitraverse[Either] = new AbstractBitraverse[Either] {
     override def bimap[A, B, C, D](fab: Either[A, B])
                                   (f: A => C, g: B => D) = fab match {
       case Left(a)  => Left(f(a))
@@ -63,7 +63,8 @@ trait EitherInstances extends EitherInstances0 {
   }
 
   /** Right biased monad */
-  implicit def eitherMonad[L] = new Traverse[({type l[a] = Either[L, a]})#l] with Monad[({type l[a] = Either[L, a]})#l] with Cozip[({type l[a] = Either[L, a]})#l] {
+  implicit def eitherMonad[L]: Traverse[({type l[a] = Either[L, a]})#l] with Monad[({type l[a] = Either[L, a]})#l] with Cozip[({type l[a] = Either[L, a]})#l] =
+    new AbstractTraverse[({type l[a] = Either[L, a]})#l] with Monad[({type l[a] = Either[L, a]})#l] with Cozip[({type l[a] = Either[L, a]})#l] {
     def bind[A, B](fa: Either[L, A])(f: A => Either[L, B]) = fa match {
       case Left(a)  => Left(a)
       case Right(b) => f(b)
@@ -166,7 +167,7 @@ trait EitherInstances extends EitherInstances0 {
     implicit def G: Bifunctor[Either] = eitherInstance
   }
 
-  implicit def eitherRightLInstance[L] = new Monad[({type λ[α] = RightProjection[L, α]})#λ] {
+  implicit def eitherRightLInstance[L]: Monad[({type λ[α] = RightProjection[L, α]})#λ] = new AbstractMonad[({type λ[α] = RightProjection[L, α]})#λ] {
     def point[A](a: => A) = Right(a).right
     def bind[A, B](fa: RightProjection[L, A])(f: A => RightProjection[L, B]) = fa.e match {
       case Left(a)  => Left(a).right
@@ -174,7 +175,7 @@ trait EitherInstances extends EitherInstances0 {
     }
   }
 
-  implicit def eitherFirstRightLInstance[L] = new Monad[({type λ[α] = RightProjection[L, α] @@ First})#λ] {
+  implicit def eitherFirstRightLInstance[L]: Monad[({type λ[α] = RightProjection[L, α] @@ First})#λ] = new AbstractMonad[({type λ[α] = RightProjection[L, α] @@ First})#λ] {
     def point[A](a: => A) = First(Right(a).right)
     def bind[A, B](fa: RightProjection[L, A] @@ First)(f: A => RightProjection[L, B] @@ First) = First(
       fa.e match {
@@ -184,7 +185,7 @@ trait EitherInstances extends EitherInstances0 {
     )
   }
 
-  implicit def eitherLastRightLInstance[L] = new Monad[({type λ[α] = RightProjection[L, α] @@ Last})#λ] {
+  implicit def eitherLastRightLInstance[L]: Monad[({type λ[α] = RightProjection[L, α] @@ Last})#λ] = new AbstractMonad[({type λ[α] = RightProjection[L, α] @@ Last})#λ] {
     def point[A](a: => A) = Last(Right(a).right)
     def bind[A, B](fa: RightProjection[L, A] @@ Last)(f: A => RightProjection[L, B] @@ Last) =
       fa.e match {
@@ -193,7 +194,7 @@ trait EitherInstances extends EitherInstances0 {
       }
   }
 
-  implicit def eitherLeftRInstance[R] = new Monad[({type λ[α] = LeftProjection[α, R]})#λ] {
+  implicit def eitherLeftRInstance[R]: Monad[({type λ[α] = LeftProjection[α, R]})#λ] = new AbstractMonad[({type λ[α] = LeftProjection[α, R]})#λ] {
     def point[A](a: => A) = Left(a).left
     def bind[A, B](fa: LeftProjection[A, R])(f: A => LeftProjection[B, R]) = fa.e match {
       case Left(a)  => f(a)
@@ -201,7 +202,7 @@ trait EitherInstances extends EitherInstances0 {
     }
   }
 
-  implicit def eitherFirstLeftRInstance[R] = new Monad[({type λ[α] = LeftProjection[α, R] @@ First})#λ] {
+  implicit def eitherFirstLeftRInstance[R]: Monad[({type λ[α] = LeftProjection[α, R] @@ First})#λ] = new AbstractMonad[({type λ[α] = LeftProjection[α, R] @@ First})#λ] {
     def point[A](a: => A) = First(Left(a).left)
     def bind[A, B](fa: LeftProjection[A, R] @@ First)(f: A => LeftProjection[B, R] @@ First) = First(
       fa.e match {
@@ -211,7 +212,7 @@ trait EitherInstances extends EitherInstances0 {
     )
   }
 
-  implicit def eitherLastLeftRInstance[R] = new Monad[({type λ[α] = LeftProjection[α, R] @@ Last})#λ] {
+  implicit def eitherLastLeftRInstance[R]: Monad[({type λ[α] = LeftProjection[α, R] @@ Last})#λ] = new AbstractMonad[({type λ[α] = LeftProjection[α, R] @@ Last})#λ] {
     def point[A](a: => A) = Last(Left(a).left)
     def bind[A, B](fa: LeftProjection[A, R] @@ Last)(f: A => LeftProjection[B, R] @@ Last) = Last(
       fa.e match {

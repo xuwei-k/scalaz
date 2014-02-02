@@ -101,7 +101,7 @@ sealed abstract class KleisliInstances6 extends KleisliInstances7 {
 }
 
 sealed abstract class KleisliInstances5 extends KleisliInstances6 {
-  implicit def kleisliApplicativePlus[F[_], R](implicit F0: ApplicativePlus[F]): ApplicativePlus[({type λ[α] = Kleisli[F, R, α]})#λ] = new ApplicativePlus[({type λ[α] = Kleisli[F, R, α]})#λ] with KleisliApplicative[F, R] with KleisliPlusEmpty[F, R] {
+  implicit def kleisliApplicativePlus[F[_], R](implicit F0: ApplicativePlus[F]): ApplicativePlus[({type λ[α] = Kleisli[F, R, α]})#λ] = new AbstractApplicativePlus[({type λ[α] = Kleisli[F, R, α]})#λ] with KleisliApplicative[F, R] with KleisliPlusEmpty[F, R] {
     implicit def F: ApplicativePlus[F] = F0
   }
   implicit def kleisliSemigroup[F[_], A, B](implicit FB0: Semigroup[F[B]]): Semigroup[Kleisli[F, A, B]] = new KleisliSemigroup[F, A, B] {
@@ -323,7 +323,7 @@ private trait KleisliPlusEmpty[F[_], A] extends PlusEmpty[({type λ[α]=Kleisli[
 
 private trait KleisliCatchable[F[_], A] extends Catchable[({type λ[α]=Kleisli[F, A, α]})#λ] {
   implicit def F: Catchable[F]
-  def attempt[B](f: Kleisli[F, A, B]): Kleisli[F, A, Throwable \/ B] = 
+  def attempt[B](f: Kleisli[F, A, B]): Kleisli[F, A, Throwable \/ B] =
     Kleisli(a => F.attempt(try f.run(a) catch { case t: Throwable => F.fail(t) }))
   def fail[B](err: Throwable): Kleisli[F, A, B] = Kleisli(_ => F.fail(err))
 }

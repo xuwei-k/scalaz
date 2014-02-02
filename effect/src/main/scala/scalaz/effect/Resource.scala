@@ -22,6 +22,8 @@ trait Resource[F]  { self =>
   val resourceSyntax = new scalaz.syntax.effect.ResourceSyntax[F] { def F = Resource.this }
 }
 
+private abstract class AbstractResource[F] extends Resource[F]
+
 object Resource {
   @inline def apply[F](implicit F: Resource[F]): Resource[F] = F
 

@@ -47,6 +47,8 @@ trait Optional[F[_]]  { self =>
   val optionalSyntax = new scalaz.syntax.OptionalSyntax[F] { def F = Optional.this }
 }
 
+private abstract class AbstractOptional[F[_]] extends Optional[F]
+
 object Optional {
   @inline def apply[F[_]](implicit F: Optional[F]): Optional[F] = F
 

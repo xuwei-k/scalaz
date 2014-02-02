@@ -44,7 +44,7 @@ trait Semigroup[F]  { self =>
    * discarded; it is a phantom type.  As such, the functor cannot
    * support [[scalaz.Bind]].
    */
-  final def apply: Apply[({type λ[α]=F})#λ] = new SemigroupApply {}
+  final def apply: Apply[({type λ[α]=F})#λ] = new SemigroupApply{}
 
   /**
    * A semigroup in type F must satisfy two laws:
@@ -63,36 +63,38 @@ trait Semigroup[F]  { self =>
   val semigroupSyntax = new scalaz.syntax.SemigroupSyntax[F] { def F = Semigroup.this }
 }
 
+private abstract class AbstractSemigroup[F] extends Semigroup[F]
+
 object Semigroup {
   @inline def apply[F](implicit F: Semigroup[F]): Semigroup[F] = F
 
   ////
   /** Make an associative binary function into an instance. */
-  def instance[A](f: (A, => A) => A): Semigroup[A] = new Semigroup[A] {
+  def instance[A](f: (A, => A) => A): Semigroup[A] = new AbstractSemigroup[A] {
     def append(f1: A, f2: => A): A = f(f1,f2)
   }
 
   /** A purely left-biased semigroup. */
-  def firstSemigroup[A] = new Semigroup[A] {
+  def firstSemigroup[A]: Semigroup[A] = new AbstractSemigroup[A] {
     def append(f1: A, f2: => A): A = f1
   }
 
   @inline implicit def firstTaggedSemigroup[A] = firstSemigroup[A @@ Tags.FirstVal]
 
   /** A purely right-biased semigroup. */
-  def lastSemigroup[A] = new Semigroup[A] {
+  def lastSemigroup[A]: Semigroup[A] = new AbstractSemigroup[A] {
     def append(f1: A, f2: => A): A = f2
   }
 
   @inline implicit def lastTaggedSemigroup[A] = lastSemigroup[A @@ Tags.LastVal]
 
-  def minSemigroup[A](implicit o: Order[A]): Semigroup[A @@ Tags.MinVal] = new Semigroup[A @@ Tags.MinVal] {
+  def minSemigroup[A](implicit o: Order[A]): Semigroup[A @@ Tags.MinVal] = new AbstractSemigroup[A @@ Tags.MinVal] {
     def append(f1: A @@ Tags.MinVal, f2: => A @@ Tags.MinVal) = Tags.MinVal(o.min(f1, f2))
   }
 
   @inline implicit def minTaggedSemigroup[A : Order] = minSemigroup[A]
 
-  def maxSemigroup[A](implicit o: Order[A]): Semigroup[A @@ Tags.MaxVal] = new Semigroup[A @@ Tags.MaxVal] {
+  def maxSemigroup[A](implicit o: Order[A]): Semigroup[A @@ Tags.MaxVal] = new AbstractSemigroup[A @@ Tags.MaxVal] {
     def append(f1: A @@ Tags.MaxVal, f2: => A @@ Tags.MaxVal) = Tags.MaxVal(o.max(f1, f2))
   }
 

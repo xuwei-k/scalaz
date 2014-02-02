@@ -49,7 +49,7 @@ trait Monoid[F] extends Semigroup[F] { self =>
     *
     * @note `category.monoid` = `this`
     */
-  final def category: Category[({type λ[α, β]=F})#λ] = new Category[({type λ[α, β]=F})#λ] with SemigroupCompose {
+  final def category: Category[({type λ[α, β]=F})#λ] = new AbstractCategory[({type λ[α, β]=F})#λ] with SemigroupCompose {
     def id[A] = zero
   }
 
@@ -60,7 +60,7 @@ trait Monoid[F] extends Semigroup[F] { self =>
    * discarded; it is a phantom type.  As such, the functor cannot
    * support [[scalaz.Bind]].
    */
-  final def applicative: Applicative[({type λ[α]=F})#λ] = new Applicative[({type λ[α]=F})#λ] with SemigroupApply {
+  final def applicative: Applicative[({type λ[α]=F})#λ] = new AbstractApplicative[({type λ[α]=F})#λ] with SemigroupApply {
     def point[A](a: => A) = zero
   }
 
@@ -79,6 +79,8 @@ trait Monoid[F] extends Semigroup[F] { self =>
   ////
   val monoidSyntax = new scalaz.syntax.MonoidSyntax[F] { def F = Monoid.this }
 }
+
+private abstract class AbstractMonoid[F] extends Monoid[F]
 
 object Monoid {
   @inline def apply[F](implicit F: Monoid[F]): Monoid[F] = F

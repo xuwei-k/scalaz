@@ -78,7 +78,7 @@ final case class WriterT[F[_], W, A](run: F[(W, A)]) { self =>
     }))
 
   def leftMap[C](f: W => C)(implicit F: Functor[F]): WriterT[F, C, A] =
-    bimap(f, identity)
+    bimap(f, conforms)
 
   def bitraverse[G[_], C, D](f: W => G[C], g: A => G[D])(implicit G: Applicative[G], F: Traverse[F]) =
     G.map(F.traverse[G, (W, A), (C, D)](run) {

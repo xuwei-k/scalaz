@@ -11,7 +11,7 @@ abstract class Yoneda[F[_], A] { yo =>
   def apply[B](f: A => B): F[B]
 
   /** Converts to `F[A]` even without a `Functor` instance for `F` */
-  def run: F[A] = apply(a => a)
+  def run: F[A] = apply(conforms)
 
   /** Converts to `Coyoneda[F,A]` even without a `Functor` instance for `F` */
   def toCoyoneda: Coyoneda[F,A] = new Coyoneda[F, A] {

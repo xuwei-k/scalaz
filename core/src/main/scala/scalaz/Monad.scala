@@ -77,6 +77,8 @@ trait Monad[F[_]] extends Applicative[F] with Bind[F] { self =>
   val monadSyntax = new scalaz.syntax.MonadSyntax[F] { def F = Monad.this }
 }
 
+private abstract class AbstractMonad[F[_]] extends Monad[F]
+
 object Monad {
   @inline def apply[F[_]](implicit F: Monad[F]): Monad[F] = F
 

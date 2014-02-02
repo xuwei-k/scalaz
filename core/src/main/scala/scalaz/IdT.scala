@@ -65,7 +65,7 @@ sealed abstract class IdTInstances extends IdTInstances0 {
 trait IdTFunctions {
 }
 
-object IdT extends IdTInstances with IdTFunctions 
+object IdT extends IdTInstances with IdTFunctions
 
 //
 // Implementation traits for type class instances
@@ -89,7 +89,7 @@ private trait IdTApplicative[F[_]] extends Applicative[({type λ[α] = IdT[F, α
   def point[A](a: => A) = new IdT[F, A](F.point(a))
 }
 
-private trait IdTMonad[F[_]] extends Monad[({type λ[α] = IdT[F, α]})#λ] with IdTApplicative[F] {
+private abstract class IdTMonad[F[_]] extends AbstractMonad[({type λ[α] = IdT[F, α]})#λ] with IdTApplicative[F] {
   implicit def F: Monad[F]
 
   def bind[A, B](fa: IdT[F, A])(f: A => IdT[F, B]) = fa flatMap f

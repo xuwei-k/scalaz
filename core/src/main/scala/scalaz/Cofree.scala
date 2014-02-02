@@ -205,7 +205,7 @@ private trait CofreeBind[F[_]] extends Bind[({type λ[α] = Cofree[F, α]})#λ] 
   }
 }
 
-private trait CofreeMonad[F[_]] extends Monad[({type λ[α] = Cofree[F, α]})#λ] with CofreeBind[F]{
+private abstract class CofreeMonad[F[_]] extends AbstractMonad[({type λ[α] = Cofree[F, α]})#λ] with CofreeBind[F]{
   implicit def G: PlusEmpty[F]
 
   def point[A](a: => A): Cofree[F, A] = Cofree(a, G.empty)

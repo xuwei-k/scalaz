@@ -106,7 +106,7 @@ sealed abstract class ReducerInstances { self: ReducerFunctions =>
   /** The "or" monoid. */
   implicit val AnyReducer: Reducer[Boolean, Boolean] = {
     implicit val B = std.anyVal.booleanInstance.disjunction
-    unitReducer(x => x)
+    unitReducer(conforms)
   }
 
   import std.anyVal._
@@ -185,5 +185,5 @@ trait ReducerFunctions {
   /** The reducer derived from any monoid.  Not implicit because it is
     * suboptimal for most reducer applications.
     */
-  def identityReducer[M](implicit mm: Monoid[M]): Reducer[M, M] = unitReducer(x => x)
+  def identityReducer[M](implicit mm: Monoid[M]): Reducer[M, M] = unitReducer(conforms)
 }

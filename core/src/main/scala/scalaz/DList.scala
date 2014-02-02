@@ -73,11 +73,11 @@ object DList extends DListInstances with DListFunctions {
 }
 
 sealed abstract class DListInstances {
-  implicit def dlistMonoid[A]: Monoid[DList[A]] = new Monoid[DList[A]] {
+  implicit def dlistMonoid[A]: Monoid[DList[A]] = new AbstractMonoid[DList[A]] {
     val zero = DList[A]()
     def append(a: DList[A], b: => DList[A]) = a ++ b
   }
-  implicit val dlistMonadPlus: MonadPlus[DList] = new MonadPlus[DList] {
+  implicit val dlistMonadPlus: MonadPlus[DList] = new AbstractMonadPlus[DList] {
     def point[A](a: => A) = DList(a)
     def bind[A, B](as: DList[A])(f: A => DList[B]) = as flatMap f
     def plus[A](a: DList[A], b: => DList[A]) = a ++ b
