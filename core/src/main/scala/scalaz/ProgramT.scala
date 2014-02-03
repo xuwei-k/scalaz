@@ -14,6 +14,7 @@ object PromptT {
     type B
     def a: I[B]
     def f: B => ProgramT[I, M, A]
+    override def toString = List(a, f).mkString(productPrefix + "(", ", ", ")")
   }
 
   def return_[I[_], M[_], A](a: A): PromptT[I, M, A] = new Return(a)
@@ -76,14 +77,21 @@ object Operational{
 
 }
 
-sealed abstract class ProgramT[I[_], M[_], A]
+sealed abstract class ProgramT[I[_], M[_], A] {
+
+  def runList(implicit e: this.type <:< Operational.ListTrans[M, A], M: Monad[M]): M[List[A]] =
+    Operational.runList(e(this))
+
+}
 
 object ProgramT {
+
   final case class Lift[I[_], M[_], A] private[ProgramT] (f: M[A]) extends ProgramT[I, M, A]
   abstract case class Bind[I[_], M[_], A] private[ProgramT]() extends ProgramT[I, M, A] {
     type B
     def a: ProgramT[I, M, B]
     def f: B => ProgramT[I, M, A]
+    override def toString = List(a, f).mkString(productPrefix + "(", ", ", ")")
   }
   final case class Instr[I[_], M[_], A] private[ProgramT] (f: I[A]) extends ProgramT[I, M, A]
 
