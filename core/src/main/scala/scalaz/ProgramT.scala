@@ -28,6 +28,13 @@ object PromptT {
 object Operational{
 
   type ListTrans[M[_], A] = ProgramT[({type λ[α] = PlusI[M, α]})#λ, M, A]
+  object ListTrans {
+    implicit def listTransMonad[M[_]: Monad]: Monad[({type l[a] = ListTrans[M, a]})#l] =
+      ProgramT.programTInstance[({type λ[α] = PlusI[M, α]})#λ, M]
+
+    implicit def listTransEqual[M[_]: Monad, A: Equal](implicit E: Equal[M[List[A]]]): Equal[ListTrans[M, A]] =
+      Equal.equalBy(runList(_))
+  }
 
   sealed abstract class PlusI[M[_], A]
   object PlusI {
@@ -39,7 +46,7 @@ object Operational{
     M.bind(viewT[({type λ[α] = PlusI[M, α]})#λ, M, A](a))(eval(_))
 
   def eval[M[_], A](b: PromptT[({type λ[α] = PlusI[M, α]})#λ, M, A])(implicit M: Monad[M]): M[List[A]] = {
-    val N: Monad[({type l[a] = ListTrans[M, a]})#l] = ProgramT.programTInstance[({type λ[α] = PlusI[M, α]})#λ, M]
+    val N = ListTrans.listTransMonad[M]
     b.fold(
       x => M.point(x :: Nil),
       b => b.a match {
