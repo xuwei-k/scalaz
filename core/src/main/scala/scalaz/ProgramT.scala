@@ -1,6 +1,12 @@
 package scalaz
 
-sealed abstract class PromptT[I[_], M[_], A]
+sealed abstract class PromptT[I[_], M[_], A] {
+  def fold[Z](pure: A => Z, bind: PromptT.:>>=[I, M, A] => Z): Z =
+    this match {
+      case PromptT.Return(a)  => pure(a)
+      case a @ PromptT.:>>=() => bind(a)
+    }
+}
 
 object PromptT {
   final case class Return[I[_], M[_], A] private[PromptT] (a: A) extends PromptT[I, M, A]
@@ -20,6 +26,32 @@ object PromptT {
 }
 
 object Operational{
+
+  type ListTrans[M[_], A] = ProgramT[({type λ[α] = PlusI[M, α]})#λ, M, A]
+
+  sealed abstract class PlusI[M[_], A]
+  object PlusI {
+    final case class Zero[M[_], A]() extends PlusI[M, A]
+    final case class Plus[M[_], A](a: ListTrans[M, A], b: ListTrans[M, A]) extends PlusI[M, A]
+  }
+
+  def runList[M[_], A](a: ListTrans[M, A])(implicit M: Monad[M]): M[List[A]] =
+    M.bind(viewT[({type λ[α] = PlusI[M, α]})#λ, M, A](a))(eval(_))
+
+  def eval[M[_], A](b: PromptT[({type λ[α] = PlusI[M, α]})#λ, M, A])(implicit M: Monad[M]): M[List[A]] = {
+    val N: Monad[({type l[a] = ListTrans[M, a]})#l] = ProgramT.programTInstance[({type λ[α] = PlusI[M, α]})#λ, M]
+    b.fold(
+      x => M.point(x :: Nil),
+      b => b.a match {
+        case PlusI.Zero() => M.point(Nil)
+        case c @ PlusI.Plus(_, _) =>
+          M.apply2(
+            runList(N.bind(c.a)(b.f)),
+            runList(N.bind(c.b)(b.f))
+          )(_ ::: _)
+      }
+    )
+  }
 
   def viewT[I[_], M[_], A](a: ProgramT[I, M, A])(implicit M: Monad[M]): M[PromptT[I, M, A]] = {
     import ProgramT._
