@@ -120,4 +120,24 @@ object FoldableTest extends SpecLite {
       (L.product(L).foldLeft((l, l2), List.empty[Int])((xs, x) => x :: xs)
        must_===((l ++ l2).reverse))
   }
+
+  "no stack overflow foldLeftMTrampoline, foldRightMTrampoline" should {
+    val n = 100000
+    val x = 1 to n
+    import Free.Trampoline
+
+    "foldLeftMTrampoline" ! {
+      val f1 = (x: Int, y: Int) => Option(x + y)
+      x.toList.foldLeftMTrampoline(0)(f1) must_=== Some(x.sum)
+      x.toStream.foldLeftMTrampoline(0)(f1) must_=== Some(x.sum)
+      EphemeralStream(x: _*).foldLeftMTrampoline(0)(f1) must_=== Some(x.sum)
+    }
+
+    "foldRightMTrampoline" ! {
+      val f1: (Int, => Int) => Option[Int] = (x, y) => Option(x + y)
+      x.toList.foldRightMTrampoline(0)(f1) must_=== Some(x.sum)
+      x.toStream.foldRightMTrampoline(0)(f1) must_=== Some(x.sum)
+      EphemeralStream(x: _*).foldRightMTrampoline(0)(f1) must_=== Some(x.sum)
+    }
+  }
 }
