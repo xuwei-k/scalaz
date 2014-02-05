@@ -63,6 +63,18 @@ trait Foldable[F[_]]  { self =>
   /**Left-associative, monadic fold of a structure. */
   def foldLeftM[G[_], A, B](fa: F[A], z: B)(f: (B, A) => G[B])(implicit M: Monad[G]): G[B] =
     foldRight[A, B => G[B]](fa, M.point(_))((a, b) => w => M.bind(f(w, a))(b))(z)
+
+  def foldRightMTrampoline[G[_], A, B](fa: F[A], z: => B)(f: (A, => B) => G[B])(implicit M: Monad[G], G: Traverse[G]): G[B] = {
+    import std.function._, syntax.functor._
+    val ff = f.map(gb => TrampolineT.from(M.map(gb)(x => Trampoline.delay(x))))
+    foldRightM[({type λ[α] = TrampolineT[G, α]})#λ, A, B](fa, z)(ff).go
+  }
+
+  def foldLeftMTrampoline[G[_], A, B](fa: F[A], z: B)(f: (B, A) => G[B])(implicit M: Monad[G], G: Traverse[G]): G[B] = {
+    import std.function._, syntax.functor._
+    val ff = f.map(gb => TrampolineT.from(M.map(gb)(x => Trampoline.delay(x))))
+    foldLeftM[({type λ[α] = TrampolineT[G, α]})#λ, A, B](fa, z)(ff).go
+  }
   
   /** Combine the elements of a structure using a monoid. */
   def fold[M: Monoid](t: F[M]): M = foldMap[M, M](t)(x => x)
