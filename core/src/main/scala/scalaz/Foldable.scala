@@ -63,6 +63,26 @@ trait Foldable[F[_]]  { self =>
   /**Left-associative, monadic fold of a structure. */
   def foldLeftM[G[_], A, B](fa: F[A], z: B)(f: (B, A) => G[B])(implicit M: Monad[G]): G[B] =
     foldRight[A, B => G[B]](fa, M.point(_))((a, b) => w => M.bind(f(w, a))(b))(z)
+
+
+  def foldLeftMTrampoline_2[G[_], A, B](fa: F[A], z: B)(f: (B, A) => G[B])(implicit M: Monad[G]): G[B] = {
+    import std.function._, syntax.functor._
+    type M[a] = FreeT[G, Function0, a]
+    val G: Monad[M] = FreeT.freeTMonad[G, Function0]
+    val ff = f.map(gb => FreeT.fromFree[G, Function0, B](() => Free.liftF(gb)))
+    val f0toId = new (Function0 ~> Id.Id){def apply[A](a: () => A) = a()}
+    foldLeftM[M, A, B](fa, z)(ff).free(f0toId).foldMap[G](
+      NaturalTransformation.refl[G]
+    )
+  }
+
+  def foldLeftMTrampoline_1[G[_], A, B](fa: F[A], z: B)(f: (B, A) => G[B])(implicit M: Monad[G]): G[B] = {
+    import std.function._, syntax.functor._
+    type M[a] = FreeT[Function0, G, a]
+    val G: Monad[M] = FreeT.freeTMonad[Function0, G]
+    val ff = f.map(gb => FreeT.fromFree[Function0, G, B](gb.map(x => Trampoline.delay(x))))
+    foldLeftM[M, A, B](fa, z)(ff).iterT(_())
+  }
   
   /** Combine the elements of a structure using a monoid. */
   def fold[M: Monoid](t: F[M]): M = foldMap[M, M](t)(x => x)
