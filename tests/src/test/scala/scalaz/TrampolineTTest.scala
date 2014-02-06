@@ -79,5 +79,14 @@ object TrampolineTTest extends SpecLite {
     TrampolineT.from[Id.Id, Int](fib(fibParam)).go must_=== fibResult
     fib(fibParam).run must_=== fibResult
   }
+
+  "kleisli" ! {
+    val a = 100000
+    val b = 10
+    val k = Kleisli[Option, IList[Int], IList[Int]](_.tailOption)
+    val endo = k.liftMK[TrampolineT].endo
+    val m = Endomorphic.kleisliEndoInstance[({type λ[α] = TrampolineT[Option, α]})#λ, IList[Int]]
+    m.multiply(endo, a).run.run(IList.fill(a + b)(0)).go.map(_.length) must_=== Option(b)
+  }
 }
 
