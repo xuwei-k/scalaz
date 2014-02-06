@@ -78,6 +78,9 @@ object TrampolineT {
   def done[M[_], A](a: M[A]): TrampolineT[M, A] =
     Done(a)
 
+  def delay[M[_], A](a: => M[A])(implicit M: Applicative[M]): TrampolineT[M, A] =
+    from(M.map(a)(Trampoline.delay(_)))
+
   def more[M[_], A](a: M[Function0[TrampolineT[M, A]]]): TrampolineT[M, A] =
     More(a)
 
