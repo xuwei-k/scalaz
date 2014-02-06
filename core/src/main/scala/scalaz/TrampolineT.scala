@@ -33,10 +33,8 @@ sealed abstract class TrampolineT[M[_], A] {
       }
   }
 
-  final def flatMap[B](f: A => TrampolineT[M, B]): TrampolineT[M, B] = this match {
-    case a @ FlatMap() => bind(a.a)(x => bind(a.f(x))(f))
-    case _             => bind(this)(f)
-  }
+  final def flatMap[B](f: A => TrampolineT[M, B]): TrampolineT[M, B] =
+    bind(this)(f)
 
   final def map[B](f: A => B)(implicit M: Applicative[M]): TrampolineT[M, B] =
     trampolineTMonad[M].map(this)(f)
@@ -79,7 +77,7 @@ object TrampolineT {
     Done(a)
 
   def delay[M[_], A](a: => M[A])(implicit M: Applicative[M]): TrampolineT[M, A] =
-    from(M.map(a)(Trampoline.delay(_)))
+    More(M.point(() => Done(a)))
 
   def more[M[_], A](a: M[Function0[TrampolineT[M, A]]]): TrampolineT[M, A] =
     More(a)
