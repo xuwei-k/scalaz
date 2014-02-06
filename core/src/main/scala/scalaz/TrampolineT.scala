@@ -85,7 +85,7 @@ sealed abstract class TrampolineT[M[_], A] {
 sealed abstract class TrampolineTInstances {
 
   implicit def trampolineTMonad[M[_]](implicit M: Applicative[M]): Monad[({type l[a] = TrampolineT[M, a]})#l] =
-    new Monad[({type l[a] = TrampolineT[M, a]})#l] {
+    new Monad[({type λ[α] = TrampolineT[M, α]})#λ] {
       def point[A](a: => A) =
         done(M.point(a))
 
