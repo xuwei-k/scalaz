@@ -39,7 +39,7 @@ sealed abstract class TrampolineT[M[_], A] {
     bind(this)(f)
 
   final def map[B](f: A => B)(implicit M: Applicative[M]): TrampolineT[M, B] =
-    trampolineTMonad[M].map(this)(f)
+    flatMap(a => Done(M.point(f(a))))
 }
 
 object TrampolineT {
