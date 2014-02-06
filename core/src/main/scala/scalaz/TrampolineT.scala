@@ -59,6 +59,13 @@ object TrampolineT {
         fa flatMap f
     }
 
+  implicit val trampolineTMonadTrans: MonadTrans[TrampolineT] =
+    new MonadTrans[TrampolineT] {
+      implicit def apply[G[_]: Monad] = trampolineTMonad[G]
+
+      def liftM[G[_]: Monad, A](a: G[A]) = done(a)
+    }
+
   implicit def trampolineTEqual[M[_], A](implicit E: Equal[M[A]], M: Bind[M], T: Traverse[M]): Equal[TrampolineT[M, A]] =
     Equal.equalBy(_.go)
 
