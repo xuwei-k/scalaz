@@ -4,44 +4,6 @@ import annotation.tailrec
 import std.function._
 import Free.Trampoline
 
-/** Trampline Monad Transformer */
-sealed abstract class TrampolineT[M[_], A] {
-  import TrampolineT._
-
-  final def toTrampoline(implicit M: Bind[M], T: Traverse[M]): Trampoline[M[A]] =
-    resume(M) match {
-      case \/-(a) => Trampoline.done(a.a)
-      case -\/(b) =>
-        val F = Bind[Trampoline]
-        F.join(
-          F.map(
-            T.traverse(b.a)(x => Trampoline.delay(x().toTrampoline))
-          )(z => F.map(T.sequence(z))(M.join))
-        )
-    }
-
-  final def go(implicit M: Bind[M], T: Traverse[M]): M[A] =
-    toTrampoline.run
-
-  @tailrec
-  private final def resume(implicit M: Functor[M]): More[M, A] \/ Done[M, A] =
-    this match {
-      case a @ Done(_)   => \/-(a)
-      case a @ More(_)   => -\/(a)
-      case a @ FlatMap() => a.a match {
-        case Done(b)       => -\/(More(M.map(b)(x => () => a.f(x))))
-        case More(b)       => -\/(More(M.map(b)(x => Functor[Function0].map(x)(_ flatMap a.f))))
-        case b @ FlatMap() => b.a.flatMap(x => b.f(x) flatMap a.f).resume
-      }
-    }
-
-  final def flatMap[B](f: A => TrampolineT[M, B]): TrampolineT[M, B] =
-    bind(this)(f)
-
-  final def map[B](f: A => B)(implicit M: Applicative[M]): TrampolineT[M, B] =
-    flatMap(a => Done(M.point(f(a))))
-}
-
 object TrampolineT {
 
   private final case class Done[M[_], A](a: M[A]) extends TrampolineT[M, A]
@@ -101,4 +63,43 @@ object TrampolineT {
       val f = f0
     }
 }
+
+/** Trampline Monad Transformer */
+sealed abstract class TrampolineT[M[_], A] {
+  import TrampolineT._
+
+  final def toTrampoline(implicit M: Bind[M], T: Traverse[M]): Trampoline[M[A]] =
+    resume(M) match {
+      case \/-(a) => Trampoline.done(a.a)
+      case -\/(b) =>
+        val F = Bind[Trampoline]
+        F.join(
+          F.map(
+            T.traverse(b.a)(x => Trampoline.delay(x().toTrampoline))
+          )(z => F.map(T.sequence(z))(M.join))
+        )
+    }
+
+  final def go(implicit M: Bind[M], T: Traverse[M]): M[A] =
+    toTrampoline.run
+
+  @tailrec
+  private final def resume(implicit M: Functor[M]): More[M, A] \/ Done[M, A] =
+    this match {
+      case a @ Done(_)   => \/-(a)
+      case a @ More(_)   => -\/(a)
+      case a @ FlatMap() => a.a match {
+        case Done(b)       => -\/(More(M.map(b)(x => () => a.f(x))))
+        case More(b)       => -\/(More(M.map(b)(x => Functor[Function0].map(x)(_ flatMap a.f))))
+        case b @ FlatMap() => b.a.flatMap(x => b.f(x) flatMap a.f).resume
+      }
+    }
+
+  final def flatMap[B](f: A => TrampolineT[M, B]): TrampolineT[M, B] =
+    bind(this)(f)
+
+  final def map[B](f: A => B)(implicit M: Applicative[M]): TrampolineT[M, B] =
+    flatMap(a => Done(M.point(f(a))))
+}
+
 
