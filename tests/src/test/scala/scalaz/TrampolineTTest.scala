@@ -53,5 +53,31 @@ object TrampolineTTest extends SpecLite {
     val bindFunctions = List.fill(n)(functions).flatten
     bindFunctions.foldLeft(x2)(_ flatMap _).go.size must_=== List.fill(n)(2).product
   }
+
+  private val fibResult = 75025
+  private val fibParam = 25
+
+  "fib" ! {
+    def fib(n: Int): TrampolineT[Id.Id, Int] =
+      if (n < 2) TrampolineT.done[Id.Id, Int](n)
+      else TrampolineT.trampolineTMonad[Id.Id].apply2(
+        TrampolineT.suspend(fib(n - 1)),
+        TrampolineT.suspend(fib(n - 2))
+      )(_ + _)
+
+    fib(fibParam).go must_=== fibResult
+  }
+
+  "from" ! {
+    def fib(n: Int): Free.Trampoline[Int] =
+      if (n < 2) Trampoline.done(n)
+      else Apply[Free.Trampoline].apply2(
+        Trampoline.suspend(fib(n - 1)),
+        Trampoline.suspend(fib(n - 2))
+      )(_ + _)
+
+    TrampolineT.from[Id.Id, Int](fib(fibParam)).go must_=== fibResult
+    fib(fibParam).run must_=== fibResult
+  }
 }
 
