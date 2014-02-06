@@ -3,8 +3,9 @@ package scalaz
 import annotation.tailrec
 import std.function._
 import Free.Trampoline
+import TrampolineT._
 
-object TrampolineT {
+object TrampolineT extends TrampolineTInstances {
 
   private final case class Done[M[_], A](a: M[A]) extends TrampolineT[M, A]
   private final case class More[M[_], A](a: M[Function0[TrampolineT[M, A]]]) extends TrampolineT[M, A]
@@ -13,26 +14,6 @@ object TrampolineT {
     val a: TrampolineT[M, B]
     val f: B => TrampolineT[M, A]
   }
-
-  implicit def trampolineTMonad[M[_]](implicit M: Applicative[M]): Monad[({type l[a] = TrampolineT[M, a]})#l] =
-    new Monad[({type l[a] = TrampolineT[M, a]})#l] {
-      def point[A](a: => A) =
-        Done(M.point(a))
-
-      def bind[A, B](fa: TrampolineT[M, A])(f: A => TrampolineT[M, B]) =
-        fa flatMap f
-    }
-
-  implicit val trampolineTMonadTrans: MonadTrans[TrampolineT] =
-    new MonadTrans[TrampolineT] {
-      implicit def apply[G[_]: Monad] = trampolineTMonad[G]
-
-      def liftM[G[_]: Monad, A](a: G[A]) = done(a)
-    }
-
-  implicit def trampolineTEqual[M[_], A](implicit E: Equal[M[A]], M: Bind[M], T: Traverse[M]): Equal[TrampolineT[M, A]] =
-    Equal.equalBy(_.go)
-
   def from[M[_], A](m: M[Trampoline[A]])(implicit M: Applicative[M]): TrampolineT[M, A] = {
     def loop(f: Trampoline[A]): TrampolineT[M, A] = f.resume match{
       case -\/(s) =>
@@ -66,16 +47,15 @@ object TrampolineT {
 
 /** Trampline Monad Transformer */
 sealed abstract class TrampolineT[M[_], A] {
-  import TrampolineT._
 
   final def toTrampoline(implicit M: Bind[M], T: Traverse[M]): Trampoline[M[A]] =
     resume(M) match {
-      case \/-(a) => Trampoline.done(a.a)
-      case -\/(b) =>
+      case \/-(a) => Trampoline.done(a)
+      case -\/(a) =>
         val F = Bind[Trampoline]
         F.join(
           F.map(
-            T.traverse(b.a)(x => Trampoline.delay(x().toTrampoline))
+            T.traverse(a)(x => Trampoline.delay(x().toTrampoline))
           )(z => F.map(T.sequence(z))(M.join))
         )
     }
@@ -84,13 +64,13 @@ sealed abstract class TrampolineT[M[_], A] {
     toTrampoline.run
 
   @tailrec
-  private final def resume(implicit M: Functor[M]): More[M, A] \/ Done[M, A] =
+  final def resume(implicit M: Functor[M]): M[Function0[TrampolineT[M, A]]] \/ M[A] =
     this match {
-      case a @ Done(_)   => \/-(a)
-      case a @ More(_)   => -\/(a)
+      case Done(a)       => \/-(a)
+      case More(a)       => -\/(a)
       case a @ FlatMap() => a.a match {
-        case Done(b)       => -\/(More(M.map(b)(x => () => a.f(x))))
-        case More(b)       => -\/(More(M.map(b)(x => Functor[Function0].map(x)(_ flatMap a.f))))
+        case Done(b)       => -\/(M.map(b)(x => () => a.f(x)))
+        case More(b)       => -\/(M.map(b)(x => Functor[Function0].map(x)(_ flatMap a.f)))
         case b @ FlatMap() => b.a.flatMap(x => b.f(x) flatMap a.f).resume
       }
     }
@@ -102,4 +82,34 @@ sealed abstract class TrampolineT[M[_], A] {
     flatMap(a => Done(M.point(f(a))))
 }
 
+sealed abstract class TrampolineTInstances {
 
+  implicit def trampolineTMonad[M[_]](implicit M: Applicative[M]): Monad[({type l[a] = TrampolineT[M, a]})#l] =
+    new Monad[({type l[a] = TrampolineT[M, a]})#l] {
+      def point[A](a: => A) =
+        done(M.point(a))
+
+      def bind[A, B](fa: TrampolineT[M, A])(f: A => TrampolineT[M, B]) =
+        fa flatMap f
+    }
+
+  implicit val trampolineTHoist: Hoist[TrampolineT] =
+    new Hoist[TrampolineT] {
+      implicit def apply[G[_]: Monad] = trampolineTMonad[G]
+
+      def liftM[G[_]: Monad, A](a: G[A]) = done(a)
+
+      def hoist[M[_], N[_]](f: M ~> N)(implicit M: Monad[M]) =
+        new (({type λ[α] = TrampolineT[M, α]})#λ ~> ({type λ[α] = TrampolineT[N, α]})#λ) {
+          private[this] val G: Functor[({type λ[α] = M[Function0[α]]})#λ] = M.compose[Function0]
+          def apply[A](a: TrampolineT[M, A]) = a.resume match {
+            case \/-(b) => done(f(b))
+            case -\/(b) => more(f(G.map(b)(this.apply)))
+          }
+        }
+    }
+
+  implicit def trampolineTEqual[M[_], A](implicit E: Equal[M[A]], M: Bind[M], T: Traverse[M]): Equal[TrampolineT[M, A]] =
+    Equal.equalBy(_.go)
+
+}
