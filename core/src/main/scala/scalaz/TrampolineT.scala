@@ -82,6 +82,9 @@ object TrampolineT {
   def more[M[_], A](a: M[Function0[TrampolineT[M, A]]]): TrampolineT[M, A] =
     More(a)
 
+  def suspend[M[_], A](a: => TrampolineT[M, A])(implicit M: Applicative[M]): TrampolineT[M, A] =
+    More(M.point(() => a))
+
   def bind[M[_], A, B0](a0: TrampolineT[M, B0])(f0: B0 => TrampolineT[M, A]): TrampolineT[M, A] =
     new FlatMap[M, A] {
       type B = B0
