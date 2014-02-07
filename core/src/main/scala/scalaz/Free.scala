@@ -110,6 +110,15 @@ sealed abstract class Free[S[_], A] {
     runM2(this)
   }
 
+  final def runMTrampoline[M[_]](f: S[Free[S, A]] => M[Free[S, A]])(implicit S: Functor[S], M: Monad[M], T: Traverse[M]): M[A] = {
+    val F = TrampolineT.trampolineTMonad[M]
+    def loop(a: Free[S, A]): TrampolineT[M, A] = a.resume match {
+      case -\/(s) => F.bind(TrampolineT.done(f(s)))(loop)
+      case \/-(r) => F.pure(r)
+    }
+    loop(this).run
+  }
+
   /**
    * Catamorphism for `Free`.
    * Runs to completion, mapping the suspension with the given transformation at each step and
@@ -120,6 +129,9 @@ sealed abstract class Free[S[_], A] {
       case -\/(s) => Monad[M].bind(f(s))(_.foldMap(f))
       case \/-(r) => Monad[M].pure(r)
     }
+
+  final def foldMapTrampoline[M[_]](f: S ~> M)(implicit S: Functor[S], M: Monad[M], T: Traverse[M]): M[A] =
+    runMTrampoline(NaturalTransformation natToFunction f)
 
   import Id._
 

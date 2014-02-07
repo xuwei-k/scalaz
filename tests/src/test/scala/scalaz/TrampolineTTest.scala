@@ -8,7 +8,7 @@ import scalaz.scalacheck.ScalaCheckBinding._
 import FreeTest._
 
 object TrampolineTTest extends SpecLite {
-  
+
   implicit def trampolineTArb[M[_], A](implicit
     M: Arbitrary ~> ({type λ[α] = Arbitrary[M[α]]})#λ,
     N: Functor[M],
@@ -57,7 +57,7 @@ object TrampolineTTest extends SpecLite {
   private val fibResult = 75025
   private val fibParam = 25
 
-  "fib" ! {
+  "fibonacci" ! {
     def fib(n: Int): TrampolineT[Id.Id, Int] =
       if (n < 2) TrampolineT.done[Id.Id, Int](n)
       else TrampolineT.trampolineTMonad[Id.Id].apply2(
@@ -68,16 +68,30 @@ object TrampolineTTest extends SpecLite {
     fib(fibParam).run must_=== fibResult
   }
 
-  "from" ! {
-    def fib(n: Int): Free.Trampoline[Int] =
-      if (n < 2) Trampoline.done(n)
-      else Apply[Free.Trampoline].apply2(
-        Trampoline.suspend(fib(n - 1)),
-        Trampoline.suspend(fib(n - 2))
-      )(_ + _)
+  def fibonacci(n: Int): Free.Trampoline[Int] =
+    if (n < 2) Trampoline.done(n)
+    else Apply[Free.Trampoline].apply2(
+      Trampoline.suspend(fibonacci(n - 1)),
+      Trampoline.suspend(fibonacci(n - 2))
+    )(_ + _)
 
-    TrampolineT.from[Id.Id, Int](fib(fibParam)).run must_=== fibResult
-    fib(fibParam).run must_=== fibResult
+  "from" ! {
+    fibonacci(fibParam).run must_=== fibResult
+    TrampolineT.from[Id.Id, Int](fibonacci(fibParam)).run must_=== fibResult
+  }
+
+  val function0ToId = new (Function0 ~> Id.Id){
+    def apply[A](a: () => A) = a()
+  }
+
+  "Free#foldMapTrampoline" ! {
+    fibonacci(fibParam).foldMap(function0ToId).mustThrowA[StackOverflowError]
+    fibonacci(fibParam).foldMapTrampoline(function0ToId) must_=== fibResult
+  }
+
+  "Free#runMTrampoline" ! {
+    fibonacci(fibParam).runM(identity).mustThrowA[StackOverflowError]
+    fibonacci(fibParam).runMTrampoline(identity) must_=== fibResult
   }
 
   "kleisli" ! {
