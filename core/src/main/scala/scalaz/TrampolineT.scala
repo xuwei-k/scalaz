@@ -73,6 +73,12 @@ sealed abstract class TrampolineT[F[_], A] {
 
   final def map[B](f: A => B)(implicit F: Applicative[F]): TrampolineT[F, B] =
     flatMap(a => Done(F.point(f(a))))
+
+  final def trans[G[_]](f: F ~> G)(implicit F: Functor[F]): TrampolineT[G, A] =
+    resume match {
+      case \/-(a) => Done(f(a))
+      case -\/(a) => More(f(F.map(a)(Functor[Function0].lift(_.trans(f)))))
+    }
 }
 
 sealed abstract class TrampolineTInstances {
@@ -94,11 +100,7 @@ sealed abstract class TrampolineTInstances {
 
       def hoist[M[_], N[_]](f: M ~> N)(implicit M: Monad[M]) =
         new (({type λ[α] = TrampolineT[M, α]})#λ ~> ({type λ[α] = TrampolineT[N, α]})#λ) {
-          private[this] val G: Functor[({type λ[α] = M[Function0[α]]})#λ] = M.compose[Function0]
-          def apply[A](a: TrampolineT[M, A]) = a.resume match {
-            case \/-(b) => done(f(b))
-            case -\/(b) => more(f(G.map(b)(this.apply)))
-          }
+          def apply[A](a: TrampolineT[M, A]) = a.trans(f)
         }
     }
 
