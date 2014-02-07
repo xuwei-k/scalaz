@@ -9,14 +9,14 @@ import FreeTest._
 
 object TrampolineTTest extends SpecLite {
   
-  implicit def coroutineArb[M[_], A](implicit
+  implicit def trampolineTArb[M[_], A](implicit
     M: Arbitrary ~> ({type λ[α] = Arbitrary[M[α]]})#λ,
     N: Functor[M],
     A: Arbitrary[A]
   ): Arbitrary[TrampolineT[M, A]] =
     Arbitrary(Gen.oneOf(
       Functor[Arbitrary].map(M(A))(TrampolineT.done).arbitrary,
-      Functor[Arbitrary].map(M(coroutineArb[M, A]))(x =>
+      Functor[Arbitrary].map(M(trampolineTArb[M, A]))(x =>
         TrampolineT.more(N.map(x)(() => _))
       ).arbitrary
     ))
