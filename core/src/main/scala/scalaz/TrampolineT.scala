@@ -38,7 +38,7 @@ object TrampolineT extends TrampolineTInstances {
     FlatMap(a, f)
 }
 
-/** Trampline Monad Transformer */
+/** Trampoline Monad Transformer */
 sealed abstract class TrampolineT[F[_], A] {
 
   final def toTrampoline(implicit F: Bind[F], T: Traverse[F]): Trampoline[F[A]] =
