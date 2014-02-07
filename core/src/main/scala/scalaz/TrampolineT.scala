@@ -9,11 +9,8 @@ object TrampolineT extends TrampolineTInstances {
 
   private final case class Done[M[_], A](a: M[A]) extends TrampolineT[M, A]
   private final case class More[M[_], A](a: M[Function0[TrampolineT[M, A]]]) extends TrampolineT[M, A]
-  private sealed abstract case class FlatMap[M[_], A]() extends TrampolineT[M, A] {
-    type B
-    val a: TrampolineT[M, B]
-    val f: B => TrampolineT[M, A]
-  }
+  private final case class FlatMap[M[_], A, B](a: TrampolineT[M, B], f: B => TrampolineT[M, A]) extends TrampolineT[M, A]
+
   def from[M[_], A](m: M[Trampoline[A]])(implicit M: Applicative[M]): TrampolineT[M, A] = {
     def loop(f: Trampoline[A]): TrampolineT[M, A] = f.resume match{
       case -\/(s) =>
@@ -37,12 +34,8 @@ object TrampolineT extends TrampolineTInstances {
   def suspend[M[_], A](a: => TrampolineT[M, A])(implicit M: Applicative[M]): TrampolineT[M, A] =
     More(M.point(() => a))
 
-  def bind[M[_], A, B0](a0: TrampolineT[M, B0])(f0: B0 => TrampolineT[M, A]): TrampolineT[M, A] =
-    new FlatMap[M, A] {
-      type B = B0
-      val a = a0
-      val f = f0
-    }
+  def bind[M[_], A, B](a: TrampolineT[M, B])(f: B => TrampolineT[M, A]): TrampolineT[M, A] =
+    FlatMap(a, f)
 }
 
 /** Trampline Monad Transformer */
@@ -60,7 +53,7 @@ sealed abstract class TrampolineT[M[_], A] {
         )
     }
 
-  final def go(implicit M: Bind[M], T: Traverse[M]): M[A] =
+  final def run(implicit M: Bind[M], T: Traverse[M]): M[A] =
     toTrampoline.run
 
   @tailrec
@@ -68,10 +61,10 @@ sealed abstract class TrampolineT[M[_], A] {
     this match {
       case Done(a)       => \/-(a)
       case More(a)       => -\/(a)
-      case a @ FlatMap() => a.a match {
-        case Done(b)       => -\/(M.map(b)(x => () => a.f(x)))
-        case More(b)       => -\/(M.map(b)(x => Functor[Function0].map(x)(_ flatMap a.f)))
-        case b @ FlatMap() => b.a.flatMap(x => b.f(x) flatMap a.f).resume
+      case FlatMap(a, f) => a match {
+        case Done(b)       => -\/(M.map(b)(x => () => f(x)))
+        case More(b)       => -\/(M.map(b)(x => Functor[Function0].map(x)(_ flatMap f)))
+        case FlatMap(b, g) => b.flatMap(g(_) flatMap f).resume
       }
     }
 
@@ -110,6 +103,6 @@ sealed abstract class TrampolineTInstances {
     }
 
   implicit def trampolineTEqual[M[_], A](implicit E: Equal[M[A]], M: Bind[M], T: Traverse[M]): Equal[TrampolineT[M, A]] =
-    Equal.equalBy(_.go)
+    Equal.equalBy(_.run)
 
 }

@@ -41,17 +41,17 @@ object TrampolineTTest extends SpecLite {
     def idFunctions = Iterator.continually((x: Int) => x).take(100000)
 
     val x1 = TrampolineT.done(Option(1))
-    idFunctions.foldLeft(x1)(_ map _).go must_=== Option(1)
+    idFunctions.foldLeft(x1)(_ map _).run must_=== Option(1)
 
     val x2 = TrampolineT.done(List(1))
-    idFunctions.foldLeft(x2)(_ map _).go must_=== List(1)
+    idFunctions.foldLeft(x2)(_ map _).run must_=== List(1)
 
     val f1 = (_: Int) :: Nil
     val f2 = (x: Int) => x :: x :: Nil
     val functions = List(f1, f2).map(f => (x: Int) => TrampolineT.delay(f(x)))
     val n = 16
     val bindFunctions = List.fill(n)(functions).flatten
-    bindFunctions.foldLeft(x2)(_ flatMap _).go.size must_=== List.fill(n)(2).product
+    bindFunctions.foldLeft(x2)(_ flatMap _).run.size must_=== List.fill(n)(2).product
   }
 
   private val fibResult = 75025
@@ -65,7 +65,7 @@ object TrampolineTTest extends SpecLite {
         TrampolineT.suspend(fib(n - 2))
       )(_ + _)
 
-    fib(fibParam).go must_=== fibResult
+    fib(fibParam).run must_=== fibResult
   }
 
   "from" ! {
@@ -76,7 +76,7 @@ object TrampolineTTest extends SpecLite {
         Trampoline.suspend(fib(n - 2))
       )(_ + _)
 
-    TrampolineT.from[Id.Id, Int](fib(fibParam)).go must_=== fibResult
+    TrampolineT.from[Id.Id, Int](fib(fibParam)).run must_=== fibResult
     fib(fibParam).run must_=== fibResult
   }
 
@@ -86,7 +86,7 @@ object TrampolineTTest extends SpecLite {
     val k = Kleisli[Option, IList[Int], IList[Int]](_.tailOption)
     val endo = k.liftMK[TrampolineT].endo
     val m = Endomorphic.kleisliEndoInstance[({type λ[α] = TrampolineT[Option, α]})#λ, IList[Int]]
-    m.multiply(endo, a).run.run(IList.fill(a + b)(0)).go.map(_.length) must_=== Option(b)
+    m.multiply(endo, a).run.run(IList.fill(a + b)(0)).run.map(_.length) must_=== Option(b)
   }
 }
 
