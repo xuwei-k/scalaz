@@ -85,13 +85,13 @@ object TrampolineTTest extends SpecLite {
   }
 
   "Free#foldMapTrampoline" ! {
-    fibonacci(fibParam).foldMap(function0ToId).mustThrowA[StackOverflowError]
+//    fibonacci(fibParam).foldMap(function0ToId).mustThrowA[StackOverflowError]
     fibonacci(fibParam).foldMapTrampoline(function0ToId) must_=== fibResult
   }
 
   "Free#runMTrampoline" ! {
-    fibonacci(fibParam).runM(identity).mustThrowA[StackOverflowError]
-    fibonacci(fibParam).runMTrampoline(identity) must_=== fibResult
+//    fibonacci(fibParam).runM(identity).mustThrowA[StackOverflowError]
+    fibonacci(fibParam).runMTrampoline(identity).apply must_=== fibResult
   }
 
   "kleisli" ! {
