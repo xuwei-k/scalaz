@@ -117,10 +117,12 @@ trait IndexedSeqSubInstances extends IndexedSeqInstances0 with IndexedSeqSub {se
 
 trait IndexedSeqSubFunctions extends IndexedSeqSub {
   @inline private[this] final
-  def lazyFoldRight[A, B](as: IxSq[A], b: => B)(f: (A, => B) => B) = {
-    def rec(ix: Int): B =
-      if (ix >= as.length - 1) b else f(as(ix+1), rec(ix+1))
-    rec(-1)
+  def lazyFoldRight[A, B](as: IxSq[A], b: => B)(f: (A, => B) => B): B = {
+    def rec(ix: Int): Free.Trampoline[B] =
+      if (ix >= as.length - 1) Trampoline.done(b)
+      else Trampoline.suspend(rec(ix+1)).map(f(as(ix+1), _))
+
+    rec(-1).run
   }
 
   /** Intersperse the element `a` between each adjacent pair of elements in `as` */
