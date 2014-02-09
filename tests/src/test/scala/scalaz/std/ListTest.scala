@@ -118,8 +118,6 @@ object ListTest extends SpecLite {
   }
 
   "no stack overflow" should {
-    import Id.Id
-
     def cons[A]: A => IList[A] = (_: A) :: IList.empty[A]
 
     val constTrue: Int => Id[Boolean]  = (_: Int) => true
@@ -129,7 +127,7 @@ object ListTest extends SpecLite {
     val constFalseList = constFalse andThen cons
 
     import syntax.std.list._
-    val a = scala.util.Random.shuffle((1 to 500000).toList)
+    val a = List.range(1, 100000)
 
     "takeWhileM" ! {
       a.takeWhileM(constTrue) must_=== a
@@ -159,12 +157,6 @@ object ListTest extends SpecLite {
     "breakM" ! {
       a.breakM(constFalse) must_=== a.span(constTrue)
       a.breakM(constFalseList) must_=== cons(a.span(constTrue))
-    }
-    "groupWhenM" ! {
-      import syntax.functor._
-      val f = (_: Int) > ( _: Int) * 2
-      a.groupWhenM[Id](f) must_=== a.groupWhen(f)
-      a.groupWhenM(f map cons) must_=== cons(a.groupWhen(f))
     }
   }
 

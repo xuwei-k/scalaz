@@ -108,8 +108,6 @@ object IndexedSeqTest extends SpecLite {
   }
 
   "no stack overflow" should {
-    import Id.Id
-
     def cons[A]: A => IList[A] = (_: A) :: IList.empty[A]
 
     val constTrue: Int => Id[Boolean]  = (_: Int) => true
@@ -119,7 +117,7 @@ object IndexedSeqTest extends SpecLite {
     val constFalseList = constFalse andThen cons
 
     import syntax.std.vector._
-    val a = scala.util.Random.shuffle((1 to 100000).toVector)
+    val a = Vector.range(1, 100000)
 
     "takeWhileM" ! {
       a.takeWhileM(constTrue) must_=== a
@@ -149,12 +147,6 @@ object IndexedSeqTest extends SpecLite {
     "breakM" ! {
       a.breakM(constFalse) must_=== a.span(constTrue)
       a.breakM(constFalseList) must_=== cons(a.span(constTrue))
-    }
-    "groupWhenM" ! {
-      import syntax.functor._
-      val f = (_: Int) > ( _: Int) * 2
-      a.groupWhenM[Id](f) must_=== a.groupWhen(f)
-      a.groupWhenM(f map cons) must_=== cons(a.groupWhen(f))
     }
   }
 
