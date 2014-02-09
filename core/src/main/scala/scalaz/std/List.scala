@@ -161,10 +161,18 @@ trait ListFunctions {
   /** Run `p(a)`s and collect `as` while `p` yields true.  Don't run
     * any `p`s after the first false.
     */
-  final def takeWhileM[A, M[_] : Monad](as: List[A])(p: A => M[Boolean]): M[List[A]] = as match {
-    case Nil    => Monad[M].point(Nil)
-    case h :: t => Monad[M].bind(p(h))(b =>
-      if (b) Monad[M].map(takeWhileM(t)(p))((tt: List[A]) => h :: tt) else Monad[M].point(Nil))
+  final def takeWhileM[A, M[_]](as: List[A])(p: A => M[Boolean])(implicit M: Monad[M]): M[List[A]] = {
+    def go(list: List[A]): Free.Trampoline[M[List[A]]] = list match {
+      case Nil    => Trampoline.done(M.point(Nil: List[A]))
+      case h :: t =>
+        Trampoline.suspend(go(t)).map(x =>
+          M.bind(p(h))(b =>
+            if(b) M.map(x)(h :: _)
+            else M.point(Nil)
+          )
+        )
+    }
+    go(as).run
   }
 
   /** Run `p(a)`s and collect `as` while `p` yields false.  Don't run
@@ -179,10 +187,17 @@ trait ListFunctions {
   /** Run `p(a)`s left-to-right until it yields a true value,
     * answering `Some(that)`, or `None` if nothing matched `p`.
     */
-  final def findM[A, M[_] : Monad](as: List[A])(p: A => M[Boolean]): M[Option[A]] = as match {
-    case Nil    => Monad[M].point(None: Option[A])
-    case h :: t => Monad[M].bind(p(h))(b =>
-      if (b) Monad[M].point(Some(h): Option[A]) else findM(t)(p))
+  final def findM[A, M[_]](as: List[A])(p: A => M[Boolean])(implicit M: Monad[M]): M[Option[A]] = {
+    def go(list: List[A]): Free.Trampoline[M[Option[A]]] = list match {
+      case Nil    => Trampoline.done(M.point(None: Option[A]))
+      case h :: t =>
+        Trampoline.suspend(go(t)).map(x =>
+          M.bind(p(h))(b =>
+            if (b) M.point(Some(h): Option[A]) else x
+          )
+        )
+    }
+    go(as).run
   }
 
   final def powerset[A](as: List[A]): List[List[A]] = {
@@ -192,23 +207,31 @@ trait ListFunctions {
   }
 
   /** A pair of passing and failing values of `as` against `p`. */
-  final def partitionM[A, M[_]](as: List[A])(p: A => M[Boolean])(implicit F: Applicative[M]): M[(List[A], List[A])] = as match {
-    case Nil    => F.point(Nil: List[A], Nil: List[A])
-    case h :: t =>
-      F.ap(partitionM(t)(p))(F.map(p(h))(b => {
+  final def partitionM[A, M[_]](as: List[A])(p: A => M[Boolean])(implicit F: Applicative[M]): M[(List[A], List[A])] = {
+    val M = Applicative[Free.Trampoline].compose(F)
+    def go(list: List[A]): Free.Trampoline[M[(List[A], List[A])]] = list match {
+      case Nil    => Trampoline.done(F.point(Nil: List[A], Nil: List[A]))
+      case h :: t =>
+        M.ap(go(t))(M.map(Trampoline.delay(p(h)))(b => {
           case (x, y) => if (b) (h :: x, y) else (x, h :: y)
-      }))
+        }))
+    }
+    go(as).run
   }
 
   /** A pair of the longest prefix of passing `as` against `p`, and
     * the remainder. */
-  final def spanM[A, M[_] : Monad](as: List[A])(p: A => M[Boolean]): M[(List[A], List[A])] = as match {
-    case Nil    => Monad[M].point(Nil, Nil)
-    case h :: t =>
-      Monad[M].bind(p(h))(b =>
-        if (b) Monad[M].map(spanM(t)(p))((k: (List[A], List[A])) => (h :: k._1, k._2))
-        else Monad[M].point(Nil, as))
-
+  final def spanM[A, M[_]](as: List[A])(p: A => M[Boolean])(implicit M: Monad[M]): M[(List[A], List[A])] = {
+    def go(list: List[A]): Free.Trampoline[M[(List[A], List[A])]] = list match {
+      case Nil    => Trampoline.done(M.point((Nil, Nil)))
+      case h :: t =>
+        Trampoline.suspend(go(t)).map(x =>
+          M.bind(p(h))(b =>
+            if (b) M.map(x)(k => (h :: k._1, k._2))
+            else M.point(Nil, list))
+        )
+    }
+    go(as).run
   }
 
   /** `spanM` with `p`'s complement. */

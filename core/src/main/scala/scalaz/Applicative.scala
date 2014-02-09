@@ -50,11 +50,17 @@ trait Applicative[F[_]] extends Apply[F] { self =>
     listInstance.sequence_(List.fill(n)(fa))(this)
 
   /** Filter `l` according to an applicative predicate. */
-  def filterM[A](l: List[A])(f: A => F[Boolean]): F[List[A]] =
-    l match {
-      case Nil => point(List())
-      case h :: t => ap(filterM(t)(f))(map(f(h))(b => t => if (b) h :: t else t))
+  def filterM[A](l: List[A])(f: A => F[Boolean]): F[List[A]] = {
+    val F = Applicative[Free.Trampoline].compose(this)
+    def go(list: List[A]): Free.Trampoline[F[List[A]]] = list match {
+      case Nil => Trampoline.done(point(Nil))
+      case h :: t =>
+        F.ap(go(t))(
+          F.map(Trampoline.delay(f(h)))(b => t => if (b) h :: t else t)
+        )
     }
+    go(l).run
+  }
 
   /**The composition of Applicatives `F` and `G`, `[x]F[G[x]]`, is an Applicative */
   def compose[G[_]](implicit G0: Applicative[G]): Applicative[({type λ[α] = F[G[α]]})#λ] = new CompositionApplicative[F, G] {
