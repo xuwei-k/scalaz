@@ -53,7 +53,7 @@ object ListTest extends SpecLite {
       val strlen = (_ : String).length
       (a groupBy strlen) must_===((a groupBy1 strlen) mapValues (_.list))
   }
-  
+
   "groupWhen.flatten is identity" ! forAll {
     (a: List[Int], p: (Int, Int) => Boolean) =>
       a.groupWhen(p).flatten must_===(a)
@@ -115,6 +115,57 @@ object ListTest extends SpecLite {
       val f = (_: Int) + 1
       xs.mapAccumRight(List[Int](), (c: List[Int], a) =>
         (c :+ a, f(a))) must_===(xs.reverse, xs.map(f))
+  }
+
+  "no stack overflow" should {
+    import Id.Id
+
+    def cons[A]: A => IList[A] = (_: A) :: IList.empty[A]
+
+    val constTrue: Int => Id[Boolean]  = (_: Int) => true
+    val constFalse: Int => Id[Boolean] = (_: Int) => false
+
+    val constTrueList  = constTrue andThen cons
+    val constFalseList = constFalse andThen cons
+
+    import syntax.std.list._
+    val a = scala.util.Random.shuffle((1 to 500000).toList)
+
+    "takeWhileM" ! {
+      a.takeWhileM(constTrue) must_=== a
+      a.takeWhileM(constTrueList) must_=== cons(a)
+    }
+    "takeUntilM" ! {
+      a.takeUntilM(constFalse) must_=== a
+      a.takeUntilM(constFalseList) must_=== cons(a)
+    }
+    "filterM" ! {
+      a.filterM(constTrue) must_=== a
+      a.filterM(constTrueList) must_=== cons(a)
+    }
+    "findM" ! {
+      a.findM(constFalse) must_=== None
+      a.findM(constFalseList) must_=== cons(None)
+    }
+    "partitionM" ! {
+      val f = (_: Int) % 3 == 0
+      a.partitionM[Id](f) must_=== a.partition(f)
+      a.partitionM(f andThen cons) must_=== cons(a.partition(f))
+    }
+    "spanM" ! {
+      a.spanM(constTrue) must_=== a.span(constTrue)
+      a.spanM(constTrueList) must_=== cons(a.span(constTrue))
+    }
+    "breakM" ! {
+      a.breakM(constFalse) must_=== a.span(constTrue)
+      a.breakM(constFalseList) must_=== cons(a.span(constTrue))
+    }
+    "groupWhenM" ! {
+      import syntax.functor._
+      val f = (_: Int) > ( _: Int) * 2
+      a.groupWhenM[Id](f) must_=== a.groupWhen(f)
+      a.groupWhenM(f map cons) must_=== cons(a.groupWhen(f))
+    }
   }
 
 }
