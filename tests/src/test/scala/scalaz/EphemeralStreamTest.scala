@@ -8,6 +8,8 @@ import org.scalacheck.Prop.forAll
 
 object EphemeralStreamTest extends SpecLite {
 
+  override def maxSize = Some(5)
+
   checkAll(equal.laws[EphemeralStream[Int]])
   checkAll(monadPlus.strongLaws[EphemeralStream])
   checkAll(traverse.laws[EphemeralStream])

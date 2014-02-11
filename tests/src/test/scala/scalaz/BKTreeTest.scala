@@ -11,6 +11,8 @@ import org.scalacheck.Prop.forAll
 object BKTreeTest extends SpecLite {
   implicit val IntArb = Arbitrary[Int](Gen.choose(Int.MinValue / 4, Int.MaxValue / 4))
 
+  override def maxSize = Some(20)
+
   "string distance" in {
     BKTree[String]("kitten").containsApproximate("sitting", 3)
   }

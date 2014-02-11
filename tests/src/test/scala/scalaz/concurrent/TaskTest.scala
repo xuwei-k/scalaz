@@ -12,6 +12,8 @@ import org.scalacheck.Prop.forAll
 
 object TaskTest extends SpecLite {
 
+  override def maxSize = Some(5)
+
   val N = 10000
   val correct = (0 to N).sum
   val LM = Monad[List]; import LM.monadSyntax._;

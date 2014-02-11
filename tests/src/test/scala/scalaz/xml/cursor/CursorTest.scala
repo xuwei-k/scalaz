@@ -9,6 +9,7 @@ import Cursor._
 import org.scalacheck.Prop.forAll
 
 object CursorTest extends SpecLite {
+  override def maxSize = Some(5)
   checkAll(equal.laws[Cursor])
   checkAll(lens.laws(currentCursorL))
   checkAll(lens.laws(leftsCursorL))

@@ -9,6 +9,8 @@ import org.scalacheck.Prop.forAll
 object ListTTest extends SpecLite {
   type ListTOpt[A] = ListT[Option, A]
 
+  override def maxSize = Some(20)
+
   "fromList / toList" ! forAll {
     (ass: List[List[Int]]) =>
       ListT.fromList(ass).toList must_===(ass)
@@ -25,12 +27,12 @@ object ListTTest extends SpecLite {
       val isEmpty = filtered.isEmpty
       isEmpty.toList.forall(identity)
   }
-  
+
   "drop" ! forAll {
     (ass: Option[List[Int]], x: Int) =>
       ListT.fromList(ass).drop(x).toList must_===(ass.map(_.drop(x)))
   }
-  
+
   "take" ! forAll {
     (ass: Option[List[Int]], x: Int) =>
       ListT.fromList(ass).take(x).toList must_===(ass.map(_.take(x)))
@@ -67,6 +69,6 @@ object ListTTest extends SpecLite {
     def functor[F[_]: Functor, A] = Functor[({type λ[α]=ListT[F, α]})#λ]
 
     // checking absence of ambiguity
-    def functor[F[_]: Monad, A] = Functor[({type λ[α]=ListT[F, α]})#λ]  
+    def functor[F[_]: Monad, A] = Functor[({type λ[α]=ListT[F, α]})#λ]
   }
 }

@@ -10,6 +10,9 @@ import org.scalacheck.Prop
 import org.scalacheck.Prop.forAll
 
 object OneAndTest extends SpecLite {
+
+  override def maxSize = Some(5)
+
   type OneAndOption[A] = OneAnd[Option, A]
   type OneAndList[A] = OneAnd[List, A]
   type OneAndNel[A] = OneAnd[NonEmptyList, A]

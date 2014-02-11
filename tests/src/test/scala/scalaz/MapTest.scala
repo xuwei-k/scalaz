@@ -15,6 +15,16 @@ object MapTest extends SpecLite {
   import std.tuple._
   import syntax.std.option._
 
+  override def maxSize = Some(100)
+
+  // https://issues.scala-lang.org/browse/SI-8264
+  def workaround_SI8264[A](a: => A): Boolean = {
+    if(scala.util.Properties.versionString.replace("version ","") != "2.11.0-M8") {
+      a
+      true
+    } else true
+  }
+
   import ==>>._
 
   def structurallySound[A: Order: Show, B: Equal: Show](m: A ==>> B) = {
@@ -245,7 +255,9 @@ object MapTest extends SpecLite {
     }
 
     "produce right keyset" ! forAll {(a: Int ==>> Int, b: Int ==>> Int) =>
+      workaround_SI8264{
       (a \\ b).keySet must_== (a.keySet diff b.keySet)
+      }
     }
 
     "be an inverse" ! forAll {(a: Int ==>> Int) =>
@@ -555,14 +567,16 @@ object MapTest extends SpecLite {
     checkAll("conjunction", semigroup.laws[(Int ==>> Int) @@ Tags.Conjunction])
   }
 
-  "align" ! forAll { (a: Int ==>> String, b: Int ==>> Long) =>
+  "align" ! forAll { (a: Int ==>> Byte, b: Int ==>> Long) =>
+
+  workaround_SI8264{
     import std.set._, \&/._
     val F = Align[({type λ[α] = Int ==>> α})#λ]
     val x = F.align(a, b)
     val keysA = a.keySet
     val keysB = b.keySet
 
-    x must_=== F.alignWith[String, Long, String \&/ Long](conforms)(a, b)
+    x must_=== F.alignWith[Byte, Long, Byte \&/ Long](conforms)(a, b)
     x.keySet must_=== (keysA ++ keysB)
 
     x.filter(_.isThis).keySet must_=== (keysA -- keysB)
@@ -572,6 +586,8 @@ object MapTest extends SpecLite {
     x.filter(_.isThis) must_=== a.filterWithKey((k, _) => ! keysB(k)).map(This(_))
     x.filter(_.isThat) must_=== b.filterWithKey((k, _) => ! keysA(k)).map(That(_))
     x.filter(_.isBoth) must_=== a.filterWithKey((k, _) => keysB(k)).mapWithKey((k, v) => Both(v, b.lookup(k).get))
+  }
+
   }
 
   type IntMap[A] = Int ==>> A

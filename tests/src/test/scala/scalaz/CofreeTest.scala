@@ -12,6 +12,8 @@ import Isomorphism._
 
 object CofreeTest extends SpecLite {
 
+  override def maxSize = Some(5)
+
   type CofreeLazyOption[A] = Cofree[LazyOption, A]
   type CofreeStream[A] = Cofree[Stream, A]
   type OneAndStream[A] = OneAnd[Stream, A]

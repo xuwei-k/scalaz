@@ -6,6 +6,9 @@ import scalaz.std.AllInstances._
 import org.scalacheck.Prop.forAll
 
 object HeapTest extends SpecLite {
+
+  override def maxSize = Some(5)
+
   checkAll(equal.laws[Heap[Int]])
   checkAll(monoid.laws[Heap[Int]])
   checkAll(foldable.laws[Heap])

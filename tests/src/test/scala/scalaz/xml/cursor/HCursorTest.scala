@@ -9,6 +9,7 @@ import HCursor._
 import org.scalacheck.Prop.forAll
 
 object HCursorTest extends SpecLite {
+  override def maxSize = Some(10)
   checkAll(equal.laws[HCursor])
   checkAll(lens.laws(historyHCursorL))
   checkAll(lens.laws(cursorHCursorL))

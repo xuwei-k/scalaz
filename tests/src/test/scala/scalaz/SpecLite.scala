@@ -4,6 +4,37 @@ import org.scalacheck._
 import org.scalacheck.Prop.Result
 import org.scalacheck.Gen.Parameters
 
+object SpecLite {
+  import scala.collection.mutable
+
+  private case class CurrentTest(name: String, startTime: Long)
+  @volatile private var current: Option[CurrentTest] = None
+  private val m = new mutable.HashMap[String, Long]()
+
+  def printTestTimes(): Unit = {
+    println()
+    m.toList.sortBy(_._2).foreach{ case (n, t) => println((t / 1000000.0, n)) }
+    println()
+    m.clear()
+  }
+
+  private def change(test: SpecLite){
+    val name = test.getClass.getName
+    synchronized{
+      current.map{ pre =>
+        val t = System.nanoTime - pre.startTime
+        m += ((pre.name, t))
+        val time = t / 1000000.0
+        println("\n ------ stop ------ " + pre.name + " " + time + "\n")
+      }.getOrElse{
+        m.clear()
+      }
+      current = Some(CurrentTest(name, System.nanoTime))
+    }
+    println("\n ------ start ------ " + name + "\n")
+  }
+}
+
 abstract class SpecLite extends Properties("") {
   def updateName: Unit = {
     val f = classOf[Properties].getDeclaredField("name")
@@ -12,22 +43,44 @@ abstract class SpecLite extends Properties("") {
   }
   updateName
 
+  def maxSize: Option[Int] = None
+
+  SpecLite.change(this)
+
+  private def contramapProp(prop: Prop)(f: Parameters => Parameters): Prop =
+    Prop(params => prop(f(params)))
+
+  private def resizeProp(name: String, prop: Prop): Prop = {
+    if(name contains "sequential fusion") {
+      prop
+    }else{
+      maxSize.map(max =>
+        contramapProp(prop)(_.withSize(scala.util.Random.nextInt(max)))
+      ).getOrElse(prop)
+    }
+  }
+
+  override def properties: Seq[(String, Prop)] =
+    super.properties.map{ case (name, prop) =>
+      name -> resizeProp(name, prop)
+    }
+
   def checkAll(name: String, props: Properties) {
     for ((name2, prop) <- props.properties) yield {
-      property(name + ":" + name2) = prop
+      property(name + ":" + name2) = resizeProp(name, prop)
     }
   }
 
   def checkAll(props: Properties) {
     for ((name, prop) <- props.properties) yield {
-      property(name) = prop
+      property(name) = resizeProp(name, prop)
     }
   }
 
   class PropertyOps(props: Properties) {
     def withProp(propName: String, prop: Prop) = new Properties(props.name) {
-      for {(name, p) <- props.properties} property(name) = p
-      property(propName) = prop
+      for {(name, p) <- props.properties} property(name) = resizeProp(name, p)
+      property(propName) = resizeProp(propName, prop)
     }
   }
 

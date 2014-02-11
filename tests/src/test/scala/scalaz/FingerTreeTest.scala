@@ -15,6 +15,7 @@ import org.scalacheck.Prop
 import org.scalacheck.Prop.forAll
 
 object FingerTreeTest extends SpecLite {
+  override def maxSize = Some(10)
   type SequenceTree[A] = FingerTree[Int, A]
   implicit def SizeReducer[A]: Reducer[A, Int] = UnitReducer(x => 1)
   import FingerTree._

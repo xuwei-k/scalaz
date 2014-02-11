@@ -11,6 +11,8 @@ import org.scalacheck.Prop.forAll
 
 object RopeTest extends SpecLite {
 
+  override def maxSize = Some(5)
+
   import Rope._
 
   checkAll(equal.laws[Rope[Int]])

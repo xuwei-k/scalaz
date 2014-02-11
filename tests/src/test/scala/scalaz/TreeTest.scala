@@ -8,6 +8,8 @@ import org.scalacheck.Prop.forAll
 
 object TreeTest extends SpecLite {
 
+  override def maxSize = Some(5)
+
   checkAll("Tree", equal.laws[Tree[Int]])
   checkAll("Tree", traverse1.laws[Tree])
   checkAll("Tree", applicative.laws[Tree])

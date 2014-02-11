@@ -7,6 +7,8 @@ import org.scalacheck.Prop.forAll
 
 object TreeLocTest extends SpecLite {
 
+  override def maxSize = Some(5)
+
   checkAll("TreeLoc", equal.laws[TreeLoc[Int]])
 
   {

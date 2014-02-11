@@ -8,6 +8,7 @@ import Element._
 import org.scalacheck.Prop.forAll
 
 object ElementTest extends SpecLite {
+  override def maxSize = Some(5)
   checkAll(equal.laws[Element])
   checkAll(lens.laws(nameElementL))
   checkAll(lens.laws(attribsElementL))
