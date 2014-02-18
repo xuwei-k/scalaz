@@ -52,8 +52,9 @@ sealed abstract class IList[A] extends Product with Serializable {
     @tailrec def go(as: IList[A], acc: IList[B]): IList[B] =
       as match {
         case ICons(h, t) =>
-          if(pf isDefinedAt h) go(t, ICons(pf(h), acc))
-          else go(t, acc)
+          val x = pf.applyOrElse(h, IList.fallback_pf)
+          if(x.asInstanceOf[AnyRef] eq IList.fallback_pf) go(t, acc)
+          else go(t, ICons(x.asInstanceOf[B], acc))
         case INil() => acc
       }
     go(this, empty).reverse
@@ -447,6 +448,8 @@ final case class INil[A]() extends IList[A]
 final case class ICons[A](head: A, tail: IList[A]) extends IList[A]
 
 object IList extends IListInstances with IListFunctions{
+  private val fallback_pf: PartialFunction[Any, Any] = { case _ => fallback_pf }
+
   private[this] val nil: IList[Nothing] = INil()
 
   def apply[A](as: A*): IList[A] =

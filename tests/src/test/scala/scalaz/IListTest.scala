@@ -134,8 +134,11 @@ object IListTest extends SpecLite {
   }
 
   "collect" ! forAll { (ns: IList[Int]) =>
-    val pf: PartialFunction[Int, Int] = { case n if n % 2 == 0 => n + 1 }
-    ns.collect(pf).toList must_=== ns.toList.collect(pf)
+    var sideEffects = 0
+    val pf: PartialFunction[Int, Int] = { case n if {sideEffects += 1; n % 2 == 0} => n + 1 }
+    val x = ns.collect(pf).toList
+    sideEffects must_=== ns.length
+    x must_=== ns.toList.collect(pf)
   }
 
   "collectFirst" ! forAll { (ns: IList[Int]) =>
