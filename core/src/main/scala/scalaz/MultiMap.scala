@@ -43,9 +43,12 @@ final case class MultiMap[A, B] private (run: A ==>> ISet[B]) {
 
   def valuesNel: List[NonEmptyList[B]] =
     run.values.map{ set =>
-      val (b, bs) = set.deleteFindMin
-      bs.foldLeft(NonEmptyList.nel(b, Nil))((acc, b) => b <:: acc)
+      val (b, bs) = set.deleteFindMax
+      bs.foldRight(NonEmptyList.nel(b, Nil))(_ <:: _)
     }
+
+  override def toString =
+    run.toList.view.map{ case (k, v) => k -> ISet.setShow(Show.showA).shows(v) }.mkString("MultiMap(", ", ", ")")
 
   def foldLeft[C](z: C)(f: (C, B) => C): C =
     run.foldlWithKey(z)((acc, _, set) => set.foldl(acc)(f))
