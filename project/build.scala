@@ -47,7 +47,7 @@ object build extends Build {
 
   lazy val standardSettings: Seq[Sett] = Defaults.defaultSettings ++ sbtrelease.ReleasePlugin.releaseSettings ++ Seq[Sett](
     organization := "org.scalaz",
-
+    incOptions := incOptions.value.withNameHashing(true),
     scalaVersion := "2.10.4",
     crossScalaVersions := Seq("2.9.3", "2.10.4", "2.11.0-RC4"),
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),

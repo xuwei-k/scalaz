@@ -1,10 +1,19 @@
 language: scala
 scala:
   - 2.11.0-RC4
+  - 2.11.0-RC3
   - 2.10.4
   - 2.9.3
 jdk:
   - oraclejdk7
-  - openjdk6
 
-script: sbt ++$TRAVIS_SCALA_VERSION check-gen-type-classes test
+script: sbt -sbt-version $SBT_VERSION ++$TRAVIS_SCALA_VERSION compile "test:compile"
+
+env:
+  - SBT_VERSION=0.13.2-M1
+  - SBT_VERSION=0.13.2-M2
+  - SBT_VERSION=0.13.2-M3
+  - SBT_VERSION=0.13.2-RC1
+  - SBT_VERSION=0.13.5-M1
+  - SBT_VERSION=0.13.5-M2
+
