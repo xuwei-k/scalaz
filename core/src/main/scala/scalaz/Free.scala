@@ -346,10 +346,7 @@ trait FreeFunctions {
 
   /** Interpret a free monad over a free functor of `S` via natural transformation to monad `M`. */
   def runFC[S[_], M[_], A](sa: FreeC[S, A])(interp: S ~> M)(implicit M: Monad[M]): M[A] =
-    sa.foldMap[M](new (({type λ[α] = Coyoneda[S, α]})#λ ~> M) {
-      def apply[A](cy: Coyoneda[S, A]): M[A] =
-        M.map(interp(cy.fi))(cy.k)
-      })
+    sa.foldMap[M](NaturalTransformation[({type λ[α] = Coyoneda[S, α]})#λ, M](_(cy => M.map(interp(cy.fi))(cy.k))))
 
   /** A trampoline step that doesn't do anything. */
   def pause: Trampoline[Unit] =

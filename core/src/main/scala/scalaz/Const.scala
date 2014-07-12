@@ -65,7 +65,7 @@ object Const extends ConstInstances with ConstFunctions
 sealed trait ConstFunctions {
   /** A properly universally quantified constant function. */
   def const[A](a: A): Function0 ~> ({type l[_] = A})#l =
-    new (Function0 ~> ({type l[_] = A})#l) {
-      override def apply[B](fa: Function0[B]): A = a
-    }
+    NaturalTransformation[Function0, ({type l[_] = A})#l](
+      _(fa => a)
+    )
 }

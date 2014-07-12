@@ -36,6 +36,12 @@ trait NaturalTransformations {
     def apply[A](fa: F[A]) = fa
   }
 
+  def apply[F[_], G[_]](cps: Forall.CPS[({type λ[α] = F[α] => G[α]})#λ]): F ~> G =
+    new (F ~> G){
+      def apply[A](g: F[A]) =
+        Forall[({type λ[α] = F[α] => G[α]})#λ](cps).apply(g)
+    }
+
   /** Reify a `NaturalTransformation`. */
   implicit def natToFunction[F[_], G[_], A](f: F ~> G): F[A] => G[A] = x => f(x)
 }
