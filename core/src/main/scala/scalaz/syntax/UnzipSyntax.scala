@@ -1,8 +1,11 @@
 package scalaz
 package syntax
 
+import spire.macrosk.Ops
+import scala.language.experimental.macros
+
 /** Wraps a value `self` and provides methods related to `Unzip` */
-final class UnzipOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Unzip[F]) extends Ops[F[A]] {
+final class UnzipOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Unzip[F]) {
   ////
   ////
 }

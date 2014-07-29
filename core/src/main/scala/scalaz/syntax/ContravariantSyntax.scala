@@ -1,8 +1,11 @@
 package scalaz
 package syntax
 
+import spire.macrosk.Ops
+import scala.language.experimental.macros
+
 /** Wraps a value `self` and provides methods related to `Contravariant` */
-final class ContravariantOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Contravariant[F]) extends Ops[F[A]] {
+final class ContravariantOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Contravariant[F]) {
   ////
   final def contramap[B](f: B => A): F[B] = F.contramap(self)(f)
   final def ∙[B](f: B => A): F[B] = F.contramap(self)(f)

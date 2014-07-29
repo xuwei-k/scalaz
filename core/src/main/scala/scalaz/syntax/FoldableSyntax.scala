@@ -1,8 +1,11 @@
 package scalaz
 package syntax
 
+import spire.macrosk.Ops
+import scala.language.experimental.macros
+
 /** Wraps a value `self` and provides methods related to `Foldable` */
-final class FoldableOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Foldable[F]) extends Ops[F[A]] {
+final class FoldableOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Foldable[F]) {
   ////
   import collection.generic.CanBuildFrom
   import collection.immutable.IndexedSeq

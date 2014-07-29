@@ -1,8 +1,11 @@
 package scalaz
 package syntax
 
+import spire.macrosk.Ops
+import scala.language.experimental.macros
+
 /** Wraps a value `self` and provides methods related to `Profunctor` */
-final class ProfunctorOps[F[_, _],A, B] private[syntax](val self: F[A, B])(implicit val F: Profunctor[F]) extends Ops[F[A, B]] {
+final class ProfunctorOps[F[_, _],A, B] private[syntax](val self: F[A, B])(implicit val F: Profunctor[F]) {
   ////
 
   final def ^>>[C](f: C => A): F[C, B] =

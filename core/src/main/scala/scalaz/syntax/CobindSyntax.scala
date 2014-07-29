@@ -1,8 +1,11 @@
 package scalaz
 package syntax
 
+import spire.macrosk.Ops
+import scala.language.experimental.macros
+
 /** Wraps a value `self` and provides methods related to `Cobind` */
-final class CobindOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Cobind[F]) extends Ops[F[A]] {
+final class CobindOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Cobind[F]) {
   ////
   final def cojoin: F[F[A]] = F.cojoin(self)
   final def coflatten: F[F[A]] = F.cojoin(self)

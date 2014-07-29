@@ -4,8 +4,11 @@ package effect
 
 import scalaz.effect.MonadIO
 
+import spire.macrosk.Ops
+import scala.language.experimental.macros
+
 /** Wraps a value `self` and provides methods related to `MonadIO` */
-final class MonadIOOps[F[_],A] private[syntax](val self: F[A])(implicit val F: MonadIO[F]) extends Ops[F[A]] {
+final class MonadIOOps[F[_],A] private[syntax](val self: F[A])(implicit val F: MonadIO[F]) {
   ////
 
   ////

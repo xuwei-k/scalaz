@@ -1,8 +1,11 @@
 package scalaz
 package syntax
 
+import spire.macrosk.Ops
+import scala.language.experimental.macros
+
 /** Wraps a value `self` and provides methods related to `Functor` */
-final class FunctorOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Functor[F]) extends Ops[F[A]] {
+final class FunctorOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Functor[F]) {
   ////
   import Leibniz.===
 
@@ -37,13 +40,15 @@ trait ToFunctorOps extends ToFunctorOps0 with ToInvariantFunctorOps {
   implicit def ToLiftV[F[_], A, B](v: A => B) = new LiftV[F, A, B] { def self = v }
 
   // TODO Duplication
-  trait LiftV[F[_], A, B] extends Ops[A => B] {
+  trait LiftV[F[_], A, B] {
+    def self: A => B
     def lift(implicit F: Functor[F]) = F.lift(self)
   }
 
   implicit def ToFunctorIdV[A](v: A) = new FunctorIdV[A] { def self = v }
 
-  trait FunctorIdV[A] extends Ops[A] {
+  trait FunctorIdV[A] {
+    def self: A
     def mapply[F[_], B](f: F[A => B])(implicit F: Functor[F]): F[B] =
       F.map(f)(fab => fab(self))
   }
@@ -59,7 +64,8 @@ trait FunctorSyntax[F[_]] extends InvariantFunctorSyntax[F] {
     def self = v
   }
 
-  trait LiftV[A,B] extends Ops[A => B] {
+  trait LiftV[A,B] {
+    def self: A => B
     def lift = F.lift(self)
   }
   ////

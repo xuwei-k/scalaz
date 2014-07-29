@@ -4,8 +4,11 @@ package effect
 
 import scalaz.effect.LiftIO
 
+import spire.macrosk.Ops
+import scala.language.experimental.macros
+
 /** Wraps a value `self` and provides methods related to `LiftIO` */
-final class LiftIOOps[F[_],A] private[syntax](val self: F[A])(implicit val F: LiftIO[F]) extends Ops[F[A]] {
+final class LiftIOOps[F[_],A] private[syntax](val self: F[A])(implicit val F: LiftIO[F]) {
   ////
   
   ////

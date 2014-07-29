@@ -1,8 +1,11 @@
 package scalaz
 package syntax
 
+import spire.macrosk.Ops
+import scala.language.experimental.macros
+
 /** Wraps a value `self` and provides methods related to `Split` */
-final class SplitOps[F[_, _],A, B] private[syntax](val self: F[A, B])(implicit val F: Split[F]) extends Ops[F[A, B]] {
+final class SplitOps[F[_, _],A, B] private[syntax](val self: F[A, B])(implicit val F: Split[F]) {
   ////
   final def -*-[C, D](k: F[C, D]): F[(A, C), (B, D)] =
     F.split(self, k)

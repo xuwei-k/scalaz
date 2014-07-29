@@ -1,12 +1,15 @@
 package scalaz
 package syntax
 
-/** Wraps a value `self` and provides methods related to `Semigroup` */
-final class SemigroupOps[F] private[syntax](val self: F)(implicit val F: Semigroup[F]) extends Ops[F] {
+import spire.macrosk.Ops
+import scala.language.experimental.macros
+
+/** Wraps a value `lhs` and provides methods related to `Semigroup` */
+final class SemigroupOps[F] private[syntax](lhs: F)(implicit val F: Semigroup[F]) {
   ////
-  final def |+|(other: => F): F = F.append(self, other)
-  final def mappend(other: => F): F = F.append(self, other)
-  final def ⊹(other: => F): F = F.append(self, other)
+  final def |+|(other: => F): F = F.append(lhs, other)
+  final def mappend(other: => F): F = F.append(lhs, other)
+  final def ⊹(rhs: => F): F = macro Ops.binop[F, F]
   ////
 }
 
@@ -20,7 +23,7 @@ trait ToSemigroupOps  {
 
 trait SemigroupSyntax[F]  {
   implicit def ToSemigroupOps(v: F): SemigroupOps[F] = new SemigroupOps[F](v)(SemigroupSyntax.this.F)
-  
+
   def F: Semigroup[F]
   ////
   def mappend(f1: F, f2: => F)(implicit F: Semigroup[F]): F = F.append(f1, f2)

@@ -1,8 +1,11 @@
 package scalaz
 package syntax
 
+import spire.macrosk.Ops
+import scala.language.experimental.macros
+
 /** Wraps a value `self` and provides methods related to `Choice` */
-final class ChoiceOps[F[_, _],A, B] private[syntax](val self: F[A, B])(implicit val F: Choice[F]) extends Ops[F[A, B]] {
+final class ChoiceOps[F[_, _],A, B] private[syntax](val self: F[A, B])(implicit val F: Choice[F]) {
   ////
   final def |||[C](x: => F[C, B]): F[A \/ C, B] =
     F.choice(self, x)

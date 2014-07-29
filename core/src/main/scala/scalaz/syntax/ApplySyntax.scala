@@ -1,8 +1,11 @@
 package scalaz
 package syntax
 
+import spire.macrosk.Ops
+import scala.language.experimental.macros
+
 /** Wraps a value `self` and provides methods related to `Apply` */
-final class ApplyOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Apply[F]) extends Ops[F[A]] {
+final class ApplyOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Apply[F]) {
   ////
 
   final def <*>[B](f: F[A => B]): F[B] = F.ap(self)(f)

@@ -1,18 +1,21 @@
 package scalaz
 package syntax
 
-/** Wraps a value `self` and provides methods related to `Monoid` */
-final class MonoidOps[F] private[syntax](val self: F)(implicit val F: Monoid[F]) extends Ops[F] {
+import spire.macrosk.Ops
+import scala.language.experimental.macros
+
+/** Wraps a value `lhs` and provides methods related to `Monoid` */
+final class MonoidOps[F] private[syntax](lhs: F)(implicit val F: Monoid[F]) {
   ////
-  final def multiply(n: Int): F = F.multiply(self, n)
+  final def multiply(rhs: Int): F = macro Ops.binop[Int, F]
 
-  final def ifEmpty[A](tv: => A)(fv: => A)(implicit e: Equal[F]): A = F.ifEmpty(self)(tv)(fv)
+  final def ifEmpty[A](tv: => A)(fv: => A)(implicit e: Equal[F]): A = F.ifEmpty(lhs)(tv)(fv)
 
-  final def isMZero(implicit e: Equal[F]): Boolean = F.isMZero(self)
+  final def isMZero(implicit rhs: Equal[F]): Boolean = macro Ops.binop[Equal[F], Boolean]
 
-  final def onNotEmpty[A](v: => A)(implicit ma: Monoid[A], e: Equal[F]): A = F.onNotEmpty(self)(v)
+  final def onNotEmpty[A](v: => A)(implicit ma: Monoid[A], e: Equal[F]): A = F.onNotEmpty(lhs)(v)
 
-  final def onEmpty[A](v: => A)(implicit ma: Monoid[A], e: Equal[F]): A = F.onEmpty(self)(v)
+  final def onEmpty[A](v: => A)(implicit ma: Monoid[A], e: Equal[F]): A = F.onEmpty(lhs)(v)
   ////
 }
 
@@ -29,7 +32,7 @@ trait ToMonoidOps extends ToSemigroupOps {
 
 trait MonoidSyntax[F] extends SemigroupSyntax[F] {
   implicit def ToMonoidOps(v: F): MonoidOps[F] = new MonoidOps[F](v)(MonoidSyntax.this.F)
-  
+
   def F: Monoid[F]
   ////
   def mzero(implicit F: Monoid[F]): F = F.zero

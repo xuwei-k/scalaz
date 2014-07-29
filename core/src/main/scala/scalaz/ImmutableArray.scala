@@ -5,7 +5,6 @@ import collection.immutable.IndexedSeq
 import collection.mutable.{ArrayBuilder, Builder}
 import collection.generic.CanBuildFrom
 import collection.IndexedSeqOptimized
-import syntax.Ops
 
 /**
  * An immutable wrapper for arrays
@@ -306,7 +305,7 @@ object ImmutableArray extends ImmutableArrayInstances with ImmutableArrayFunctio
     }
   }
 
-  sealed class ImmutableArrayCharW(val self: ImmutableArray[Char]) extends Ops[ImmutableArray[Char]] {
+  sealed class ImmutableArrayCharW(val self: ImmutableArray[Char]) {
     def asString = self match {
       case a: StringArray => a.str
       case a: ofChar => wrapArray(a).mkString

@@ -1,8 +1,11 @@
 package scalaz
 package syntax
 
+import spire.macrosk.Ops
+import scala.language.experimental.macros
+
 /** Wraps a value `self` and provides methods related to `Compose` */
-final class ComposeOps[F[_, _],A, B] private[syntax](val self: F[A, B])(implicit val F: Compose[F]) extends Ops[F[A, B]] {
+final class ComposeOps[F[_, _],A, B] private[syntax](val self: F[A, B])(implicit val F: Compose[F]) {
   ////
   final def <<<[C](x: F[C, A]): F[C, B] =
     F.compose(self, x)

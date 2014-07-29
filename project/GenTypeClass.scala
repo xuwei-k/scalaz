@@ -278,8 +278,11 @@ object $typeClassName {
       case Kind.* =>
         s"""$syntaxPackString
 
-/** Wraps a value `self` and provides methods related to `${typeClassName}` */
-final class ${typeClassName}Ops[F] private[syntax](val self: F)(implicit val F: ${typeClassName}[F]) extends Ops[F] {
+import spire.macrosk.Ops
+import scala.language.experimental.macros
+
+/** Wraps a value `lhs` and provides methods related to `${typeClassName}` */
+final class ${typeClassName}Ops[F] private[syntax](lhs: F)(implicit val F: ${typeClassName}[F]) {
   ////
 
   ////
@@ -296,7 +299,7 @@ trait To${typeClassName}Ops $extendsToSyntaxListText {
 
 trait ${typeClassName}Syntax[F] ${extendsListText("Syntax", cti = "F")} {
   implicit def To${typeClassName}Ops(v: F): ${typeClassName}Ops[F] = new ${typeClassName}Ops[F](v)(${typeClassName}Syntax.this.F)
-  
+
   def F: ${typeClassName}[F]
   ////
 
@@ -315,8 +318,11 @@ s"""  implicit def To${typeClassName}Ops[F[_],A](v: F[A])(implicit F0: ${typeCla
 
     s"""$syntaxPackString
 
+import spire.macrosk.Ops
+import scala.language.experimental.macros
+
 /** Wraps a value `self` and provides methods related to `${typeClassName}` */
-final class ${typeClassName}Ops[F[_],A] private[syntax](val self: F[A])(implicit val F: ${typeClassName}[F]) extends Ops[F[A]] {
+final class ${typeClassName}Ops[F[_],A] private[syntax](val self: F[A])(implicit val F: ${typeClassName}[F]) {
   ////
 
   ////
@@ -362,8 +368,11 @@ trait ${typeClassName}Syntax[F[_]] ${extendsListText("Syntax", cti = "F")} {
 
     s"""$syntaxPackString
 
+import spire.macrosk.Ops
+import scala.language.experimental.macros
+
 /** Wraps a value `self` and provides methods related to `${typeClassName}` */
-final class ${typeClassName}Ops[F[_, _],A, B] private[syntax](val self: F[A, B])(implicit val F: ${typeClassName}[F]) extends Ops[F[A, B]] {
+final class ${typeClassName}Ops[F[_, _],A, B] private[syntax](val self: F[A, B])(implicit val F: ${typeClassName}[F]) {
   ////
 
   ////

@@ -1,8 +1,11 @@
 package scalaz
 package syntax
 
+import spire.macrosk.Ops
+import scala.language.experimental.macros
+
 /** Wraps a value `self` and provides methods related to `Plus` */
-final class PlusOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Plus[F]) extends Ops[F[A]] {
+final class PlusOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Plus[F]) {
   ////
 
   final def <+>(other: => F[A]) = F.plus(self, other)

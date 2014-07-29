@@ -4,8 +4,11 @@ package effect
 
 import scalaz.effect.MonadControlIO
 
+import spire.macrosk.Ops
+import scala.language.experimental.macros
+
 /** Wraps a value `self` and provides methods related to `MonadControlIO` */
-final class MonadControlIOOps[F[_],A] private[syntax](val self: F[A])(implicit val F: MonadControlIO[F]) extends Ops[F[A]] {
+final class MonadControlIOOps[F[_],A] private[syntax](val self: F[A])(implicit val F: MonadControlIO[F]) {
   ////
 
   ////

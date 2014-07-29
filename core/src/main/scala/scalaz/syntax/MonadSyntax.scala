@@ -1,8 +1,11 @@
 package scalaz
 package syntax
 
+import spire.macrosk.Ops
+import scala.language.experimental.macros
+
 /** Wraps a value `self` and provides methods related to `Monad` */
-final class MonadOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Monad[F]) extends Ops[F[A]] {
+final class MonadOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Monad[F]) {
   ////
 
   def liftM[G[_[_], _]](implicit G: MonadTrans[G]): G[F, A] = G.liftM(self)

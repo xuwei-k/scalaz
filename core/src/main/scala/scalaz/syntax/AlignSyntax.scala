@@ -1,8 +1,11 @@
 package scalaz
 package syntax
 
+import spire.macrosk.Ops
+import scala.language.experimental.macros
+
 /** Wraps a value `self` and provides methods related to `Align` */
-final class AlignOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Align[F]) extends Ops[F[A]] {
+final class AlignOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Align[F]) {
   ////
   def align[B](b: F[B]): F[A \&/ B] = F.align(self, b)
   def alignWith[B, C](fb: F[B])(f: (A \&/ B) => C): F[C] = F.alignWith(f)(self, fb)

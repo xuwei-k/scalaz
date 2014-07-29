@@ -4,12 +4,15 @@ package effect
 
 import scalaz.effect.Resource
 
-/** Wraps a value `self` and provides methods related to `Resource` */
-final class ResourceOps[F] private[syntax](val self: F)(implicit val F: Resource[F]) extends Ops[F] {
+import spire.macrosk.Ops
+import scala.language.experimental.macros
+
+/** Wraps a value `lhs` and provides methods related to `Resource` */
+final class ResourceOps[F] private[syntax](lhs: F)(implicit val F: Resource[F]) {
   ////
 
-  def close = F.close(self)
-  
+  def close = F.close(lhs)
+
   ////
 }
 
@@ -24,7 +27,7 @@ trait ToResourceOps  {
 
 trait ResourceSyntax[F]  {
   implicit def ToResourceOps(v: F): ResourceOps[F] = new ResourceOps[F](v)(ResourceSyntax.this.F)
-  
+
   def F: Resource[F]
   ////
 

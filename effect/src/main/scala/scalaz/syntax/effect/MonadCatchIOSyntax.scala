@@ -6,7 +6,8 @@ import scalaz.effect.MonadCatchIO
 import scalaz.effect.Resource
 
 /** Wraps a value `self` and provides methods related to `MonadCatchIO` */
-sealed abstract class MonadCatchIOOps[F[_],A] extends Ops[F[A]] {
+sealed abstract class MonadCatchIOOps[F[_],A] {
+  def self: F[A]
   implicit def F: MonadCatchIO[F]
   ////
   def except(handler: Throwable => F[A]): F[A] = F.except(self)(handler)
@@ -14,7 +15,7 @@ sealed abstract class MonadCatchIOOps[F[_],A] extends Ops[F[A]] {
   def catchLeft: F[Throwable \/ A] = MonadCatchIO.catchLeft(self)
   def catchSomeLeft[B](p: Throwable => Option[B]): F[B \/ A] = MonadCatchIO.catchSomeLeft(self)(p)
   def onException[B](action: F[B]): F[A] = MonadCatchIO.onException(self, action)
-  def bracket[B, C](after: A => F[B])(during: A => F[C]): F[C] = 
+  def bracket[B, C](after: A => F[B])(during: A => F[C]): F[C] =
     MonadCatchIO.bracket(self)(after)(during)
   def ensuring[B](sequel: F[B]): F[A] = MonadCatchIO.ensuring(self, sequel)
   def bracket_[B, C](after: F[B])(during: F[C]): F[C] =

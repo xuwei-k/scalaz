@@ -1,44 +1,47 @@
 package scalaz
 package syntax
 
-/** Wraps a value `self` and provides methods related to `Enum` */
-final class EnumOps[F] private[syntax](val self: F)(implicit val F: Enum[F]) extends Ops[F] {
+import spire.macrosk.Ops
+import scala.language.experimental.macros
+
+/** Wraps a value `lhs` and provides methods related to `Enum` */
+final class EnumOps[F] private[syntax](lhs: F)(implicit val F: Enum[F]) {
   ////
   final def succ: F =
-    F succ self
+    F succ lhs
 
   final def -+-(n: Int): F =
-    F.succn(n, self)
+    F.succn(n, lhs)
 
   final def succx: Option[F] =
-    F.succx.apply(self)
+    F.succx.apply(lhs)
 
   final def pred: F =
-    F pred self
+    F pred lhs
 
   final def ---(n: Int): F =
-    F.predn(n, self)
+    F.predn(n, lhs)
 
   final def predx: Option[F] =
-    F.predx.apply(self)
+    F.predx.apply(lhs)
 
   final def from: EphemeralStream[F] =
-    F.from(self)
+    F.from(lhs)
 
   final def fromStep(step: Int): EphemeralStream[F] =
-    F.fromStep(step, self)
+    F.fromStep(step, lhs)
 
   final def |=>(to: F): EphemeralStream[F] =
-    F.fromTo(self, to)
+    F.fromTo(lhs, to)
 
   final def |->(to: F): List[F] =
-    F.fromToL(self, to)
+    F.fromToL(lhs, to)
 
   final def |==>(step: Int, to: F): EphemeralStream[F] =
-    F.fromStepTo(step, self, to)
+    F.fromStepTo(step, lhs, to)
 
   final def |-->(step: Int, to: F): List[F] =
-    F.fromStepToL(step, self, to)
+    F.fromStepToL(step, lhs, to)
 
   ////
 }
@@ -54,7 +57,7 @@ trait ToEnumOps extends ToOrderOps {
 
 trait EnumSyntax[F] extends OrderSyntax[F] {
   implicit def ToEnumOps(v: F): EnumOps[F] = new EnumOps[F](v)(EnumSyntax.this.F)
-  
+
   def F: Enum[F]
   ////
 

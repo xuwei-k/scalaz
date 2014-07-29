@@ -1,8 +1,11 @@
 package scalaz
 package syntax
 
+import spire.macrosk.Ops
+import scala.language.experimental.macros
+
 /** Wraps a value `self` and provides methods related to `Applicative` */
-final class ApplicativeOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Applicative[F]) extends Ops[F[A]] {
+final class ApplicativeOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Applicative[F]) {
   ////
   final def unlessM(cond: Boolean): F[Unit] = scalaz.std.boolean.unlessM(cond)(self)
   final def whenM(cond: Boolean): F[Unit] = scalaz.std.boolean.whenM(cond)(self)
@@ -29,7 +32,8 @@ trait ToApplicativeOps extends ToApplicativeOps0 with ToApplyOps {
     lazy val self = v
   }
 
-  trait ApplicativeIdV[A] extends Ops[A] {
+  trait ApplicativeIdV[A] {
+    def self: A
     def point[F[_] : Applicative]: F[A] = Applicative[F].point(self)
     def pure[F[_] : Applicative]: F[A] = Applicative[F].point(self)
     def η[F[_] : Applicative]: F[A] = Applicative[F].point(self)
@@ -51,7 +55,8 @@ trait ApplicativeSyntax[F[_]] extends ApplySyntax[F] {
     lazy val self = v
   }
 
-  trait ApplicativeIdV[A] extends Ops[A] {
+  trait ApplicativeIdV[A] {
+    def self: A
     def point(implicit F: Applicative[F]): F[A] = Applicative[F].point(self)
 
     /** Alias for `point` */

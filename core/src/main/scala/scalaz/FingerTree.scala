@@ -1,7 +1,6 @@
 package scalaz
 
 import collection.Iterator
-import syntax.Ops
 import std.option._
 
 /**View of the left end of a sequence.*/
@@ -1123,7 +1122,8 @@ sealed abstract class IndSeqInstances {
  * operation favours the first argument. Accordingly, the measuer of a node is the
  * item with the highest priority contained recursively below that node.
  */
-sealed abstract class OrdSeq[A] extends Ops[FingerTree[LastOption[A], A]] {
+sealed abstract class OrdSeq[A] {
+  def self: FingerTree[LastOption[A], A]
   import std.function._
   import std.option._
 
