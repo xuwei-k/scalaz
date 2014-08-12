@@ -221,7 +221,8 @@ final class BooleanOps(val self: Boolean) {
   /**
    * @return `t` if true, `f` otherwise
    */
-  final def fold[A](t: => A, f: => A): A = b.fold(self, t, f)
+  final def fold[A](t: A, f: A): A =
+    macro BooleanFunctions.foldOpsImpl[A]
 
   final class Conditional[X](t: => X) {
     def |(f: => X) = if (self) t else f

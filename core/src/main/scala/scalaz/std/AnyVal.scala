@@ -378,6 +378,16 @@ object BooleanFunctions {
     import c.universe._
     unlessImpl(c)(c.Expr(q"${c.prefix}.self"))(f)
   }
+
+  def foldImpl[A: c.WeakTypeTag](c: Context)(cond: c.Expr[Boolean], t: c.Expr[A], f: c.Expr[A]): c.Expr[A] = {
+    import c.universe._
+    c.Expr(q"if($cond) $t else $f")
+  }
+
+  def foldOpsImpl[A: c.WeakTypeTag](c: Context)(t: c.Expr[A], f: c.Expr[A]): c.Expr[A] = {
+    import c.universe._
+    foldImpl(c)(c.Expr[Boolean](q"${c.prefix}.self"), t, f)
+  }
 }
 
 trait BooleanFunctions {
@@ -515,7 +525,8 @@ trait BooleanFunctions {
   /**
    * @return `t` if `cond` is `true`, `f` otherwise
    */
-  final def fold[A](cond: Boolean, t: => A, f: => A): A = if (cond) t else f
+  final def fold[A](cond: Boolean, t: A, f: A): A =
+    macro BooleanFunctions.foldImpl[A]
 
   /**
    * Returns the given argument in `Some` if `cond` is `true`, `None` otherwise.
