@@ -182,6 +182,7 @@ object build extends Build {
     settings = standardSettings ++ buildInfoSettings ++ Seq[Sett](
       name := "scalaz-core",
       typeClasses := TypeClass.core,
+      libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value,
       sourceGenerators in Compile <+= (sourceManaged in Compile) map {
         dir => Seq(GenerateTupleW(dir))
       },

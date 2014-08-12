@@ -1,7 +1,8 @@
 package scalaz
 package std
 
-import scalaz._
+import scala.language.experimental.macros
+import scala.reflect.macros.blackbox.Context
 import Id._
 
 trait AnyValInstances {
@@ -326,6 +327,29 @@ trait AnyValInstances {
   }
 }
 
+object BooleanFunctions {
+
+  def conjunctionImpl(c: Context)(p: c.Expr[Boolean], q: c.Expr[Boolean]): c.Expr[Boolean] = {
+    import c.universe._
+    c.Expr(q"$p && $q")
+  }
+
+  def conjunctionOpsImpl(c: Context)(q: c.Expr[Boolean]): c.Expr[Boolean] = {
+    import c.universe._
+    conjunctionImpl(c)(c.Expr(q"${c.prefix}.self"), q)
+  }
+
+  def disjunctionImpl(c: Context)(p: c.Expr[Boolean], q: c.Expr[Boolean]): c.Expr[Boolean] = {
+    import c.universe._
+    c.Expr(q"$p || $q")
+  }
+
+  def disjunctionOpsImpl(c: Context)(q: c.Expr[Boolean]): c.Expr[Boolean] = {
+    import c.universe._
+    disjunctionImpl(c)(c.Expr(q"${c.prefix}.self"), q)
+  }
+}
+
 trait BooleanFunctions {
 
   /**
@@ -339,7 +363,8 @@ trait BooleanFunctions {
    * 1 1  1
    * }}}
    */
-  final def conjunction(p: Boolean, q: => Boolean) = p && q
+  final def conjunction(p: Boolean, q: Boolean): Boolean =
+    macro BooleanFunctions.conjunctionImpl
 
   /**
    * Disjunction. (OR)
@@ -352,7 +377,8 @@ trait BooleanFunctions {
    * 1 1  1
    * }}}
    */
-  final def disjunction(p: Boolean, q: => Boolean) = p || q
+  final def disjunction(p: Boolean, q: Boolean): Boolean =
+    macro BooleanFunctions.disjunctionImpl
 
   /**
    * Negation of Disjunction. (NOR)

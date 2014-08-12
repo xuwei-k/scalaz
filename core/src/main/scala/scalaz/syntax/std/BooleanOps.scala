@@ -2,11 +2,12 @@ package scalaz
 package syntax
 package std
 
-import scalaz.std.{boolean => b}
+import scalaz.std.{boolean => b, BooleanFunctions}
 import scalaz.Tags.{ Conjunction, Disjunction }
+import scala.language.experimental.macros
 
 
-final class BooleanOps(self: Boolean) {
+final class BooleanOps(val self: Boolean) {
 
   final def conjunction: Boolean @@ Conjunction = Conjunction(self)
 
@@ -31,7 +32,8 @@ final class BooleanOps(self: Boolean) {
    * 1 1  1
    * }}}
    */
-  final def ∧(q: => Boolean) = b.conjunction(self, q)
+  final def ∧(q: Boolean): Boolean =
+    macro BooleanFunctions.conjunctionOpsImpl
 
   /**
    * Conjunction. (AND)
@@ -44,8 +46,8 @@ final class BooleanOps(self: Boolean) {
    * 1 1  1
    * }}}
    */
-  final def /\(q: => Boolean) =
-    ∧(q)
+  final def /\(q: Boolean): Boolean =
+    macro BooleanFunctions.conjunctionOpsImpl
 
   /**
    * Disjunction. (OR)
@@ -58,7 +60,8 @@ final class BooleanOps(self: Boolean) {
    * 1 1  1
    * }}}
    */
-  final def ∨(q: => Boolean): Boolean = b.disjunction(self, q)
+  final def ∨(q: Boolean): Boolean =
+    macro BooleanFunctions.disjunctionOpsImpl
 
   /**
    * Disjunction. (OR)
@@ -71,7 +74,8 @@ final class BooleanOps(self: Boolean) {
    * 1 1  1
    * }}}
    */
-  final def \/(q: => Boolean): Boolean = ∨(q)
+  final def \/(q: Boolean): Boolean =
+    macro BooleanFunctions.disjunctionOpsImpl
 
   /**
    * Negation of Disjunction. (NOR)
