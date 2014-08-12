@@ -183,6 +183,18 @@ object build extends Build {
       name := "scalaz-core",
       typeClasses := TypeClass.core,
       libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value,
+      libraryDependencies ++= {
+        CrossVersion.partialVersion(scalaVersion.value) match {
+          case Some((2, 10)) =>
+            ("org.scalamacros" %% "quasiquotes" % "2.0.1") ::
+            compilerPlugin("org.scalamacros" % "paradise" % "2.0.1" cross CrossVersion.full) ::
+            Nil
+          case _ => Nil
+        }
+      },
+      unmanagedSourceDirectories in Compile += {
+        (sourceDirectory in Compile).value / ("scala" + scalaBinaryVersion.value)
+      },
       sourceGenerators in Compile <+= (sourceManaged in Compile) map {
         dir => Seq(GenerateTupleW(dir))
       },
