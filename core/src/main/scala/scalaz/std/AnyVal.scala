@@ -348,6 +348,26 @@ object BooleanFunctions {
     import c.universe._
     disjunctionImpl(c)(c.Expr(q"${c.prefix}.self"), q)
   }
+
+  def norImpl(c: Context)(p: c.Expr[Boolean], q: c.Expr[Boolean]): c.Expr[Boolean] = {
+    import c.universe._
+    c.Expr(q"!($p || $q)")
+  }
+
+  def norOpsImpl(c: Context)(q: c.Expr[Boolean]): c.Expr[Boolean] = {
+    import c.universe._
+    norImpl(c)(c.Expr(q"${c.prefix}.self"), q)
+  }
+
+  def unlessImpl(c: Context)(cond: c.Expr[Boolean])(f: c.Expr[Unit]): c.Expr[Unit] = {
+    import c.universe._
+    c.Expr(q"if(!$cond) f")
+  }
+
+  def unlessOpsImpl(c: Context)(f: c.Expr[Unit]): c.Expr[Unit] = {
+    import c.universe._
+    unlessImpl(c)(c.Expr(q"${c.prefix}.self"))(f)
+  }
 }
 
 trait BooleanFunctions {
@@ -391,7 +411,8 @@ trait BooleanFunctions {
    * 1 1  0
    * }}}
    */
-  final def nor(p: Boolean, q: => Boolean) = !(p || q)
+  final def nor(p: Boolean, q: Boolean): Boolean =
+    macro BooleanFunctions.norImpl
 
   /**
    * Negation of Conjunction. (NAND)
@@ -462,7 +483,8 @@ trait BooleanFunctions {
   /**
    * Executes the given side-effect if `cond` is `false`
    */
-  final def unless(cond: Boolean)(f: => Unit) = if (!cond) f
+  final def unless(cond: Boolean)(f: Unit): Unit =
+    macro BooleanFunctions.unlessImpl
 
   /**
    * Executes the given side-effect if `cond` is `true`

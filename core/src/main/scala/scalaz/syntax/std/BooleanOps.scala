@@ -88,7 +88,8 @@ final class BooleanOps(val self: Boolean) {
    * 1 1  0
    * }}}
    */
-  final def !||(q: => Boolean) = b.nor(self, q)
+  final def !||(q: Boolean): Boolean =
+    macro BooleanFunctions.norOpsImpl
 
 
   /**
@@ -198,7 +199,8 @@ final class BooleanOps(val self: Boolean) {
   /**
    * Executes the given side-effect if this boolean value is `false`.
    */
-  final def unless(f: => Unit) = b.unless(self)(f)
+  final def unless(f: Unit): Unit =
+    macro BooleanFunctions.unlessOpsImpl
 
   /**
    * Executes the given side-effect if this boolean value is `true`.
