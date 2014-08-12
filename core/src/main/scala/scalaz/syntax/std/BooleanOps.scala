@@ -103,7 +103,8 @@ final class BooleanOps(val self: Boolean) {
    * 1 1  0
    * }}}
    */
-  final def !&&(q: => Boolean) = b.nand(self, q)
+  final def !&&(q: Boolean): Boolean =
+    macro BooleanFunctions.nandOpsImpl
 
   /**
    * Conditional.

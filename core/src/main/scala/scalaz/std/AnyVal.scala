@@ -359,6 +359,16 @@ object BooleanFunctions {
     norImpl(c)(c.Expr(q"${c.prefix}.self"), q)
   }
 
+  def nandImpl(c: Context)(p: c.Expr[Boolean], q: c.Expr[Boolean]): c.Expr[Boolean] = {
+    import c.universe._
+    c.Expr(q"!($p && $q)")
+  }
+
+  def nandOpsImpl(c: Context)(q: c.Expr[Boolean]): c.Expr[Boolean] = {
+    import c.universe._
+    nandImpl(c)(c.Expr(q"${c.prefix}.self"), q)
+  }
+
   def unlessImpl(c: Context)(cond: c.Expr[Boolean])(f: c.Expr[Unit]): c.Expr[Unit] = {
     import c.universe._
     c.Expr(q"if(!$cond) f")
@@ -425,7 +435,8 @@ trait BooleanFunctions {
    * 1 1  0
    * }}}
    */
-  final def nand(p: Boolean, q: => Boolean) = !(p && q)
+  final def nand(p: Boolean, q: Boolean): Boolean =
+    macro BooleanFunctions.nandImpl
 
   /**
    * Conditional.
