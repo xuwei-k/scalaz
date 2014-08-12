@@ -1,5 +1,8 @@
 package scalaz
 
+import scala.reflect.macros.blackbox.Context
+import scala.language.experimental.macros
+
 ////
 /**
  * Applicative Functor, described in [[http://www.soi.city.ac.uk/~ross/papers/Applicative.html Applicative Programming with Effects]]
@@ -64,8 +67,9 @@ trait Applicative[F[_]] extends Apply[F] { self =>
   /**
    * Returns the given argument if `cond` is `true`, otherwise, unit lifted into F.
    */
-  def whenM[A](cond: Boolean)(f: => F[A]): F[Unit] = if (cond) void(f) else point(())
-  
+  def whenM[A](cond: Boolean)(f: F[A]): F[Unit] =
+    macro Applicative.whenMImpl[A, F]
+
   /**The composition of Applicatives `F` and `G`, `[x]F[G[x]]`, is an Applicative */
   def compose[G[_]](implicit G0: Applicative[G]): Applicative[({type λ[α] = F[G[α]]})#λ] = new CompositionApplicative[F, G] {
     implicit def F = self
@@ -116,6 +120,12 @@ object Applicative {
   @inline def apply[F[_]](implicit F: Applicative[F]): Applicative[F] = F
 
   ////
+
+  def whenMImpl[A, F[_]](c: Context)(cond: c.Expr[Boolean])(f: c.Expr[F[A]]): c.Expr[F[Unit]] = {
+    import c.universe._
+    val F = c.prefix
+    c.Expr[F[Unit]](q"if ($cond) $F.void($f) else $F.point(())")
+  }
 
   implicit def monoidApplicative[M:Monoid]: Applicative[({type λ[α] = M})#λ] = Monoid[M].applicative
 

@@ -216,7 +216,7 @@ final class BooleanOps(val self: Boolean) {
   /**
    * Returns the given argument if `cond` is true`, otherwise, unit lifted into M.
    */
-  final def whenM[M[_]: Applicative, A](f: => M[A]): M[Unit] = b.whenM(self)(f)
+ // final def whenM[M[_]: Applicative, A](f: => M[A]): M[Unit] = b.whenM(self)(f)
 
   /**
    * @return `t` if true, `f` otherwise

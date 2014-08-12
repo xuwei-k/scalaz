@@ -520,7 +520,7 @@ trait BooleanFunctions {
   /**
    * Returns the given argument if `cond` is `true`, otherwise, unit lifted into M.
    */
-  final def whenM[M[_], A](cond: Boolean)(f: => M[A])(implicit M: Applicative[M]): M[Unit] = M.whenM(cond)(f)
+//  final def whenM[M[_], A](cond: Boolean)(f: => M[A])(implicit M: Applicative[M]): M[Unit] = M.whenM(cond)(f)
 
   /**
    * @return `t` if `cond` is `true`, `f` otherwise
