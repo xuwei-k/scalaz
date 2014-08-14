@@ -1,7 +1,7 @@
 package scalaz
 package syntax
 
-import spire.macrosk.Ops
+import machinist.DefaultOps
 import scala.language.experimental.macros
 
 /** Wraps a value `lhs` and provides methods related to `Show` */

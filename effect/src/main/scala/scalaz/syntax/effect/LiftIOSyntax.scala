@@ -4,7 +4,7 @@ package effect
 
 import scalaz.effect.LiftIO
 
-import spire.macrosk.Ops
+import machinist.DefaultOps
 import scala.language.experimental.macros
 
 /** Wraps a value `self` and provides methods related to `LiftIO` */

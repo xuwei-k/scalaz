@@ -1,7 +1,7 @@
 package scalaz
 package syntax
 
-import spire.macrosk.Ops
+import machinist.DefaultOps
 import scala.language.experimental.macros
 
 /** Wraps a value `lhs` and provides methods related to `Semigroup` */
@@ -9,7 +9,7 @@ final class SemigroupOps[F] private[syntax](lhs: F)(implicit val F: Semigroup[F]
   ////
   final def |+|(other: => F): F = F.append(lhs, other)
   final def mappend(other: => F): F = F.append(lhs, other)
-  final def ⊹(rhs: => F): F = macro Ops.binop[F, F]
+  final def ⊹(rhs: => F): F = macro DefaultOps.binop[F, F]
   ////
 }
 

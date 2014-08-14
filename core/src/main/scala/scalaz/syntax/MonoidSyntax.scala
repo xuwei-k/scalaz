@@ -1,17 +1,17 @@
 package scalaz
 package syntax
 
-import spire.macrosk.Ops
+import machinist.DefaultOps
 import scala.language.experimental.macros
 
 /** Wraps a value `lhs` and provides methods related to `Monoid` */
 final class MonoidOps[F] private[syntax](lhs: F)(implicit val F: Monoid[F]) {
   ////
-  final def multiply(rhs: Int): F = macro Ops.binop[Int, F]
+  final def multiply(rhs: Int): F = macro DefaultOps.binop[Int, F]
 
   final def ifEmpty[A](tv: => A)(fv: => A)(implicit e: Equal[F]): A = F.ifEmpty(lhs)(tv)(fv)
 
-  final def isMZero(implicit rhs: Equal[F]): Boolean = macro Ops.binop[Equal[F], Boolean]
+  final def isMZero(implicit rhs: Equal[F]): Boolean = macro DefaultOps.binop[Equal[F], Boolean]
 
   final def onNotEmpty[A](v: => A)(implicit ma: Monoid[A], e: Equal[F]): A = F.onNotEmpty(lhs)(v)
 

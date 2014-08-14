@@ -278,7 +278,7 @@ object $typeClassName {
       case Kind.* =>
         s"""$syntaxPackString
 
-import spire.macrosk.Ops
+import machinist.DefaultOps
 import scala.language.experimental.macros
 
 /** Wraps a value `lhs` and provides methods related to `${typeClassName}` */
@@ -318,7 +318,7 @@ s"""  implicit def To${typeClassName}Ops[F[_],A](v: F[A])(implicit F0: ${typeCla
 
     s"""$syntaxPackString
 
-import spire.macrosk.Ops
+import machinist.DefaultOps
 import scala.language.experimental.macros
 
 /** Wraps a value `self` and provides methods related to `${typeClassName}` */
@@ -368,7 +368,7 @@ trait ${typeClassName}Syntax[F[_]] ${extendsListText("Syntax", cti = "F")} {
 
     s"""$syntaxPackString
 
-import spire.macrosk.Ops
+import machinist.DefaultOps
 import scala.language.experimental.macros
 
 /** Wraps a value `self` and provides methods related to `${typeClassName}` */
