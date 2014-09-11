@@ -6,5 +6,5 @@ This has been compiled for Scala.JS and published to Maven central under `com.gi
 
 build.sbt
 ```
-libraryDependencies += "com.github.japgolly.fork.scalaz" %%% "scalaz-core" % "7.1.0"
+libraryDependencies += "com.github.japgolly.fork.scalaz" %%% "scalaz-core" % "7.1.0-2"
 ```
