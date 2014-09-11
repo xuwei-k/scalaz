@@ -47,10 +47,17 @@ object build extends Build {
 
   private def gitHash = sys.process.Process("git rev-parse HEAD").lines_!.head
 
+  val sourceMapOpt = {
+    val a = new java.io.File("").toURI.toString.replaceFirst("/$", "")
+    val g = "https://raw.githubusercontent.com/japgolly/scalaz/v7.1.0-js"
+    s"-P:scalajs:mapSourceURI:$a->$g/"
+  }
+
   lazy val standardSettings: Seq[Sett] = Defaults.defaultSettings ++ sbtrelease.ReleasePlugin.releaseSettings ++
                                          scala.scalajs.sbtplugin.ScalaJSPlugin.scalaJSBuildSettings ++
                                          Seq[Sett](
     organization := "com.github.japgolly.fork.scalaz",
+    scalacOptions += sourceMapOpt,
 
     scalaVersion := "2.10.4",
     crossScalaVersions := Seq("2.9.3", "2.10.4", "2.11.2"),
