@@ -8,3 +8,11 @@ build.sbt
 ```
 libraryDependencies += "com.github.japgolly.fork.scalaz" %%% "scalaz-core" % "7.1.0-2"
 ```
+
+### Changes
+
+* Compiled for Scala.js 0.5.3+
+* Removed support for
+  * `java.math.BigInteger`
+  * `java.util.concurrent.Callable`
+  * `scala.xml.NodeSeq`

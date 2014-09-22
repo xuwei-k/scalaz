@@ -1,5 +1,6 @@
 package scalaz.example
 
+/* japgolly
 import scalaz._
 import Scalaz._
  
@@ -122,3 +123,4 @@ object AdjunctUsage extends App {
   assert(repeats === false)  // no repeats
   assert(sumResult === 10)   // sum is 10
 }
+*/

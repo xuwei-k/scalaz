@@ -9,9 +9,9 @@ trait AllInstances
   with scalaz.std.math.OrderingInstances
   with scalaz.std.util.parsing.combinator.Parsers
   with scalaz.std.java.util.MapInstances
-  with scalaz.std.java.math.BigIntegerInstances
+  // with scalaz.std.java.math.BigIntegerInstances // japgolly
   with scalaz.std.java.EnumInstances
-  with scalaz.std.java.util.concurrent.CallableInstances
-  with NodeSeqInstances
+  // with scalaz.std.java.util.concurrent.CallableInstances // japgolly
+  // with NodeSeqInstances // japgolly
 
 object AllInstances extends AllInstances
