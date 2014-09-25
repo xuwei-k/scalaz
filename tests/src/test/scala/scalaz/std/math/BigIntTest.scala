@@ -2,6 +2,7 @@ package scalaz
 package std
 package math
 
+/* japgolly
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
@@ -15,3 +16,4 @@ object BigIntTest extends SpecLite {
   checkAll("BigInt @@ Multiplication", monoid.laws[BigInt @@ Multiplication])
   checkAll("BigInt", monoid.laws[BigInt])
 }
+*/

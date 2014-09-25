@@ -15,4 +15,6 @@ libraryDependencies += "com.github.japgolly.fork.scalaz" %%% "scalaz-core" % "7.
 * Removed support for
   * `java.math.BigInteger`
   * `java.util.concurrent.Callable`
+  * `scala.math.BigDecimal`
+  * `scala.math.BigInt`
   * `scala.xml.NodeSeq`
