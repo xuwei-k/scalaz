@@ -49,7 +49,7 @@ object build extends Build {
 
   val sourceMapOpt = {
     val a = new java.io.File("").toURI.toString.replaceFirst("/$", "")
-    val g = "https://raw.githubusercontent.com/japgolly/scalaz/v7.1.0-js"
+    val g = "https://raw.githubusercontent.com/japgolly/scalaz/v7.1.0-js-4"
     s"-P:scalajs:mapSourceURI:$a->$g/"
   }
 
