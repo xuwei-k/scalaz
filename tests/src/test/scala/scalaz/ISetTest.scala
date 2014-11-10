@@ -55,6 +55,23 @@ object ISetTest extends SpecLite {
     }
   }
 
+  "lookupLE" ! forAll { (a: ISet[Int], i: Int) =>
+    a.lookupLE(i) match {
+      case Some(b) =>
+        (i >= b) must_=== true
+        val (c, found, d) = a.splitMember(i)
+        if(found){
+          i must_=== b
+        }else{
+          c.findMax must_=== Option(b)
+        }
+        Foldable[ISet].all(d)(_ > i) must_=== true
+        a.filter(x => b < x && x < i) must_=== ISet.empty
+      case None =>
+        Foldable[ISet].all(a)(_ > i) must_=== true
+    }
+  }
+
   "lookupLT" ! forAll { (a: ISet[Int], i: Int) =>
     a.lookupLT(i) match {
       case Some(b) =>
@@ -65,6 +82,23 @@ object ISetTest extends SpecLite {
         a.filter(x => b < x && x < i) must_=== ISet.empty
       case None =>
         a.split(i)._1 must_=== ISet.empty
+    }
+  }
+
+  "lookupGE" ! forAll { (a: ISet[Int], i: Int) =>
+    a.lookupGE(i) match {
+      case Some(b) =>
+        (i <= b) must_=== true
+        val (c, found, d) = a.splitMember(i)
+        if(found){
+          i must_=== b
+        }else{
+          d.findMin must_=== Option(b)
+        }
+        Foldable[ISet].all(c)(_ < i) must_=== true
+        a.filter(x => b > x && x > i) must_=== ISet.empty
+      case None =>
+        Foldable[ISet].all(a)(_ < i) must_=== true
     }
   }
 
