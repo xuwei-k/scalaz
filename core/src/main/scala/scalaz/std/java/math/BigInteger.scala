@@ -1,6 +1,8 @@
 package scalaz
 package std.java.math
 
+/* japgolly
+
 import java.math.BigInteger
 
 trait BigIntegerInstances {
@@ -45,3 +47,4 @@ trait BigIntegerInstances {
 object bigInteger extends BigIntegerInstances {
 
 }
+*/

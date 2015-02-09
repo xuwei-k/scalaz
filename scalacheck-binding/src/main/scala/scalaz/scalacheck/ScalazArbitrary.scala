@@ -1,7 +1,7 @@
 package scalaz
 package scalacheck
 
-import java.math.BigInteger
+// import java.math.BigInteger // japgolly
 import org.scalacheck.{Gen, Arbitrary}
 import collection.mutable.ArraySeq
 
@@ -46,10 +46,12 @@ object ScalazArbitrary {
 
   implicit val arbBigInt: Arbitrary[BigInt] = Apply[Arbitrary].apply2[Int, Int, BigInt](arb[Int], arb[Int])(_ + _)
 
+  /* japgolly
   implicit val arbBigInteger: Arbitrary[BigInteger] = Functor[Arbitrary].map(arb[BigInt])(_.bigInteger)
 
   implicit val BigIntegerMultiplicationArbitrary: Arbitrary[BigInteger @@ Multiplication] =
     Tag.subst[BigInteger, Arbitrary, Multiplication](arb[BigInteger])
+  */
 
   implicit val BigIntMultiplicationArbitrary: Arbitrary[BigInt @@ Multiplication] = Tag.subst(arb[BigInt])
 
@@ -199,9 +201,11 @@ object ScalazArbitrary {
   implicit def RopeArbitrary[A : Arbitrary : ClassManifest]: Arbitrary[Rope[A]] =
     Functor[Arbitrary].map(FingerTreeArbitrary(ImmutableArrayArbitrary[A], Rope.sizer[A]))(Rope[A](_))
 
+  /* japgolly
   import java.util.concurrent.Callable
 
   implicit def CallableArbitrary[A: Arbitrary]: Arbitrary[Callable[A]] = Functor[Arbitrary].map(arb[A])((x: A) => Applicative[Callable].point(x))
+  */
 
   import scalaz.concurrent.Promise
 

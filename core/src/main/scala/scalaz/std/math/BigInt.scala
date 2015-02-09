@@ -2,6 +2,7 @@ package scalaz
 package std
 package math
 
+/* japgolly
 trait BigInts {
   implicit val bigIntInstance: Monoid[BigInt] with Enum[BigInt] with Show[BigInt] = new Monoid[BigInt] with Enum[BigInt] with Show[BigInt] {
     override def shows(f: BigInt) = f.toString
@@ -36,3 +37,4 @@ trait BigInts {
 object bigInt extends BigInts {
 
 }
+*/

@@ -2,6 +2,7 @@ package scalaz
 package std
 package math
 
+/* japgolly
 trait BigDecimalInstances {
   implicit val bigDecimalInstance: Monoid[BigDecimal] with Enum[BigDecimal] with Show[BigDecimal] = new Monoid[BigDecimal] with Enum[BigDecimal] with Show[BigDecimal] {
     override def shows(f: BigDecimal) = f.toString
@@ -30,3 +31,4 @@ trait BigDecimalInstances {
 }
 
 object bigDecimal extends BigDecimalInstances
+*/

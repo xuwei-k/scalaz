@@ -3,6 +3,8 @@ package std
 package java
 package math
 
+/* japgolly
+
 import _root_.java.math.BigInteger
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
@@ -16,3 +18,4 @@ object BigIntegerTest extends SpecLite {
   checkAll("BigInteger", monoid.laws[BigInteger])
   checkAll("BigInteger @@ Multiplication", monoid.laws[BigInteger @@ Multiplication])
 }
+*/
