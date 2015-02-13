@@ -16,5 +16,10 @@ jdk:
   - openjdk6
 
 script:
-  - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m test mima-report-binary-issues
+  - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m test mima-report-binary-issues publish
   - find $HOME/.ivy2 -name "ivydata-*.properties" | xargs rm
+
+env:
+  global:
+  - secure: ofDZjMTk4IvQe4erz0/3ib0b8uuaSaUIzS5BLvrTOa3ejPaEeEX39cKJ2HEtXhfKmC+BZJiF9qKK77Kvot2r65IRpY7LSggPUrYjkxGUyAOAv649miWRK/UkArwkFKAzsNANtH2nY1wtb9lyIP5F5DyohqS0Iox4H9v6GdTD914=
+  - secure: VvFXtr6UE8ekSuBWECXJsOGx6NbJOIosgFNj2yOxpRkBTC5M+mA9CBvOPO9a7A6/U6NTNabbk1bGdSOnuu4rTEst4kHqWCAMh3mvMHLN8NRTq6FTCr8iy8WHOgLx28DWGdkG3PBd9zfzfoRZ3PLClyNFqMLDIes8NVDjx2zuN3E=
