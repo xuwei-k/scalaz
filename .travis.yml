@@ -16,7 +16,7 @@ script:
   - git config core.whitespace tab-in-indent,trailing-space,blank-at-eol
   - git show --oneline --check
   - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m check-gen-type-classes "project $TEST_PROJECT" test:compile
-  - sbt ++$TRAVIS_SCALA_VERSION "project $TEST_PROJECT" test "project /" $(if [[ "${TEST_PROJECT}" == "rootJVM" ]]; then echo "publishLocal"; fi)
+  - sbt ++$TRAVIS_SCALA_VERSION "project $TEST_PROJECT" test "project /" $(if [[ "${TEST_PROJECT}" == "rootJVM" ]]; then echo "publish" ; fi)
   # Tricks to avoid unnecessary cache updates
   - find $HOME/.sbt -name "*.lock" | xargs rm
   - find $HOME/.ivy2 -name "ivydata-*.properties" | xargs rm
@@ -25,6 +25,9 @@ env:
   matrix:
   - TEST_PROJECT="rootJVM"
   - TEST_PROJECT="rootJS"
+  global:
+  - secure: "KrEcY0bltQh5kMn/hyiuGDZKvnU8SpQGGxUJJ4GnZyxNSYNfYI12acE81fDAMAnVV0gJaErBhyfm1OrThRm0633TBthseFWLouI2blikqSdsAM27kx3LVmRk9qlNnUfMIymCzSnpA155++x9VK/a9uzo+XzCdjl4MDq0C7Sugsp9RychPWGObz/54YbDn9/gRgqmG3h8HafJDcCZxUvvZOmck9fhTbHTYZmpxnW2jIdAPlh53GsIjSr6cHFR7nmHFRieoVl7oo/uaZOU6aEueE50yDNDFE4xwn7ngJr8TEzK+KvnThbmkDyHGtwyWG8PvtghK8mlPihB5hk6OWvYFTixRzSrpvGEXq8fpWmPP6Yh0G+/iXjD/CKoTxKBRdkC6+06MpZ/i+mqv2LCs2RFlyN7YNKJvjRabNpxJO0avdcYG0GKqVdapUBbvPfpBuiAjOAIPpwu2b9YcbkLONPNmnxpk6QOyk1inEFWaRF7xwxnMeuaHwPxsyNfDJiEx21dVYZqrtiKbjbUnmzHuX7ODqIFMVyZQENvA2FHB/kIX/+fWwdx/XOQQZ5YAtOSiYt8FoeuT3xaA797mM2rFKmUf44mdKyNBxGtT62SWnUtqxYHrdEdjEv+b2Q53BCrz9qHzpuwmqi7KB3Cllb1aJ8sHdDcK1HPSvRzvXbFHOrxsQg="
+  - secure: "JmSzU69UYLXa4vQRCfUwyMRRzMkG0PsIi33h/P4WgaRcs5rz6VbhrhTHF+tVsvB028DrWmLdSWfKHx3oJqvQvPJ+9CW+P2yL44CEGEqRnTbQ7n0odarIgnx4HiIqTQxQIMwJPlLzBnpXagtYtGYPpPSbIrdrzqiJfIQ+BzB69BTt1BsnCiBSskkYChS5bDn2JQUGJrAgdHzvaSEtv33RGeTtTbcXcP5v1ivkFQzt8YHaZ2ahmrOCjQ2GiNODSAkTQgWpE47ihvM/rkqKqRga/Jt5Tfb4AxrAodY2wSSmJAbTwtjEoS5Be45iSuQuReQCAsbtDFDNw99P/AecIM2vI6XlJXAxXKi4DHTG9hcP/uZF2Y68gJoclmdn79cOKu/++x+dBSJkCh+vOrAUQYn+ind9/fBM6Dv/46Kl2m9H+goFmdqhg6Qg226Akz6+w4eaU5wMFPFDmozTbFQkD8b6sA+ywsrvrgwJ/7pZ4mkOjE7nmt7pfJHAOia3qZGpVhsfs4UTlYsRTq9HEoztBF3IAs2yQziwUEBjDrCwIEybVH2Z20gQPOs07ZHsTP1lm/RNy27gfx0k/16ryYIrctPH2s8yAKPWB0kuZubA8vdfGeeZ+G+cRoKYjr52ZQ8ZDMvvmsbiEYEnAPYAfIkQPyn8lK7y0wyFo3NgEZul+Wawq9M="
 
 addons:
   apt:
@@ -43,7 +46,7 @@ matrix:
     - git checkout v0.9.3
     - sbt ++${TRAVIS_SCALA_VERSION} 'set scalacOptions -= "-Xfatal-warnings"' publishLocal
     - cd ..
-    - sbt ++${TRAVIS_SCALA_VERSION} -J-Xmx3784m check-gen-type-classes "project $TEST_PROJECT" test
+    - sbt ++${TRAVIS_SCALA_VERSION} -J-Xmx3784m check-gen-type-classes "project $TEST_PROJECT" test publish
   - scala: 2.13.0-M1
     jdk: oraclejdk8
     env: TEST_PROJECT="rootJS"
@@ -55,7 +58,7 @@ matrix:
     - sbt ++${TRAVIS_SCALA_VERSION} 'set scalacOptions -= "-Xfatal-warnings"' publishLocal
     - cd ..
     # https://github.com/rickynils/scalacheck/issues/330
-    - sbt ++${TRAVIS_SCALA_VERSION} -J-Xmx3784m check-gen-type-classes coreJS/compile effectJS/compile iterateeJS/compile
+    - sbt ++${TRAVIS_SCALA_VERSION} -J-Xmx3784m check-gen-type-classes coreJS/compile effectJS/compile iterateeJS/compile coreJS/publish effectJS/publish iterateeJS/publish
   - scala: 2.11.11
     jdk: oraclejdk8
     sudo: required
@@ -79,7 +82,7 @@ matrix:
     - make testinstall prefix=/usr
     - popd
     script:
-    - ./sbt ++$TRAVIS_SCALA_VERSION nativeTest/run nativeTest/publishLocal
+    - ./sbt ++$TRAVIS_SCALA_VERSION nativeTest/run coreNative/publish effectNative/publish iterateeNative/publish
 
   - dist: trusty
     group: edge
