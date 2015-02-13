@@ -45,7 +45,7 @@ object build extends Build {
 
   def scalaCheckVersion = "1.12.2"
 
-  private def gitHash = sys.process.Process("git rev-parse HEAD").lines_!.head
+  private def gitHash = sys.process.Process("git rev-parse HEAD^").lines_!.head
 
   lazy val standardSettings: Seq[Sett] = sbtrelease.ReleasePlugin.releaseSettings ++ Seq[Sett](
     organization := "org.scalaz",
