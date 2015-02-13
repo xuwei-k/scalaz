@@ -19,7 +19,7 @@ object ApplyTest extends SpecLite {
     Apply[Option].apply5(some("1"), some("2"), some("3"), some("4"), some("5"))(_ + _ + _ + _ + _) must_===(some("12345"))
 
     val A = Monoid[String].applicative
-    def undefined = sys.error("")
+    def undefined: Any = sys.error("")
 
     A.ap(fa = "1")(f = "2") must_===("21")
     A.ap2("1", "2")("3") must_===("312")

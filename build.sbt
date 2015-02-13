@@ -13,7 +13,7 @@ lazy val jvmProjects = Seq[ProjectReference](
 )
 
 lazy val nativeProjects = Seq[ProjectReference](
-  coreNative, effectNative, iterateeNative, nativeTest
+  coreNative, effectNative, iterateeNative, testsNative
 )
 
 lazy val scalaz = Project(
@@ -98,7 +98,7 @@ lazy val example = Project(
 )
 
 lazy val scalacheckBinding =
-  crossProject(JVMPlatform, JSPlatform).crossType(ScalazCrossType)
+  crossProject(JVMPlatform, JSPlatform, NativePlatform).crossType(ScalazCrossType)
     .in(file("scalacheck-binding"))
     .settings(standardSettings)
     .settings(
@@ -108,11 +108,15 @@ lazy val scalacheckBinding =
     .dependsOn(core, iteratee)
     .jvmConfigure(_ dependsOn concurrent)
     .jsSettings(scalajsProjectSettings)
+    .nativeSettings(nativeSettings)
 
 lazy val scalacheckBindingJVM = scalacheckBinding.jvm
 lazy val scalacheckBindingJS  = scalacheckBinding.js
+lazy val scalacheckBindingNative = scalacheckBinding.native.dependsOn(
+  ProjectRef(uri("git://github.com/xuwei-k/scalacheck#f9560c98790924652bc3468ba8e0ff8937cbe103"), "native")
+)
 
-lazy val tests = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType)
+lazy val tests = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
   .settings(standardSettings)
   .settings(
     name := "scalaz-tests",
@@ -121,16 +125,14 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType
   .dependsOn(core, effect, iteratee, scalacheckBinding)
   .jvmConfigure(_ dependsOn concurrent)
   .jsSettings(scalajsProjectSettings)
+  .platformsSettings(JVMPlatform, JSPlatform)(
+    jvm_js_settings
+  )
+  .nativeSettings(
+    nativeSettings,
+    testOptions in scalanative.sbtplugin.ScalaNativePluginInternal.NativeTest := (testOptions in Test).value
+  )
 
 lazy val testsJVM = tests.jvm
 lazy val testsJS  = tests.js
-
-// can't use "sbt test"
-// https://github.com/scala-native/scala-native/issues/339
-lazy val nativeTest = Project(nativeTestId, file("nativeTest")).enablePlugins(ScalaNativePlugin)
-  .settings(
-    standardSettings,
-    nativeSettings,
-    notPublish
-  )
-  .dependsOn(iterateeNative)
+lazy val testsNative  = tests.native

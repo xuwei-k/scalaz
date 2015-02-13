@@ -27,7 +27,6 @@ object build {
   type Sett = Def.Setting[_]
 
   val rootNativeId = "rootNative"
-  val nativeTestId = "nativeTest"
 
   lazy val publishSignedArtifacts = ReleaseStep(
     action = st => {
@@ -189,7 +188,7 @@ object build {
       inquireVersions,
       runTest,
       SetScala211,
-      releaseStepCommand(s"${nativeTestId}/run"),
+      releaseStepCommand(s"testsNative/test"),
       setReleaseVersion,
       commitReleaseVersion,
       tagRelease,
@@ -249,9 +248,12 @@ object build {
     OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
   )
 
-  private[this] val jvm_js_settings = Seq(
+  val jvm_js_settings = Seq(
     unmanagedSourceDirectories in Compile += {
       baseDirectory.value.getParentFile / "jvm_js/src/main/scala/"
+    },
+    unmanagedSourceDirectories in Test += {
+      baseDirectory.value.getParentFile / "jvm_js/src/test/scala/"
     }
   )
 
