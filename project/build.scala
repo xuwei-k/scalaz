@@ -44,7 +44,7 @@ object build extends Build {
 
   val scalaCheckVersion = SettingKey[String]("scalaCheckVersion")
 
-  private def gitHash = sys.process.Process("git rev-parse HEAD").lines_!.head
+  private def gitHash = sys.process.Process("git rev-parse HEAD^").lines_!.head
 
   // no generic signatures for scala 2.10.x, see SI-7932, #571 and #828
   def scalac210Options = Seq("-Yno-generic-signatures")
