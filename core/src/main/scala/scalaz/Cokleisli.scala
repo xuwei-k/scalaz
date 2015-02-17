@@ -46,7 +46,7 @@ sealed abstract class CokleisliInstances0 {
 }
 
 sealed abstract class CokleisliInstances extends CokleisliInstances0 {
-  implicit def cokleisliMonad[F[_], R]: Monad[Cokleisli[F, R, ?]] =
+  implicit def cokleisliInstance[F[_], R]: Monad[Cokleisli[F, R, ?]] with Distributive[Cokleisli[F, R, ?]] =
     new CokleisliMonad[F, R] {}
 
   implicit def cokleisliArrow[F[_]](implicit F0: Comonad[F]): Arrow[Cokleisli[F, ?, ?]] with ProChoice[Cokleisli[F, ?, ?]] =
@@ -57,10 +57,12 @@ sealed abstract class CokleisliInstances extends CokleisliInstances0 {
 
 trait CokleisliFunctions
 
-private trait CokleisliMonad[F[_], R] extends Monad[Cokleisli[F, R, ?]] {
+private trait CokleisliMonad[F[_], R] extends Monad[Cokleisli[F, R, ?]] with Distributive[Cokleisli[F, R, ?]] {
   override def ap[A, B](fa: => Cokleisli[F, R, A])(f: => Cokleisli[F, R, A => B]) = f flatMap (fa map _)
   def point[A](a: => A) = Cokleisli(_ => a)
   def bind[A, B](fa: Cokleisli[F, R, A])(f: A => Cokleisli[F, R, B]) = fa flatMap f
+  override def distributeImpl[G[_], A, B](fa: G[A])(f: A => Cokleisli[F, R, B])(implicit G: Functor[G]) =
+    Cokleisli(r => G.map(fa)(a => f(a)(r)))
 }
 
 private trait CokleisliCompose[F[_]] extends Compose[Cokleisli[F, ?, ?]] {
