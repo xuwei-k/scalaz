@@ -19,6 +19,6 @@ object TreeLocTest extends SpecLite {
 
     // TODO checkAll("TreeLoc", traverse.laws[TreeLoc])
     // TODO checkAll("TreeLoc", applicative.laws[TreeLoc])
-    checkAll("TreeLoc", comonad.laws[TreeLoc])
+    //checkAll("TreeLoc", comonad.laws[TreeLoc])
   }
 }

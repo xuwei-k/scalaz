@@ -310,4 +310,60 @@ object ScalazArbitrary {
     ))
   }
 
+  import org.scalacheck.CoArbitrary
+
+  implicit def coarbName[A: CoArbitrary]: CoArbitrary[Name[A]] =
+    implicitly[CoArbitrary[A]].contramap(_.value)
+
+  implicit def coarbNeed[A: CoArbitrary]: CoArbitrary[Need[A]] =
+    implicitly[CoArbitrary[A]].contramap(_.value)
+
+  implicit def coarbValue[A: CoArbitrary]: CoArbitrary[Value[A]] =
+    implicitly[CoArbitrary[A]].contramap(_.value)
+
+  implicit def coarbNel[A: CoArbitrary]: CoArbitrary[NonEmptyList[A]] =
+    CoArbitrary.coarbList[A].contramap(_.toList)
+
+  implicit def coarbIList[A: CoArbitrary]: CoArbitrary[IList[A]] =
+    CoArbitrary.coarbList[A].contramap(_.toList)
+
+  implicit def coarbEpehemral[A: CoArbitrary]: CoArbitrary[EphemeralStream[A]] =
+    CoArbitrary.coarbList[A].contramap(_.toList)
+
+  implicit def coarbTree[A: CoArbitrary]: CoArbitrary[Tree[A]] =
+    CoArbitrary.coarbList[A].contramap(_.toList) // TODO improve
+
+  implicit def coarbWriterT[F[_], A, B](implicit FAB: CoArbitrary[F[(A, B)]]): CoArbitrary[WriterT[F, A, B]] =
+    FAB.contramap(_.run)
+
+  implicit def coarbUnwriterT[F[_], A, B](implicit FAB: CoArbitrary[F[(A, B)]]): CoArbitrary[UnwriterT[F, A, B]] =
+    FAB.contramap(_.run)
+
+  implicit def coarbIndexedStoreT[F[_], A, B, C](implicit FABC: CoArbitrary[(F[A => B], C)]): CoArbitrary[IndexedStoreT[F, C, A, B]] =
+    FABC.contramap(_.run)
+
+  implicit def coarbMaybe[A: CoArbitrary]: CoArbitrary[Maybe[A]] =
+    implicitly[CoArbitrary[Option[A]]].contramap(_.toOption)
+
+  implicit def coarbLazyOption[A: CoArbitrary]: CoArbitrary[LazyOption[A]] =
+    implicitly[CoArbitrary[Option[A]]].contramap(_.toOption)
+
+  implicit def coarbLazyEither[A: CoArbitrary, B: CoArbitrary]: CoArbitrary[LazyEither[A, B]] =
+    implicitly[CoArbitrary[Either[A, B]]].contramap(_.toEither)
+
+  implicit def coarb_\/[A: CoArbitrary, B: CoArbitrary]: CoArbitrary[A \/ B] =
+    implicitly[CoArbitrary[Either[A, B]]].contramap(_.toEither)
+
+  implicit def coarbCoproduct[F[_], G[_], A](implicit F: CoArbitrary[F[A] \/ G[A]]): CoArbitrary[Coproduct[F, G, A]] =
+    F.contramap(_.run)
+
+  implicit def coarbZipper[A: CoArbitrary]: CoArbitrary[Zipper[A]] =
+    implicitly[CoArbitrary[(Stream[A], A, Stream[A])]].contramap{z => (z.lefts, z.focus, z.rights)}
+
+  implicit def coarbOneOne[F[_], A](implicit A: CoArbitrary[F[A] \/ A]): CoArbitrary[OneOr[F, A]] =
+    A.contramap(_.run)
+
+  implicit def coarbCoyoneda[F[_], A](implicit A: CoArbitrary[F[A]], F: Functor[F]): CoArbitrary[Coyoneda[F, A]] =
+    A.contramap(_.run)
 }
+

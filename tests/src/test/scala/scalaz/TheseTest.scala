@@ -11,7 +11,7 @@ object TheseTest extends SpecLite {
   type TheseInt[a] = Int \&/ a
 
   checkAll(monad.laws[TheseInt])
-  checkAll(cobind.laws[TheseInt])
+  //checkAll(cobind.laws[TheseInt])
   checkAll(traverse.laws[TheseInt])
   checkAll(equal.laws[Int \&/ Int])
   checkAll(semigroup.laws[Int \&/ Int])

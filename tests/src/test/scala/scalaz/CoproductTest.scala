@@ -7,7 +7,7 @@ import org.scalacheck.Prop.forAll
 
 object CoproductTest extends SpecLite {
 
-  checkAll(comonad.laws[Coproduct[NonEmptyList, Tree, ?]])
+  checkAll(comonad.laws[Coproduct[NonEmptyList, NonEmptyList, ?]])
   checkAll(traverse.laws[Coproduct[Option, List, ?]])
 
   object instances {

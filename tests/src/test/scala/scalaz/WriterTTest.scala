@@ -24,7 +24,7 @@ object WriterTTest extends SpecLite {
   implicit def writerArb[F[_], W, A](implicit W: Arbitrary[W], A: Arbitrary[A]): Arbitrary[Writer[W, A]] =
     Applicative[Arbitrary].apply2(W, A)((w, a) => Writer[W, A](w, a))
 
-  checkAll(comonad.laws[Writer[Int, ?]])
+  //checkAll(comonad.laws[Writer[Int, ?]])
 
   "flatMapF consistent with flatMap" ! forAll {
     (fa: WriterTOptInt[Int], f: Int => Option[(Int, Int)]) =>

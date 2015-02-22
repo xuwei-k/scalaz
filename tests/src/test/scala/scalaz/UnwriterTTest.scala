@@ -20,7 +20,7 @@ object UnwriterTTest extends SpecLite {
   implicit def UnwriterArb[F[_], W, A](implicit W: Arbitrary[W], A: Arbitrary[A]): Arbitrary[Unwriter[W, A]] =
     Applicative[Arbitrary].apply2(W, A)(Unwriter(_, _))
 
-  checkAll(comonad.laws[Unwriter[Int, ?]])
+//  checkAll(comonad.laws[Unwriter[Int, ?]])
 
   object instances {
     def equal[F[_], W, A](implicit E: Equal[F[(W, A)]]) = Equal[UnwriterT[F, W, A]]

@@ -215,7 +215,7 @@ object ScalazProperties {
                                             f: Arbitrary[F[A] => B], g: Arbitrary[F[B] => C], h: Arbitrary[F[C] => D]) =
       forAll(F.cobindLaw.cobindAssociative[A, B, C, D] _)
 
-    def laws[F[_]](implicit a: Cobind[F], am: Arbitrary[F[Int]], e: Equal[F[Int]]) = new Properties("cobind") {
+    def laws[F[_]](implicit a: Cobind[F], am: Arbitrary[F[Int]], e: Equal[F[Int]], x: Arbitrary[F[Int] => Int]) = new Properties("cobind") {
       include(functor.laws[F])
       property("cobind associative") = cobindAssociative[F, Int, Int, Int, Int]
     }
@@ -526,7 +526,7 @@ object ScalazProperties {
     def errorsStopComputation[F[_, _], E, A](implicit me: MonadError[F, E], eq: Equal[F[E, A]], ae: Arbitrary[E], aa: Arbitrary[A]) =
       forAll(me.monadErrorLaw.errorsStopComputation[A] _)
 
-    def laws[F[_, _], E](implicit me: MonadError[F, E], am: Arbitrary[F[E, Int]], afap: Arbitrary[F[E, Int => Int]], aeq: Equal[F[E, Int]], ae: Arbitrary[E]) =
+    def laws[F[_, _], E](implicit me: MonadError[F, E], am: Arbitrary[F[E, Int]], afap: Arbitrary[F[E, Int => Int]], aeq: Equal[F[E, Int]], ae: Arbitrary[E], x: Arbitrary[E => F[E, Int]]) =
       new Properties("monad error") {
         include(monad.laws[F[E, ?]])
         property("raisedErrorsHandled") = raisedErrorsHandled[F, E, Int]
