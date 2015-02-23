@@ -249,7 +249,7 @@ object build extends Build {
       osgiExport("scalaz.scalacheck")
     )
   ).dependsOn(
-    ProjectRef(uri("git://github.com/xuwei-k/scalacheck.git#f0ada986a87"), "jvm")
+    ProjectRef(uri("git://github.com/xuwei-k/scalacheck.git#46596824aad37f11f97c"), "jvm")
   )
 
   lazy val tests = Project(
