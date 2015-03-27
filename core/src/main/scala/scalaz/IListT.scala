@@ -5,6 +5,20 @@ package scalaz
  */
 final case class IListT[F[_], A](run: F[Maybe[(A, IListT[F, A])]]){
 
+  private[this] def reverse(implicit F: Monad[F]): F[IList[A]] = {
+    def loop(xs: IListT[F, A], ys: IList[A]): F[IList[A]] =
+      F.bind(xs.run) {
+        case Maybe.Empty() =>
+          F.point(ys)
+        case Maybe.Just((h, t)) =>
+          loop(t, h :: ys)
+      }
+    loop(this, IList.empty)
+  }
+
+  def toIList(implicit F: Monad[F]): F[IList[A]] =
+    F.map(this.reverse)(_.reverse)
+
   def map[B](f: A => B)(implicit F: Functor[F]): IListT[F, B] =
     IListT(F.map(run)(_.map{ case (a, b) => f(a) -> b.map(f) }))
 
