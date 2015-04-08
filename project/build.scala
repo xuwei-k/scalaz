@@ -47,6 +47,11 @@ object build extends Build {
 
   private def gitHash = sys.process.Process("git rev-parse HEAD").lines_!.head
 
+  private[this] val unusedWarnings = Seq(
+    "-Ywarn-unused",
+    "-Ywarn-unused-import"
+  )
+
   lazy val standardSettings: Seq[Sett] = Defaults.defaultSettings ++ sbtrelease.ReleasePlugin.releaseSettings ++ Seq[Sett](
     organization := "org.scalaz",
 
@@ -63,7 +68,13 @@ object build extends Build {
       "-unchecked",
       "-Yno-generic-signatures"
     ),
-
+    scalacOptions ++= {
+      if(scalaVersion.value startsWith "2.10")
+        Nil
+      else
+        unusedWarnings
+    },
+    scalacOptions in (Compile, console) ~= {_.filterNot(unusedWarnings.toSet)},
     scalacOptions in (Compile, doc) <++= (baseDirectory in LocalProject("scalaz"), version) map { (bd, v) =>
       val tagOrBranch = if(v endsWith "SNAPSHOT") gitHash else ("v" + v)
       Seq("-sourcepath", bd.getAbsolutePath, "-doc-source-url", "https://github.com/scalaz/scalaz/tree/" + tagOrBranch + "€{FILE_PATH}.scala")
