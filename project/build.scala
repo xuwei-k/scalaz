@@ -47,12 +47,14 @@ object build extends Build {
 
   private def gitHash = sys.process.Process("git rev-parse HEAD").lines_!.head
 
-  lazy val standardSettings: Seq[Sett] = Defaults.defaultSettings ++ sbtrelease.ReleasePlugin.releaseSettings ++ Seq[Sett](
+  lazy val standardSettings: Seq[Sett] = sbtrelease.ReleasePlugin.releaseSettings ++ Seq[Sett](
     organization := "org.scalaz",
 
-    scalaVersion := "2.10.5",
+    scalaVersion := "2.12.0-M1",
     crossScalaVersions := Seq("2.10.5", "2.11.6"),
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
+    resolvers += "Scala 2.12.0-M1 Modules" at "https://oss.sonatype.org/content/repositories/orgscala-lang-1202/",
+    resolvers += "Scala 2.12.0-M1 Core" at "https://oss.sonatype.org/content/repositories/orgscala-lang-1201/",
     scalacOptions ++= Seq(
       // contains -language:postfixOps (because 1+ as a parameter to a higher-order function is treated as a postfix op)
       // no generic signatures, see SI-7932 and #571
@@ -161,28 +163,71 @@ object build extends Build {
           }
         }
         </developers>
-      ),
-    // kind-projector plugin
-    resolvers += "bintray/non" at "http://dl.bintray.com/non/maven",
-    addCompilerPlugin("org.spire-math" % "kind-projector" % "0.5.2"  cross CrossVersion.binary)
+      )
   ) ++ osgiSettings ++ Seq[Sett](
     OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
   )
 
-  lazy val scalaz = Project(
-    id = "scalaz",
-    base = file("."),
-    settings = standardSettings ++ unidocSettings ++ Seq[Sett](
+  def module(id: String, dir: String) =
+    Project(id, file(dir)).settings(
+      standardSettings : _*
+    ).settings(
+      scalacOptions <+= (kindProjectorJar in kindProjector).map("-Xplugin:" + _)
+    ).dependsOn(
+      kindProjector % "plugin->default(compile)"
+    )
+
+  lazy val scalaz = module(
+    "scalaz",
+    "."
+  ).settings(
+    unidocSettings ++ Seq[Sett](
       artifacts <<= Classpaths.artifactDefs(Seq(packageDoc in Compile)),
       packagedArtifacts <<= Classpaths.packaged(Seq(packageDoc in Compile))
-    ) ++ Defaults.packageTaskSettings(packageDoc in Compile, (unidoc in Compile).map(_.flatMap(Path.allSubpaths))),
-    aggregate = Seq(core, concurrent, effect, example, iteratee, scalacheckBinding, tests)
+    ) ++ Defaults.packageTaskSettings(packageDoc in Compile, (unidoc in Compile).map(_.flatMap(Path.allSubpaths))) : _*
+  ).aggregate(
+    core, concurrent, effect, example, iteratee, kindProjector
   )
 
-  lazy val core = Project(
-    id = "core",
-    base = file("core"),
-    settings = standardSettings ++ buildInfoSettings ++ Seq[Sett](
+  lazy val kindProjectorJar = TaskKey[String]("kindProjectorJar")
+
+  lazy val kindProjector = {
+    val kindProjectorRef = "9d9a1db322f0ab6b6f3f84ea2624c67252369665"
+    val kindProjectorZip = url(s"https://github.com/non/kind-projector/archive/$kindProjectorRef.zip")
+
+    Project(
+      "kind-projector",
+      file("kindProjector")
+    ).settings(
+      standardSettings
+    ).settings(
+      publishArtifact := false,
+      publish := {},
+      publishLocal := {},
+      libraryDependencies <+= scalaVersion("org.scala-lang" % "scala-compiler" % _ % "provided"),
+      kindProjectorJar <<= (packageBin in Compile).map(_.getAbsolutePath),
+      (sourceGenerators in Compile) += task{
+        IO.unzipURL(
+          kindProjectorZip,
+          (sourceManaged in Compile).value,
+          new SimpleFilter(
+            name => name.contains("src/main/scala/") && name.endsWith(".scala")
+          )
+        ).toSeq
+      },
+      (resourceGenerators in Compile) += task{
+        val resource = (resourceManaged in Compile).value / "scalac-plugin.xml"
+        val pluginXML = s"https://raw.githubusercontent.com/non/kind-projector/$kindProjectorRef/src/main/resources/scalac-plugin.xml"
+        IO.download(url(pluginXML), resource)
+        Seq(resource)
+      }
+    )
+  }
+
+  lazy val core = module(
+    "core", "core"
+  ).settings(
+    buildInfoSettings ++ Seq[Sett](
       name := "scalaz-core",
       typeClasses := TypeClass.core,
       sourceGenerators in Compile <+= (sourceManaged in Compile) map {
@@ -193,72 +238,46 @@ object build extends Build {
       buildInfoPackage := "scalaz",
       osgiExport("scalaz"),
       OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*")
-    )
+    ) : _*
   )
 
-  lazy val concurrent = Project(
-    id = "concurrent",
-    base = file("concurrent"),
-    settings = standardSettings ++ Seq[Sett](
-      name := "scalaz-concurrent",
-      typeClasses := TypeClass.concurrent,
-      osgiExport("scalaz.concurrent"),
-      OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*")
-    ),
-    dependencies = Seq(core, effect)
+  lazy val concurrent = module(
+    "concurrent", "concurrent"
+  ).settings(
+    name := "scalaz-concurrent",
+    typeClasses := TypeClass.concurrent,
+    osgiExport("scalaz.concurrent"),
+    OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*")
+  ).dependsOn(
+    core, effect
   )
 
-  lazy val effect = Project(
-    id = "effect",
-    base = file("effect"),
-    settings = standardSettings ++ Seq[Sett](
-      name := "scalaz-effect",
-      typeClasses := TypeClass.effect,
-      osgiExport("scalaz.effect", "scalaz.std.effect", "scalaz.syntax.effect")
-    ),
-    dependencies = Seq(core)
+  lazy val effect = module(
+    "effect", "effect"
+  ).settings(
+    name := "scalaz-effect",
+    typeClasses := TypeClass.effect,
+    osgiExport("scalaz.effect", "scalaz.std.effect", "scalaz.syntax.effect")
+  ).dependsOn(
+    core
   )
 
-  lazy val iteratee = Project(
-    id = "iteratee",
-    base = file("iteratee"),
-    settings = standardSettings ++ Seq[Sett](
-      name := "scalaz-iteratee",
-      osgiExport("scalaz.iteratee")
-    ),
-    dependencies = Seq(effect)
+  lazy val iteratee = module(
+    "iteratee", "iteratee"
+  ).settings(
+    name := "scalaz-iteratee",
+    osgiExport("scalaz.iteratee")
+  ).dependsOn(
+    effect
   )
 
-  lazy val example = Project(
-    id = "example",
-    base = file("example"),
-    dependencies = Seq(core, iteratee, concurrent),
-    settings = standardSettings ++ Seq[Sett](
-      name := "scalaz-example",
-      publishArtifact := false
-    )
-  )
-
-  lazy val scalacheckBinding = Project(
-    id           = "scalacheck-binding",
-    base         = file("scalacheck-binding"),
-    dependencies = Seq(core, concurrent, iteratee),
-    settings     = standardSettings ++ Seq[Sett](
-      name := "scalaz-scalacheck-binding",
-      libraryDependencies += "org.scalacheck" %% "scalacheck" % scalaCheckVersion,
-      osgiExport("scalaz.scalacheck")
-    )
-  )
-
-  lazy val tests = Project(
-    id = "tests",
-    base = file("tests"),
-    dependencies = Seq(core, iteratee, concurrent, effect, scalacheckBinding % "test"),
-    settings = standardSettings ++Seq[Sett](
-      name := "scalaz-tests",
-      publishArtifact := false,
-      libraryDependencies += "org.scalacheck" %% "scalacheck" % scalaCheckVersion % "test"
-    )
+  lazy val example = module(
+    "example", "example"
+  ).settings(
+    name := "scalaz-example",
+    publishArtifact := false
+  ).dependsOn(
+    core, iteratee, concurrent
   )
 
   lazy val publishSetting = publishTo <<= (version).apply{
