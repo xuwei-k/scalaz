@@ -325,6 +325,12 @@ sealed abstract class IList[A] extends Product with Serializable {
   def sortBy[B](f: A => B)(implicit B: Order[B]): IList[A] =
     sorted(B.contramap(f))
 
+  def sortByOld[B](f: A => B)(implicit B: Order[B]): IList[A] =
+    IList(toList.sortBy(f)(B.toScalaOrdering): _*)
+
+  def sortedOld(implicit ev: Order[A]): IList[A] =
+    sortByOld(identity)
+
   def sorted(implicit ev: Order[A]): IList[A] = {
     val len = length
     if(len <= 1){

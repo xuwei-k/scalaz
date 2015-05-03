@@ -23,9 +23,10 @@ scala:
   - 2.10.5
 jdk:
   - openjdk7
+  - oraclejdk8
 
 script:
-  - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m check-gen-type-classes test
+  - sbt -Xmx512M ++$TRAVIS_SCALA_VERSION bench/run
 
   # Tricks to avoid unnecessary cache updates
   - find $HOME/.sbt -name "*.lock" | xargs rm

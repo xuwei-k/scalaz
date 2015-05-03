@@ -23,6 +23,7 @@ import sbtbuildinfo.Plugin._
 
 import sbtunidoc.Plugin._
 import sbtunidoc.Plugin.UnidocKeys._
+import pl.project13.scala.sbt._
 
 object build extends Build {
   type Sett = Def.Setting[_]
@@ -47,7 +48,7 @@ object build extends Build {
 
   private def gitHash = sys.process.Process("git rev-parse HEAD").lines_!.head
 
-  lazy val standardSettings: Seq[Sett] = Defaults.defaultSettings ++ sbtrelease.ReleasePlugin.releaseSettings ++ Seq[Sett](
+  lazy val standardSettings: Seq[Sett] = sbtrelease.ReleasePlugin.releaseSettings ++ Seq[Sett](
     organization := "org.scalaz",
 
     scalaVersion := "2.10.5",
@@ -195,6 +196,15 @@ object build extends Build {
       OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*")
     )
   )
+
+  lazy val bench = Project(
+    "bench",
+    file("bench")
+  ).settings(
+    standardSettings
+  ).dependsOn(
+    core
+  ).enablePlugins(JmhPlugin)
 
   lazy val concurrent = Project(
     id = "concurrent",
