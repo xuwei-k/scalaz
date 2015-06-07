@@ -41,12 +41,6 @@ object ListTTest extends SpecLite {
       ListT.fromList(ass).map(_ * 2).toList must_===(ass.map(_.map(_ * 2)))
   }
 
-  "flatMap" ! forAll {
-    (ass: List[List[Int]]) =>
-      (ListT.fromList(ass).flatMap(number => ListT.fromList(List(List(number.toFloat)))).toList
-      must_===(ass.map(_.flatMap(number => List(number.toFloat)))))
-  }
-
   // Exists to ensure that fromList and map don't stack overflow.
   "large map" ! {
     val list = (0 to 400).toList.map(_ => (0 to 400).toList)
@@ -66,9 +60,8 @@ object ListTTest extends SpecLite {
   checkAll(monadPlus.laws[ListTOpt])
 
   object instances {
-    def semigroup[F[_]: Monad, A] = Semigroup[ListT[F, A]]
-    def monoid[F[_]: Monad, A] = Monoid[ListT[F, A]]
-    def monad[F[_]: Monad, A] = Monad[ListT[F, ?]]
+    def monoid[F[_]: Commutative, A] = Monoid[ListT[F, A]]
+    def monad[F[_]: Commutative, A] = Monad[ListT[F, ?]]
     def functor[F[_]: Functor, A] = Functor[ListT[F, ?]]
 
     // checking absence of ambiguity

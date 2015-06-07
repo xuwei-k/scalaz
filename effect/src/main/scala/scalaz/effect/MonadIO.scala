@@ -42,8 +42,6 @@ object MonadIO {
 
   implicit def idTMonadIO[F[_]: MonadIO] = fromLiftIO[IdT[F, ?]]
 
-  implicit def listTMonadIO[F[_]: MonadIO] = fromLiftIO[ListT[F, ?]]
-
   implicit def optionTMonadIO[F[_]: MonadIO] = fromLiftIO[OptionT[F, ?]]
 
   implicit def eitherTMonadIO[F[_]: MonadIO, E] = fromLiftIO[EitherT[F, E, ?]]
