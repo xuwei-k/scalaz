@@ -210,6 +210,17 @@ object ScalazProperties {
     }
   }
 
+  object commutative {
+    def commutative[M[_], X, Y](implicit M: Commutative[M], x: Arbitrary[M[X]], y: Arbitrary[M[Y]], e: Equal[M[(X, Y)]]) =
+      forAll(M.commutativeLow.commutative[X, Y] _)
+
+    def laws[M[_]](implicit M: Commutative[M], a1: Arbitrary[M[Int]], a2: Arbitrary[M[Int => Int]], e1: Equal[M[Int]], e2: Equal[M[(Int, Int)]]) =
+      new Properties("commutative") {
+        include(monad.laws[M])
+        property("commutative monad") = commutative[M, Int, Int]
+      }
+  }
+
   object cobind {
     def cobindAssociative[F[_], A, B, C, D](implicit F: Cobind[F], D: Equal[D], fa: Arbitrary[F[A]],
                                             f: Arbitrary[F[A] => B], g: Arbitrary[F[B] => C], h: Arbitrary[F[C] => D]) =
