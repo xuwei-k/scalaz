@@ -1,14 +1,13 @@
 package scalaz
 
-import org.scalacheck.Prop
 import org.scalacheck.Prop.forAll
 import Tags._
 
 object MaybeTest extends SpecLite {
-  import org.scalacheck.Arbitrary
   import scalaz.scalacheck.ScalazProperties._
   import scalaz.scalacheck.ScalazArbitrary._
   import std.anyVal._
+  import std.tuple._
   import std.string._
   import syntax.equal._
 
@@ -32,6 +31,7 @@ object MaybeTest extends SpecLite {
   checkAll("Maybe @@ Max", monad.laws[MaxMaybe])
 
   checkAll(monadPlus.strongLaws[Maybe])
+  checkAll(commutative.laws[Maybe])
   checkAll(traverse.laws[Maybe])
   checkAll(zip.laws[Maybe])
   checkAll(isEmpty.laws[Maybe])
