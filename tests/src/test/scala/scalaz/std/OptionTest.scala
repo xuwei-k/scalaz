@@ -18,6 +18,7 @@ object OptionTest extends SpecLite {
 
   checkAll("Option", monoid.laws[Option[Int]])
   checkAll("Option", monadPlus.strongLaws[Option])
+  checkAll("Option", commutative.laws[Option])
   checkAll("Option", traverse.laws[Option])
   checkAll("Option", zip.laws[Option])
   checkAll("Option", isEmpty.laws[Option])

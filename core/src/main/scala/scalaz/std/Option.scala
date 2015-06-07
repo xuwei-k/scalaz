@@ -8,7 +8,7 @@ sealed trait OptionInstances0 {
 }
 
 trait OptionInstances extends OptionInstances0 {
-  implicit val optionInstance = new Traverse[Option] with MonadPlus[Option] with Cozip[Option] with Zip[Option] with Unzip[Option] with Align[Option] with IsEmpty[Option] with Cobind[Option] with Optional[Option] {
+  implicit val optionInstance = new Commutative[Option] with Traverse[Option] with MonadPlus[Option] with Cozip[Option] with Zip[Option] with Unzip[Option] with Align[Option] with IsEmpty[Option] with Cobind[Option] with Optional[Option] {
     def point[A](a: => A) = Some(a)
     override def index[A](fa: Option[A], n: Int) = if (n == 0) fa else None
     override def length[A](fa: Option[A]) = if (fa.isEmpty) 0 else 1
