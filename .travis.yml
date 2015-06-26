@@ -18,14 +18,13 @@ cache:
     - $HOME/.sbt/boot/scala-$TRAVIS_SCALA_VERSION
 
 language: scala
-scala:
-  - 2.11.7
-  - 2.10.5
 jdk:
-  - openjdk7
+  - oraclejdk8
 
 script:
-  - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m check-gen-type-classes test
+  - sbt core/jarSize
+  - git clean -fdx
+  - sbt 'project core' 'set scalacOptions ++= List("-Ybackend:GenBCode", "-Ydelambdafy:method", "-target:jvm-1.8")' core/jarSize
 
   # Tricks to avoid unnecessary cache updates
   - find $HOME/.sbt -name "*.lock" | xargs rm

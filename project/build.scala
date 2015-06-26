@@ -52,7 +52,7 @@ object build extends Build {
   lazy val standardSettings: Seq[Sett] = Seq[Sett](
     organization := "org.scalaz",
 
-    scalaVersion := "2.10.5",
+    scalaVersion := "2.11.7",
     crossScalaVersions := Seq("2.10.5", "2.11.7"),
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     scalacOptions ++= Seq(
@@ -70,6 +70,12 @@ object build extends Build {
     scalacOptions in (Compile, doc) <++= (baseDirectory in LocalProject("scalaz"), version) map { (bd, v) =>
       val tagOrBranch = if(v endsWith "SNAPSHOT") gitHash else ("v" + v)
       Seq("-sourcepath", bd.getAbsolutePath, "-doc-source-url", "https://github.com/scalaz/scalaz/tree/" + tagOrBranch + "€{FILE_PATH}.scala")
+    },
+
+    TaskKey[Unit]("jarSize") := {
+      val size = (packageBin in Compile).value.length
+      val id = thisProject.value.id
+      streams.value.log.info(s"[$id] $size bytes")
     },
 
     // retronym: I was seeing intermittent heap exhaustion in scalacheck based tests, so opting for determinism.
@@ -191,6 +197,7 @@ object build extends Build {
       sourceGenerators in Compile <+= (sourceManaged in Compile) map {
         dir => Seq(GenerateTupleW(dir))
       },
+      libraryDependencies += "org.scala-lang.modules" %% "scala-java8-compat" % "0.5.0",
       buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
       buildInfoPackage := "scalaz",
       osgiExport("scalaz"),
