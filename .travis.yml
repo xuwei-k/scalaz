@@ -1,33 +1,25 @@
 # Use Docker-based container (instead of OpenVZ)
 sudo: false
 
-cache:
-  directories:
-    - $HOME/.ivy2/cache
-
-    # At the moment, sbt 0.13.5 is preinstalled in Travis VM image,
-    # which fortunately corresponds to current scalaz settings.
-    # The line below can be used to cache a given sbt version.
-    # - $HOME/.sbt/launchers/0.13.x
-
-    # At the moment, Scala 2.11.2 and 2.10.4 are preinstalled in Travis VM
-    # image, which fortunately corresponds to current scalaz settings.
-    # The line below is used to cache the scala version used by the build
-    # job, as these versions might be replaced after a Travis CI build
-    # environment upgrade (e.g. scala 2.11.2 could be replaced by scala 2.11.4).
-    - $HOME/.sbt/boot/scala-$TRAVIS_SCALA_VERSION
-
 language: scala
-scala:
-  - 2.12.0-M1
-  - 2.11.7
-  - 2.10.5
 jdk:
-  - openjdk7
+  - oraclejdk8
 
 script:
-  - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m check-gen-type-classes test
+  - sbt 'project core' compile > /dev/null
+  - git clean -fdx
+  - sbt 'project core' update compile
+  - git clean -fdx
+  - sbt 'project core' 'set scalacOptions ++= List("-Ybackend:GenBCode", "-Ydelambdafy:method", "-target:jvm-1.8")' update compile
+  - git clean -fdx
+  - sbt 'project core' update compile
+  - git clean -fdx
+  - sbt 'project core' 'set scalacOptions ++= List("-Ybackend:GenBCode", "-Ydelambdafy:method", "-target:jvm-1.8")' update compile
 
-  # Tricks to avoid unnecessary cache updates
-  - find $HOME/.sbt -name "*.lock" | xargs rm
-  - find $HOME/.ivy2 -name "ivydata-*.properties" | xargs rm
+env:
+  matrix:
+    - DUMMY="1"
+    - DUMMY="2"
+    - DUMMY="3"
+    - DUMMY="4"
+    - DUMMY="5"

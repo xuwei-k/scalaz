@@ -52,7 +52,7 @@ object build extends Build {
   lazy val standardSettings: Seq[Sett] = Seq[Sett](
     organization := "org.scalaz",
 
-    scalaVersion := "2.10.5",
+    scalaVersion := "2.11.7",
     crossScalaVersions := Seq("2.10.5", "2.11.7", "2.12.0-M1"),
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     scalacOptions ++= Seq(
@@ -191,6 +191,7 @@ object build extends Build {
       sourceGenerators in Compile <+= (sourceManaged in Compile) map {
         dir => Seq(GenerateTupleW(dir))
       },
+      libraryDependencies += "org.scala-lang.modules" %% "scala-java8-compat" % "0.5.0",
       buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
       buildInfoPackage := "scalaz",
       osgiExport("scalaz"),
