@@ -24,7 +24,7 @@ jdk:
 script:
   - sbt core/jarSize
   - git clean -fdx
-  - sbt 'project core' 'set scalacOptions ++= List("-Ybackend:GenBCode", "-Ydelambdafy:method", "-target:jvm-1.8")' core/jarSize
+  - sbt 'project core' 'set scalacOptions ++= List("-Ybackend:GenBCode", "-Ydelambdafy:method", "-target:jvm-1.8", "-Yopt:l:classpath")' core/jarSize
 
   # Tricks to avoid unnecessary cache updates
   - find $HOME/.sbt -name "*.lock" | xargs rm
