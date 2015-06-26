@@ -52,7 +52,7 @@ object build extends Build {
   lazy val standardSettings: Seq[Sett] = Seq[Sett](
     organization := "org.scalaz",
 
-    scalaVersion := "2.10.5",
+    scalaVersion := "2.11.7",
     crossScalaVersions := Seq("2.10.5", "2.11.7"),
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     scalacOptions ++= Seq(
@@ -247,9 +247,10 @@ object build extends Build {
     dependencies = Seq(core, concurrent, iteratee),
     settings     = standardSettings ++ Seq[Sett](
       name := "scalaz-scalacheck-binding",
-      libraryDependencies += "org.scalacheck" %% "scalacheck" % scalaCheckVersion,
       osgiExport("scalaz.scalacheck")
     )
+  ).dependsOn(
+    ProjectRef(uri("git://github.com/rickynils/scalacheck.git#8b6dee5b"), "jvm")
   )
 
   lazy val tests = Project(
