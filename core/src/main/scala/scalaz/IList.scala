@@ -548,6 +548,17 @@ sealed abstract class IListInstances extends IListInstance0 {
       def zip[A, B](a: => IList[A], b: => IList[B]): IList[(A, B)] =
         a zip b
 
+      override def zipWith[A, B, C](a: => IList[A], b: => IList[B])(f: (A, B) => C)(implicit F: Functor[IList]) = {
+        @tailrec def loop(xs: IList[A], ys: IList[B], accum: IList[C]): IList[C] =
+          (xs, ys) match {
+            case (ICons(x, xx), ICons(y, yy)) => loop(xx, yy, f(x, y) :: accum)
+            case _ => accum
+          }
+        val a0 = a
+        if (a0.isEmpty) empty
+        else loop(a0, b, empty).reverse
+      }
+
       def isEmpty[A](fa: IList[A]): Boolean =
         fa.isEmpty
 

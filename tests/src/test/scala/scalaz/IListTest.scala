@@ -425,6 +425,10 @@ object IListTest extends SpecLite {
     ns.zipWithIndex.toList must_=== ns.toList.zipWithIndex
   }
 
+  "zipWith" ! forAll { (as: IList[Int], bs: IList[Int]) =>
+    Zip[IList].zipWith(as, bs)(_ + _).toList must_=== Zip[List].zipWith(as.toList, bs.toList)(_ + _)
+  }
+
   checkAll(FoldableTests.anyAndAllLazy[IList])
 
 }
