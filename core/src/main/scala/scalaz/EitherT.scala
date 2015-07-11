@@ -214,6 +214,28 @@ object EitherT extends EitherTInstances with EitherTFunctions {
   def right[F[_], A, B](b: F[B])(implicit F: Functor[F]): EitherT[F, A, B] =
     apply(F.map(b)(\/.right))
 
+  def leftU[B]: EitherTLeft[B] =
+    new EitherTLeft[B](())
+
+  /**
+   * @example {{{
+   * val a: String \/ Int = \/-(1)
+   * val b: EitherT[({type l[a] = String \/ a})#l, Boolean, Int] = EitherT.rightU[Boolean](a)
+   * }}}
+   */
+  def rightU[A]: EitherTRight[A] =
+    new EitherTRight[A](())
+
+  private[scalaz] final class EitherTLeft[B](val dummy: Unit) extends AnyVal {
+    def apply[FA](fa: FA)(implicit F: Unapply[Functor, FA]): EitherT[F.M, F.A, B] =
+      EitherT[F.M, F.A, B](F.TC.map(F(fa))(\/.left))
+  }
+
+  private[scalaz] final class EitherTRight[A](val dummy: Unit) extends AnyVal {
+    def apply[FB](fb: FB)(implicit F: Unapply[Functor, FB]): EitherT[F.M, A, F.A] =
+      EitherT[F.M, A, F.A](F.TC.map(F(fb))(\/.right))
+  }
+
   /** Construct a disjunction value from a standard `scala.Either`. */
   def fromEither[F[_], A, B](e: F[Either[A, B]])(implicit F: Functor[F]): EitherT[F, A, B] =
     apply(F.map(e)(_ fold (\/.left, \/.right)))
