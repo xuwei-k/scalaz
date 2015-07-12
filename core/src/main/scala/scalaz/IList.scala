@@ -526,9 +526,38 @@ sealed abstract class IListInstance0 {
 
 sealed abstract class IListInstances extends IListInstance0 {
 
-  implicit val instances: Traverse[IList] with MonadPlus[IList] with Zip[IList] with Unzip[IList] with Align[IList] with IsEmpty[IList] with Cobind[IList] =
+  implicit val instances: Traverse[IList] with Witherable[IList] with MonadPlus[IList] with Zip[IList] with Unzip[IList] with Align[IList] with IsEmpty[IList] with Cobind[IList] =
 
-    new Traverse[IList] with MonadPlus[IList] with Zip[IList] with Unzip[IList] with Align[IList] with IsEmpty[IList] with Cobind[IList] {
+    new Traverse[IList] with Witherable[IList] with MonadPlus[IList] with Zip[IList] with Unzip[IList] with Align[IList] with IsEmpty[IList] with Cobind[IList] {
+
+      def wither[G[_], A, B](fa: IList[A])(f: A => G[Maybe[B]])(implicit G: Applicative[G]): G[IList[B]] =
+        fa match {
+          case ICons(x, xs) =>
+            G.apply2(f(x), wither(xs)(f)) {
+              case (Maybe.Just(a), as) => ICons(a, as)
+              case (Maybe.Empty(), as) => as
+            }
+          case INil() =>
+            G.point(IList())
+        }
+
+      override def mapMaybe[A, B](fa: IList[A])(f: A => Maybe[B]) = {
+        @tailrec def go(as: IList[A], acc: IList[B]): IList[B] =
+          as match {
+            case ICons(h, t) =>
+              f(h) match {
+                case Maybe.Just(a) =>
+                  go(t, ICons(a, acc))
+                case Maybe.Empty() =>
+                  go(t, acc)
+              }
+            case INil() => acc
+          }
+        go(fa, empty).reverse
+      }
+
+      override def filterW[A](fa: IList[A])(f: A => Boolean) =
+        fa.filter(f)
 
       override def map[A, B](fa: IList[A])(f: A => B): IList[B] =
         fa map f

@@ -34,6 +34,7 @@ object TypeClass {
   lazy val foldable = TypeClass("Foldable", *->*)
   lazy val foldable1 = TypeClass("Foldable1", *->*, extendsList = Seq(foldable))
   lazy val traverse = TypeClass("Traverse", *->*, extendsList = Seq(functor, foldable))
+  lazy val witherable = TypeClass("Witherable", *->*, extendsList = Seq(traverse))
   lazy val traverse1 = TypeClass("Traverse1", *->*, extendsList = Seq(traverse, foldable1))
 
   lazy val contravariant = TypeClass("Contravariant", *->*, extendsList = Seq(invariantFunctor))
@@ -104,6 +105,7 @@ object TypeClass {
     foldable1,
     traverse,
     traverse1,
+    witherable,
     associative,
     bifunctor,
     bifoldable,
