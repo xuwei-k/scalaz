@@ -53,7 +53,23 @@ object Equal {
 
   def equalBy[A, B: Equal](f: A => B): Equal[A] = Equal[B] contramap f
 
-  implicit val equalContravariant: Divisible[Equal] = new Divisible[Equal] {
+  implicit val equalContravariant: Decidable[Equal] = new Decidable[Equal] {
+
+    override def lose[A](f: λ[a => A] ~> Id.Id) =
+      ???
+
+    override def decide[A, B, C](fb: Equal[B], fc: Equal[C])(f: A => B \/ C) =
+      Equal.equal[A]{ (x, y) =>
+        (f(x), f(y)) match {
+          case (\/-(c1), \/-(c2)) =>
+            fc.equal(c1, c2)
+          case (-\/(b1), -\/(b2)) =>
+            fb.equal(b1, b2)
+          case _ =>
+            false
+        }
+      }
+
     def contramap[A, B](r: Equal[A])(f: B => A) = r.contramap(f)
 
     override def conquer[A] = Equal.equal((_, _) => true)
