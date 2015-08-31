@@ -112,6 +112,12 @@ sealed abstract class MaybeTInstances extends MaybeTInstances0 {
 
   implicit def maybeTEqual[F[_], A](implicit F0: Equal[F[Maybe[A]]]): Equal[MaybeT[F, A]] =
     F0.contramap((_: MaybeT[F, A]).run)
+
+  implicit def maybeTContravariant[F[_]](implicit F: Contravariant[F]): Contravariant[MaybeT[F, ?]] =
+    new Contravariant[MaybeT[F, ?]] {
+      override def contramap[A, B](r: MaybeT[F, A])(f: B => A) =
+        MaybeT(F.contramap(r.run)(_.map(f)))
+    }
 }
 
 trait MaybeTFunctions {
