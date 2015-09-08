@@ -77,13 +77,24 @@ sealed abstract class Tree[A] {
     }
   }
 
-  /** Pre-order traversal. */
-  def flatten: Stream[A] = {
-    def squish(tree: Tree[A], xs: Stream[A]): Stream[A] =
-      Stream.cons(tree.rootLabel, Foldable[Stream].foldRight(tree.subForest, xs)(squish(_, _)))
+  private def flatten0: Trampoline[Stream[A]] = {
+    def loop(s: Stream[Tree[A]]): Trampoline[Stream[A]] = s match {
+      case ts if ts.isEmpty =>
+        Trampoline.done(Stream.empty[A])
+      case t #:: ts if ts.isEmpty =>
+        Trampoline.suspend(t.flatten0)
+      case t #:: ts =>
+        Apply[Trampoline].apply2(
+          Trampoline.suspend(t.flatten0),
+          Trampoline.suspend(loop(ts))
+        )(_ ++ _)
+    }
 
-    squish(this, Stream.Empty)
+    loop(subForest).map(rootLabel #:: _)
   }
+
+  /** Pre-order traversal. */
+  def flatten: Stream[A] = flatten0.run
 
   /** Breadth-first traversal. */
   def levels: Stream[Stream[A]] = {
