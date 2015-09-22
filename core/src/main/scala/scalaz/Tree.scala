@@ -78,18 +78,15 @@ sealed abstract class Tree[A] {
   }
 
   private def flatten0: Trampoline[Stream[A]] = {
-    def loop(s: Stream[Tree[A]]): Trampoline[Stream[A]] = s match {
-      case ts if ts.isEmpty =>
+    def loop(s: Stream[Tree[A]]): Trampoline[Stream[A]] =
+      if(s.isEmpty) {
         Trampoline.done(Stream.empty[A])
-      case t #:: ts if ts.isEmpty =>
-        Trampoline.suspend(t.flatten0)
-      case t #:: ts =>
+      } else {
         Apply[Trampoline].apply2(
-          Trampoline.suspend(t.flatten0),
-          Trampoline.suspend(loop(ts))
+          Trampoline.suspend(s.head.flatten0),
+          Trampoline.suspend(loop(s.tail))
         )(_ ++ _)
-    }
-
+      }
     loop(subForest).map(rootLabel #:: _)
   }
 
