@@ -15,6 +15,16 @@ trait Zap[F[_], G[_]] { self =>
 
 sealed abstract class ZapInstances {
 
+  implicit def coyonedaF[F[_], G[_]](implicit d: Zap[F, G]): Zap[Coyoneda[F, ?], G] =
+    new Zap[Coyoneda[F, ?], G] {
+      override def zapWith[A, B, C](fa: Coyoneda[F, A], gb: G[B])(f: (A, B) => C): C = ???
+    }
+
+  implicit def coyonedaG[F[_], G[_]](implicit d: Zap[F, G]): Zap[F, Coyoneda[G, ?]] =
+    new Zap[F, Coyoneda[G, ?]] {
+      override def zapWith[A, B, C](fa: F[A], gb: Coyoneda[G, B])(f: (A, B) => C): C = ???
+    }
+
   /** The identity functor annihilates itself. */
   implicit val identityZap: Zap[Id, Id] = 
     new Zap[Id, Id] {
@@ -47,7 +57,7 @@ sealed abstract class ZapInstances {
       def zapWith[A, B, C](ma: Free[F, A], wb: Cofree[G, B])(f: (A, B) => C): C =
         ma.resume match {
           case \/-(a) => f(a, wb.head)
-          case -\/(k) => d.zapWith(k, wb.tail)(zapWith(_, _)(f))
+          case -\/(k) => Zap[F, Coyoneda[G, ?]].zapWith(k, wb.tailC)(zapWith(_, _)(f))
         }
     }
 
@@ -57,9 +67,11 @@ sealed abstract class ZapInstances {
       def zapWith[A, B, C](wa: Cofree[F, A], mb: Free[G, B])(f: (A, B) => C): C =
         mb.resume match {
           case \/-(b) => f(wa.head, b)
-          case -\/(k) => d.zapWith(wa.tail, k)(zapWith(_, _)(f))
+          case -\/(k) => Zap[Coyoneda[F, ?], G].zapWith(wa.tailC, k)(zapWith(_, _)(f))
         }
     }
 }
 
-object Zap extends ZapInstances 
+object Zap extends ZapInstances {
+  @inline def apply[F[_], G[_]](implicit d: Zap[F, G]): Zap[F, G] = d
+}
