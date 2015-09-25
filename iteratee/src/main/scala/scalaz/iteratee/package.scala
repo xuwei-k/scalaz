@@ -1,7 +1,5 @@
 package scalaz
 
-import Id._
-
 package object iteratee {
 
   type Step[E, A] =

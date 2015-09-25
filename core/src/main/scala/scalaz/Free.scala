@@ -188,8 +188,6 @@ sealed abstract class Free[S[_], A] {
       case Gosub(x, g) => M.bind(x foldMap f)(c => g(c) foldMap f)
     }
 
-  import Id._
-
   /**
    * Folds this free recursion to the right using the given natural transformations.
    */

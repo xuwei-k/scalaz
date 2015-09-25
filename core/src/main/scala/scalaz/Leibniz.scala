@@ -1,7 +1,5 @@
 package scalaz
 
-import Id._
-
 /**
  * Leibnizian equality: a better `=:=`
  *

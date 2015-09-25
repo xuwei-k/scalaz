@@ -1,7 +1,5 @@
 package scalaz
 
-import Id._
-
 object Tag {
   /** `subst` specialized to `Id`.
     *
@@ -23,7 +21,7 @@ object Tag {
 
   /** @see `Tag.of` */
   final class TagOf[T] private[Tag]()
-      extends (Id.Id ~> (? @@ T)) {
+      extends (Id ~> (? @@ T)) {
     /** Like `Tag.apply`, but specify only the `T`. */
     def apply[A](a: A): A @@ T = Tag.apply(a)
 

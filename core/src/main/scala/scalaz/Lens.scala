@@ -1,7 +1,5 @@
 package scalaz
 
-import Id._
-
 /**
  * A Lens Family, offering a purely functional means to access and retrieve
  * a field transitioning from type `B1` to type `B2` in a record simultaneously

@@ -5,7 +5,6 @@ import org.scalacheck.Arbitrary
 
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
-import Id._
 import org.scalacheck.Prop.forAll
 
 object VectorTest extends SpecLite {
@@ -106,6 +105,6 @@ object VectorTest extends SpecLite {
 
   "groupWhen is groupWhenM[Id]" ! forAll { xs: Vector[Int] =>
     val f: (Int, Int) => Boolean = _ > _
-    xs.groupWhen(f) must_=== xs.groupWhenM[Id.Id](f)
+    xs.groupWhen(f) must_=== xs.groupWhenM[Id](f)
   }
 }

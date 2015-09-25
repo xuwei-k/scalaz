@@ -1,7 +1,5 @@
 package scalaz
 
-import Id._
-
 /**
  * This data type is isomorphic to `WriterT`, however, it is NOT a monad.
  *

@@ -1,7 +1,5 @@
 package scalaz
 
-import Id._
-
 trait IndexedStateT[F[_], -S1, S2, A] { self =>
   /** Run and return the final value and state in the context of `F` */
   def apply(initial: S1): F[(S2, A)]

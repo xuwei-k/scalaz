@@ -5,7 +5,6 @@ import std.AllInstances._
 import Either3._
 import Iteratee._
 
-import Id._
 import org.scalacheck.Prop.forAll
 
 object EnumeratorPTest extends SpecLite {

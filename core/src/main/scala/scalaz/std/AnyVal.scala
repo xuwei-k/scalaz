@@ -2,7 +2,6 @@ package scalaz
 package std
 
 import scalaz._
-import Id._
 
 trait AnyValInstances {
 

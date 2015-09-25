@@ -1,8 +1,6 @@
 package scalaz
 
 ////
-import scalaz.Id.Id
-
 /**
  * A [[scalaz.Traverse]] where `traverse` is total over
  * [[scalaz.Apply]]s.  That is, `toList` cannot return an empty list.

@@ -1,7 +1,5 @@
 package scalaz
 
-import Id._
-
 final class BijectionT[F[_], G[_], A, B] private[scalaz](_to: A => F[B], _from: B => G[A]) { self =>
   def to(a: A): F[B] = _to(a)
   def from(b: B): G[A] = _from(b)

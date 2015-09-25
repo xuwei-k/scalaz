@@ -185,7 +185,7 @@ trait VectorFunctions {
       }
     }
 
-  /** `groupWhenM` specialized to [[scalaz.Id.Id]]. */
+  /** `groupWhenM` specialized to [[scalaz.Id]]. */
   final def groupWhen[A](as: Vector[A])(p: (A, A) => Boolean): Vector[Vector[A]] = {
     @tailrec
     def span1(xs: Vector[A], s: A, l: Vector[A]): (Vector[A], Vector[A]) =

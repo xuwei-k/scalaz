@@ -3,7 +3,6 @@ package iteratee
 
 import effect._
 import Iteratee._
-import Id._
 
 /**
  * A data sink.

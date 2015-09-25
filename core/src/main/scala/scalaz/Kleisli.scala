@@ -1,7 +1,5 @@
 package scalaz
 
-import Id._
-
 /**
  * Represents a function `A => M[B]`.
  */

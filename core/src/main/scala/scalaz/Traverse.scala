@@ -1,8 +1,6 @@
 package scalaz
 
 ////
-import scalaz.Id.Id
-
 /**
  * Idiomatic traversal of a structure, as described in
  * [[http://www.cs.ox.ac.uk/jeremy.gibbons/publications/iterator.pdf The Essence of the Iterator Pattern]].
@@ -71,7 +69,7 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
 
   /** Traverse with `State`. */
   def traverseS[S,A,B](fa: F[A])(f: A => State[S,B]): State[S,F[B]] =
-    traverseSTrampoline[S, Id.Id, A, B](fa)(f)
+    traverseSTrampoline[S, Id, A, B](fa)(f)
 
   def runTraverseS[S,A,B](fa: F[A], s: S)(f: A => State[S,B]): (S, F[B]) =
     traverseS(fa)(f)(s)

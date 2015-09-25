@@ -5,7 +5,6 @@ import std.AllInstances._
 import Free.Trampoline
 import Iteratee._
 import effect._
-import Id._
 import org.scalacheck.Prop.forAll
 
 object IterateeTTest extends SpecLite {

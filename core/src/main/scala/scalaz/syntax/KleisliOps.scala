@@ -1,8 +1,6 @@
 package scalaz
 package syntax
 
-import Id._
-
 final class KleisliIdOps[A](val self: A) extends AnyVal {
   /** Lift the value into a Kleisli */
   def liftKleisliId[R]: Kleisli[Id, R, A] = Kleisli[Id, R, A](_ => self)

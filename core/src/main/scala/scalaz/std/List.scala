@@ -240,7 +240,7 @@ trait ListFunctions {
     nels + (b -> (nels get b map (a <:: _) getOrElse NonEmptyList(a)))
   } mapValues (_.reverse)
 
-  /** `groupWhenM` specialized to [[scalaz.Id.Id]]. */
+  /** `groupWhenM` specialized to [[scalaz.Id]]. */
   final def groupWhen[A](as: List[A])(p: (A, A) => Boolean): List[NonEmptyList[A]] = {
     @tailrec
     def span1(xs: List[A], s: A, l: List[A]): (List[A], List[A]) = xs match {

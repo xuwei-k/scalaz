@@ -13,8 +13,7 @@ trait Ran[G[_], H[_], A] { ran =>
 }
 
 object Ran {
-  import Id._
-
+  
   implicit def ranFunctor[G[_], H[_]]: Functor[Ran[G, H, ?]] =
     new Functor[Ran[G, H, ?]] {
       def map[A,B](r: Ran[G, H, A])(f: A => B) = r map f
@@ -89,8 +88,7 @@ trait Lan[G[_], H[_], A] { lan =>
 }
 
 object Lan {
-  import Id._
-
+  
   implicit def lanFunctor[F[_], G[_]]: Functor[Lan[F, G, ?]] =
     new Functor[Lan[F, G, ?]] {
       def map[A,B](lan: Lan[F,G,A])(g: A => B) = lan map g

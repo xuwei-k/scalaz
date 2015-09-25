@@ -7,7 +7,6 @@ import effect._
 
 import org.scalacheck.Arbitrary
 import scalaz.scalacheck.ScalaCheckBinding._
-import Id._
 import org.scalacheck.Prop.forAll
 
 object EnumeratorTTest extends SpecLite {

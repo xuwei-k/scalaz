@@ -3,7 +3,6 @@ package iteratee
 
 import effect._
 import Iteratee._
-import Id._
 
 trait EnumeratorT[E, F[_]] { self =>
   def apply[A]: StepT[E, F, A] => IterateeT[E, F, A]

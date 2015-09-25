@@ -74,11 +74,11 @@ trait Bifoldable[F[_, _]]  { self =>
 
   /** Embed one Foldable to the left of this Bifoldable .*/
   def embedLeft[G[_]](implicit G0: Foldable[G]): Bifoldable[λ[(α, β) => F[G[α],β]]] = 
-    embed[G,Id.Id]
+    embed[G,Id]
 
   /** Embed one Foldable to the right of this Bifoldable .*/
   def embedRight[H[_]](implicit H0: Foldable[H]): Bifoldable[λ[(α, β) => F[α,H[β]]]] =
-    embed[Id.Id,H]
+    embed[Id,H]
 
   trait BifoldableLaw {
     import std.vector._

@@ -1,7 +1,5 @@
 package scalaz
 
-import Id._
-
 final case class WriterT[F[_], W, A](run: F[(W, A)]) { self =>
   import WriterT._
 

@@ -39,8 +39,6 @@ sealed abstract class Coyoneda[F[_], A] { coyo =>
   final def trans[G[_]](f: F ~> G): Aux[G, A, I] =
     apply(f(fi))(k)
 
-  import Id._
-
   /** `Coyoneda[F,_]` is the left Kan extension of `F` along `Id` */
   def toLan: Lan[Id, F, A] = new Lan[Id, F, A] {
     type I = coyo.I

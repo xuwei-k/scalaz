@@ -22,7 +22,6 @@ abstract class Yoneda[F[_], A] { yo =>
       def apply[C](g: B => C) = yo(f andThen g)
     }
 
-  import Id._
   /** `Yoneda[F, _]` is the right Kan extension of `F` along `Id` */
   def toRan: Ran[Id, F, A] =
     new Ran[Id, F, A] {

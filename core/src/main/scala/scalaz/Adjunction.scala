@@ -82,7 +82,6 @@ sealed abstract class AdjunctionInstances {
   implicit def compositeAdjunction[F[_], P[_], G[_], Q[_]](implicit A1: F -| G, A2: P -| Q): λ[α => P[F[α]]] -| λ[α => G[Q[α]]] =
     A1 compose A2
 
-  import Id._
   import std.tuple._
   import std.function._
 

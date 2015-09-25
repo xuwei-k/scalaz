@@ -6,7 +6,6 @@ import Iteratee._
 import Enumeratee2T._
 import Either3._
 import MonadPartialOrder._
-import Id._
 import org.scalacheck.Prop.forAll
 
 object Enumeratee2TTest extends SpecLite {

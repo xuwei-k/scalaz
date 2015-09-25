@@ -1,7 +1,5 @@
 package scalaz
 
-import Id._
-
 /** A universally quantified function, usually written as `F ~> G`,
   * for symmetry with `A => B`.
   *
@@ -29,7 +27,7 @@ trait NaturalTransformations {
     */
   type ->[A, B] = λ[α => A] ~> λ[α => B]
 
-  /** `refl` specialized to [[scalaz.Id.Id]]. */
+  /** `refl` specialized to [[scalaz.Id]]. */
   def id = 
     new (Id ~> Id) {
       def apply[A](a: A) = a

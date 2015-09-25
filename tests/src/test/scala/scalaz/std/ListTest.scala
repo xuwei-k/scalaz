@@ -3,7 +3,6 @@ package std
 
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
-import Id._
 import org.scalacheck.Prop
 import org.scalacheck.Prop.forAll
 
@@ -141,7 +140,7 @@ object ListTest extends SpecLite {
 
   "groupWhen is groupWhenM[Id]" ! forAll { xs: List[Int] =>
     val f: (Int, Int) => Boolean = _ > _
-    xs.groupWhen(f) must_=== xs.groupWhenM[Id.Id](f)
+    xs.groupWhen(f) must_=== xs.groupWhenM[Id](f)
   }
 
   "mapAccumLeft" ! forAll {
