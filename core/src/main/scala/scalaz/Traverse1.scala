@@ -1,7 +1,7 @@
 package scalaz
 
 ////
-import scalaz.Id.Id
+import scalaz.Id
 
 /**
  * A [[scalaz.Traverse]] where `traverse` is total over

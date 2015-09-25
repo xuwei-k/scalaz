@@ -52,10 +52,10 @@ trait Bifunctor[F[_, _]]  { self =>
   }
 
   /** Embed one Functor to the left */
-  def embedLeft[G[_]](implicit G0: Functor[G]): Bifunctor[({type λ[α, β]=F[G[α],β]})#λ] = embed[G,Id.Id]
+  def embedLeft[G[_]](implicit G0: Functor[G]): Bifunctor[({type λ[α, β]=F[G[α],β]})#λ] = embed[G,Id]
 
   /** Embed one Functor to the right */
-  def embedRight[H[_]](implicit H0: Functor[H]): Bifunctor[({type λ[α, β]=F[α,H[β]]})#λ] = embed[Id.Id,H]
+  def embedRight[H[_]](implicit H0: Functor[H]): Bifunctor[({type λ[α, β]=F[α,H[β]]})#λ] = embed[Id,H]
 
   ////
   val bifunctorSyntax = new scalaz.syntax.BifunctorSyntax[F] { def F = Bifunctor.this }

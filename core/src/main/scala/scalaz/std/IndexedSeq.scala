@@ -219,7 +219,7 @@ trait IndexedSeqSubFunctions extends IndexedSeqSub {
       }
     }
 
-  /** `groupWhenM` specialized to [[scalaz.Id.Id]]. */
+  /** `groupWhenM` specialized to [[scalaz.Id]]. */
   final def groupWhen[A](as: IxSq[A])(p: (A, A) => Boolean): IxSq[IxSq[A]] = {
     @tailrec
     def span1(xs: IxSq[A], s: A, l: IxSq[A]): (IxSq[A], IxSq[A]) =

@@ -23,7 +23,7 @@ object Tag {
 
   /** @see `Tag.of` */
   final class TagOf[T] private[Tag]()
-      extends (Id.Id ~> ({type λ[α] = α @@ T})#λ) {
+      extends (Id ~> ({type λ[α] = α @@ T})#λ) {
     /** Like `Tag.apply`, but specify only the `T`. */
     def apply[A](a: A): A @@ T = Tag.apply(a)
 

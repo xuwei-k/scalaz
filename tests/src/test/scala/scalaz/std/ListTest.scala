@@ -141,7 +141,7 @@ object ListTest extends SpecLite {
 
   "groupWhen is groupWhenM[Id]" ! forAll { xs: List[Int] =>
     val f: (Int, Int) => Boolean = _ > _
-    xs.groupWhen(f) must_=== xs.groupWhenM[Id.Id](f)
+    xs.groupWhen(f) must_=== xs.groupWhenM[Id](f)
   }
 
   "mapAccumLeft" ! forAll {

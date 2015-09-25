@@ -85,7 +85,11 @@
  *  - [[scalaz.EitherT]] Represents computations of type `F[A \/ B]`
  */
 package object scalaz {
-  import Id._
+
+  /** The strict identity type constructor. Can be thought of as `Tuple1`, but with no
+   *  runtime representation.
+   */
+  type Id[+X] = X
 
   implicit val idInstance: Traverse1[Id] with Each[Id] with Monad[Id] with Comonad[Id] with Distributive[Id] with Zip[Id] with Unzip[Id] with Align[Id] with Cozip[Id] = Id.id
 

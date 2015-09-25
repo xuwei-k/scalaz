@@ -1,7 +1,7 @@
 package scalaz
 
 ////
-import scalaz.Id.Id
+import scalaz.Id
 
 /**
  * A type giving rise to two unrelated [[scalaz.Traverse]]s.
@@ -114,10 +114,10 @@ trait Bitraverse[F[_, _]] extends Bifunctor[F] with Bifoldable[F] { self =>
   }
 
   /** Embed a Traverse on the left side of this Bitraverse . */
-  def embedLeft[G[_]](implicit G0: Traverse[G]): Bitraverse[({type λ[α, β]=F[G[α], β]})#λ] = embed[G,Id.Id]
+  def embedLeft[G[_]](implicit G0: Traverse[G]): Bitraverse[({type λ[α, β]=F[G[α], β]})#λ] = embed[G,Id]
 
   /** Embed a Traverse on the right side of this Bitraverse . */
-  def embedRight[H[_]](implicit H0: Traverse[H]): Bitraverse[({type λ[α, β]=F[α, H[β]]})#λ] = embed[Id.Id,H]
+  def embedRight[H[_]](implicit H0: Traverse[H]): Bitraverse[({type λ[α, β]=F[α, H[β]]})#λ] = embed[Id,H]
 
   ////
   val bitraverseSyntax = new scalaz.syntax.BitraverseSyntax[F] { def F = Bitraverse.this }

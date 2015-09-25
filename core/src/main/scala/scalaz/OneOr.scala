@@ -226,7 +226,7 @@ trait OneOrFunctions {
   type OneOrList[A] = OneOr[List, A]
   type OneOrNel[A] = OneOr[NonEmptyList, A]
   type OneOrOption[A] = OneOr[Option, A]
-  type OneOrId[A] = OneOr[Id.Id, A]
+  type OneOrId[A] = OneOr[Id, A]
   type OneOrNothing[A] = OneOr[Nothing, A]
 }
 
