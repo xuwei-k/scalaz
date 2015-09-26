@@ -17,6 +17,22 @@ trait MonadState[F[_, _], S] extends Monad[F[S, ?]] { self =>
   def put(s: S): F[S, Unit]
   def modify(f: S => S): F[S, Unit] = bind(init)(s => put(f(s)))
 
+  trait MonadStateLaw extends MonadLaw {
+    def putPut(s1: S, s2: S)(implicit E: Equal[F[S, Unit]]): Boolean =
+      E.equal(bind(put(s1))(_ => put(s2)), put(s2))
+
+    def putGet(s: S)(implicit E: Equal[F[S, S]]): Boolean =
+      E.equal(bind(put(s))(_ => get), bind(put(s))(_ => point(s)))
+
+    def getPut(implicit E: Equal[F[S, Unit]]): Boolean =
+      E.equal(bind(get)(put), point(()))
+
+    def getGet(k: S => S => F[S, Unit])(implicit E: Equal[F[S, Unit]]): Boolean =
+      E.equal(bind(get)(s => bind(get)(k(s))), bind(get)(s => k(s)(s)))
+  }
+
+  def monadStateLaw = new MonadStateLaw{}
+
   ////
   
 }
