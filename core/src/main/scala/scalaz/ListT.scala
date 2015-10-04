@@ -9,7 +9,7 @@ final case class ListT[M[_], A](run: M[List[A]]){
     M.map(run){list =>
       list match {
         case Nil => None
-        case listHead :: listTail => Some(listHead, new ListT(M.point(listTail)))
+        case listHead :: listTail => Some((listHead, new ListT(M.point(listTail))))
       }
     }
   }

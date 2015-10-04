@@ -60,6 +60,7 @@ object build extends Build {
       // contains -language:postfixOps (because 1+ as a parameter to a higher-order function is treated as a postfix op)
       "-deprecation",
       "-encoding", "UTF-8",
+      "-Yno-adapted-args",
       "-feature",
       "-language:implicitConversions", "-language:higherKinds", "-language:existentials", "-language:postfixOps",
       "-unchecked"

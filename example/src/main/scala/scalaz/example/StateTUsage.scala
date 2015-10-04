@@ -33,7 +33,7 @@ object FibStateExample extends App {
     s <- init:State[(Int, Int), (Int, Int)]
     (a,b) = s
     n = a + b
-    _ <- put (b, n)
+    _ <- put((b, n))
   } yield b // if we yield n, getNFibs gives you (1,2,3,5,8...)
             // yield b instead to get (1,1,2,3...)
 

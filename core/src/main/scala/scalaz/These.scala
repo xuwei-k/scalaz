@@ -64,7 +64,7 @@ sealed abstract class \&/[+A, +B] extends Product with Serializable {
     this match {
       case This(_) => None
       case That(_) => None
-      case Both(a, b) => Some(a, b)
+      case Both(a, b) => Some((a, b))
     }
 
   def pad: (Option[A], Option[B]) =
