@@ -73,6 +73,14 @@ object build extends Build {
       Seq("-sourcepath", bd.getAbsolutePath, "-doc-source-url", "https://github.com/scalaz/scalaz/tree/" + tagOrBranch + "€{FILE_PATH}.scala")
     },
 
+    scalacOptions in Compile ++= {
+      val jar = (packageBin in (kindProjector, Compile)).value
+      val addPlugin = "-Xplugin:" + jar.getAbsolutePath
+      // https://github.com/retronym/boxer/blob/26a12fd571/project/build.scala#L29-L35
+      val dummy = "-Jdummy=" + jar.lastModified
+      Seq(addPlugin, dummy)
+    },
+
     // retronym: I was seeing intermittent heap exhaustion in scalacheck based tests, so opting for determinism.
     parallelExecution in Test := false,
     testOptions in Test += Tests.Argument(TestFrameworks.ScalaCheck, "-maxSize", "5", "-minSuccessfulTests", "33", "-workers", "1"),
@@ -165,10 +173,7 @@ object build extends Build {
           }
         }
         </developers>
-      ),
-    // kind-projector plugin
-    resolvers += Resolver.sonatypeRepo("releases"),
-    addCompilerPlugin("org.spire-math" % "kind-projector" % "0.6.3" cross CrossVersion.binary)
+      )
   ) ++ osgiSettings ++ Seq[Sett](
     OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
   )
@@ -181,6 +186,35 @@ object build extends Build {
       packagedArtifacts <<= Classpaths.packaged(Seq(packageDoc in Compile))
     ) ++ Defaults.packageTaskSettings(packageDoc in Compile, (unidoc in Compile).map(_.flatMap(Path.allSubpaths))),
     aggregate = Seq(core, concurrent, effect, example, iteratee, scalacheckBinding, tests)
+  )
+
+  private[this] val kindProjectorSourceUrl: String = {
+    val v = "0.6.3"
+    val n = "kind-projector_2.11"
+    "https://repo1.maven.org/maven2/org/spire-math/" + n + "/" + v + "/" + n + "-" + v + "-sources.jar"
+  }
+
+  lazy val kindProjector = Project(
+    id = "kind-projector",
+    base = file("kind-projector")
+  ).settings(
+    name := "kind-projector",
+    publishArtifact := false,
+    libraryDependencies <+= scalaVersion("org.scala-lang" % "scala-compiler" % _ % "provided"),
+    resourceGenerators in Compile += task{
+      IO.unzipURL(
+        url(kindProjectorSourceUrl),
+        (resourceManaged in Compile).value,
+        "*.xml"
+      ).toSeq
+    },
+    sourceGenerators in Compile += task{
+      IO.unzipURL(
+        url(kindProjectorSourceUrl),
+        (sourceManaged in Compile).value,
+        "*.scala"
+      ).toSeq
+    }
   )
 
   lazy val core = Project(
