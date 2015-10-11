@@ -21,6 +21,9 @@ class FutureTest extends SpecLite {
 
   val duration: Duration = 1.seconds
 
+  private[this] implicit def futureArb[A](implicit A: Arbitrary[A]): Arbitrary[Future[A]] =
+    Functor[Arbitrary].map(A)(Future.successful(_))
+
   implicit val throwableEqual: Equal[Throwable] = Equal.equalA[Throwable]
 
  {
