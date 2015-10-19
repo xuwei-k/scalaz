@@ -51,7 +51,7 @@ sealed abstract class CokleisliInstances extends CokleisliInstances0 {
   implicit def cokleisliMonad[F[_], R]: Monad[Cokleisli[F, R, ?]] =
     new CokleisliMonad[F, R] {}
 
-  implicit def cokleisliArrow[F[_]](implicit F0: Comonad[F]): Arrow[Cokleisli[F, ?, ?]] with ProChoice[Cokleisli[F, ?, ?]] =
+  implicit def cokleisliArrow[F[_]](implicit F0: Comonad[F]): ArrowChoice[Cokleisli[F, ?, ?]] =
     new CokleisliArrow[F] {
       override implicit def F = F0
     }
@@ -83,8 +83,7 @@ private trait CokleisliProfunctor[F[_]] extends Profunctor[Cokleisli[F, ?, ?]] {
 }
 
 private trait CokleisliArrow[F[_]]
-  extends Arrow[Cokleisli[F, ?, ?]]
-  with ProChoice[Cokleisli[F, ?, ?]]
+  extends ArrowChoice[Cokleisli[F, ?, ?]]
   with CokleisliProfunctor[F]
   with CokleisliCompose[F] {
 

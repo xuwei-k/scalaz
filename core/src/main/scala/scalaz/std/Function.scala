@@ -76,8 +76,8 @@ trait FunctionInstances extends FunctionInstances0 {
       def equal(a1: () => R, a2: () => R) = Equal[R].equal(a1(), a2())
     }
 
-  implicit val function1Instance: Arrow[Function1] with Choice[Function1] with ProChoice[Function1] =
-    new Arrow[Function1] with Choice[Function1] with ProChoice[Function1] {
+  implicit val function1Instance: ArrowChoice[Function1] with Choice[Function1] =
+    new ArrowChoice[Function1] with Choice[Function1] {
       def left[A, B, C](fa: A => B) = _.leftMap(fa)
 
       def right[A, B, C](fa: A => B) = _.map(fa)

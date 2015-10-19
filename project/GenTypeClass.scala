@@ -65,6 +65,7 @@ object TypeClass {
   lazy val strong = TypeClass("Strong", *^*->*, extendsList = Seq(profunctor))
   lazy val proChoice = TypeClass("ProChoice", *^*->*, extendsList = Seq(profunctor))
   lazy val arrow = TypeClass("Arrow", *^*->*, extendsList = Seq(split, strong, category))
+  lazy val arrowChoice = TypeClass("ArrowChoice", *^*->*, extendsList = Seq(arrow, proChoice))
 
   lazy val liftIO = TypeClass("LiftIO", *->*, pack = Seq("scalaz", "effect"))
   lazy val monadIO = TypeClass("MonadIO", *->*, extendsList = Seq(liftIO, monad), pack = Seq("scalaz", "effect"))
@@ -122,6 +123,7 @@ object TypeClass {
     strong,
     proChoice,
     arrow,
+    arrowChoice,
     monadState,
     monadError,
     monadTell,
