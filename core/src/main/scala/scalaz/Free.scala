@@ -215,18 +215,13 @@ sealed abstract class Free[S[_], A] {
     ev(this).go(_())
 
   /** Interleave this computation with another, combining the results with the given function. */
-  final def zipWith[B, C](tb: Free[S, B])(f: (A, B) => C): Free[S, C] = {
-    (step, tb.step) match {
-      case (Return(a), Return(b)) => Return(f(a, b))
-      case (a@Suspend(_), Return(b)) => a.flatMap(x => Return(f(x, b)))
-      case (Return(a), b@Suspend(_)) => b.flatMap(x => Return(f(a, x)))
-      case (a@Suspend(_), b@Suspend(_)) => a.flatMap(x => b.map(y => f(x, y)))
-      case (Gosub(a, g), Return(b)) => a.flatMap(x => g(x).map(f(_, b)))
-      case (Gosub(a, g), b@Suspend(_)) => a.flatMap(x => b.flatMap(y => g(x).map(f(_, y))))
-      case (Gosub(a, g), Gosub(b, h)) => a.zipWith(b)((x, y) => g(x).zipWith(h(y))(f)).flatMap(x => x)
-      case (a, Gosub(b, g)) => a.flatMap(x => b.flatMap(y => g(y).map(f(x, _))))
+  final def zipWith[B, C](tb: Free[S, B])(f: (A, B) => C)(implicit F: Functor[S], Z: Zip[S]): Free[S, C] =
+    (resume, tb.resume) match {
+      case (-\/(a), -\/(b)) => roll(Z.zipWith(a, b)((x, y) => x.zipWith(y)(f)))
+      case (-\/(a), \/-(b)) => roll(F.map(a)(x => x.zipWith(Return(b))(f)))
+      case (\/-(a), -\/(b)) => roll(F.map(b)(y => Return(a).zipWith(y)(f)))
+      case (\/-(a), \/-(b)) => Return(f(a, b))
     }
-  }
 
   /** Runs a `Source` all the way to the end, tail-recursively, collecting the produced values. */
   def collect[B](implicit ev: Free[S, A] =:= Source[B, A]): (Vector[B], A) = {
