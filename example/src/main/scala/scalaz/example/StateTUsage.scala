@@ -12,7 +12,7 @@ object StateTUsage extends App {
   def m[M[_]: Monad] {
     Applicative[({type l[a] = StateT[M, Int, a]})#l]
     Monad[({type l[a] = StateT[M, Int, a]})#l]
-    MonadState[({type f[s, a] = StateT[M, s, a]})#f, Int]
+    MonadState[StateT[M, Int, ?], Int]
   }
 
   def state() {
