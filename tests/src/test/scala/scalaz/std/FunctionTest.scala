@@ -47,6 +47,10 @@ object FunctionTest extends SpecLite {
   checkAll("Function1", comonad.laws[Int => ?])
 
   checkAll("Function1", zip.laws[Int => ?])
+  checkAll("Function2", zip.laws[(B, C) => ?])
+  checkAll("Function3", zip.laws[(B, C, D) => ?])
+  checkAll("Function4", zip.laws[(B, C, D, E) => ?])
+  checkAll("Function5", zip.laws[(B, C, D, E, F) => ?])
 
   // Likely could be made to cover all the FunctionN types.
   "Function0 map eagerness" ! forAll{(number: Int) =>

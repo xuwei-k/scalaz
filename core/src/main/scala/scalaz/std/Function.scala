@@ -160,13 +160,16 @@ trait FunctionInstances extends FunctionInstances0 {
       def contramap[A, B](r: A => R)(f: B => A) = r compose f
     }
 
-  implicit def function2Instance[T1, T2]: Monad[(T1, T2) => ?] with BindRec[(T1, T2) => ?] =
-    new Monad[(T1, T2) => ?] with BindRec[(T1, T2) => ?] {
+  implicit def function2Instance[T1, T2]: Monad[(T1, T2) => ?] with BindRec[(T1, T2) => ?] with Zip[(T1, T2) => ?] =
+    new Monad[(T1, T2) => ?] with BindRec[(T1, T2) => ?] with Zip[(T1, T2) => ?] {
       def point[A](a: => A) =
         (_, _) => a
 
       def bind[A, B](fa: (T1, T2) => A)(f: (A) => (T1, T2) => B) =
         (t1, t2) => f(fa(t1, t2))(t1, t2)
+
+      def zip[A, B](a: => (T1, T2) => A, b: => (T1, T2) => B) =
+        (t1, t2) => (a(t1, t2), b(t1, t2))
 
       def tailrecM[A, B](f: A => (T1, T2) => A \/ B)(a: A): (T1, T2) => B =
         (t1, t2) => {
@@ -180,13 +183,16 @@ trait FunctionInstances extends FunctionInstances0 {
         }
     }
 
-  implicit def function3Instance[T1, T2, T3]: Monad[(T1, T2, T3) => ?] with BindRec[(T1, T2, T3) => ?] =
-    new Monad[(T1, T2, T3) => ?] with BindRec[(T1, T2, T3) => ?] {
+  implicit def function3Instance[T1, T2, T3]: Monad[(T1, T2, T3) => ?] with BindRec[(T1, T2, T3) => ?] with Zip[(T1, T2, T3) => ?] =
+    new Monad[(T1, T2, T3) => ?] with BindRec[(T1, T2, T3) => ?] with Zip[(T1, T2, T3) => ?] {
       def point[A](a: => A) =
         (_, _, _) => a
 
       def bind[A, B](fa: (T1, T2, T3) => A)(f: (A) => (T1, T2, T3) => B) =
         (t1, t2, t3) => f(fa(t1, t2, t3))(t1, t2, t3)
+
+      def zip[A, B](a: => (T1, T2, T3) => A, b: => (T1, T2, T3) => B) =
+        (t1, t2, t3) => (a(t1, t2, t3), b(t1, t2, t3))
 
       def tailrecM[A, B](f: A => (T1, T2, T3) => A \/ B)(a: A): (T1, T2, T3) => B =
         (t1, t2, t3) => {
@@ -200,13 +206,16 @@ trait FunctionInstances extends FunctionInstances0 {
         }
     }
 
-  implicit def function4Instance[T1, T2, T3, T4]: Monad[(T1, T2, T3, T4) => ?] with BindRec[(T1, T2, T3, T4) => ?] =
-    new Monad[(T1, T2, T3, T4) => ?] with BindRec[(T1, T2, T3, T4) => ?] {
+  implicit def function4Instance[T1, T2, T3, T4]: Monad[(T1, T2, T3, T4) => ?] with BindRec[(T1, T2, T3, T4) => ?] with Zip[(T1, T2, T3, T4) => ?] =
+    new Monad[(T1, T2, T3, T4) => ?] with BindRec[(T1, T2, T3, T4) => ?] with Zip[(T1, T2, T3, T4) => ?] {
       def point[A](a: => A) =
         (_, _, _, _) => a
 
       def bind[A, B](fa: (T1, T2, T3, T4) => A)(f: (A) => (T1, T2, T3, T4) => B) =
         (t1, t2, t3, t4) => f(fa(t1, t2, t3, t4))(t1, t2, t3, t4)
+
+      def zip[A, B](a: => (T1, T2, T3, T4) => A, b: => (T1, T2, T3, T4) => B) =
+        (t1, t2, t3, t4) => (a(t1, t2, t3, t4), b(t1, t2, t3, t4))
 
       def tailrecM[A, B](f: A => (T1, T2, T3, T4) => A \/ B)(a: A): (T1, T2, T3, T4) => B =
         (t1, t2, t3, t4) => {
@@ -220,13 +229,16 @@ trait FunctionInstances extends FunctionInstances0 {
         }
     }
 
-  implicit def function5Instance[T1, T2, T3, T4, T5]: Monad[(T1, T2, T3, T4, T5) => ?] with BindRec[(T1, T2, T3, T4, T5) => ?] =
-    new Monad[(T1, T2, T3, T4, T5) => ?] with BindRec[(T1, T2, T3, T4, T5) => ?] {
+  implicit def function5Instance[T1, T2, T3, T4, T5]: Monad[(T1, T2, T3, T4, T5) => ?] with BindRec[(T1, T2, T3, T4, T5) => ?] with Zip[(T1, T2, T3, T4, T5) => ?] =
+    new Monad[(T1, T2, T3, T4, T5) => ?] with BindRec[(T1, T2, T3, T4, T5) => ?] with Zip[(T1, T2, T3, T4, T5) => ?] {
       def point[A](a: => A) =
         (_, _, _, _, _) => a
 
       def bind[A, B](fa: (T1, T2, T3, T4, T5) => A)(f: (A) => (T1, T2, T3, T4, T5) => B) =
         (t1, t2, t3, t4, t5) => f(fa(t1, t2, t3, t4, t5))(t1, t2, t3, t4, t5)
+
+      def zip[A, B](a: => (T1, T2, T3, T4, T5) => A, b: => (T1, T2, T3, T4, T5) => B) =
+        (t1, t2, t3, t4, t5) => (a(t1, t2, t3, t4, t5), b(t1, t2, t3, t4, t5))
 
       def tailrecM[A, B](f: A => (T1, T2, T3, T4, T5) => A \/ B)(a: A): (T1, T2, T3, T4, T5) => B =
         (t1, t2, t3, t4, t5) => {
@@ -240,13 +252,16 @@ trait FunctionInstances extends FunctionInstances0 {
         }
     }
 
-  implicit def function6Instance[T1, T2, T3, T4, T5, T6]: Monad[(T1, T2, T3, T4, T5, T6) => ?] with BindRec[(T1, T2, T3, T4, T5, T6) => ?] =
-    new Monad[(T1, T2, T3, T4, T5, T6) => ?] with BindRec[(T1, T2, T3, T4, T5, T6) => ?] {
+  implicit def function6Instance[T1, T2, T3, T4, T5, T6]: Monad[(T1, T2, T3, T4, T5, T6) => ?] with BindRec[(T1, T2, T3, T4, T5, T6) => ?] with Zip[(T1, T2, T3, T4, T5, T6) => ?] =
+    new Monad[(T1, T2, T3, T4, T5, T6) => ?] with BindRec[(T1, T2, T3, T4, T5, T6) => ?] with Zip[(T1, T2, T3, T4, T5, T6) => ?] {
       def point[A](a: => A) =
         (_, _, _, _, _, _) => a
 
       def bind[A, B](fa: (T1, T2, T3, T4, T5, T6) => A)(f: (A) => (T1, T2, T3, T4, T5, T6) => B) =
         (t1, t2, t3, t4, t5, t6) => f(fa(t1, t2, t3, t4, t5, t6))(t1, t2, t3, t4, t5, t6)
+
+      def zip[A, B](a: => (T1, T2, T3, T4, T5, T6) => A, b: => (T1, T2, T3, T4, T5, T6) => B) =
+        (t1, t2, t3, t4, t5, t6) => (a(t1, t2, t3, t4, t5, t6), b(t1, t2, t3, t4, t5, t6))
 
       def tailrecM[A, B](f: A => (T1, T2, T3, T4, T5, T6) => A \/ B)(a: A): (T1, T2, T3, T4, T5, T6) => B =
         (t1, t2, t3, t4, t5, t6) => {
@@ -260,13 +275,16 @@ trait FunctionInstances extends FunctionInstances0 {
         }
     }
 
-  implicit def function7Instance[T1, T2, T3, T4, T5, T6, T7]: Monad[(T1, T2, T3, T4, T5, T6, T7) => ?] with BindRec[(T1, T2, T3, T4, T5, T6, T7) => ?] =
-    new Monad[(T1, T2, T3, T4, T5, T6, T7) => ?] with BindRec[(T1, T2, T3, T4, T5, T6, T7) => ?] {
+  implicit def function7Instance[T1, T2, T3, T4, T5, T6, T7]: Monad[(T1, T2, T3, T4, T5, T6, T7) => ?] with BindRec[(T1, T2, T3, T4, T5, T6, T7) => ?] with Zip[(T1, T2, T3, T4, T5, T6, T7) => ?] =
+    new Monad[(T1, T2, T3, T4, T5, T6, T7) => ?] with BindRec[(T1, T2, T3, T4, T5, T6, T7) => ?] with Zip[(T1, T2, T3, T4, T5, T6, T7) => ?] {
       def point[A](a: => A) =
         (_, _, _, _, _, _, _) => a
 
       def bind[A, B](fa: (T1, T2, T3, T4, T5, T6, T7) => A)(f: (A) => (T1, T2, T3, T4, T5, T6, T7) => B) =
         (t1, t2, t3, t4, t5, t6, t7) => f(fa(t1, t2, t3, t4, t5, t6, t7))(t1, t2, t3, t4, t5, t6, t7)
+
+      def zip[A, B](a: => (T1, T2, T3, T4, T5, T6, T7) => A, b: => (T1, T2, T3, T4, T5, T6, T7) => B) =
+        (t1, t2, t3, t4, t5, t6, t7) => (a(t1, t2, t3, t4, t5, t6, t7), b(t1, t2, t3, t4, t5, t6, t7))
 
       def tailrecM[A, B](f: A => (T1, T2, T3, T4, T5, T6, T7) => A \/ B)(a: A): (T1, T2, T3, T4, T5, T6, T7) => B =
         (t1, t2, t3, t4, t5, t6, t7) => {
@@ -280,13 +298,16 @@ trait FunctionInstances extends FunctionInstances0 {
         }
     }
 
-  implicit def function8Instance[T1, T2, T3, T4, T5, T6, T7, T8]: Monad[(T1, T2, T3, T4, T5, T6, T7, T8) => ?] with BindRec[(T1, T2, T3, T4, T5, T6, T7, T8) => ?] =
-    new Monad[(T1, T2, T3, T4, T5, T6, T7, T8) => ?] with BindRec[(T1, T2, T3, T4, T5, T6, T7, T8) => ?] {
+  implicit def function8Instance[T1, T2, T3, T4, T5, T6, T7, T8]: Monad[(T1, T2, T3, T4, T5, T6, T7, T8) => ?] with BindRec[(T1, T2, T3, T4, T5, T6, T7, T8) => ?] with Zip[(T1, T2, T3, T4, T5, T6, T7, T8) => ?] =
+    new Monad[(T1, T2, T3, T4, T5, T6, T7, T8) => ?] with BindRec[(T1, T2, T3, T4, T5, T6, T7, T8) => ?] with Zip[(T1, T2, T3, T4, T5, T6, T7, T8) => ?] {
       def point[A](a: => A) =
         (_, _, _, _, _, _, _, _) => a
 
       def bind[A, B](fa: (T1, T2, T3, T4, T5, T6, T7, T8) => A)(f: (A) => (T1, T2, T3, T4, T5, T6, T7, T8) => B) =
         (t1, t2, t3, t4, t5, t6, t7, t8) => f(fa(t1, t2, t3, t4, t5, t6, t7, t8))(t1, t2, t3, t4, t5, t6, t7, t8)
+
+      def zip[A, B](a: => (T1, T2, T3, T4, T5, T6, T7, T8) => A, b: => (T1, T2, T3, T4, T5, T6, T7, T8) => B) =
+        (t1, t2, t3, t4, t5, t6, t7, t8) => (a(t1, t2, t3, t4, t5, t6, t7, t8), b(t1, t2, t3, t4, t5, t6, t7, t8))
 
       def tailrecM[A, B](f: A => (T1, T2, T3, T4, T5, T6, T7, T8) => A \/ B)(a: A): (T1, T2, T3, T4, T5, T6, T7, T8) => B =
         (t1, t2, t3, t4, t5, t6, t7, t8) => {
