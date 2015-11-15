@@ -104,12 +104,19 @@ sealed abstract class IndexedStoreTInstances2 {
 sealed abstract class IndexedStoreTInstances1 extends IndexedStoreTInstances2 {
   implicit def indexedStoreTFunctorLeft[F[_], A, B]: Functor[IndexedStoreT[F, ?, A, B]] =
     new IndexedStoreTFunctorLeft[F, A, B] {}
+
+  implicit def indexedStoreTApply[F[_], I, A](implicit F0: Apply[F], I0: Semigroup[I]): Apply[IndexedStoreT[F, I, A, ?]] =
+    new IndexedStoreTApply[F, I, A] {
+      def F = F0
+      def I = I0
+    }
 }
 sealed abstract class IndexedStoreTInstances0 extends IndexedStoreTInstances1 {
   implicit def indexedStoreTBifunctor[F[_], A](implicit F0: Functor[F]): Bifunctor[IndexedStoreT[F, ?, A, ?]] =
     new IndexedStoreTBifunctor[F, A] {
       implicit def F: Functor[F] = F0
     }
+
 }
 sealed abstract class IndexedStoreTInstances extends IndexedStoreTInstances0 {
   implicit def indexedStoreTFunctorRight[F[_], I, A](implicit F0: Functor[F]): Functor[IndexedStoreT[F, I, A, ?]] =
@@ -124,9 +131,11 @@ sealed abstract class StoreTInstances2 extends IndexedStoreTInstances {
     }
 }
 sealed abstract class StoreTInstances1 extends StoreTInstances2 {
-  implicit def storeTComonad[F[_], A](implicit F0: Comonad[F]): Comonad[StoreT[F, A, ?]] =
-    new StoreTComonad[F, A] {
-      implicit def F: Comonad[F] = F0
+  implicit def indexedStoreTApplicative[F[_], I, A](implicit F0: Applicative[F], I0: Monoid[I]): Applicative[IndexedStoreT[F, I, A, ?]] =
+    new Applicative[IndexedStoreT[F, I, A, ?]] with IndexedStoreTApply[F, I, A] {
+      def F = F0
+      def I = I0
+      def point[B](a: => B) = IndexedStoreT((F.point(_ => a), I.zero))
     }
 }
 sealed abstract class StoreTInstances0 extends StoreTInstances1 {
@@ -147,6 +156,14 @@ private trait IndexedStoreTFunctorLeft[F[_], A0, B0] extends Functor[IndexedStor
 private trait IndexedStoreTFunctorRight[F[_], I0, A0] extends Functor[IndexedStoreT[F, I0, A0, ?]]{
   implicit def F: Functor[F]
   override def map[A, B](fa: IndexedStoreT[F, I0, A0, A])(f: A => B): IndexedStoreT[F, I0, A0, B] = fa map f
+}
+
+private trait IndexedStoreTApply[F[_], I0, A0] extends Apply[IndexedStoreT[F, I0, A0, ?]] with IndexedStoreTFunctorRight[F, I0, A0] {
+  implicit def F: Apply[F]
+  def I: Semigroup[I0]
+  import std.function._
+  override final def ap[A, B](fa: => IndexedStoreT[F, I0, A0, A])(f: => IndexedStoreT[F, I0, A0, A => B]) =
+    IndexedStoreT((F.compose[A0 => ?].ap(fa.set)(f.set), I.append(f.pos, fa.pos)))
 }
 
 private trait IndexedStoreTContravariant[F[_], I0, B0] extends Contravariant[IndexedStoreT[F, I0, ?, B0]] {

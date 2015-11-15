@@ -14,16 +14,29 @@ object StoreTTest extends SpecLite {
   }
 
   checkAll(comonad.laws[StoreT[Tuple1, Int, ?]])
+  checkAll(applicative.laws[StoreT[Tuple1, Int, ?]])
 
   object instances {
-    type A = Int
-    def functor[F[_] : Functor] = Functor[StoreT[F, A, ?]]
-    def cobind[F[_] : Cobind] = Cobind[StoreT[F, A, ?]]
-    def comonad[F[_] : Comonad] = Comonad[StoreT[F, A, ?]]
+    def contravarant[F[_]: Functor, I, B] = Contravariant[IndexedStoreT[F, I, ?, B]]
+    def functor[F[_], A, B] = Functor[IndexedStoreT[F, ?, A, B]]
+    def functor[F[_] : Functor, I, A] = Functor[IndexedStoreT[F, I, A, ?]]
+    def apply[F[_] : Apply, I: Semigroup, A] = Apply[IndexedStoreT[F, I, A, ?]]
+    def applicative[F[_] : Applicative, I: Monoid, A] = Applicative[IndexedStoreT[F, I, A, ?]]
+    def cobind[F[_] : Cobind, A] = Cobind[StoreT[F, A, ?]]
+    def comonad[F[_] : Comonad, A] = Comonad[StoreT[F, A, ?]]
+    def bifunctor[F[_]: Functor, A] = Bifunctor[IndexedStoreT[F, ?, A, ?]]
 
     // checking absence of ambiguity
-    def functor[F[_] : Comonad] = Functor[StoreT[F, A, ?]]
-    def cobind[F[_] : Comonad] = Cobind[StoreT[F, A, ?]]
+    def functor[F[_] : Cobind, A] = Functor[StoreT[F, A, ?]]
+    def functor[F[_] : Comonad, A] = Functor[StoreT[F, A, ?]]
+    def functor[F[_] : Apply, I: Semigroup, A] = Functor[IndexedStoreT[F, I, A, ?]]
+    def functor[F[_] : Applicative, I: Monoid, A] = Functor[IndexedStoreT[F, I, A, ?]]
+    def functor[F[_] : Apply: Cobind, I: Semigroup, A] = Functor[StoreT[F, A, ?]]
+    def functor[F[_] : Applicative: Cobind, I: Monoid, A] = Functor[StoreT[F, A, ?]]
+    def functor[F[_] : Apply: Comonad, I: Semigroup, A] = Functor[StoreT[F, A, ?]]
+    def functor[F[_] : Applicative: Comonad, I: Monoid, A] = Functor[StoreT[F, A, ?]]
+    def apply[F[_] : Applicative, I: Monoid, A] = Apply[IndexedStoreT[F, I, A, ?]]
+    def cobind[F[_] : Comonad, A] = Cobind[StoreT[F, A, ?]]
   }
 
 }
