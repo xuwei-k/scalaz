@@ -23,6 +23,9 @@ import sbtbuildinfo.BuildInfoPlugin.autoImport._
 import sbtunidoc.Plugin._
 import sbtunidoc.Plugin.UnidocKeys._
 
+import org.scalajs.sbtplugin.ScalaJSPlugin
+import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
+
 object build extends Build {
   type Sett = Def.Setting[_]
 
@@ -181,13 +184,14 @@ object build extends Build {
       artifacts <<= Classpaths.artifactDefs(Seq(packageDoc in Compile)),
       packagedArtifacts <<= Classpaths.packaged(Seq(packageDoc in Compile))
     ) ++ Defaults.packageTaskSettings(packageDoc in Compile, (unidoc in Compile).map(_.flatMap(Path.allSubpaths))),
-    aggregate = Seq(core, concurrent, effect, example, iteratee, scalacheckBinding, tests)
+    aggregate = Seq(
+      coreJVM, concurrentJVM, effectJVM, exampleJVM, iterateeJVM, scalacheckBindingJVM, testsJVM,
+      coreJS, concurrentJS, effectJS, exampleJS, iterateeJS, scalacheckBindingJS, testsJS
+    )
   )
 
-  lazy val core = Project(
-    id = "core",
-    base = file("core"),
-    settings = standardSettings ++ Seq[Sett](
+  lazy val core = crossProject.crossType(CrossType.Pure).in(file("core")).settings(
+    standardSettings ++ Seq(
       name := "scalaz-core",
       typeClasses := TypeClass.core,
       sourceGenerators in Compile <+= (sourceManaged in Compile) map {
@@ -197,73 +201,75 @@ object build extends Build {
       buildInfoPackage := "scalaz",
       osgiExport("scalaz"),
       OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*")
-    )
+    ) : _*
   ).enablePlugins(sbtbuildinfo.BuildInfoPlugin)
 
-  lazy val concurrent = Project(
-    id = "concurrent",
-    base = file("concurrent"),
-    settings = standardSettings ++ Seq[Sett](
+  lazy val coreJVM = core.jvm
+  lazy val coreJS = core.js
+
+  lazy val concurrent = crossProject.crossType(CrossType.Pure).in(file("concurrent")).settings(
+    standardSettings ++ Seq[Sett](
       name := "scalaz-concurrent",
       typeClasses := TypeClass.concurrent,
       osgiExport("scalaz.concurrent"),
       OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*")
-    ),
-    dependencies = Seq(core, effect)
-  )
+    ) : _*
+  ).dependsOn(effect)
 
-  lazy val effect = Project(
-    id = "effect",
-    base = file("effect"),
-    settings = standardSettings ++ Seq[Sett](
+  lazy val concurrentJVM = concurrent.jvm
+  lazy val concurrentJS = concurrent.js
+
+  lazy val effect = crossProject.crossType(CrossType.Pure).in(file("effect")).settings(
+    standardSettings ++ Seq[Sett](
       name := "scalaz-effect",
       typeClasses := TypeClass.effect,
       osgiExport("scalaz.effect", "scalaz.std.effect", "scalaz.syntax.effect")
-    ),
-    dependencies = Seq(core)
-  )
+    ) : _*
+  ).dependsOn(core)
 
-  lazy val iteratee = Project(
-    id = "iteratee",
-    base = file("iteratee"),
-    settings = standardSettings ++ Seq[Sett](
+  lazy val effectJVM = effect.jvm
+  lazy val effectJS = effect.js
+
+  lazy val iteratee = crossProject.crossType(CrossType.Pure).in(file("iteratee")).settings(
+    standardSettings ++ Seq[Sett](
       name := "scalaz-iteratee",
       osgiExport("scalaz.iteratee")
-    ),
-    dependencies = Seq(effect)
-  )
+    ) : _*
+  ).dependsOn(effect)
 
-  lazy val example = Project(
-    id = "example",
-    base = file("example"),
-    dependencies = Seq(core, iteratee, concurrent),
-    settings = standardSettings ++ Seq[Sett](
+  lazy val iterateeJVM = iteratee.jvm
+  lazy val iterateeJS = iteratee.js
+
+  lazy val example = crossProject.crossType(CrossType.Pure).in(file("example")).settings(
+    standardSettings ++ Seq[Sett](
       name := "scalaz-example",
       publishArtifact := false
-    )
-  )
+    ) : _*
+  ).dependsOn(core, iteratee, concurrent)
 
-  lazy val scalacheckBinding = Project(
-    id           = "scalacheck-binding",
-    base         = file("scalacheck-binding"),
-    dependencies = Seq(core, concurrent, iteratee),
-    settings     = standardSettings ++ Seq[Sett](
+  lazy val exampleJVM = example.jvm
+  lazy val exampleJS = example.js
+
+  lazy val scalacheckBinding = crossProject.crossType(CrossType.Pure).in(file("scalacheck-binding")).settings(
+    standardSettings ++ Seq[Sett](
       name := "scalaz-scalacheck-binding",
-      libraryDependencies += "org.scalacheck" %% "scalacheck" % scalaCheckVersion.value,
+      libraryDependencies += "org.scalacheck" %%% "scalacheck" % scalaCheckVersion.value,
       osgiExport("scalaz.scalacheck")
-    )
-  )
+    ) : _*
+  ).dependsOn(core, concurrent, iteratee)
 
-  lazy val tests = Project(
-    id = "tests",
-    base = file("tests"),
-    dependencies = Seq(core, iteratee, concurrent, effect, scalacheckBinding % "test"),
-    settings = standardSettings ++Seq[Sett](
+  lazy val scalacheckBindingJVM = scalacheckBinding.jvm
+  lazy val scalacheckBindingJS = scalacheckBinding.js
+
+  lazy val tests = crossProject.crossType(CrossType.Pure).in(file("tests")).settings(
+    standardSettings ++ Seq[Sett](
       name := "scalaz-tests",
-      publishArtifact := false,
-      libraryDependencies += "org.scalacheck" %% "scalacheck" % scalaCheckVersion.value % "test"
-    )
-  )
+      publishArtifact := false
+    ) : _*
+  ).dependsOn(core, iteratee, concurrent, effect, scalacheckBinding % "test")
+
+  lazy val testsJVM = tests.jvm
+  lazy val testsJS = tests.js
 
   lazy val publishSetting = publishTo <<= (version).apply{
     v =>
