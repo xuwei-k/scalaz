@@ -284,8 +284,8 @@ object build extends Build {
     .dependsOn(core, effect, iteratee, scalacheckBinding)
     .jvmConfigure(_ dependsOn concurrent)
     .jsSettings(
-      scalaJSStage in Test := FastOptStage,
-      postLinkJSEnv := PhantomJSEnv().value) // Faster
+      scalaJSStage in Test := FastOptStage
+    )
 
   lazy val testsJVM = tests.jvm
   lazy val testsJS  = tests.js
