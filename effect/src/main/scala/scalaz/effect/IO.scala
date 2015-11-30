@@ -9,6 +9,7 @@ import ST._
 import Kleisli._
 import Free._
 import std.function._
+import scala.io.StdIn
 
 sealed abstract class IO[A] {
   private[effect] def apply(rw: Tower[IvoryTower]): Trampoline[(Tower[IvoryTower], A)]
@@ -178,7 +179,7 @@ object IO extends IOInstances {
     io(rw => return_(rw -> a))
 
   /** Reads a character from standard input. */
-  def getChar: IO[Char] = IO(readChar())
+  def getChar: IO[Char] = IO(StdIn.readChar())
 
   /** Writes a character to standard output. */
   def putChar(c: Char): IO[Unit] = io(rw => return_(rw -> {
@@ -199,7 +200,7 @@ object IO extends IOInstances {
   }))
 
   /** Reads a line of standard input. */
-  def readLn: IO[String] = IO(readLine())
+  def readLn: IO[String] = IO(StdIn.readLine())
 
   def put[A](a: A)(implicit S: Show[A]): IO[Unit] =
     io(rw => return_(rw -> {

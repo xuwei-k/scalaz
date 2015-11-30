@@ -46,14 +46,13 @@ object build extends Build {
 
   private def gitHash = sys.process.Process("git rev-parse HEAD").lines_!.head
 
-  // no generic signatures for scala 2.10.x, see SI-7932, #571 and #828
-  def scalac210Options = Seq("-Yno-generic-signatures")
+  private val Scala211 = "2.11.7"
 
   lazy val standardSettings: Seq[Sett] = Seq[Sett](
     organization := "org.scalaz",
 
-    scalaVersion := "2.10.6",
-    crossScalaVersions := Seq("2.10.6", "2.11.7", "2.12.0-M3"),
+    scalaVersion := Scala211,
+    crossScalaVersions := Seq(Scala211, "2.12.0-M3"),
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
     scalaCheckVersion := "1.12.5",
@@ -64,10 +63,7 @@ object build extends Build {
       "-feature",
       "-language:implicitConversions", "-language:higherKinds", "-language:existentials", "-language:postfixOps",
       "-unchecked"
-    ) ++ (CrossVersion.partialVersion(scalaVersion.value) match {
-      case Some((2,10)) => scalac210Options
-      case _ => Nil
-    }),
+    ),
 
     scalacOptions in (Compile, doc) <++= (baseDirectory in LocalProject("scalaz"), version) map { (bd, v) =>
       val tagOrBranch = if(v endsWith "SNAPSHOT") gitHash else ("v" + v)
