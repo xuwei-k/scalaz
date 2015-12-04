@@ -49,11 +49,26 @@ object Free extends FreeInstances {
   def apply[S[_], A](s: S[Free[S, A]]): Free[S, A] =
     roll(s)
 
+  private sealed trait ReturnOrSuspend[S[_], A] extends Free[S, A]
+
   /** Return from the computation with the given value. */
-  private case class Return[S[_], A](a: A) extends Free[S, A]
+  private case class Return[S[_], A](a: A) extends ReturnOrSuspend[S, A]
 
   /** Suspend the computation with the given suspension. */
-  private case class Suspend[S[_], A](a: S[A]) extends Free[S, A]
+  private case class Suspend[S[_], A](a: S[A]) extends ReturnOrSuspend[S, A]
+
+  private sealed abstract class Stepped[S[_], B] {
+    type C
+    val a: S[C]
+    val f: C => Free[S, B]
+  }
+
+  private def stepped[S[_], B, C0](a0: S[C0])(f0: C0 => Free[S, B]): Stepped[S, B] =
+    new Stepped[S, B] {
+      type C = C0
+      val a = a0
+      val f = f0
+    }
 
   /** Call a subroutine and continue with the given function. */
   private sealed abstract case class Gosub[S[_], B]() extends Free[S, B] {
@@ -191,6 +206,19 @@ sealed abstract class Free[S[_], A] {
     B.tailrecM[Free[S, A], A]((ma: Free[S, A]) => go(ma.resume))(this)
   }
 
+  @annotation.tailrec private final def stepAll: Either3[Stepped[S, A], A, S[A]] = this match {
+    case x@Gosub() => x.a match {
+      case b@Gosub() =>
+        b.a.flatMap(a => b.f(a).flatMap(x.f)).stepAll
+      case Return(b)=>
+        x.f(b).stepAll
+      case Suspend(y) =>
+        Left3(stepped(y)(x.f))
+    }
+    case Return(x) => Middle3(x)
+    case Suspend(x) => Right3(x)
+  }
+
   /**
    * Evaluate one layer in the free monad, re-associating any left-nested binds to the right
    * and pulling the first suspension to the top.
@@ -212,12 +240,27 @@ sealed abstract class Free[S[_], A] {
    * Runs to completion, mapping the suspension with the given transformation at each step and
    * accumulating into the monad `M`.
    */
+  @annotation.tailrec
   final def foldMap[M[_]](f: S ~> M)(implicit M: Monad[M]): M[A] =
-    step match {
-      case Return(a) => M.pure(a)
-      case Suspend(s) => f(s)
-      // This is stack safe because `step` ensures right-associativity of Gosub
-      case a@Gosub() => M.bind(a.a foldMap f)(c => a.f(c) foldMap f)
+    stepAll match {
+      case Middle3(a) => M.pure(a)
+      case Right3(s) => f(s)
+      case Left3(a) =>
+        gosub(Free.liftF(a.a))(a.f).foldMap(f)
+/*
+a@Gosub() => a.a match {
+        case Suspend(b) =>
+          val x: M[a.C] = f(b)
+          val g: a.C => Free[S, A] = a.f
+          val z: M[Free[S, A]] = M.map(x)(g)
+         
+          ???
+        case b@Gosub() =>
+          b.a.flatMap(b.f(_).flatMap(a.f)).foldMap(f)
+        case Return(b) =>
+          a.f(b).foldMap(f)
+      }
+*/
     }
 
   import Id._
