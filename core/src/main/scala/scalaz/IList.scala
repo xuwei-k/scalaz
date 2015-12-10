@@ -234,8 +234,13 @@ sealed abstract class IList[A] extends Product with Serializable {
       case INil() => None
     }
 
-  def length: Int =
-    foldLeft(0)((n, _) => n + 1)
+  def length: Int = {
+    @tailrec def go(xs: IList[A], size: Int): Int = xs match {
+      case ICons(_, t) => go(t, size + 1)
+      case INil() => size
+    }
+    go(this, 0)
+  }
 
   def map[B](f: A => B): IList[B] =
     foldRight(IList.empty[B])(f(_) :: _)
