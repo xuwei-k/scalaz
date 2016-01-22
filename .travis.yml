@@ -21,13 +21,13 @@ language: scala
 scala:
   - 2.11.7
   - 2.10.6
-  - 2.9.3
 jdk:
   - oraclejdk7
-  - openjdk6
+  - oraclejdk8
 
 script:
-  - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m check-gen-type-classes test mima-report-binary-issues
+  - wget https://raw.githubusercontent.com/paulp/sbt-extras/59aefc33f47bd25a1bf0fc36b7f931b1f05eb482/sbt && chmod +x ./sbt
+  - ./sbt ++$TRAVIS_SCALA_VERSION bench/compile && ./sbt -J-Xms512M -J-Xmx512M ++$TRAVIS_SCALA_VERSION "bench/jmh:run -wi 10 -i 20 -f 2"
 
   # Tricks to avoid unnecessary cache updates
   - find $HOME/.sbt -name "*.lock" | xargs rm

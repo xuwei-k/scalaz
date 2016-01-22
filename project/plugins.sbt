@@ -14,3 +14,5 @@ addSbtPlugin("com.typesafe" % "sbt-mima-plugin" % "0.1.8")
 
 // https://github.com/sbt/sbt/issues/2217
 fullResolvers ~= {_.filterNot(_.name == "jcenter")}
+
+addSbtPlugin("pl.project13.scala" % "sbt-jmh" % "0.2.6")

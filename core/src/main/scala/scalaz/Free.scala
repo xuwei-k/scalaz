@@ -90,6 +90,17 @@ sealed abstract class Free[S[_], A] {
       }
     }
 
+  @tailrec final def resumeOld(implicit S: Functor[S]): (S[Free[S, A]] \/ A) =
+    this match {
+      case Return(a)  => \/-(a)
+      case Suspend(t) => -\/(t)
+      case x @ Gosub() => x.a() match {
+        case Return(a)   => x.f(a).resumeOld
+        case Suspend(t)  => -\/(S.map(t)(_ flatMap x.f))
+        case y @ Gosub() => y.a().flatMap(z => y.f(z) flatMap x.f).resumeOld
+      }
+    }
+
   /** Changes the suspension functor by the given natural transformation. */
   final def mapSuspension[T[_]](f: S ~> T)(implicit S: Functor[S], T: Functor[T]): Free[T, A] =
     resume match {
@@ -169,6 +180,16 @@ sealed abstract class Free[S[_], A] {
       case -\/(s) => f(S.map(s)(_.foldRight(z)(f)))
       case \/-(r) => z(r)
     }
+
+  final def foldRunOld[B](b: B)(f: (B, S[Free[S, A]]) => (B, Free[S, A]))(implicit S: Functor[S]): (B, A) = {
+    @tailrec def foldRun2(t: Free[S, A], z: B): (B, A) = t.resumeOld match {
+      case -\/(s) =>
+        val (b1, s1) = f(z, s)
+        foldRun2(s1, b1)
+      case \/-(r) => (z, r)
+    }
+    foldRun2(this, b)
+  }
 
   /** Runs to completion, allowing the resumption function to thread an arbitrary state of type `B`. */
   final def foldRun[B](b: B)(f: (B, S[Free[S, A]]) => (B, Free[S, A]))(implicit S: Functor[S]): (B, A) = {

@@ -25,6 +25,8 @@ import com.typesafe.tools.mima.plugin.MimaKeys.previousArtifacts
 import sbtunidoc.Plugin._
 import sbtunidoc.Plugin.UnidocKeys._
 
+import pl.project13.scala.sbt.JmhPlugin
+
 object build extends Build {
   type Sett = Def.Setting[_]
 
@@ -219,6 +221,14 @@ object build extends Build {
       case _ => "1.0.5"
     }
   )
+
+  lazy val bench = Project(
+    "bench",
+    file("bench")
+  ).settings(
+    standardSettings ++ Seq(
+    )
+  ).enablePlugins(JmhPlugin).dependsOn(core)
 
   lazy val core = Project(
     id = "core",
