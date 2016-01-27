@@ -74,6 +74,10 @@ trait IndexedContsTFunctions {
       def apply[A](fa: IndexedContsT[W, M, R, O, A]): IndexedContsT[V, M, R, O, A] = IndexedContsT { k => fa.run(f(k)) }
     }
 
+  // https://hackage.haskell.org/package/transformers-0.5.1.0/docs/Control-Monad-Trans-Cont.html#v:shiftT
+  def shiftT[M[_], R, A](f: (A => M[R]) => ContT[M, R, R])(implicit M: Monad[M]): ContT[M, R, A] =
+    ContT[M, R, A]{ f(_).run_ }
+
   def shift[W[_], M[_], I, R, J, O, A](f: (A => IndexedContsT[W, M, I, I, O]) => IndexedContsT[W, M, R, J, J])(implicit W: Comonad[W], WA: Applicative[W], M: Monad[M]): IndexedContsT[W, M, R, O, A] =
     IndexedContsT { k0 =>
       (f { a =>
