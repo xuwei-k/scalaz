@@ -4,7 +4,6 @@ import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import Tree._
-import org.scalacheck.Gen
 import org.scalacheck.Prop.forAll
 
 object TreeTest extends SpecLite {
@@ -25,7 +24,7 @@ object TreeTest extends SpecLite {
     F.toList(a) must_=== F.toList(xs).zipWithIndex.map{case (a, b) => (b, a)}
   }
 
-  "ScalazArbitrary.treeGenSized" ! forAll(Gen.choose(1, 200)){ size =>
+  "ScalazArbitrary.treeGenSized" ! forAll(org.scalacheck.Gen.choose(1, 200)){ size =>
     val gen = treeGenSized[Unit](size)
     Stream.continually(gen.sample).flatten.take(10).map(Foldable[Tree].length(_)).forall(_ == size)
   }

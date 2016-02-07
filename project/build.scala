@@ -181,7 +181,7 @@ object build extends Build {
       artifacts <<= Classpaths.artifactDefs(Seq(packageDoc in Compile)),
       packagedArtifacts <<= Classpaths.packaged(Seq(packageDoc in Compile))
     ) ++ Defaults.packageTaskSettings(packageDoc in Compile, (unidoc in Compile).map(_.flatMap(Path.allSubpaths))),
-    aggregate = Seq(core, concurrent, effect, example, iteratee, scalacheckBinding, tests)
+    aggregate = Seq(core, concurrent, effect, example, iteratee, scalacheckBinding, tests, laws, check)
   )
 
   lazy val core = Project(
@@ -191,7 +191,7 @@ object build extends Build {
       name := "scalaz-core",
       typeClasses := TypeClass.core,
       sourceGenerators in Compile <+= (sourceManaged in Compile) map {
-        dir => Seq(GenerateTupleW(dir), TupleNInstances(dir))
+        dir => Seq(GenerateTupleW(dir), TupleNInstances(dir), Cogen(dir), Gen(dir))
       },
       buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
       buildInfoPackage := "scalaz",
@@ -251,6 +251,27 @@ object build extends Build {
       name := "scalaz-scalacheck-binding",
       libraryDependencies += "org.scalacheck" %% "scalacheck" % scalaCheckVersion.value,
       osgiExport("scalaz.scalacheck")
+    )
+  )
+
+  lazy val laws = Project(
+    id           = "laws",
+    base         = file("laws"),
+    dependencies = Seq(core),
+    settings     = standardSettings ++ Seq[Sett](
+      name := "scalaz-laws",
+      osgiExport("scalaz.laws")
+    )
+  )
+
+  lazy val check = Project(
+    id           = "check",
+    base         = file("check"),
+    dependencies = Seq(laws, concurrent),
+    settings     = standardSettings ++ Seq[Sett](
+      name := "scalaz-check",
+      libraryDependencies += "org.scala-sbt" % "test-interface" % "1.0",
+      osgiExport("scalaz")
     )
   )
 

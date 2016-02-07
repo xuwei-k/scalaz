@@ -1,6 +1,6 @@
 package scalaz
 
-import org.scalacheck.{Arbitrary, Gen}
+import org.scalacheck.Arbitrary
 import org.scalacheck.Prop.forAll
 import std.AllInstances._
 import FreeT._
@@ -35,7 +35,7 @@ object FreeTListOption {
 
   implicit def freeTListOptionArb[A](implicit A: Arbitrary[A]): Arbitrary[FreeTListOption[A]] =
     Arbitrary(FreeTTest.freeTGen[List, Option, A](
-      Gen.choose(0, 2).flatMap(Gen.listOfN(_, freeTListOptionArb[A].arbitrary.map(_.f)))
+      org.scalacheck.Gen.choose(0, 2).flatMap(org.scalacheck.Gen.listOfN(_, freeTListOptionArb[A].arbitrary.map(_.f)))
     ).map(FreeTListOption.apply))
 
   implicit def freeTListOptionEq[A](implicit A: Equal[A]): Equal[FreeTListOption[A]] = new Equal[FreeTListOption[A]] {
@@ -44,8 +44,8 @@ object FreeTListOption {
 }
 
 object FreeTTest extends SpecLite {
-  def freeTGen[F[_], G[_], A](g: Gen[F[FreeT[F, G, A]]])(implicit F: Functor[F], G: Applicative[G], A: Arbitrary[A]): Gen[FreeT[F, G, A]] =
-    Gen.frequency(
+  def freeTGen[F[_], G[_], A](g: org.scalacheck.Gen[F[FreeT[F, G, A]]])(implicit F: Functor[F], G: Applicative[G], A: Arbitrary[A]): org.scalacheck.Gen[FreeT[F, G, A]] =
+    org.scalacheck.Gen.frequency(
       (1, Functor[Arbitrary].map(A)(FreeT.point[F, G, A](_)).arbitrary),
       (1, Functor[Arbitrary].map(Arbitrary(g))(FreeT.liftF[F, G, FreeT[F, G, A]](_).flatMap(x => x)).arbitrary)
     )
