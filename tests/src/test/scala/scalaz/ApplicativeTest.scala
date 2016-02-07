@@ -1,6 +1,5 @@
 package scalaz
 
-import org.scalacheck.Gen
 import org.scalacheck.Prop.forAll
 
 object ApplicativeTest extends SpecLite {
@@ -24,7 +23,7 @@ object ApplicativeTest extends SpecLite {
       case h :: t => Monad[F].bind(f(h))(b => Monad[F].map(filterM(t, f))(t => if (b) h :: t else t))
     }
 
-  "replicateM is the same" ! forAll { (fa: Option[Int]) => forAll(Gen.choose(0, 100)) { n =>
+  "replicateM is the same" ! forAll { (fa: Option[Int]) => forAll(org.scalacheck.Gen.choose(0, 100)) { n =>
     fa.replicateM(n) must_===(replicateM(n, fa))
   }}
 

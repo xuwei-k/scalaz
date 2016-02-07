@@ -7,7 +7,7 @@ import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
-import org.scalacheck.{Gen, Prop}
+import org.scalacheck.Prop
 import org.scalacheck.Prop.forAll
 
 object ZipperTest extends SpecLite {
@@ -412,10 +412,10 @@ object ZipperTest extends SpecLite {
     z.findBy(z => None)(x => x == z.focus).isEmpty
   }
 
-  val intZipperWithExistingElement: Gen[(Zipper[Int], Int)] = for {
+  val intZipperWithExistingElement: org.scalacheck.Gen[(Zipper[Int], Int)] = for {
     z <- arbitrary[Zipper[Int]]
     stream = z.toStream
-    i <- Gen.choose(0, stream.length -1)
+    i <- org.scalacheck.Gen.choose(0, stream.length -1)
   } yield (z, stream(i))
 
   "given nextC findBy should return Some if the element exists" !  forAll(intZipperWithExistingElement) { case (z, e) =>
@@ -428,11 +428,11 @@ object ZipperTest extends SpecLite {
     true
    }
 
-  def minSizeIntZipper(size: Int): Gen[Zipper[Int]] = for {
-      leftSize <- Gen.choose(0, size - 2)
+  def minSizeIntZipper(size: Int): org.scalacheck.Gen[Zipper[Int]] = for {
+      leftSize <- org.scalacheck.Gen.choose(0, size - 2)
       rightSize = size - 1 - leftSize
-      lefts  <- Gen.containerOfN[Stream,Int](leftSize,  implicitly[Arbitrary[Int]].arbitrary)
-      rights <- Gen.containerOfN[Stream,Int](rightSize, implicitly[Arbitrary[Int]].arbitrary)
+      lefts  <- org.scalacheck.Gen.containerOfN[Stream,Int](leftSize,  implicitly[Arbitrary[Int]].arbitrary)
+      rights <- org.scalacheck.Gen.containerOfN[Stream,Int](rightSize, implicitly[Arbitrary[Int]].arbitrary)
       focus <- arbitrary[Int]
   } yield zipper(lefts, focus, rights)
 

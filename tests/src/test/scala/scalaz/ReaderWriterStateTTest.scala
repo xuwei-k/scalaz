@@ -2,22 +2,22 @@ package scalaz
 
 import scalaz.scalacheck.ScalazProperties._
 import std.AllInstances._
-import org.scalacheck.{Gen, Arbitrary}
+import org.scalacheck.Arbitrary
 
 object ReaderWriterStateTTest extends SpecLite {
   type RWSOptInt[A] = RWST[Option, Int, Int, Int, A]
-  implicit val RWSOptIntArb = Arbitrary(Gen.oneOf[RWSOptInt[Int]](
-    Gen.const(RWST[Option, Int, Int, Int, Int]((r: Int, s: Int) => None)),
-    Gen.const(RWST[Option, Int, Int, Int, Int]((r: Int, s: Int) => Some((0, 0, 0)))),
-    Gen.const(RWST[Option, Int, Int, Int, Int]((r: Int, s: Int) => Some((r, r, r)))),
-    Gen.const(RWST[Option, Int, Int, Int, Int]((r: Int, s: Int) => Some((s, s, s))))
+  implicit val RWSOptIntArb = Arbitrary(org.scalacheck.Gen.oneOf[RWSOptInt[Int]](
+    org.scalacheck.Gen.const(RWST[Option, Int, Int, Int, Int]((r: Int, s: Int) => None)),
+    org.scalacheck.Gen.const(RWST[Option, Int, Int, Int, Int]((r: Int, s: Int) => Some((0, 0, 0)))),
+    org.scalacheck.Gen.const(RWST[Option, Int, Int, Int, Int]((r: Int, s: Int) => Some((r, r, r)))),
+    org.scalacheck.Gen.const(RWST[Option, Int, Int, Int, Int]((r: Int, s: Int) => Some((s, s, s))))
   ))
-  implicit val RWSOptIntIntArb = Arbitrary(Gen.oneOf[RWSOptInt[Int => Int]](
-    Gen.const(RWST[Option, Int, Int, Int, Int => Int]((r: Int, s: Int) => None)),
-    Gen.const(RWST[Option, Int, Int, Int, Int => Int]((r: Int, s: Int) => Some((0, x => 0, 0)))),
-    Gen.const(RWST[Option, Int, Int, Int, Int => Int]((r: Int, s: Int) => Some((r, x => r, r)))),
-    Gen.const(RWST[Option, Int, Int, Int, Int => Int]((r: Int, s: Int) => Some((s, x => s, s)))),
-    Gen.const(RWST[Option, Int, Int, Int, Int => Int]((r: Int, s: Int) => Some((s, x => x, s))))
+  implicit val RWSOptIntIntArb = Arbitrary(org.scalacheck.Gen.oneOf[RWSOptInt[Int => Int]](
+    org.scalacheck.Gen.const(RWST[Option, Int, Int, Int, Int => Int]((r: Int, s: Int) => None)),
+    org.scalacheck.Gen.const(RWST[Option, Int, Int, Int, Int => Int]((r: Int, s: Int) => Some((0, x => 0, 0)))),
+    org.scalacheck.Gen.const(RWST[Option, Int, Int, Int, Int => Int]((r: Int, s: Int) => Some((r, x => r, r)))),
+    org.scalacheck.Gen.const(RWST[Option, Int, Int, Int, Int => Int]((r: Int, s: Int) => Some((s, x => s, s)))),
+    org.scalacheck.Gen.const(RWST[Option, Int, Int, Int, Int => Int]((r: Int, s: Int) => Some((s, x => x, s))))
   ))
 
   implicit val RWSOptIntEqual = new Equal[RWSOptInt[Int]] {

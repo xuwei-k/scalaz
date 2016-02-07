@@ -41,8 +41,8 @@ object ContravariantCoyonedaGens {
     ((x - 1 : BigInt) isProbablePrime 5, x)
   }
 
-  val intOrders: Gen[CtCoOrder[Int]] =
-    Gen.oneOf[CtCoOrder[Int]](
+  val intOrders: org.scalacheck.Gen[CtCoOrder[Int]] =
+    org.scalacheck.Gen.oneOf[CtCoOrder[Int]](
       aToString[Int], evensFirst, negated, probablePrime)
 }
 

@@ -231,11 +231,11 @@ object build extends Build {
   )
 
   private[this] lazy val jsProjects = Seq[ProjectReference](
-    coreJS, effectJS, iterateeJS, scalacheckBindingJS, testsJS
+    coreJS, effectJS, iterateeJS, scalacheckBindingJS, testsJS, checkJS, lawsJS
   )
 
   private[this] lazy val jvmProjects = Seq[ProjectReference](
-    coreJVM, effectJVM, iterateeJVM, scalacheckBindingJVM, testsJVM, concurrent, example
+    coreJVM, effectJVM, iterateeJVM, scalacheckBindingJVM, testsJVM, concurrent, example, checkJVM, checkJS
   )
 
   lazy val scalaz = Project(
@@ -272,7 +272,7 @@ object build extends Build {
     .settings(
       name := "scalaz-core",
       sourceGenerators in Compile <+= (sourceManaged in Compile) map {
-        dir => Seq(GenerateTupleW(dir), TupleNInstances(dir))
+        dir => Seq(GenerateTupleW(dir), TupleNInstances(dir), Cogen(dir), Gen(dir))
       },
       buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
       buildInfoPackage := "scalaz",
@@ -357,6 +357,37 @@ object build extends Build {
 
   lazy val scalacheckBindingJVM = scalacheckBinding.jvm
   lazy val scalacheckBindingJS  = scalacheckBinding.js
+
+  lazy val laws = crossProject.crossType(ScalazCrossType)
+    .settings(standardSettings: _*)
+    .settings(
+      name := "scalaz-laws",
+      osgiExport("scalaz.laws")
+    )
+    .dependsOn(core)
+    .jsSettings(scalajsProjectSettings : _*)
+
+  lazy val lawsJVM = laws.jvm
+  lazy val lawsJS = laws.js
+
+  lazy val check = crossProject.crossType(ScalazCrossType)
+    .settings(standardSettings: _*)
+    .settings(
+      name := "scalaz-check",
+      osgiExport("scalaz")
+    )
+    .jvmSettings(
+      libraryDependencies += "org.scala-sbt" % "test-interface" % "1.0",
+      libraryDependencies += "org.scala-js" %% "scalajs-stubs" % scalaJSVersion % "provided"
+    )
+    .jsSettings(
+      libraryDependencies += "org.scala-js" %% "scalajs-test-interface" % scalaJSVersion
+    )
+    .dependsOn(laws)
+    .jsSettings(scalajsProjectSettings : _*)
+
+  lazy val checkJVM = check.jvm
+  lazy val checkJS = check.js
 
   lazy val tests = crossProject.crossType(ScalazCrossType)
     .settings(standardSettings: _*)

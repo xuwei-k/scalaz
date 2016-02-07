@@ -3,7 +3,7 @@ package scalaz
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
-import org.scalacheck.{Gen, Arbitrary}
+import org.scalacheck.Arbitrary
 import org.scalacheck.Prop.forAll
 
 object KleisliTest extends SpecLite {
@@ -14,9 +14,9 @@ object KleisliTest extends SpecLite {
   type KleisliEither[A] = Kleisli[IntOr, Int, A]
 
   implicit def Function1IntOptInt[A](implicit A: Arbitrary[Option[Int]]): Arbitrary[Int => Option[Int]] =
-    Arbitrary(Gen.frequency[Int => Option[Int]](
-      (1, Gen.const((x: Int) => Some(x))),
-      (1, Gen.const((x: Int) => Some(x + 1))),
+    Arbitrary(org.scalacheck.Gen.frequency[Int => Option[Int]](
+      (1, org.scalacheck.Gen.const((x: Int) => Some(x))),
+      (1, org.scalacheck.Gen.const((x: Int) => Some(x + 1))),
       (3, A.arbitrary.map(a => (_: Int) => a))
     ))
 

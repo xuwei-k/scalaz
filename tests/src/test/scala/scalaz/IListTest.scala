@@ -3,7 +3,7 @@ package scalaz
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
-import org.scalacheck.{Arbitrary, Gen}
+import org.scalacheck.Arbitrary
 import org.scalacheck.Prop.forAll
 import syntax.bifunctor._, syntax.foldable._
 
@@ -25,11 +25,11 @@ object IListTest extends SpecLite {
 
   implicit val intBooleanArb: Arbitrary[Int => Boolean] = {
     val intGen = implicitly[Arbitrary[Int]].arbitrary
-    Arbitrary(Gen.oneOf(
-      Gen.const((_: Int) => true),
-      Gen.const((_: Int) => false),
-      Gen.choose(2, 5).map(n => (a: Int) => a % n == 0),
-      Gen.choose(2, 5).map(n => (a: Int) => a % n != 0),
+    Arbitrary(org.scalacheck.Gen.oneOf(
+      org.scalacheck.Gen.const((_: Int) => true),
+      org.scalacheck.Gen.const((_: Int) => false),
+      org.scalacheck.Gen.choose(2, 5).map(n => (a: Int) => a % n == 0),
+      org.scalacheck.Gen.choose(2, 5).map(n => (a: Int) => a % n != 0),
       intGen.map(n => (_: Int) > n),
       intGen.map(n => (_: Int) < n)
     ))

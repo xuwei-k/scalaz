@@ -1,6 +1,6 @@
 package scalaz
 
-import org.scalacheck.{Arbitrary, Gen}
+import org.scalacheck.Arbitrary
 import std.AllInstances._
 import Free._
 import scalaz.scalacheck.ScalazProperties._
@@ -36,7 +36,7 @@ object FreeList extends FreeListInstances {
 
   implicit def freeListArb[A](implicit A: Arbitrary[A]): Arbitrary[FreeList[A]] =
     Arbitrary(FreeTest.freeGen[List, A](
-      Gen.choose(0, 2).flatMap(Gen.listOfN(_, freeListArb[A].arbitrary.map(_.f)))
+      org.scalacheck.Gen.choose(0, 2).flatMap(org.scalacheck.Gen.listOfN(_, freeListArb[A].arbitrary.map(_.f)))
     ).map(FreeList.apply))
 
   implicit def freeListEq[A](implicit A: Equal[A]): Equal[FreeList[A]] = new Equal[FreeList[A]] {
@@ -72,7 +72,7 @@ object FreeOption {
 
   implicit def freeOptionArb[A](implicit A: Arbitrary[A]): Arbitrary[FreeOption[A]] =
     Arbitrary(FreeTest.freeGen[Option, A](
-      Gen.choose(0, 1).flatMap(Gen.listOfN(_, freeOptionArb[A].arbitrary.map(_.f)).map(_.headOption))
+      org.scalacheck.Gen.choose(0, 1).flatMap(org.scalacheck.Gen.listOfN(_, freeOptionArb[A].arbitrary.map(_.f)).map(_.headOption))
     ).map(FreeOption.apply))
 
   implicit def freeOptionEq[A](implicit A: Equal[A]): Equal[FreeOption[A]] = new Equal[FreeOption[A]] {
@@ -81,8 +81,8 @@ object FreeOption {
 }
 
 object FreeTest extends SpecLite {
-  def freeGen[F[_], A](g: Gen[F[Free[F, A]]])(implicit A: Arbitrary[A]): Gen[Free[F, A]] =
-    Gen.frequency(
+  def freeGen[F[_], A](g: org.scalacheck.Gen[F[Free[F, A]]])(implicit A: Arbitrary[A]): org.scalacheck.Gen[Free[F, A]] =
+    org.scalacheck.Gen.frequency(
       (1, Functor[Arbitrary].map(A)(Free.pure[F, A](_)).arbitrary),
       (1, Functor[Arbitrary].map(Arbitrary(g))(Free[F, A](_)).arbitrary)
     )
