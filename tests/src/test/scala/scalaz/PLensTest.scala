@@ -2,10 +2,10 @@ package scalaz
 
 import std.AllInstances._
 
-object PLensTest extends SpecLite {
+object PLensTest extends Scalaprops {
   import PLens._
 
-  "list head" in {
+  val `list head` = Property.forAll {
     listHeadPLens[Int].get(List(1, 2)) must_===(Some(1))
     listHeadPLens[Int].get(Nil) must_===(None)
   }
