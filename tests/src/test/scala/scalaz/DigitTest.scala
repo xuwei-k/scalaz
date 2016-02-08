@@ -1,9 +1,8 @@
 package scalaz
 
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
-
-object DigitTest extends SpecLite {
-  checkAll(enum.laws[Digit])
-  checkAll(monoid.laws[Digit])
+object DigitTest extends Scalaprops{
+  val testLaws = Properties.list(
+    laws.enum.all[Digit],
+    laws.monoid.all[Digit]
+  )
 }

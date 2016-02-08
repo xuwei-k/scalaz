@@ -53,6 +53,10 @@ object Digit extends DigitInstances {
 
   val digits: List[Digit] = List(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9)
 
+  implicit val digitGen: Gen[Digit] = Gen.elements(
+    _0, _1, _2, _3, _4, _5, _6, _7, _8, _9
+  )
+
   implicit def DigitLong(d: Digit): Long = d.toLong
 
   def digitFromChar(c: Char): Option[Digit] =
