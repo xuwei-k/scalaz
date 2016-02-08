@@ -1,9 +1,8 @@
 package scalaz
 
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
-
-object OrderingTest extends SpecLite {
-  checkAll("Ordering", enum.laws[Ordering])
-  checkAll("Ordering", monoid.laws[Ordering])
+object OrderingTest extends Scalaprops {
+  val testLaws = Properties.list(
+    laws.enum.all[Ordering],
+    laws.monoid.all[Ordering]
+  )
 }
