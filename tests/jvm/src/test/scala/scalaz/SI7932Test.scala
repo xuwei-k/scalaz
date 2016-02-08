@@ -4,9 +4,9 @@ package scalaz
  * - [[https://issues.scala-lang.org/browse/SI-7932]]
  * - [[https://github.com/scalaz/scalaz/pull/932]]
  */
-object SI7932Test extends SpecLite {
+object SI7932Test extends Scalaprops {
 
-  "SI-7932" in {
+  val `SI-7932` = Property.forAll {
     classOf[C].getMethods.map(_.toGenericString)
     true
   }
