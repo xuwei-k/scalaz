@@ -390,7 +390,7 @@ object build extends Build {
   lazy val checkJS = check.js
 
   lazy val tests = crossProject.crossType(ScalazCrossType)
-    .settings(standardSettings: _*)
+    .settings(standardSettings ++ ScalapropsPlugin.autoImport.scalapropsSettings: _*)
     .settings(
       name := "scalaz-tests",
       publishArtifact := false,
