@@ -279,10 +279,9 @@ object build extends Build {
     id = "tests",
     base = file("tests"),
     dependencies = Seq(core, check, iteratee, concurrent, effect, scalacheckBinding % "test"),
-    settings = standardSettings ++Seq[Sett](
+    settings = standardSettings ++ ScalapropsPlugin.autoImport.scalapropsSettings ++ Seq[Sett](
       name := "scalaz-tests",
       publishArtifact := false,
-      testFrameworks += new TestFramework("scalaz.ScalapropsFramework"),
       libraryDependencies += "org.scalacheck" %% "scalacheck" % scalaCheckVersion.value % "test"
     )
   )
