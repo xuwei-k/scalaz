@@ -10,6 +10,8 @@ trait Scalaprops {
   def transformProperties[A](properties: List[Properties[A]]): List[Properties[A]] =
     properties.map(Scalaprops.filterUnitEmpty).sortBy(_.id.toString)
 
+  implicit def toAnyOps[A](actual: => A): AnyOps[A] =
+    new AnyOps(actual)
 }
 
 object Scalaprops {
