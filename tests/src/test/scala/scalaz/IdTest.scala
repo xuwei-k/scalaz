@@ -1,13 +1,14 @@
 package scalaz
 
-import std.AllInstances._
-import scalaz.scalacheck.ScalazProperties._
+import std.anyVal._
 import Id._
 
-object IdTest extends SpecLite {
-  checkAll(monad.laws[Id])
-  checkAll(traverse.laws[Id])
-  checkAll(zip.laws[Id])
-  checkAll(align.laws[Id])
-  checkAll(comonad.laws[Id])
+object IdTest extends Scalaprops {
+  val testLaws = Properties.list(
+    laws.monad.all[Id],
+    laws.traverse.all[Id],
+    laws.zip.all[Id],
+    laws.align.all[Id],
+    laws.comonad.all[Id]
+  )
 }
