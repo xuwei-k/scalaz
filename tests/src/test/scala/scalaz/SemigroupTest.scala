@@ -1,9 +1,9 @@
 package scalaz
 
-import std.AllInstances._
+import std.anyVal._
 
-object SemigroupTest extends SpecLite {
-  "invariant functor" in {
+object SemigroupTest extends Scalaprops {
+  val `invariant functor` = Property.forAll {
     import InvariantFunctorTest._
     import syntax.invariantFunctor._
 

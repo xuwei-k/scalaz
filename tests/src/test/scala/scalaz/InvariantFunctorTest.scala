@@ -6,14 +6,15 @@ import Isomorphism.{<=>, IsoSet}
 import std.AllInstances._
 import std.option.some
 import syntax.invariantFunctor._
+import Property.forAll
 
-object InvariantFunctorTest extends SpecLite {
+object InvariantFunctorTest extends Scalaprops {
 
-  "xmap" in {
+  val xmap = forAll {
     some(1).xmap[Int](_ + 1, _ - 1) must_===(some(2))
   }
 
-  "xmap iso" in {
+  val `xmap iso` = forAll {
     val succI: Int <=> Int = new IsoSet[Int, Int] {
       def to = (_: Int) + 1
       def from = (_: Int) - 1
@@ -21,7 +22,7 @@ object InvariantFunctorTest extends SpecLite {
     some(1) xmapi succI must_===(some(2))
   }
 
-  "xmap bijection" in {
+  val `xmap bijection` = forAll {
     val succB: Bijection[Int, Int] = liftBijection[Id, Id, Int, Int](_ + 1, _ - 1)
     some(1) xmapb succB must_===(some(2))
   }

@@ -1,10 +1,10 @@
 package scalaz
 
 import std.AllInstances._
-import org.scalacheck.Prop.forAll
+import Property.forAll
 
-object MonoidTest extends SpecLite {
-  "multiply" ! forAll{ (a: Int, b: Int) =>
+object MonoidTest extends Scalaprops {
+  val multiply = forAll{ (a: Int, b: Int) =>
     if(b <= 0) {
       Monoid[Int].multiply(a, b) must_=== 0
     } else {
@@ -12,7 +12,7 @@ object MonoidTest extends SpecLite {
     }
   }
 
-  "endo multiply" in {
+  val `endo multiply` = forAll {
     import syntax.monoid._
 
     def inc(i: Int) = i + 1
@@ -21,7 +21,7 @@ object MonoidTest extends SpecLite {
     incTimesThree(0) must_===(3)
   }
 
-  "endo kleisli multiply" in {
+  val `endo kleisli multiply` = forAll {
     import syntax.monoid._
 
     val k = Kleisli { i: Int => if (i % 2 == 0) Some(i * 2) else None }
@@ -30,7 +30,7 @@ object MonoidTest extends SpecLite {
     kTimes3.run(2) must_=== (Some(16))
   }
 
-  "unfold" in {
+  val unfold = forAll {
     val ss = std.stream.unfold(1) {
       case x if x < 10 => Some((x.toString, x * 2))
       case _           => None
@@ -38,19 +38,18 @@ object MonoidTest extends SpecLite {
     ss.toList must_===(List("1", "2", "4", "8"))
   }
 
-  "intercalate empty" in (
-    Foldable[List].intercalate(List[String](), "oops")
-    must_===("")
-  )
+  val `intercalate empty` = forAll {
+    Foldable[List].intercalate(List[String](), "oops") must_===("")
+  }
 
-  "intercalate" in {
+  val intercalate = forAll {
     val xs = List(Vector(Cord("this"), Cord("has")), Vector(),
 		  Vector(Cord("elements")), Vector(Cord("beneath")), Vector())
     ((Foldable[List] compose Foldable[Vector]).intercalate(xs, Cord("!!")).toString
      must_===(Cord("this!!has!!elements!!beneath").toString))
   }
 
-  "invariant functor" in {
+  val `invariant functor` = forAll {
     import InvariantFunctorTest._
     import syntax.invariantFunctor._
 
