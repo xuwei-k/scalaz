@@ -7,19 +7,19 @@ import org.scalacheck._
 abstract class SpecLite extends Properties("") with SpecLitePlatform {
   updateName
 
-  def checkAll(name: String, props: Properties) {
+  def checkAll(name: String, props: org.scalacheck.Properties) {
     for ((name2, prop) <- props.properties) yield {
       property(name + ":" + name2) = prop
     }
   }
 
-  def checkAll(props: Properties) {
+  def checkAll(props: org.scalacheck.Properties) {
     for ((name, prop) <- props.properties) yield {
       property(name) = prop
     }
   }
 
-  class PropertyOps(props: Properties) {
+  implicit class PropertyOps(props: org.scalacheck.Properties) {
     def withProp(propName: String, prop: Prop): Properties = {
       val p = new Properties(props.name)
       for {(name, x) <- props.properties} p.property(name) = x
@@ -28,10 +28,9 @@ abstract class SpecLite extends Properties("") with SpecLitePlatform {
     }
   }
 
-  implicit def enrichProperties(props: Properties) = new PropertyOps(props)
   private var context: String = ""
 
-  class StringOps(s: String) {
+  implicit class StringOps(s: String) {
     def should[A](a: => Any): Unit = {
       val saved = context
       context = s; try a finally context = saved
@@ -41,8 +40,6 @@ abstract class SpecLite extends Properties("") with SpecLitePlatform {
     def in[A](a: => A)(implicit ev: (A) => Prop): Unit =
       property(context + ":" + s) = Prop(ev(a)(_)) // TODO sort out the laziness / implicit conversions properly
   }
-
-  implicit def enrichString(s: String) = new StringOps(s)
 
   def check(x: => Boolean): Prop = {
     x must_==(true)

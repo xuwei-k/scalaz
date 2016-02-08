@@ -4,7 +4,7 @@ import std.AllInstances._
 import syntax.foldable._
 import syntax.equal._
 import org.scalacheck.Prop.forAll
-import org.scalacheck.{Arbitrary, Properties}
+import org.scalacheck.Arbitrary
 
 object FoldableTest extends SpecLite {
   "to" ! forAll {
