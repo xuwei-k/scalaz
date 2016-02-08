@@ -2,8 +2,8 @@ package scalaz
 
 import std.AllInstances._
 
-object IdSyntaxTest extends SpecLite {
-  "smorgasbord" in {
+object IdSyntaxTest extends Scalaprops {
+  val smorgasbord = Property.forAll {
     import syntax.id._
     2 |> (_ * 3) must_===(6)
 
