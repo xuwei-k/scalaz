@@ -25,7 +25,7 @@ jdk:
   - oraclejdk8 # scalaz 7.3 does not support Java 7
 
 script:
-  - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m check-gen-type-classes compile
+  - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m check-gen-type-classes test
 
   # Tricks to avoid unnecessary cache updates
   - find $HOME/.sbt -name "*.lock" | xargs rm
