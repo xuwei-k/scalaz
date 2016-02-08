@@ -3,51 +3,47 @@ package scalaz
 import reflect.ClassTag
 
 import org.scalacheck._
-import org.scalacheck.Prop.Result
 import org.scalacheck.Gen.Parameters
 
-abstract class SpecLite extends Properties("") {
+abstract class SpecLite extends org.scalacheck.Properties("") {
   def updateName: Unit = {
-    val f = classOf[Properties].getDeclaredField("name")
+    val f = classOf[org.scalacheck.Properties].getDeclaredField("name")
     f.setAccessible(true)
     f.set(this, getClass.getName.stripSuffix("$"))
   }
   updateName
 
-  def checkAll(name: String, props: Properties) {
+  def checkAll(name: String, props: org.scalacheck.Properties) {
     for ((name2, prop) <- props.properties) yield {
       property(name + ":" + name2) = prop
     }
   }
 
-  def checkAll(props: Properties) {
+  def checkAll(props: org.scalacheck.Properties) {
     for ((name, prop) <- props.properties) yield {
       property(name) = prop
     }
   }
 
-  class PropertyOps(props: Properties) {
-    def withProp(propName: String, prop: Prop) = new Properties(props.name) {
+  implicit class PropertyOps(props: org.scalacheck.Properties) {
+    def withProp(propName: String, prop: Prop) = new org.scalacheck.Properties(props.name) {
       for {(name, p) <- props.properties} property(name) = p
       property(propName) = prop
     }
   }
 
-  implicit def enrichProperties(props: Properties) = new PropertyOps(props)
   private var context: String = ""
 
-  class StringOps(s: String) {
+  implicit class StringOps(s: String) {
     def should[A](a: => Any): Unit = {
       val saved = context
       context = s; try a finally context = saved
     }
     def ![A](a: => A)(implicit ev: (A) => Prop): Unit = in(a)
     def in[A](a: => A)(implicit ev: (A) => Prop): Unit = property(context + ":" + s) = new Prop {
-      def apply(prms: Parameters): Result = ev(a).apply(prms) // TODO sort out the laziness / implicit conversions properly
+      def apply(prms: Parameters) = ev(a).apply(prms) // TODO sort out the laziness / implicit conversions properly
     }
   }
-
-  implicit def enrichString(s: String) = new StringOps(s)
 
   def check(x: => Boolean): Prop = {
     x must_==(true)

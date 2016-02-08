@@ -4,7 +4,7 @@ import std.AllInstances._
 import syntax.foldable._
 import syntax.equal._
 import org.scalacheck.Prop.forAll
-import org.scalacheck.{Arbitrary, Properties}
+import org.scalacheck.Arbitrary
 
 object FoldableTest extends SpecLite {
   "to" ! forAll {
@@ -216,8 +216,8 @@ object FoldableTests {
       F.all(fa)(f) === F.toList(fa).forall(f)
     }
 
-  def anyAndAllLazy[F[_]](implicit fa: Arbitrary[F[Int]], F: Foldable[F]) =
-    new Properties("foldable") {
+  def anyAndAllLazy[F[_]](implicit fa: Arbitrary[F[Int]], F: Foldable[F]): org.scalacheck.Properties =
+    new org.scalacheck.Properties("foldable") {
       property("consistent any") = anyConsistent[F, Int](_ > 0)
       property("consistent all") = allConsistent[F, Int](_ > 0)
       property("any is lazy") = anyIsLazy[F, Int]
