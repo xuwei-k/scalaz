@@ -19,6 +19,9 @@ object AsProperty {
       def asProperty(a: A) = f(a)
     }
 
+  implicit val unit: AsProperty[Unit] =
+    from(_ => Property.prop(true))
+
   implicit val bool: AsProperty[Bool] =
     from(b => Property.prop(b.b))
 
