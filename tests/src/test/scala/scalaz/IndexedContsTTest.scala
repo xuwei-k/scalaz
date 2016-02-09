@@ -1,6 +1,6 @@
 package scalaz
 
-object IndexedContsTTest extends SpecLite {
+object IndexedContsTTest {
 
   object instances {
     def functorRight[W[_]: Functor, M[_], R, O] = Functor[IndexedContsT[W, M, R, O, ?]]
