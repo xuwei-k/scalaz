@@ -1,29 +1,33 @@
 package scalaz
 
-import std.AllInstances._
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
+import std.anyVal._
 
-object LazyTupleTest extends SpecLite {
+object LazyTupleTest extends Scalaprops {
 
   type A = Int
   type B = Int
   type C = Int
   type D = Int
 
-  checkAll("LazyTuple2", bitraverse.laws[LazyTuple2])
+  val bitraverse = laws.bitraverse.all[LazyTuple2]
+  val associative = laws.associative.all[LazyTuple2]
 
-  checkAll("LazyTuple2", order.laws[LazyTuple2[A, B]])
-  checkAll("LazyTuple3", order.laws[LazyTuple3[A, B, C]])
-  checkAll("LazyTuple4", order.laws[LazyTuple4[A, B, C, D]])
+  val lazyTuple2 = Properties.list(
+    laws.order.all[LazyTuple2[A, B]],
+    laws.monoid.all[LazyTuple2[A, B]],
+    laws.monad.all[LazyTuple2[B, ?]]
+  )
 
-  checkAll("LazyTuple2", monoid.laws[LazyTuple2[A, B]])
-  checkAll("LazyTuple3", monoid.laws[LazyTuple3[A, B, C]])
-  checkAll("LazyTuple4", monoid.laws[LazyTuple4[A, B, C, D]])
+  val lazyTuple3 = Properties.list(
+    laws.order.all[LazyTuple3[A, B, C]],
+    laws.monoid.all[LazyTuple3[A, B, C]],
+    laws.monad.all[LazyTuple3[B, C, ?]]
+  )
 
-  checkAll("LazyTuple2", monad.laws[LazyTuple2[B, ?]])
-  checkAll("LazyTuple3", monad.laws[LazyTuple3[B, C, ?]])
-  checkAll("LazyTuple4", monad.laws[LazyTuple4[B, C, D, ?]])
+  val lazyTuple4 = Properties.list(
+    laws.order.all[LazyTuple4[A, B, C, D]],
+    laws.monoid.all[LazyTuple4[A, B, C, D]],
+    laws.monad.all[LazyTuple4[B, C, D, ?]]
+  )
 
-  checkAll("LazyTuple2", associative.laws[LazyTuple2])
 }
