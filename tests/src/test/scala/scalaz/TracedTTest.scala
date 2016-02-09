@@ -1,6 +1,6 @@
 package scalaz
 
-object TracedTTest extends SpecLite {
+object TracedTTest {
 
   def compilationTestTracedTU: Unit = {
     import scalaz.syntax.either._
