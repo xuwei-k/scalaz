@@ -1,10 +1,8 @@
 package scalaz
 
 import std.AllInstances._
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
 
-object ProductTest extends SpecLite {
+object ProductTest extends Scalaprops {
   type OptionList[α] = (Option[α], List[α])
   type OneAndOption[α] = OneAnd[Option, α]
   type OneAndOptionPair[α] = (OneAndOption[α], OneAndOption[α])
@@ -13,15 +11,18 @@ object ProductTest extends SpecLite {
   implicit val optionListZip = Zip[Option].product[List]
   implicit val oneAndOptionPairTraverse1 = Traverse1[OneAndOption].product[OneAndOption]
 
-  {
+  val optionListBindRecTest = {
     implicit val optionListBindRec = BindRec[Option].product[List]
-    checkAll(bindRec.laws[OptionList])
+    laws.bindRec.tailrecBindConsistency[OptionList, Int]
   }
 
-  checkAll(monadPlus.strongLaws[OptionList])
-  checkAll(zip.laws[OptionList])
-  checkAll(traverse1.laws[OneAndOptionPair])
+  val optionList = Properties.list(
+    laws.monadPlusStrong.all[OptionList],
+    laws.zip.all[OptionList]
+  )
+
+  val oneAndOptionPair = laws.traverse1.all[OneAndOptionPair]
 
   implicit val eitherTuple2 = Bitraverse[Either].product[Tuple2]
-  checkAll(bitraverse.laws[λ[(α, β) => (Either[α, β], (α, β))]])
+  val eitherTuple2Test = laws.bitraverse.all[λ[(α, β) => (Either[α, β], (α, β))]]
 }
