@@ -2,11 +2,10 @@ package scalaz
 
 import std.AllInstances._
 import Dual._
-import scalaz.scalacheck.ScalazArbitrary._
-import org.scalacheck.Prop.forAll
+import Property.forAll
 
-object OrderTest extends SpecLite {
-  "duals" ! forAll {
+object OrderTest extends Scalaprops {
+  val duals = forAll {
     (xs: List[Int]) =>
       val F = Foldable[List]
       val xsdual: List[Int @@ Tags.Dual] = Tag subst xs
@@ -14,7 +13,7 @@ object OrderTest extends SpecLite {
       (F minimum xs: Option[Int]) must_===(Tag unsubst (F maximum xsdual: Option[Int @@ Tags.Dual]))
   }
 
-  "semigroups min" ! forAll {
+  val `semigroups min` = forAll {
     (xs: NonEmptyList[Int]) =>
       val F = Foldable1[NonEmptyList]
       import Tags._
@@ -22,7 +21,7 @@ object OrderTest extends SpecLite {
       Tag unwrap (MinVal.subst(xs).suml1) must_===(F minimum1 xs)
   }
 
-  "semigroups max" ! forAll {
+  val `semigroups max` = forAll {
     (xs: NonEmptyList[Int]) =>
       val F = Foldable1[NonEmptyList]
       import Tags._
