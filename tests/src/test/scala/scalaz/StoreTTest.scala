@@ -1,10 +1,8 @@
 package scalaz
 
 import std.AllInstances._
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
 
-object StoreTTest extends SpecLite {
+object StoreTTest extends Scalaprops {
 
   implicit def storeTuple1IntEqual = new Equal[StoreT[Tuple1, Int, Int]] {
     def equal(a1: StoreT[Tuple1, Int, Int], a2: StoreT[Tuple1, Int, Int]) = (a1.run, a2.run) match {
@@ -12,7 +10,7 @@ object StoreTTest extends SpecLite {
     }
   }
 
-  checkAll(comonad.laws[StoreT[Tuple1, Int, ?]])
+  val testLaws = laws.comonad.all[StoreT[Tuple1, Int, ?]]
 
   object instances {
     type A = Int
