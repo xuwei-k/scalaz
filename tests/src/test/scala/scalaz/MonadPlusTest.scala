@@ -2,18 +2,19 @@ package scalaz
 
 import std.AllInstances._
 import std.option.{some, none}
+import Property.forAll
 
-object MonadPlusTest extends SpecLite {
+object MonadPlusTest extends Scalaprops {
 
-  "unite" in {
+  val unite = forAll{
     MonadPlus[List].unite(List(some(1), none[Int], some(2))) must_===(List(1, 2))
   }
 
-  "uniteU" in {
+  val uniteU = forAll{
     MonadPlus[List].uniteU(List(\/.right(1), \/.left("a"), \/.right(2))) must_===(List(1, 2))
   }
 
-  "separate" in {
+  val separate = forAll{
     import \&/._
     import syntax.monadPlus._
 
@@ -26,7 +27,7 @@ object MonadPlusTest extends SpecLite {
     Stream(Success(1), Failure("a"), Success(2)).separate must_===(Stream("a") -> Stream(1, 2))
   }
 
-  "filter" in {
+  val filter = forAll{
     MonadPlus[List].filter(List(1, 2, 3))(_ % 2 == 0) must_===(List(2))
   }
 }
