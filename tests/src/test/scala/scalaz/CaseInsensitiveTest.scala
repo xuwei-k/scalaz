@@ -1,23 +1,24 @@
 package scalaz
 
-import std.AllInstances._
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
-import org.scalacheck.Prop.forAll
+import Property.forAll
+import std.string._
 
-object CaseInsensitiveTest extends SpecLite {
+object CaseInsensitiveTest extends Scalaprops {
+  private[this] implicit val stringGen =
+    Tag.unsubst(Gen[String @@ GenTags.AlphaNum])
 
-  "map identity" ! forAll {
+  val `map identity` = forAll {
     (a: CaseInsensitive[String]) =>
       Equal[CaseInsensitive[String]].equal(a.map(x => x), a)
   }
   
-  "map associativity" ! forAll {
+  val `map associativity` = forAll {
     (a: CaseInsensitive[String], f: String => String, g: String => String) =>
       Equal[CaseInsensitive[String]].equal(a.map(f).map(g), a.map(g compose f))
   }
-  
-  checkAll(monoid.laws[CaseInsensitive[String]])
-  checkAll(equal.laws[CaseInsensitive[String]])
-  checkAll(order.laws[CaseInsensitive[String]])
+
+  val testLaws = Properties.list(
+    laws.monoid.all[CaseInsensitive[String]],
+    laws.order.all[CaseInsensitive[String]]
+  )
 }
