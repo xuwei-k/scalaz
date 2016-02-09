@@ -158,6 +158,14 @@ object ScalazLaw {
   val foldableLeftFMConsistent = law0(foldable, "left fold consistent foldMap")
   val foldableRightFMConsistent = law0(foldable, "right fold consistent foldMap")
 
+
+  val foldableAnyAndAll = law("foldable any and all")
+  val foldableConsistentAny = law0(foldableAnyAndAll, "consistent any")
+  val foldableConsistentAll = law0(foldableAnyAndAll, "consistent all")
+  val foldableAnyIsLazy = law0(foldableAnyAndAll, "any is lazy")
+  val foldableAllIsLazy = law0(foldableAnyAndAll, "all is lazy")
+
+
   val foldable1 = law("foldable1")
   val foldable1All = all(foldable1)
   val foldable1LeftFM1Consistent = law0(foldable1, "left fold consistent foldMap1")
