@@ -25,7 +25,7 @@ abstract class SpecLite extends org.scalacheck.Properties("") {
     }
   }
 
-  implicit class PropertyOps(props: org.scalacheck.Properties) {
+  protected[this] implicit class PropertyOps(props: org.scalacheck.Properties) {
     def withProp(propName: String, prop: Prop) = new org.scalacheck.Properties(props.name) {
       for {(name, p) <- props.properties} property(name) = p
       property(propName) = prop
@@ -34,7 +34,7 @@ abstract class SpecLite extends org.scalacheck.Properties("") {
 
   private var context: String = ""
 
-  implicit class StringOps(s: String) {
+  protected[this] implicit class StringOps(s: String) {
     def should[A](a: => Any): Unit = {
       val saved = context
       context = s; try a finally context = saved
