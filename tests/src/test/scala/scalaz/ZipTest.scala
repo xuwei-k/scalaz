@@ -2,9 +2,9 @@ package scalaz
 
 import std.list._, std.tuple._, std.anyVal._
 
-object ZipTest extends SpecLite {
+object ZipTest extends Scalaprops {
 
-  "Zip.ap laziness" ! {
+  val `Zip.ap laziness` = Property.forAll {
     val F = Zip[List].ap
     def undefined[A]: List[A] = sys.error("")
     F.apply2(nil[Int], undefined[Int])(Tuple2.apply) must_=== Nil
