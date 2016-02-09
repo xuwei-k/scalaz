@@ -21,6 +21,9 @@ object CaseInsensitive extends CaseInsensitiveInstances {
     val original = a
     lazy val foldedCase = fc
   }
+
+  implicit def CaseInsensitiveGen[A](implicit A0: Gen[A], A1: FoldCase[A]): Gen[CaseInsensitive[A]] =
+    A0.map(CaseInsensitive(_))
 }
 
 sealed abstract class CaseInsensitiveInstances {
