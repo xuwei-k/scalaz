@@ -1,19 +1,22 @@
 package scalaz
 
 import std.AllInstances._
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
-import org.scalacheck.Prop.forAll
 
-object TreeLocTest extends SpecLite {
+object TreeLocTest extends Scalaprops {
+  import Property.{forAll, forAllG}
 
-  checkAll("TreeLoc", order.laws[TreeLoc[Int]])
-  checkAll("TreeLoc", traverse1.laws[TreeLoc])
-  checkAll(FoldableTests.anyAndAllLazy[TreeLoc])
+  val testLaws = Properties.list(
+    laws.order.all[TreeLoc[Int]],
+    laws.traverse1.all[TreeLoc],
+    laws.foldable.anyAndAllLazy[TreeLoc]
+  )
 
-  "ScalazArbitrary.treeLocGenSized" ! forAll(org.scalacheck.Gen.choose(1, 200)){ size =>
-    val gen = treeLocGenSized[Unit](size)
-    Stream.continually(gen.sample).flatten.take(10).map(Foldable[TreeLoc].length(_)).forall(_ == size)
+  val treeLocGenSized = forAllG(Gen.choose(1, 100), Gen[Long]){ (size, seed) =>
+    Gen[TreeLoc[Unit]].samples(
+      listSize = 10,
+      seed = seed,
+      size = size
+    ).map(Foldable[TreeLoc].length(_)).forall(_ == size)
   }
 
   {
@@ -24,11 +27,10 @@ object TreeLocTest extends SpecLite {
         Equal[A].equal(a1.rootLabel, a2.rootLabel) && streamEqualApprox.equal(a1.subForest, a2.subForest)
     }
 
-    // TODO checkAll("TreeLoc", applicative.laws[TreeLoc])
-    checkAll("TreeLoc", comonad.laws[TreeLoc])
+    laws.comonad.all[TreeLoc]
   }
 
-  "TreeLoc from empty forest does not throw an exception" ! {
+  val `TreeLoc from empty forest does not throw an exception` = forAll{
     import scalaz.std.option._
     val result: Option[TreeLoc[Int]] = TreeLoc.fromForest(Stream.empty[Tree[Int]])
     result must_==(none[TreeLoc[Int]])
