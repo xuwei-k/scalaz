@@ -19,7 +19,7 @@ abstract class SpecLite extends Properties("") with SpecLitePlatform {
     }
   }
 
-  implicit class PropertyOps(props: org.scalacheck.Properties) {
+  protected[this] implicit class PropertyOps(props: org.scalacheck.Properties) {
     def withProp(propName: String, prop: Prop): Properties = {
       val p = new Properties(props.name)
       for {(name, x) <- props.properties} p.property(name) = x
@@ -30,7 +30,7 @@ abstract class SpecLite extends Properties("") with SpecLitePlatform {
 
   private var context: String = ""
 
-  implicit class StringOps(s: String) {
+  protected[this] implicit class StringOps(s: String) {
     def should[A](a: => Any): Unit = {
       val saved = context
       context = s; try a finally context = saved
