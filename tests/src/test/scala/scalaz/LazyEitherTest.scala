@@ -1,25 +1,24 @@
 package scalaz
 
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
 import std.AllInstances._
 
-object LazyEitherTest extends SpecLite {
+object LazyEitherTest extends Scalaprops {
   implicit def LazyEitherEqual[A: Equal, B: Equal]: Equal[LazyEither[A, B]] = new Equal[LazyEither[A, B]] {
     def equal(a: LazyEither[A, B], b: LazyEither[A, B]) =
       Equal[Either[A, B]].equal(a.toEither,b.toEither)
   }
 
-  
-  checkAll(equal.laws[LazyEither[Int,Int]])
-  checkAll(monad.laws[LazyEither[Int, ?]])
-  checkAll(monadError.laws[LazyEither[Int, ?], Int])
-  checkAll(bindRec.laws[LazyEither[Int, ?]])
-  checkAll(traverse.laws[LazyEither[Int, ?]])
-  checkAll(associative.laws[LazyEither])
-  checkAll(bitraverse.laws[LazyEither])
+  val testLaws = Properties.list(
+    laws.equal.all[LazyEither[Int, Int]],
+    laws.monadError.all[LazyEither[Int, ?], Int],
+    laws.bindRec.all[LazyEither[Int, ?]],
+    laws.traverse.all[LazyEither[Int, ?]]
+  )
 
-  "tail recursive tailrecM" in {
+  val bitraverse = laws.bitraverse.all[LazyEither]
+  val associative = laws.associative.all[LazyEither]
+
+  val `tail recursive tailrecM` = Property.forAll {
     val times = 10000
     
     val result = 
