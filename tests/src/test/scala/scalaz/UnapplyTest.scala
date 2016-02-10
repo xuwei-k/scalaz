@@ -2,7 +2,7 @@ package scalaz
 
 import Leibniz.===
 
-object UnapplyTest extends SpecLite {
+object UnapplyTest {
   object unapply {
     val ue = Unapply[Monad, Int \/ String]
     def mequiv[A] = implicitly[ue.M[A] === (Int \/ A)]
