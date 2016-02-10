@@ -1,24 +1,21 @@
 package scalaz
 
 import std.AllInstances._
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
-import Const._
-import org.scalacheck.Prop.forAll
+import Property.forAll
 
-object ConstTest extends SpecLite {
-  checkAll("Const", order.laws[Const[Int, String]])
+object ConstTest extends Scalaprops {
+  val order = laws.order.laws[Const[Int, String]]
 
-  checkAll("Const List"  , applicative.laws[λ[α => Const[List[Int], α]]])
-  checkAll("Const Option", applicative.laws[λ[α => Const[Option[Int], α]]])
+  val list = laws.applicative.all[Const[List[Int], ?]]
+  val option = laws.applicative.all[Const[Option[Int], ?]]
 
-  checkAll(traverse.laws[Const[Int, ?]])
-  checkAll(contravariant.laws[Const[Int, ?]])
+  val testLaws = Properties.list(
+    laws.traverse.laws[Const[Int, ?]],
+    laws.contravariant.laws[Const[Int, ?]]
+  )
 
-  "const functions" in {
-    "const" ! forAll { (x: Int, y: Function0[String]) =>
-      const(x)(y) == x
-    }
+  val const = forAll { (x: Int, y: Function0[Int]) =>
+    Const.const(x)(y) == x
   }
 
   object instances {
