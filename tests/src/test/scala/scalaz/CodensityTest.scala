@@ -1,23 +1,26 @@
 package scalaz
 
-import org.scalacheck.Arbitrary
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalaCheckBinding._
 import std.list._
 import std.anyVal._
 import std.option._
 
-object CodensityTest extends SpecLite {
-  implicit def arbCodensity[F[_], A](implicit A: Arbitrary[F[A]], M: Monad[F])
-      : Arbitrary[Codensity[F, A]] =
-    Functor[Arbitrary].map(A)(Codensity.rep(_))
+object CodensityTest extends Scalaprops {
 
-  implicit def eqlCodensity[F[_], A](implicit A: Equal[F[A]], M: Applicative[F])
-      : Equal[Codensity[F, A]] =
-    Equal.equalBy(_.improve)
+  private[this] final class CodensityEqual[B] {
+    import FunctionEqual._
+    implicit def equal[F[_], A](implicit F: Gen[A => F[B]], E: Equal[F[B]]): Equal[Codensity[F, A]] =
+      Equal[(A => F[B]) => F[B]].contramap(f => f.apply[B] _)
+  }
 
-  checkAll("List", monadPlus.laws[Codensity[List, ?]])
-  checkAll("Option", monadPlus.laws[Codensity[Option, ?]])
+  private[this] val E = new CodensityEqual[Int]
+  import E._
+
+  val list = laws.monadPlusStrong.all[Codensity[List, ?]].andThenParam(Param.maxSize(10))
+  val option = laws.monadPlusStrong.all[Codensity[Option, ?]]
+
+  val monadTrans = laws.monadTrans.all[Codensity].andThenParamPF{
+    case ScalazLaw.monadTransLaw2IList => Param.maxSize(5)
+  }
 
   object instances {
     def functor[F[_]: MonadPlus] = Functor[Codensity[F, ?]]
