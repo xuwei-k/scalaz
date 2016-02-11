@@ -1,25 +1,27 @@
 package scalaz
 
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
-import scalaz.scalacheck.ScalaCheckBinding._
 import std.AllInstances._
-import org.scalacheck.Arbitrary
 
-object UnwriterTTest extends SpecLite {
+object UnwriterTTest extends Scalaprops {
 
   type UnwriterTOpt[W, A] = UnwriterT[Option, W, A]
   type UnwriterTOptInt[A] = UnwriterTOpt[Int, A]
 
-  checkAll(equal.laws[UnwriterTOptInt[Int]])
-  checkAll(bind.laws[UnwriterTOptInt])
-  checkAll(traverse.laws[UnwriterTOptInt])
-  checkAll(bitraverse.laws[UnwriterTOpt])
+  val testLaws = Properties.list(
+    laws.equal.all[UnwriterTOptInt[Int]],
+    laws.bind.all[UnwriterTOptInt],
+    laws.traverse.all[UnwriterTOptInt]
+  )
 
-  implicit def UnwriterArb[F[_], W, A](implicit W: Arbitrary[W], A: Arbitrary[A]): Arbitrary[Unwriter[W, A]] =
-    Applicative[Arbitrary].apply2(W, A)(Unwriter(_, _))
+  val bitraverse = laws.bitraverse.all[UnwriterTOpt]
 
-  checkAll(comonad.laws[Unwriter[Int, ?]])
+  private[this] implicit def unwriterGen[A: Gen, B: Gen]: Gen[Unwriter[A, B]] =
+    Gen.unwriterTGen[Id.Id, A, B]
+
+  private[this] implicit def unwriterCogen[A: Cogen, B: Cogen]: Cogen[Unwriter[A, B]] =
+    Cogen.cogenUnwriterT[Id.Id, A, B]
+
+  val comonad = laws.comonad.all[Unwriter[Int, ?]]
 
   object instances {
     def equal[F[_], W, A](implicit E: Equal[F[(W, A)]]) = Equal[UnwriterT[F, W, A]]
