@@ -1,18 +1,20 @@
 package scalaz
 
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
 import std.AllInstances._
+import Property.forAll
 
-object LazyOptionTTest extends SpecLite {
+object LazyOptionTTest extends Scalaprops {
 
   type LazyOptionTList[A] = LazyOptionT[List, A]
 
-  checkAll(equal.laws[LazyOptionTList[Int]])
-  checkAll(monadPlus.laws[LazyOptionTList])
-  checkAll(bindRec.laws[LazyOptionTList])
+  val bindRec = laws.bindRec.tailrecBindConsistency[LazyOptionTList, Int]
 
-  "tail recursive tailrecM" in {
+  val testLaws = Properties.list(
+    laws.equal.all[LazyOptionTList[Int]],
+    laws.monadPlus.all[LazyOptionTList]
+  )
+
+  val `tail recursive tailrecM` = forAll {
     import Scalaz.Id
     type LazyOptionId[A] = LazyOptionT[Id, A]
 
