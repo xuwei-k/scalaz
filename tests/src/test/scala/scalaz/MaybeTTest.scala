@@ -1,20 +1,23 @@
 package scalaz
 
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
 import std.AllInstances._
 
-object MaybeTTest extends SpecLite {
+object MaybeTTest extends Scalaprops {
 
   type MaybeTList[A] = MaybeT[List, A]
   type IntOr[A] = Int \/ A
   type MaybeTEither[A] = MaybeT[IntOr, A]
 
-  checkAll(equal.laws[MaybeTList[Int]])
-  checkAll(bindRec.laws[MaybeTList])
-  checkAll(monadPlus.laws[MaybeTList])
-  checkAll(traverse.laws[MaybeTList])
-  checkAll(monadError.laws[MaybeTEither, Int])
+  val monadTrans = laws.monadTrans.all[MaybeT]
+
+  val testLaws = Properties.list(
+    laws.equal.all[MaybeTList[Int]],
+    laws.monadPlus.all[MaybeTList],
+    laws.traverse.all[MaybeTList],
+    laws.monadError.all[MaybeTEither, Int]
+  )
+
+  val bindRec = laws.bindRec.laws[MaybeT[Maybe, ?]]
 
   object instances {
     def functor[F[_] : Functor] = Functor[MaybeT[F, ?]]
