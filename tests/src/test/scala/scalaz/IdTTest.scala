@@ -1,7 +1,7 @@
 package scalaz
 
 
-object IdTTest extends SpecLite {
+object IdTTest {
 
   object instances {
     def equal[F[_], A](implicit F: Equal[F[A]]) = Equal[IdT[F, A]]
