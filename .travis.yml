@@ -20,7 +20,6 @@ cache:
 language: scala
 scala:
   - 2.11.7
-  - 2.10.6
 jdk:
   - oraclejdk8 # scalaz 7.3 does not support Java 7
 
@@ -30,11 +29,6 @@ script:
   # Tricks to avoid unnecessary cache updates
   - find $HOME/.sbt -name "*.lock" | xargs rm
   - find $HOME/.ivy2 -name "ivydata-*.properties" | xargs rm
-
-matrix:
-  include:
-    - scala: 2.12.0-M3
-      jdk: oraclejdk8
 
 addons:
   apt:

@@ -42,8 +42,6 @@ object build extends Build {
     enableCrossBuild = true
   )
 
-  val scalaCheckVersion = SettingKey[String]("scalaCheckVersion")
-
   private def gitHash = sys.process.Process("git rev-parse HEAD").lines_!.head
 
   // no generic signatures for scala 2.10.x, see SI-7932, #571 and #828
@@ -56,7 +54,6 @@ object build extends Build {
     crossScalaVersions := Seq("2.10.6", "2.11.7", "2.12.0-M3"),
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
-    scalaCheckVersion := "1.13.0",
     scalacOptions ++= Seq(
       // contains -language:postfixOps (because 1+ as a parameter to a higher-order function is treated as a postfix op)
       "-deprecation",
@@ -249,9 +246,10 @@ object build extends Build {
     dependencies = Seq(core, concurrent, iteratee),
     settings     = standardSettings ++ Seq[Sett](
       name := "scalaz-scalacheck-binding",
-      libraryDependencies += "org.scalacheck" %% "scalacheck" % scalaCheckVersion.value,
       osgiExport("scalaz.scalacheck")
     )
+  ).dependsOn(
+    ProjectRef(uri("git://github.com/xuwei-k/scalacheck.git#a6066af4447db679"), "jvm")
   )
 
   lazy val tests = Project(
@@ -260,8 +258,7 @@ object build extends Build {
     dependencies = Seq(core, iteratee, concurrent, effect, scalacheckBinding % "test"),
     settings = standardSettings ++Seq[Sett](
       name := "scalaz-tests",
-      publishArtifact := false,
-      libraryDependencies += "org.scalacheck" %% "scalacheck" % scalaCheckVersion.value % "test"
+      publishArtifact := false
     )
   )
 
