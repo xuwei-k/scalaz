@@ -1,14 +1,12 @@
 package scalaz
 
 import std.AllInstances._
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
 
-object CoproductTest extends SpecLite {
+object CoproductTest extends Scalaprops {
 
-  checkAll(comonad.laws[Coproduct[NonEmptyList, Tree, ?]])
-  checkAll(traverse.laws[Coproduct[Option, List, ?]])
-  checkAll(traverse1.laws[Coproduct[NonEmptyList, NonEmptyList, ?]])
+  val nelTreeComonad = laws.comonad.all[Coproduct[NonEmptyList, Tree, ?]]
+  val optionListTraverse = laws.traverse.all[Coproduct[Option, List, ?]]
+  val nelNelTraverse1 = laws.traverse1.all[Coproduct[NonEmptyList, NonEmptyList, ?]]
 
   object instances {
     def functor[F[_]: Functor, G[_]: Functor] = Functor[Coproduct[F, G, ?]]
