@@ -1,73 +1,70 @@
 package scalaz
 
 import std.AllInstances._
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
-import org.scalacheck.Prop.forAll
+import Property.forAll
 
-object ListTTest extends SpecLite {
+object ListTTest extends Scalaprops {
   type ListTOpt[A] = ListT[Option, A]
 
-  "fromList / toList" ! forAll {
+  val `fromList / toList` = forAll {
     (ass: List[List[Int]]) =>
       ListT.fromList(ass).toList must_===(ass)
   }
 
-  "filter all" ! forAll {
+  val `filter all` = forAll {
     (ass: ListT[List, Int]) =>
       ass.filter(_ => true) must_===(ass)
   }
 
-  "filter none" ! forAll {
+  val `filter none` = forAll {
     (ass: ListT[List, Int]) =>
       val filtered = ass.filter(_ => false)
       val isEmpty = filtered.isEmpty
       isEmpty.toList.forall(identity)
   }
 
-  "find" ! forAll {
+  val find = forAll {
     (ass: ListTOpt[Int]) =>
       ass.find(_ > 0 ) must_===(OptionT.optionT(ass.run.map(_.find( _ > 0))))
   }
   
-  "drop" ! forAll {
+  val drop = forAll {
     (ass: Option[List[Int]], x: Int) =>
       ListT.fromList(ass).drop(x).toList must_===(ass.map(_.drop(x)))
   }
   
-  "take" ! forAll {
+  val take = forAll {
     (ass: Option[List[Int]], x: Int) =>
       ListT.fromList(ass).take(x).toList must_===(ass.map(_.take(x)))
   }
 
-  "map" ! forAll {
+  val map = forAll {
     (ass: List[List[Int]]) =>
       ListT.fromList(ass).map(_ * 2).toList must_===(ass.map(_.map(_ * 2)))
   }
 
-  "flatMap" ! forAll {
+  val flatMap = forAll {
     (ass: List[List[Int]]) =>
       (ListT.fromList(ass).flatMap(number => ListT.fromList(List(List(number.toFloat)))).toList
       must_===(ass.map(_.flatMap(number => List(number.toFloat)))))
   }
 
   // Exists to ensure that fromList and map don't stack overflow.
-  "large map" ! {
+  val `large map` = forAll {
     val list = (0 to 400).toList.map(_ => (0 to 400).toList)
     ListT.fromList(list).map(_ * 2).toList must_===(list.map(_.map(_ * 2)))
-    ()
   }
   
-  "listT" ! forAll {
+  val listT = forAll {
     (ass: Option[List[Int]]) =>
       ListT.listT(ass).run == ass
   }
 
-  checkAll(equal.laws[ListTOpt[Int]])
-  checkAll(monoid.laws[ListTOpt[Int]])
-  checkAll(plusEmpty.laws[ListTOpt])
-  checkAll(monad.laws[ListTOpt])
-  checkAll(monadPlus.laws[ListTOpt])
+  val testLaws = Properties.list(
+    laws.equal.all[ListTOpt[Int]],
+    laws.monoid.all[ListTOpt[Int]],
+    laws.monadPlus.all[ListTOpt]
+  )
 
   object instances {
     def semigroup[F[_]: Monad, A] = Semigroup[ListT[F, A]]
