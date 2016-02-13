@@ -1,26 +1,27 @@
 package scalaz
 
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
 import std.AllInstances._
-import org.scalacheck.Prop.forAll
+import Property.forAll
 
-object LazyOptionTest extends SpecLite {
-  checkAll(equal.laws[LazyOption[Int]])
-  checkAll(bindRec.laws[LazyOption])
-  checkAll(monadPlus.strongLaws[LazyOption])
-  checkAll(cobind.laws[LazyOption])
-  checkAll(traverse.laws[LazyOption])
-  checkAll(zip.laws[LazyOption])
-  checkAll(align.laws[LazyOption])
-  checkAll(isEmpty.laws[LazyOption])
-  checkAll(monoid.laws[LazyOption[Int]])
+object LazyOptionTest extends Scalaprops {
+  val testLaws = Properties.list(
+    laws.equal.all[LazyOption[Int]],
+    laws.bindRec.all[LazyOption],
+    laws.monadPlusStrong.all[LazyOption],
+    laws.cobind.all[LazyOption],
+    laws.traverse.all[LazyOption],
+    laws.zip.all[LazyOption],
+    laws.align.all[LazyOption],
+    laws.isEmpty.all[LazyOption]
+  )
 
-  "monoid" ! forAll { (a: LazyOption[Int], b: LazyOption[Int]) =>
+  val monoidLaws = laws.monoid.all[LazyOption[Int]]
+
+  val monoid = forAll { (a: LazyOption[Int], b: LazyOption[Int]) =>
     Monoid[LazyOption[Int]].append(a, b).toOption must_=== Monoid[Option[Int]].append(a.toOption, b.toOption)
   }
 
-  "tail recursive tailrecM" in {
+  val `tail recursive tailrecM` = forAll {
     val times = 10000
     
     val result = 
