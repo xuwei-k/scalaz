@@ -1,32 +1,32 @@
 package scalaz
 
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
 import std.AllInstances._
-import org.scalacheck.Prop.forAll
+import Property.forAll
 
-object OptionTTest extends SpecLite {
+object OptionTTest extends Scalaprops {
 
   type OptionTList[A] = OptionT[List, A]
   type OptionTOption[A] = OptionT[Option, A]
   type IntOr[A] = Int \/ A
   type OptionTEither[A] = OptionT[IntOr, A]
 
-  checkAll(equal.laws[OptionTList[Int]])
-  checkAll(bindRec.laws[OptionTList])
-  checkAll(monadPlus.laws[OptionTList])
-  checkAll(traverse.laws[OptionTList])
-  checkAll(monadError.laws[OptionTEither, Int])
+  val testLaws = Properties.list(
+    laws.equal.all[OptionTList[Int]],
+    laws.monadPlus.all[OptionTList],
+    laws.traverse.all[OptionTList],
+    laws.monadError.all[OptionTEither, Int]
+  )
+  val bindRec = laws.bindRec.tailrecBindConsistency[OptionTList, Int]
 
-  "show" ! forAll { a: OptionTList[Int] =>
+  val show = forAll { a: OptionTList[Int] =>
     Show[OptionTList[Int]].show(a) must_=== Show[List[Option[Int]]].show(a.run)
   }
   
-  "optionT" ! forAll { ass: List[Option[Int]] =>
-      OptionT.optionT(ass).run == ass
+  val optionT = forAll { ass: List[Option[Int]] =>
+    OptionT.optionT(ass).run == ass
   }
 
-  "listT" ! forAll { a: OptionTList[Int] => a.toListT.run must_=== a.run.map(_.toList)}
+  val listT = forAll { a: OptionTList[Int] => a.toListT.run must_=== a.run.map(_.toList)}
 
   object instances {
     def functor[F[_] : Functor] = Functor[OptionT[F, ?]]
