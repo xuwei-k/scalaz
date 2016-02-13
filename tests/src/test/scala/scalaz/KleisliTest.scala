@@ -1,24 +1,14 @@
 package scalaz
 
 import std.AllInstances._
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
-import org.scalacheck.Arbitrary
-import org.scalacheck.Prop.forAll
+import Property.forAll
 
-object KleisliTest extends SpecLite {
+object KleisliTest extends Scalaprops {
 
   type KleisliOpt[A, B] = Kleisli[Option, A, B]
   type KleisliOptInt[B] = KleisliOpt[Int, B]
   type IntOr[A] = Int \/ A
   type KleisliEither[A] = Kleisli[IntOr, Int, A]
-
-  implicit def Function1IntOptInt[A](implicit A: Arbitrary[Option[Int]]): Arbitrary[Int => Option[Int]] =
-    Arbitrary(org.scalacheck.Gen.frequency[Int => Option[Int]](
-      (1, org.scalacheck.Gen.const((x: Int) => Some(x))),
-      (1, org.scalacheck.Gen.const((x: Int) => Some(x + 1))),
-      (3, A.arbitrary.map(a => (_: Int) => a))
-    ))
 
   implicit def KleisliEqual[M[_]](implicit M: Equal[M[Int]]): Equal[Kleisli[M, Int, Int]] = new Equal[Kleisli[M, Int, Int]] {
     def equal(a1: Kleisli[M, Int, Int], a2: Kleisli[M, Int, Int]): Boolean = {
@@ -28,17 +18,20 @@ object KleisliTest extends SpecLite {
     }
   }
 
-  "mapK" ! forAll {
+  val mapK = forAll {
     (f: Int => Option[Int], a: Int) =>
       Kleisli(f).mapK(_.toList.map(_.toString)).run(a)  must_===(f(a).toList.map(_.toString))
   }
 
-  checkAll(monoid.laws[KleisliOptInt[Int]])
-  checkAll(bindRec.laws[KleisliOptInt])
-  checkAll(monadPlus.strongLaws[KleisliOptInt])
-  checkAll(monadError.laws[KleisliEither, Int])
-  checkAll(zip.laws[KleisliOptInt])
-  checkAll(category.laws[KleisliOpt])
+  val monoidLaws = laws.monoid.all[KleisliOptInt[Int]]
+  val categoryLaws = laws.category.all[KleisliOpt]
+
+  val testLaws = Properties.list(
+    laws.bindRec.all[KleisliOptInt],
+    laws.monadPlusStrong.all[KleisliOptInt],
+    laws.monadError.all[KleisliEither, Int],
+    laws.zip.all[KleisliOptInt]
+  )
 
   object instances {
     def semigroup[F[_], A, B](implicit FB: Semigroup[F[B]]) = Semigroup[Kleisli[F, A, B]]
@@ -155,40 +148,36 @@ object KleisliTest extends SpecLite {
     }
   }
 
-  "Catchable[Kleisli]" should {
+  import effect.IO
 
-    import effect.IO
+  type F[A] = Kleisli[IO, Int, A]
+  val C = Catchable[F]
+  private[this] val err = new Error("oh noes")
+  private[this] val bad = C.fail[Int](err)
 
-    type F[A] = Kleisli[IO, Int, A]
-    val C = Catchable[F]
-    val err = new Error("oh noes")
-    val bad = C.fail[Int](err)
-
-    "throw exceptions captured via fail()" in {
-      try {
-        bad.run(1).unsafePerformIO
-        fail("should have thrown")
-      } catch {
-        case t: Throwable => t must_== err
-      }
+  val `throw exceptions captured via fail()` = forAll {
+    try {
+      bad.run(1).unsafePerformIO
+      sys.error("should have thrown")
+    } catch {
+      case t: Throwable => t must_== err
     }
+  }
 
-    "catch exceptions captured via fail()" in {
-      C.attempt(bad).run(1).unsafePerformIO must_== -\/(err)
-    }
+  val `catch exceptions captured via fail()` = forAll {
+    C.attempt(bad).run(1).unsafePerformIO must_== -\/(err)
+  }
 
-    "catch ambient exceptions (1/2)" in {
-      C.attempt(Kleisli(_ => IO[Int](throw err))).run(1).unsafePerformIO must_== -\/(err)
-    }
+  val `catch ambient exceptions (1/2)` = forAll {
+    C.attempt(Kleisli(_ => IO[Int](throw err))).run(1).unsafePerformIO must_== -\/(err)
+  }
 
-    "catch ambient exceptions (2/2)" in {
-      C.attempt(Kleisli(_ => throw err)).run(1).unsafePerformIO must_== -\/(err)
-    }
+  val `catch ambient exceptions (2/2)` = forAll {
+    C.attempt(Kleisli(_ => throw err)).run(1).unsafePerformIO must_== -\/(err)
+  }
 
-    "properly handle success" in {
-      C.attempt(Kleisli(n => IO(n + 2))).run(1).unsafePerformIO must_== \/-(3)
-    }
-
+  val `properly handle success` = forAll {
+    C.attempt(Kleisli(n => IO(n + 2))).run(1).unsafePerformIO must_== \/-(3)
   }
 
 }
