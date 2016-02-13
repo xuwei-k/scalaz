@@ -1,35 +1,30 @@
 package scalaz
 
-import org.scalacheck.Prop._
-
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
 import std.AllInstances._
-import org.scalacheck.Prop.forAll
+import Property.forAll
 
-object OneOrTest extends SpecLite {
+object OneOrTest extends Scalaprops {
   import OneOr._
-  checkAll("OneOr", equal.laws[OneOr[List, Int]])
-  checkAll("OneOr", order.laws[OneOr[List, Int]])
-  checkAll("OneOr List", traverse.laws[OneOrList])
-  checkAll("OneOr List", applicative.laws[OneOrList])
-  checkAll("OneOr Nel", traverse1.laws[OneOrNel])
-  checkAll("OneOr Nel", comonad.laws[OneOrNel])
 
-//  "inequality exists" ! forAll {(a: OneOrList[Int]) =>
-//    exists {(b: OneOrList[Int]) =>
-//      propBoolean(!Equal[OneOrList[Int]].equal(a, b))
-//    }
-//  }
+  val testLaws = Properties.list(
+    laws.equal.all[OneOr[List, Int]],
+    laws.order.all[OneOr[List, Int]]
+  )
+  val list = Properties.list(
+    laws.traverse.all[OneOrList],
+    laws.applicative.all[OneOrList]
+  )
+  val nel = Properties.list(
+    laws.traverse1.all[OneOrNel],
+    laws.comonad.all[OneOrNel]
+  )
 
-  "findLeft" ! forAll{ a: OneOr[List, Int] =>
-    val f = (_: Int) % 2 == 0
+  val findLeft = forAll { (a: OneOr[List, Int], f: Int => Boolean) =>
     val F = Foldable[OneOr.OneOrList]
     F.findLeft(a)(f) must_=== Foldable[List].findLeft(F.toList(a))(f)
   }
 
-  "findRight" ! forAll { a: OneOr[List, Int] =>
-    val f = (_: Int) % 2 == 0
+  val findRight = forAll { (a: OneOr[List, Int], f: Int => Boolean) =>
     val F = Foldable[OneOr.OneOrList]
     F.findRight(a)(f) must_=== Foldable[List].findRight(F.toList(a))(f)
   }
