@@ -1,27 +1,18 @@
 package scalaz
 
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalaCheckBinding._
-import scalaz.scalacheck.ScalazArbitrary._
-import org.scalacheck.Arbitrary
+import std.AllInstances._
 import KleisliTest._
 import CokleisliTest._
-import std.AllInstances._
 
-object EndomorphicTest extends SpecLite {
+object EndomorphicTest extends Scalaprops {
 
-  implicit def endoEqual[F[_], G[_[_], _, _], A](
+  private[this] implicit def endoEqual[F[_], G[_[_], _, _], A](
     implicit F: Equal[G[F, A, A]]
   ): Equal[Endomorphic[G[F, ?, ?], A]] =
     Equal.equalBy(_.run)
 
-  implicit def endoArb[F[_], G[_[_], _, _], A](
-    implicit F: Arbitrary[G[F, A, A]]
-  ): Arbitrary[Endomorphic[G[F, ?, ?], A]] =
-    Functor[Arbitrary].map(F)(Endomorphic[G[F, ?, ?], A](_))
-
-  checkAll(monoid.laws[Endomorphic[Kleisli[Option, ?, ?], Int]])
-  checkAll(semigroup.laws[Endomorphic[Cokleisli[Option, ?, ?], Int]])
+  val kleisliOption = laws.monoid.all[Endomorphic[Kleisli[Option, ?, ?], Int]]
+  val cokleisliOption = laws.semigroup.all[Endomorphic[Cokleisli[Option, ?, ?], Int]]
 
   object instances{
     def semigroup[F[_, _]: Compose, A] = Semigroup[Endomorphic[F, A]]
