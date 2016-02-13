@@ -4,14 +4,14 @@ import std.AllInstances._
 import Property.forAll
 
 object ConstTest extends Scalaprops {
-  val order = laws.order.laws[Const[Int, String]]
+  val order = laws.order.all[Const[Int, String]]
 
   val list = laws.applicative.all[Const[List[Int], ?]]
   val option = laws.applicative.all[Const[Option[Int], ?]]
 
   val testLaws = Properties.list(
-    laws.traverse.laws[Const[Int, ?]],
-    laws.contravariant.laws[Const[Int, ?]]
+    laws.traverse.all[Const[Int, ?]],
+    laws.contravariant.all[Const[Int, ?]]
   )
 
   val const = forAll { (x: Int, y: Function0[Int]) =>
