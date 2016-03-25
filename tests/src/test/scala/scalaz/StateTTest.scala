@@ -1,21 +1,20 @@
 package scalaz
 
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary
 import std.AllInstances._
+import Property.forAll
 
-object StateTTest extends SpecLite {
+object StateTTest extends Scalaprops {
 
   type StateTList[S, A] = StateT[List, S, A]
   type StateTListInt[A] = StateTList[Int, A]
 
   implicit def stateTListEqual = Equal[List[(Int, Int)]].contramap((_: StateTListInt[Int]).runZero[Int])
-  implicit def stateTListArb = ScalazArbitrary.stateTArb[List, Int, Int]
-  implicit def stateTListArb2 = ScalazArbitrary.stateTArb[List, Int, Int => Int]
 
-  checkAll(equal.laws[StateTListInt[Int]])
-  checkAll(bindRec.laws[StateTListInt])
-  checkAll(monad.laws[StateTListInt])
+  val testLaws = Properties.list(
+    laws.equal.all[StateTListInt[Int]],
+    laws.bindRec.all[StateTListInt],
+    laws.monad.all[StateTListInt]
+  )
 
   object instances {
     def functor[S, F[_] : Functor] = Functor[StateT[F, S, ?]]
@@ -33,41 +32,41 @@ object StateTTest extends SpecLite {
     def plus[F[_]: MonadPlus, S] = Plus[StateT[F, S, ?]]
   }
 
-  "monadState.state" in {
+  val `monadState.state` = forAll {
     instances.monadState[Boolean].state(42).run(true) must_===((true, 42))
   }
 
-  "monadState.constantState" in {
+  val `monadState.constantState` = forAll {
     instances.monadState[Boolean].constantState(42, false).run(true) must_===((false, 42))
   }
 
-  "monadState.get" in {
+  val `monadState.get` = forAll {
     instances.monadState[Boolean].get.run(true) must_===((true, true))
   }
 
-  "monadState.gets" in {
+  val `monadState.gets` = forAll {
     instances.monadState[Int].gets { _ + 1 }.run(10) must_===((10, 11))
   }
 
-  "monadState.put" in {
+  val `monadState.put` = forAll {
     instances.monadState[Int].put(20).run(10) must_===((20, ()))
   }
 
-  "monadState.modify" in {
+  val `monadState.modify` = forAll {
     instances.monadState[Int].modify { _ + 1 }.run(10) must_===((11, ()))
   }
 
-  "monadPlus.empty (List)" in {
+  val `monadPlus.empty (List)` = forAll {
     instances.monadPlus[Boolean, List].empty[Int].run(false) must_===(Nil)
   }
 
-  "monadPlus.plus (List)" in {
+  val `monadPlus.plus (List)` = forAll {
     val a = StateT[List, Int, Boolean](s => List((s, false)))
     val b = StateT[List, Int, Boolean](s => List((s, true)))
     instances.monadPlus[Int, List].plus(a, b).run(0) must_===(List((0, false), (0, true)))
   }
 
-  "StateT can be trampolined without stack overflow" in {
+  val `StateT can be trampolined without stack overflow` = forAll {
     import scalaz.Free._
     val result = (0 to 4000).toList.map(i => StateT[Trampoline, Int, Int]((ii:Int) => Trampoline.done((i,i))))
       .foldLeft(StateT((s:Int) => Trampoline.done((s,s))))( (a,b) => a.flatMap(_ => b))
