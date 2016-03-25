@@ -1,7 +1,6 @@
 package scalaz
 
 import java.util.WeakHashMap
-import scalaz.Maybe
 
 object Variant {
 
