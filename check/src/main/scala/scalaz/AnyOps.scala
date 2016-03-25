@@ -22,4 +22,15 @@ final class AnyOps[A](actual: => A) {
     if (!test)
       throw new AssertionError(koMessage)
   }
+  def mustThrowA[T <: Throwable: reflect.ClassTag](implicit man: reflect.ClassTag[T]): Unit = {
+    val erasedClass = man.runtimeClass
+    try {
+      actual
+      throw new AssertionError("no exception thrown, expected " + erasedClass)
+    } catch {
+      case ex: Throwable =>
+        if (!erasedClass.isInstance(ex))
+          throw new AssertionError("wrong exception thrown, expected: " + erasedClass + " got: " + ex)
+    }
+  }
 }
