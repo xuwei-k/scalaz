@@ -1,7 +1,5 @@
 package scalaz
 
-import scalaz._
-
 abstract class Rand {
 
   def nextInt: (Rand, Int)
@@ -85,6 +83,7 @@ abstract class Rand {
     nextInt._1
 
   def reseed(newSeed: Long): Rand
+  def setIntSeed(newSeed: Int): Rand
 }
 
 object Rand{
@@ -105,12 +104,12 @@ object Rand{
     Equal.equalA[Rand]
 
   def standard(s: Long): Rand =
-    fromSeed(s.toInt)
+    Platform.randFromLong(s)
 
   private[scalaz] final val defaultSeed = 5489
 
   def fromSeed(seed: Int = defaultSeed): Rand =
-    MersenneTwister32.fromSeed(seed)
+    Platform.randFromInt(seed)
 
   // Generates a random Double in the interval [0, 1)
   def nextDouble(state: Rand): (Rand, Double) = {

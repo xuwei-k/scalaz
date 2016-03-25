@@ -217,7 +217,7 @@ object FoldableTests {
     }
 
   def anyAndAllLazy[F[_]](implicit fa: Arbitrary[F[Int]], F: Foldable[F]) = {
-    val p = new Properties("foldable")
+    val p = new org.scalacheck.Properties("foldable")
     p.property("consistent any") = anyConsistent[F, Int](_ > 0)
     p.property("consistent all") = allConsistent[F, Int](_ > 0)
     p.property("any is lazy") = anyIsLazy[F, Int]

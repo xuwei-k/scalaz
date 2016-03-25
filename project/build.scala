@@ -396,7 +396,7 @@ object build extends Build {
       publishArtifact := false,
       testFrameworks += new TestFramework("scalaz.ScalapropsFramework"),
       libraryDependencies += "org.scalacheck" %%% "scalacheck" % scalaCheckVersion.value % "test")
-    .dependsOn(core, effect, iteratee, scalacheckBinding)
+    .dependsOn(core, effect, iteratee, scalacheckBinding, check)
     .jvmConfigure(_ dependsOn concurrent)
     .jsSettings(scalajsProjectSettings : _*)
     .jsSettings(

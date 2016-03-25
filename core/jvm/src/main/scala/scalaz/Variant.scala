@@ -1,6 +1,7 @@
 package scalaz
 
 import java.util.WeakHashMap
+import scalaz.Maybe
 
 object Variant {
 
@@ -8,6 +9,9 @@ object Variant {
 
   private[this] val variantMemo: VariantCache[LongGen, CogenState] =
     new VariantCache[LongGen, CogenState]
+
+  def variantInt[A](n: Int, g: CogenState[A]): CogenState[A] =
+    variant(n, g)
 
   def variant[A](n: Long, g: CogenState[A]): CogenState[A] = {
     val (next, int) = g.rand.nextInt

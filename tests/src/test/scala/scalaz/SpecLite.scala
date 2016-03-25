@@ -1,10 +1,9 @@
 package scalaz
 
 import reflect.ClassTag
+import org.scalacheck.{Prop, Arbitrary}
 
-import org.scalacheck._
-
-abstract class SpecLite extends Properties("") with SpecLitePlatform {
+abstract class SpecLite extends org.scalacheck.Properties("") with SpecLitePlatform {
   updateName
 
   def checkAll(name: String, props: org.scalacheck.Properties) {
@@ -20,8 +19,8 @@ abstract class SpecLite extends Properties("") with SpecLitePlatform {
   }
 
   protected[this] implicit class PropertyOps(props: org.scalacheck.Properties) {
-    def withProp(propName: String, prop: Prop): Properties = {
-      val p = new Properties(props.name)
+    def withProp(propName: String, prop: Prop): org.scalacheck.Properties = {
+      val p = new org.scalacheck.Properties(props.name)
       for {(name, x) <- props.properties} p.property(name) = x
       p.property(propName) = prop
       p
