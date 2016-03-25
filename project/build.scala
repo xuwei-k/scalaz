@@ -394,7 +394,6 @@ object build extends Build {
     .settings(
       name := "scalaz-tests",
       publishArtifact := false,
-      testFrameworks += new TestFramework("scalaz.ScalapropsFramework"),
       libraryDependencies += "org.scalacheck" %%% "scalacheck" % scalaCheckVersion.value % "test")
     .dependsOn(core, effect, iteratee, scalacheckBinding, check)
     .jvmConfigure(_ dependsOn concurrent)
