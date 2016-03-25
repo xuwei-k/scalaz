@@ -15,4 +15,11 @@ final class AnyOps[A](actual: => A) {
     if (!test)
       throw new AssertionError(koMessage)
   }
+  def mustMatch(f: PartialFunction[A, Boolean]): Unit = {
+    val act = actual
+    def test = f.isDefinedAt(act) && f(act)
+    def koMessage = "%s does not satisfy partial function".format(act)
+    if (!test)
+      throw new AssertionError(koMessage)
+  }
 }
