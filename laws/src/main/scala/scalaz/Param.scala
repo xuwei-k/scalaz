@@ -6,7 +6,7 @@ import scala.concurrent.duration.Duration
 
 final case class Param(
   rand: Rand,
-  minSuccessful: Int = 100,
+  minSuccessful: Int = Platform.minSuccessful,
   maxDiscarded: Int = 500,
   minSize: Int = 0,
   maxSize: Int = Gen.defaultSize,
