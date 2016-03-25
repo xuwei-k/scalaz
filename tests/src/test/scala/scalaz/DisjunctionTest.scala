@@ -1,22 +1,24 @@
 package scalaz
 
 import std.AllInstances._
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
+import Property.forAll
 
-object DisjunctionTest extends SpecLite {
+object DisjunctionTest extends Scalaprops {
 
-  checkAll(order.laws[Int \/ Int])
-  checkAll(monoid.laws[Int \/ Int])
-  checkAll(bindRec.laws[Int \/ ?])
-  checkAll(monad.laws[Int \/ ?])
-  checkAll(monadError.laws[Int \/ ?, Int])
-  checkAll(plus.laws[Int \/ ?])
-  checkAll(traverse.laws[Int \/ ?])
-  checkAll(bitraverse.laws[\/])
-  checkAll(associative.laws[\/])
+  val testLaws = Properties.list(
+    laws.order.all[Int \/ Int],
+    laws.monoid.all[Int \/ Int],
+    laws.bindRec.all[Int \/ ?],
+    laws.monad.all[Int \/ ?],
+    laws.monadError.all[Int \/ ?, Int],
+    laws.plus.all[Int \/ ?],
+    laws.traverse.all[Int \/ ?]
+  )
 
-  "fromTryCatchThrowable" in {
+  val bitraverse = laws.bitraverse.all[\/]
+  val associative = laws.associative.all[\/]
+
+  val fromTryCatchThrowable = forAll {
     class Foo extends Throwable
     final class Bar extends Foo
     val foo = new Foo
@@ -33,7 +35,7 @@ object DisjunctionTest extends SpecLite {
     \/.fromTryCatchThrowable[Int, Bar](throw foo).mustThrowA[Foo]
   }
 
-  "recover" in {
+  val recover = forAll {
     sealed trait Foo
     case object Bar extends Foo
     case object Baz extends Foo
@@ -46,7 +48,7 @@ object DisjunctionTest extends SpecLite {
     \/.right[Foo, Int](1).recover({ case Bar => 4 }) must_=== \/-(1)
   }
 
-  "recoverWith" in {
+  val recoverWith = forAll {
     sealed trait Foo
     case object Bar extends Foo
     case object Baz extends Foo
@@ -67,7 +69,7 @@ object DisjunctionTest extends SpecLite {
     \/.right[Foo, Int](1).recoverWith(barToBaz) must_=== \/-(1)
   }
 
-  "validation" in {
+  val validation = forAll {
     import syntax.either._
     import syntax.validation._
 
@@ -75,7 +77,7 @@ object DisjunctionTest extends SpecLite {
     "Hello".left[Int].validation must_=== "Hello".failure[Int]
   }
 
-  "validationNel" in {
+  val validationNel = forAll {
     import syntax.either._
     import syntax.validation._
     import syntax.apply._
