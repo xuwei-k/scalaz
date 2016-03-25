@@ -3,7 +3,7 @@ package scalaz
 import scala.util.Random
 import scalaz._
 
-object FunctionEqual extends FunctionEqual(10)
+object FunctionEqual extends FunctionEqual(5)
 
 sealed class FunctionEqual(size: Int) {
   implicit def f1[A1: Gen, B](implicit B: Equal[B]): Equal[A1 => B] = {
