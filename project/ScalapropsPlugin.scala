@@ -49,7 +49,7 @@ object ScalapropsPlugin extends AutoPlugin {
     )
 
     val scalapropsSettings: Seq[Setting[_]] = scalapropsCoreSettings ++ Seq(
-      testFrameworks += new TestFramework("scalaz.ScalapropsFramework"),
+      testFrameworks in Global += new TestFramework("scalaz.ScalapropsFramework"),
       parallelExecution in Test := false
     )
   }
