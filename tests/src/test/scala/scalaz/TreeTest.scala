@@ -30,7 +30,7 @@ object TreeTest extends Scalaprops {
     ).map(Foldable[Tree].length)
 
     a must_=== List.fill(size)(n)
-  }
+  }.toProperties((), Param.minSuccessful(10))
 
   val `infinite Tree flatten` = forAll{
     Node(0, Stream.from(1).map(Leaf(_))).flatten

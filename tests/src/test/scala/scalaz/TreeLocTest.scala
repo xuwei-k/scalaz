@@ -17,7 +17,7 @@ object TreeLocTest extends Scalaprops {
       seed = seed,
       size = size
     ).map(Foldable[TreeLoc].length(_)).forall(_ == size)
-  }
+  }.toProperties((), Param.minSuccessful(10))
 
   val comonad = {
     def treeEqual[A: Equal]: Equal[Tree[A]] = new Equal[Tree[A]] {
