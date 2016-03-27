@@ -235,7 +235,7 @@ object build extends Build {
   )
 
   private[this] lazy val jvmProjects = Seq[ProjectReference](
-    coreJVM, effectJVM, iterateeJVM, scalacheckBindingJVM, testsJVM, concurrent, example, checkJVM, checkJS
+    coreJVM, effectJVM, iterateeJVM, scalacheckBindingJVM, testsJVM, concurrent, example, checkJVM, lawsJVM
   )
 
   lazy val scalaz = Project(
