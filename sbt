@@ -111,7 +111,7 @@ sbtjar_07_url () {
   echo "http://simple-build-tool.googlecode.com/files/sbt-launch-${1}.jar"
 }
 sbtjar_release_url () {
-  echo "http://typesafe.artifactoryonline.com/typesafe/ivy-releases/org.scala-tools.sbt/sbt-launch/$sbt_version/sbt-launch.jar"
+  echo "http://repo.typesafe.com/typesafe/ivy-releases/org.scala-tools.sbt/sbt-launch/$sbt_version/sbt-launch.jar"
 }
 sbtjar_snapshot_url () {
   local ver="$sbt_version"

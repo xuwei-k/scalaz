@@ -4,7 +4,6 @@ import sbt._
 import Keys._
 import GenTypeClass._
 import Project.Setting
-import com.jsuereth.pgp.GpgPlugin._
 
 object build extends Build {
   type Sett = Project.Setting[_]
@@ -43,8 +42,6 @@ object build extends Build {
       if (index.exists()) Desktop.getDesktop.open(out / "index.html")
     },
     credentialsSetting,
-    useGpg := true,
-    useGpgAgent := true,
     publishSetting,
     publishArtifact in Test := false,
     pomIncludeRepository := {
