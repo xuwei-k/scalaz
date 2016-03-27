@@ -1,36 +1,37 @@
 package scalaz
 
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
-import scalaz.scalacheck.ScalaCheckBinding._
 import std.AllInstances._
-import org.scalacheck.Arbitrary
-import Id._
-import org.scalacheck.Prop.forAll
+import Property.forAll
 
-object WriterTTest extends SpecLite {
+object WriterTTest extends Scalaprops {
 
   type WriterTOpt[W, A] = WriterT[Option, W, A]
   type WriterTOptInt[A] = WriterTOpt[Int, A]
   type IntOr[A] = Int \/ A
   type WriterTEither[A] = WriterT[IntOr, Int, A]
 
-  checkAll(equal.laws[WriterTOptInt[Int]])
-  checkAll(monoid.laws[WriterTOptInt[Int]])
-  checkAll(monadError.laws[WriterTEither, Int])
-  checkAll(traverse.laws[WriterTOptInt])
-  checkAll(bindRec.laws[WriterTOptInt])
-  checkAll(monadPlus.strongLaws[WriterTOptInt])
-  checkAll(bifunctor.laws[WriterTOpt])
-  checkAll(functor.laws[WriterT[NonEmptyList, Int, ?]])
-  checkAll(bitraverse.laws[WriterTOpt])
+  val equal = laws.equal.all[WriterTOptInt[Int]]
 
-  implicit def writerArb[W, A](implicit W: Arbitrary[W], A: Arbitrary[A]): Arbitrary[Writer[W, A]] =
-    Applicative[Arbitrary].apply2(W, A)((w, a) => Writer[W, A](w, a))
+  val monoid = laws.monoid.all[WriterTOptInt[Int]]
 
-  checkAll(comonad.laws[Writer[Int, ?]])
+  val either = laws.monadError.all[WriterTEither, Int]
 
-  "flatMapF consistent with flatMap" ! forAll {
+  val option = Properties.list(
+    laws.traverse.all[WriterTOptInt],
+    laws.bindRec.all[WriterTOptInt],
+    laws.monadPlusStrong.all[WriterTOptInt]
+  )
+
+  val nel = laws.functor.all[WriterT[NonEmptyList, Int, ?]]
+
+  val bitraverse = laws.bitraverse.all[WriterTOpt]
+
+  val comonad = {
+    type F[A] = Writer[Int, A]
+    laws.comonad.all[F]
+  }
+
+  val `flatMapF consistent with flatMap` = forAll {
     (fa: WriterTOptInt[Int], f: Int => Option[(Int, Int)]) =>
       fa.flatMapF(f) must_=== fa.flatMap(f andThen WriterT.writerT)
   }
@@ -83,7 +84,7 @@ object WriterTTest extends SpecLite {
       def applicative[W: Monoid] = Applicative[Writer[W, ?]]
       def bind[W: Semigroup] = Bind[Writer[W, ?]]
       def monad[W: Monoid] = Monad[Writer[W, ?]]
-      def foldable[W] = Foldable[Writer[W, ?]](WriterT.writerTFoldable[Id, W])
+      def foldable[W] = Foldable[Writer[W, ?]]
       def traverse[W] = Traverse[Writer[W, ?]]
       def comonad[W] = Comonad[Writer[W, ?]]
     }
