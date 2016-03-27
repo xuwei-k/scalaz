@@ -1,33 +1,30 @@
 package scalaz
 
 import std.option._, std.anyVal._
-import org.scalacheck.Arbitrary
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
-import scalaz.scalacheck.ScalaCheckBinding._
 
-object CoyonedaTest extends SpecLite {
-
-  implicit def coyonedaArb[F[_], A](implicit A: Arbitrary[F[A]]): Arbitrary[Coyoneda[F, A]] =
-    Functor[Arbitrary].map(A)(Coyoneda.lift)
+object CoyonedaTest extends Scalaprops {
 
   type CoyonedaOption[A] = Coyoneda[Option, A]
   type CoyonedaNel[A] = Coyoneda[NonEmptyList, A]
 
-  checkAll(monadPlus.strongLaws[CoyonedaOption])
-  checkAll(bindRec.laws[CoyonedaOption])
-  checkAll(cobind.laws[CoyonedaOption])
-  checkAll(traverse.laws[CoyonedaOption])
-  checkAll(order.laws[Coyoneda[Option, Int]])
-  checkAll(foldable.laws[CoyonedaOption](implicitly, Coyoneda.coyonedaFoldable, implicitly))
+  val option = Properties.list(
+    laws.monadPlusStrong.all[CoyonedaOption],
+    laws.bindRec.all[CoyonedaOption],
+    laws.cobind.all[CoyonedaOption],
+    laws.traverse.all[CoyonedaOption],
+    laws.order.all[Coyoneda[Option, Int]],
+    laws.foldable.all[CoyonedaOption]
+  )
 
-  checkAll(monad.laws[CoyonedaNel])
-  checkAll(bindRec.laws[CoyonedaNel])
-  checkAll(plus.laws[CoyonedaNel])
-  checkAll(comonad.laws[CoyonedaNel])
-  checkAll(traverse1.laws[CoyonedaNel])
-  checkAll(order.laws[Coyoneda[NonEmptyList, Int]])
-  checkAll(foldable1.laws[CoyonedaNel](implicitly, Coyoneda.coyonedaFoldable1, implicitly))
+  val nel = Properties.list(
+    laws.monad.all[CoyonedaNel],
+    laws.bindRec.all[CoyonedaNel],
+    laws.plus.all[CoyonedaNel],
+    laws.comonad.all[CoyonedaNel],
+    laws.traverse1.all[CoyonedaNel],
+    laws.order.all[Coyoneda[NonEmptyList, Int]],
+    laws.foldable1.all[CoyonedaNel]
+  )
 
   object instances {
     def functor[F[_]] = Functor[Coyoneda[F, ?]]
