@@ -64,6 +64,7 @@ object build extends Build {
 
   val scalajsProjectSettings = Seq[Sett](
     isJSProject := true,
+    scalaJSOptimizerOptions ~= (_.withBatchMode(true)),
     scalacOptions += {
       val a = (baseDirectory in LocalRootProject).value.toURI.toString
       val g = "https://raw.githubusercontent.com/scalaz/scalaz/" + tagOrHash.value
