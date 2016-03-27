@@ -43,7 +43,7 @@ class WriterTTest extends Spec {
       def pointed[W: Monoid] = Pointed[({type λ[α]=Writer[W, α]})#λ]
       def apply[W: Semigroup] = Apply[({type λ[α]=Writer[W, α]})#λ]
       def monad[W: Monoid] = Monad[({type λ[α]=Writer[W, α]})#λ]
-      def foldable[W] = Foldable[({type λ[α]=Writer[W, α]})#λ](WriterT.writerTFoldable[Id, W])
+      def foldable[W] = Foldable[({type λ[α]=Writer[W, α]})#λ]
       def traverse[W] = Traverse[({type λ[α]=Writer[W, α]})#λ]
       def copointed[W] = Copointed[({type λ[α]=Writer[W, α]})#λ]
       def comonad[W] = Comonad[({type λ[α]=Writer[W, α]})#λ]
