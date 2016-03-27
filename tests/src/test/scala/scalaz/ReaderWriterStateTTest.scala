@@ -1,33 +1,23 @@
 package scalaz
 
-import scalaz.scalacheck.ScalazProperties._
 import std.AllInstances._
-import org.scalacheck.Arbitrary
+import Property.forAll
+import FunctionEqual._
 
-object ReaderWriterStateTTest extends SpecLite {
+object ReaderWriterStateTTest extends Scalaprops {
   type RWSOptInt[A] = RWST[Option, Int, Int, Int, A]
-  implicit val RWSOptIntArb = Arbitrary(org.scalacheck.Gen.oneOf[RWSOptInt[Int]](
-    org.scalacheck.Gen.const(RWST[Option, Int, Int, Int, Int]((r: Int, s: Int) => None)),
-    org.scalacheck.Gen.const(RWST[Option, Int, Int, Int, Int]((r: Int, s: Int) => Some((0, 0, 0)))),
-    org.scalacheck.Gen.const(RWST[Option, Int, Int, Int, Int]((r: Int, s: Int) => Some((r, r, r)))),
-    org.scalacheck.Gen.const(RWST[Option, Int, Int, Int, Int]((r: Int, s: Int) => Some((s, s, s))))
-  ))
-  implicit val RWSOptIntIntArb = Arbitrary(org.scalacheck.Gen.oneOf[RWSOptInt[Int => Int]](
-    org.scalacheck.Gen.const(RWST[Option, Int, Int, Int, Int => Int]((r: Int, s: Int) => None)),
-    org.scalacheck.Gen.const(RWST[Option, Int, Int, Int, Int => Int]((r: Int, s: Int) => Some((0, x => 0, 0)))),
-    org.scalacheck.Gen.const(RWST[Option, Int, Int, Int, Int => Int]((r: Int, s: Int) => Some((r, x => r, r)))),
-    org.scalacheck.Gen.const(RWST[Option, Int, Int, Int, Int => Int]((r: Int, s: Int) => Some((s, x => s, s)))),
-    org.scalacheck.Gen.const(RWST[Option, Int, Int, Int, Int => Int]((r: Int, s: Int) => Some((s, x => x, s))))
-  ))
 
-  implicit val RWSOptIntEqual = new Equal[RWSOptInt[Int]] {
-    def equal(a1: RWSOptInt[Int], a2: RWSOptInt[Int]) = a1.run(0, 0) == a2.run(0, 0)
-  }
+  private[this] implicit def equal[F[_]: Monad, R, W, S1, S2, A](
+    implicit F: Equal[(R, S1) => F[(W, A, S2)]]
+  ): Equal[IndexedReaderWriterStateT[F, R, W, S1, S2, A]] =
+    F.contramap(_.run)
 
-  checkAll(bindRec.laws[RWSOptInt])
-  checkAll(monadPlus.strongLaws[RWSOptInt])
+  val testLaws = Properties.list(
+    laws.bindRec.all[RWSOptInt],
+    laws.monadPlusStrong.all[RWSOptInt]
+  )
   
-  "ReaderWriterStateT can be trampolined without stack overflow" in {
+  val `ReaderWriterStateT can be trampolined without stack overflow` = forAll {
     import scalaz.Free._
     val result = (0 to 10000).toList.map(ii => ReaderWriterStateT[Trampoline, Unit, String, Int, Int]((_, i: Int) => Trampoline.done(("", i, ii))))
       .foldLeft(ReaderWriterStateT[Trampoline, Unit, String, Int, Int]((_, i: Int) => Trampoline.done(("", i, i))))( (a, b) => a.flatMap(_ => b))
