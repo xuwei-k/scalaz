@@ -1,10 +1,9 @@
 package scalaz
 
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
 import std.AllInstances._
+import Property.forAll
 
-object LazyEitherTTest extends SpecLite {
+object LazyEitherTTest extends Scalaprops {
 
   import LazyEitherTest.LazyEitherEqual
 
@@ -14,14 +13,17 @@ object LazyEitherTTest extends SpecLite {
   type LazyEitherTList[A, B] = LazyEitherT[List, A, B]
   type LazyEitherTListInt[A] = LazyEitherT[List, Int, A]
 
-  checkAll(equal.laws[LazyEitherTListInt[Int]])
-  checkAll(monadPlus.laws[LazyEitherTListInt])
-  checkAll(traverse.laws[LazyEitherTListInt])
-  checkAll(bitraverse.laws[LazyEitherTList])
-  checkAll(bindRec.laws[LazyEitherTListInt])
-  checkAll(monadError.laws[LazyEitherTListInt, Int])
+  val testLaws = Properties.list(
+    laws.equal.all[LazyEitherTListInt[Int]],
+    laws.monadPlus.all[LazyEitherTListInt],
+    laws.traverse.all[LazyEitherTListInt],
+    laws.bindRec.all[LazyEitherTListInt],
+    laws.monadError.all[LazyEitherTListInt, Int]
+  )
 
-  "tail recursive tailrecM" in {
+  val bitraverse = laws.bitraverse.all[LazyEitherTList]
+
+  val `tail recursive tailrecM` = forAll {
     import Scalaz.Id
     type LazyEitherId[A] = LazyEitherT[Id, Int, A]
 
