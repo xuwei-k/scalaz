@@ -1,33 +1,36 @@
 package scalaz
 
 import java.util.concurrent.atomic.AtomicInteger
-
-import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary._
 import std.AllInstances._
-import org.scalacheck.Prop.forAll
+import Property.forAll
 
-object EitherTTest extends SpecLite {
+object EitherTTest extends Scalaprops {
+
+  private[this] implicit val stringGen =
+    Tag.unsubst(Gen[String @@ GenTags.AlphaNum])
 
   type EitherTList[A, B] = EitherT[List, A, B]
   type EitherTListInt[A] = EitherT[List, Int, A]
   type EitherTOptionInt[A] = EitherT[Option, Int, A]
   type EitherTComputation[A] = EitherT[Function0, Int, A] // in lieu of IO
 
-  checkAll(equal.laws[EitherTListInt[Int]])
-  checkAll(bindRec.laws[EitherTListInt])
-  checkAll(monadPlus.laws[EitherTListInt])
-  checkAll(monadError.laws[EitherTListInt, Int])
-  checkAll(traverse.laws[EitherTListInt])
-  checkAll(bitraverse.laws[EitherTList])
+  val testLaws = Properties.list(
+    laws.equal.all[EitherTListInt[Int]],
+    laws.bindRec.all[EitherTListInt],
+    laws.monadPlus.all[EitherTListInt],
+    laws.monadError.all[EitherTListInt, Int],
+    laws.traverse.all[EitherTListInt]
+  )
 
-  "rightU" should {
+  val bitraverse = laws.bitraverse.all[EitherTList]
+
+  val rightU = forAll {
     val a: String \/ Int = \/-(1)
     val b: EitherT[({type l[a] = String \/ a})#l, Boolean, Int] = EitherT.rightU[Boolean](a)
     b must_== EitherT.right[({type l[a] = String \/ a})#l, Boolean, Int](a)
   }
 
-  "consistent Bifoldable" ! forAll { a: EitherTList[Int, Int] =>
+  val `consistent Bifoldable` = forAll { a: EitherTList[Int, Int] =>
     val F = new Bitraverse[EitherTList]{
       def bitraverseImpl[G[_]: Applicative, A, B, C, D](fab: EitherTList[A, B])(f: A => G[C], g: B => G[D]) =
         EitherT.eitherTBitraverse[List].bitraverseImpl(fab)(f, g)
@@ -36,19 +39,19 @@ object EitherTTest extends SpecLite {
     Bifoldable[EitherTList].bifoldMap(a)(_ :: Nil)(_ :: Nil) must_=== F.bifoldMap(a)(_ :: Nil)(_ :: Nil)
   }
 
-  "show" ! forAll { a: EitherTList[Int, Int] =>
+  val show = forAll { a: EitherTList[Int, Int] =>
     Show[EitherTList[Int, Int]].show(a) must_=== Show[List[Int \/ Int]].show(a.run)
   }
 
-  "fromDisjunction" ! forAll { (a: String \/ Int) =>
+  val fromDisjunction = forAll { (a: String \/ Int) =>
     Option(a.isLeft) must_=== EitherT.fromDisjunction[Option](a).isLeft
   }
 
-  "flatMapF consistent with flatMap" ! forAll { (a: EitherTList[Int, Int], f: Int => List[Int \/ String]) =>
+  val `flatMapF consistent with flatMap` = forAll { (a: EitherTList[Int, Int], f: Int => List[Int \/ String]) =>
     a.flatMap(f andThen EitherT.apply) must_=== a.flatMapF(f)
   }
 
-  "orElse only executes the left hand monad once" should {
+  val `orElse only executes the left hand monad once` = forAll {
     val counter = new AtomicInteger(0)
     val inc: EitherTComputation[Int] = EitherT.right(() => counter.incrementAndGet())
     val other: EitherTComputation[Int] = EitherT.right(() => 0) // does nothing
