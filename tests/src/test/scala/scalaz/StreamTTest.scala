@@ -153,8 +153,9 @@ object StreamTTest extends SpecLite {
     }
 
     "not stack-overflow on tailMRec" in {
-      s.tailMRec.step mustMatch {
-        case StreamT.Done() => true
+      s.tailMRec.step match {
+        case StreamT.Done() =>
+        case other => sys.error("unexpected " + other)
       }
     }
 
