@@ -20,7 +20,10 @@ cache:
 language: scala
 scala:
   - 2.11.8
-  - 2.10.6
+  - 2.11.7
+  - 2.11.6
+  - 2.11.5
+  - 2.11.4
 jdk:
   - openjdk7
 
@@ -32,19 +35,9 @@ script:
   - find $HOME/.sbt -name "*.lock" | xargs rm
   - find $HOME/.ivy2 -name "ivydata-*.properties" | xargs rm
 
-matrix:
-  include:
-    - scala: 2.12.0-M3
-      jdk: oraclejdk8
-      env: TEST_PROJECT="rootJVM"
-    - scala: 2.12.0-M3
-      jdk: oraclejdk8
-      env: TEST_PROJECT="rootJS"
-
 env:
   matrix:
   - TEST_PROJECT="rootJVM"
-  - TEST_PROJECT="rootJS"
 
 addons:
   apt:
