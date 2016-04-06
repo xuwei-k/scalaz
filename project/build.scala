@@ -109,11 +109,12 @@ object build extends Build {
       "-unchecked"
     ) ++ (CrossVersion.partialVersion(scalaVersion.value) match {
       case Some((2,10)) => scalac210Options
-      case _ => Seq(
+      case Some((2,11)) => Seq(
         "-Ybackend:GenBCode",
         "-Ydelambdafy:method",
         "-target:jvm-1.8"
       )
+      case _ => Nil
     }),
 
     scalacOptions in (Compile, doc) ++= {
@@ -282,7 +283,6 @@ object build extends Build {
     .enablePlugins(sbtbuildinfo.BuildInfoPlugin)
     .jsSettings(
       scalajsProjectSettings ++ Seq(
-        libraryDependencies += "org.scala-js" %%% "scalajs-java-time" % "0.1.0"
       ) : _*
     )
     .jvmSettings(
