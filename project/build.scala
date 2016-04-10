@@ -95,7 +95,7 @@ object build extends Build {
   lazy val standardSettings: Seq[Sett] = Seq[Sett](
     organization := "org.scalaz",
 
-    scalaVersion := "2.10.6",
+    scalaVersion := "2.12.0-M4",
     crossScalaVersions := Seq("2.10.6", "2.11.8", "2.12.0-M3"),
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
@@ -223,10 +223,7 @@ object build extends Build {
           }
         }
         </developers>
-      ),
-    // kind-projector plugin
-    resolvers += Resolver.sonatypeRepo("releases"),
-    addCompilerPlugin("org.spire-math" % "kind-projector" % "0.7.1" cross CrossVersion.binary)
+      )
   ) ++ osgiSettings ++ Seq[Sett](
     OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
   )
@@ -243,6 +240,7 @@ object build extends Build {
     id = "scalaz",
     base = file("."),
     settings = standardSettings ++ unidocSettings ++ Seq[Sett](
+      scalacOptions <+= (kindProjectorJar in kindProjector).map("-Xplugin:" + _),
       artifacts <<= Classpaths.artifactDefs(Seq(packageDoc in Compile)),
       packagedArtifacts <<= Classpaths.packaged(Seq(packageDoc in Compile)),
       unidocProjectFilter in (ScalaUnidoc, unidoc) := {
@@ -250,7 +248,7 @@ object build extends Build {
       }
     ) ++ Defaults.packageTaskSettings(packageDoc in Compile, (unidoc in Compile).map(_.flatMap(Path.allSubpaths))),
     aggregate = jvmProjects ++ jsProjects
-  )
+  ).dependsOn(kindProjector % "plugin->default(compile)")
 
   lazy val rootJS = Project(
     "rootJS",
@@ -268,6 +266,41 @@ object build extends Build {
     notPublish
   ).aggregate(jvmProjects: _*)
 
+  lazy val kindProjectorJar = TaskKey[String]("kindProjectorJar")
+
+  lazy val kindProjector = {
+    val kindProjectorRef = "b32e94cec6b586bd17564499c6ed988a90f503d5"
+    val kindProjectorZip = url(s"https://github.com/non/kind-projector/archive/$kindProjectorRef.zip")
+
+    Project(
+      "kind-projector",
+      file("kindProjector")
+    ).settings(
+      standardSettings
+    ).settings(
+      publishArtifact := false,
+      publish := {},
+      publishLocal := {},
+      libraryDependencies <+= scalaVersion("org.scala-lang" % "scala-compiler" % _ % "provided"),
+      kindProjectorJar <<= (packageBin in Compile).map(_.getAbsolutePath),
+      (sourceGenerators in Compile) += task{
+        IO.unzipURL(
+          kindProjectorZip,
+          (sourceManaged in Compile).value,
+          new SimpleFilter(
+            name => name.contains("src/main/scala/") && name.endsWith(".scala")
+          )
+        ).toSeq
+      },
+      (resourceGenerators in Compile) += task{
+        val resource = (resourceManaged in Compile).value / "scalac-plugin.xml"
+        val pluginXML = s"https://raw.githubusercontent.com/non/kind-projector/$kindProjectorRef/src/main/resources/scalac-plugin.xml"
+        IO.download(url(pluginXML), resource)
+        Seq(resource)
+      }
+    )
+  }
+
   lazy val core = crossProject.crossType(ScalazCrossType)
     .settings(standardSettings: _*)
     .settings(
@@ -275,6 +308,7 @@ object build extends Build {
       sourceGenerators in Compile <+= (sourceManaged in Compile) map {
         dir => Seq(GenerateTupleW(dir), TupleNInstances(dir))
       },
+      scalacOptions <+= (kindProjectorJar in kindProjector).map("-Xplugin:" + _),
       buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
       buildInfoPackage := "scalaz",
       buildInfoObject := "ScalazBuildInfo",
@@ -293,8 +327,8 @@ object build extends Build {
       typeClasses := TypeClass.core
     )
 
-  lazy val coreJVM = core.jvm
-  lazy val coreJS  = core.js
+  lazy val coreJVM = core.jvm.dependsOn(kindProjector % "plugin->default(compile)")
+  lazy val coreJS  = core.js.dependsOn(kindProjector % "plugin->default(compile)")
 
   private final val ConcurrentName = "scalaz-concurrent"
 
@@ -304,16 +338,18 @@ object build extends Build {
     settings = standardSettings ++ Seq(
       name := ConcurrentName,
       typeClasses := TypeClass.concurrent,
+      scalacOptions <+= (kindProjectorJar in kindProjector).map("-Xplugin:" + _),
       osgiExport("scalaz.concurrent"),
       OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*")
     ),
     dependencies = Seq(coreJVM, effectJVM)
-  )
+  ).dependsOn(kindProjector % "plugin->default(compile)")
 
   lazy val effect = crossProject.crossType(ScalazCrossType)
     .settings(standardSettings: _*)
     .settings(
       name := "scalaz-effect",
+      scalacOptions <+= (kindProjectorJar in kindProjector).map("-Xplugin:" + _),
       osgiExport("scalaz.effect", "scalaz.std.effect", "scalaz.syntax.effect"))
     .dependsOn(core)
     .jsSettings(scalajsProjectSettings : _*)
@@ -321,19 +357,20 @@ object build extends Build {
       typeClasses := TypeClass.effect
     )
 
-  lazy val effectJVM = effect.jvm
-  lazy val effectJS  = effect.js
+  lazy val effectJVM = effect.jvm.dependsOn(kindProjector % "plugin->default(compile)")
+  lazy val effectJS  = effect.js.dependsOn(kindProjector % "plugin->default(compile)")
 
   lazy val iteratee = crossProject.crossType(ScalazCrossType)
     .settings(standardSettings: _*)
     .settings(
       name := "scalaz-iteratee",
+      scalacOptions <+= (kindProjectorJar in kindProjector).map("-Xplugin:" + _),
       osgiExport("scalaz.iteratee"))
     .dependsOn(core, effect)
     .jsSettings(scalajsProjectSettings : _*)
 
-  lazy val iterateeJVM = iteratee.jvm
-  lazy val iterateeJS  = iteratee.js
+  lazy val iterateeJVM = iteratee.jvm.dependsOn(kindProjector % "plugin->default(compile)")
+  lazy val iterateeJS  = iteratee.js.dependsOn(kindProjector % "plugin->default(compile)")
 
   lazy val example = Project(
     id = "example",
@@ -341,6 +378,7 @@ object build extends Build {
     dependencies = Seq(coreJVM, iterateeJVM, concurrent),
     settings = standardSettings ++ Seq[Sett](
       name := "scalaz-example",
+      scalacOptions <+= (kindProjectorJar in kindProjector).map("-Xplugin:" + _),
       publishArtifact := false
     )
   )
@@ -350,19 +388,21 @@ object build extends Build {
       .settings(standardSettings: _*)
       .settings(
         name := "scalaz-scalacheck-binding",
+        scalacOptions <+= (kindProjectorJar in kindProjector).map("-Xplugin:" + _),
         libraryDependencies += "org.scalacheck" %%% "scalacheck" % scalaCheckVersion.value,
         osgiExport("scalaz.scalacheck"))
       .dependsOn(core, iteratee)
       .jvmConfigure(_ dependsOn concurrent)
       .jsSettings(scalajsProjectSettings : _*)
 
-  lazy val scalacheckBindingJVM = scalacheckBinding.jvm
-  lazy val scalacheckBindingJS  = scalacheckBinding.js
+  lazy val scalacheckBindingJVM = scalacheckBinding.jvm.dependsOn(kindProjector % "plugin->default(compile)")
+  lazy val scalacheckBindingJS  = scalacheckBinding.js.dependsOn(kindProjector % "plugin->default(compile)")
 
   lazy val tests = crossProject.crossType(ScalazCrossType)
     .settings(standardSettings: _*)
     .settings(
       name := "scalaz-tests",
+      scalacOptions <+= (kindProjectorJar in kindProjector).map("-Xplugin:" + _),
       publishArtifact := false,
       libraryDependencies += "org.scalacheck" %%% "scalacheck" % scalaCheckVersion.value % "test")
     .dependsOn(core, effect, iteratee, scalacheckBinding)
@@ -373,8 +413,8 @@ object build extends Build {
       scalaJSUseRhino in Global := false
     )
 
-  lazy val testsJVM = tests.jvm
-  lazy val testsJS  = tests.js
+  lazy val testsJVM = tests.jvm.dependsOn(kindProjector % "plugin->default(compile)")
+  lazy val testsJS  = tests.js.dependsOn(kindProjector % "plugin->default(compile)")
 
   lazy val publishSetting = publishTo <<= (version).apply{
     v =>
