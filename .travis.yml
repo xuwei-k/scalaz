@@ -19,9 +19,7 @@ cache:
 
 language: scala
 scala:
-  - 2.12.0-M3
-  - 2.11.8
-  - 2.10.6
+  - 2.11.8-tl-201604151108
 jdk:
   - oraclejdk8 # scalaz 7.3 does not support Java 7
 
@@ -35,7 +33,6 @@ script:
 env:
   matrix:
   - TEST_PROJECT="rootJVM"
-  - TEST_PROJECT="rootJS"
 
 addons:
   apt:

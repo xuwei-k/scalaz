@@ -95,13 +95,16 @@ object build extends Build {
   lazy val standardSettings: Seq[Sett] = Seq[Sett](
     organization := "org.scalaz",
 
-    scalaVersion := "2.10.6",
+    scalaVersion := "2.11.8-tl-201604151108",
+    scalaBinaryVersion := "2.11",
     crossScalaVersions := Seq("2.10.6", "2.11.8", "2.12.0-M3"),
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
+    resolvers += "scalatl" at "http://milessabin.com/scalatl",
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
     scalaCheckVersion := "1.12.5",
     scalacOptions ++= Seq(
       // contains -language:postfixOps (because 1+ as a parameter to a higher-order function is treated as a postfix op)
+      "-Yhigher-order-unification",
       "-deprecation",
       "-encoding", "UTF-8",
       "-feature",
