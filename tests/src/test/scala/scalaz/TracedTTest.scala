@@ -7,7 +7,7 @@ object TracedTTest extends SpecLite {
     import scalaz.std.function._
 
     val a: Int \/ (Byte => String) = 1.left[Byte => String]
-    TracedT.tracedTU(a)
+    TracedT(a)
   }
 
   object instances {

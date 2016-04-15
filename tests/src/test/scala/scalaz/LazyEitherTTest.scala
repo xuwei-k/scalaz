@@ -36,7 +36,7 @@ object LazyEitherTTest extends SpecLite {
   
   private def lazyEitherTUcompilationTest: Unit = {
     val a: String \/ LazyEither[Int, Boolean] = null
-    LazyEitherT.lazyEitherTU(a)
+    LazyEitherT.lazyEitherT(a)
   }
 
   object instances {

@@ -22,7 +22,7 @@ object BitraverseTest extends SpecLite {
   "bitraverseU" in {
     import syntax.bitraverse._
     val a: Validation[Int \/ String, Int \/ Boolean] = Success(\/-(true))
-    val b = a.bitraverseU(identity, identity)
+    val b = a.bitraverse(identity, identity)
     val _ = b: (Int \/ Validation[String, Boolean])
     b must_=== \/-(Success(true))
   }

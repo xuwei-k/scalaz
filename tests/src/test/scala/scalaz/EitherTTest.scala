@@ -115,9 +115,9 @@ object EitherTTest extends SpecLite {
     //compilation test for eitherTU
     {
       val se: State[Vector[String], Int \/ Float] = null
-      EitherT.eitherTU(se)
+      EitherT.eitherT(se)
       val ee: String \/ (Int \/ Float) = null
-      EitherT.eitherTU(ee)
+      EitherT.eitherT(ee)
     }
   }
 }

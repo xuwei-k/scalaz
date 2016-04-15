@@ -64,12 +64,12 @@ object BooleanSyntaxTest extends SpecLite {
 
     "boolean.whenMU" ! forAll { (b: Boolean) =>
       import syntax.validation._
-      b.whenMU("false".failure).isSuccess != b
+      b.whenM("false".failure).isSuccess != b
     }
 
     "boolean.unlessMU" ! forAll { (b: Boolean) =>
       import syntax.validation._
-      b.unlessMU("false".failure).isSuccess == b
+      b.unlessM("false".failure).isSuccess == b
     }
 
     "boolean.guard" ! forAll { (b: Boolean, s: String) =>
