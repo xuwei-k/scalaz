@@ -9,8 +9,7 @@ final class CozipOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Coz
 }
 
 sealed trait ToCozipOps0 {
-  implicit def ToCozipOpsUnapply[FA](v: FA)(implicit F0: Unapply[Cozip, FA]) =
-    new CozipOps[F0.M,F0.A](F0(v))(F0.TC)
+
 
 }
 

@@ -32,8 +32,7 @@ final class Foldable1Ops[F[_],A] private[syntax](val self: F[A])(implicit val F:
 }
 
 sealed trait ToFoldable1Ops0 {
-  implicit def ToFoldable1OpsUnapply[FA](v: FA)(implicit F0: Unapply[Foldable1, FA]) =
-    new Foldable1Ops[F0.M,F0.A](F0(v))(F0.TC)
+
 
 }
 

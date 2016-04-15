@@ -9,8 +9,7 @@ final class DivisibleOps[F[_],A] private[syntax](val self: F[A])(implicit val F:
 }
 
 sealed trait ToDivisibleOps0 {
-  implicit def ToDivisibleOpsUnapply[FA](v: FA)(implicit F0: Unapply[Divisible, FA]) =
-    new DivisibleOps[F0.M,F0.A](F0(v))(F0.TC)
+
 
 }
 

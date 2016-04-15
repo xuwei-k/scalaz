@@ -8,8 +8,7 @@ final class UnzipOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Unz
 }
 
 sealed trait ToUnzipOps0 {
-  implicit def ToUnzipOpsUnapply[FA](v: FA)(implicit F0: Unapply[Unzip, FA]) =
-    new UnzipOps[F0.M,F0.A](F0(v))(F0.TC)
+
 
 }
 

@@ -9,8 +9,7 @@ final class BindRecOps[F[_],A] private[syntax](val self: F[A])(implicit val F: B
 }
 
 sealed trait ToBindRecOps0 {
-  implicit def ToBindRecOpsUnapply[FA](v: FA)(implicit F0: Unapply[BindRec, FA]) =
-    new BindRecOps[F0.M,F0.A](F0(v))(F0.TC)
+
 
 }
 

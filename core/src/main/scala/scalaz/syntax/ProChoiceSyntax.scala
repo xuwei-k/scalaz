@@ -14,9 +14,8 @@ final class ProChoiceOps[F[_, _],A, B] private[syntax](val self: F[A, B])(implic
 }
 
 sealed trait ToProChoiceOps0 {
-    implicit def ToProChoiceOpsUnapply[FA](v: FA)(implicit F0: Unapply2[ProChoice, FA]) =
-      new ProChoiceOps[F0.M,F0.A,F0.B](F0(v))(F0.TC)
   
+
 }
 
 trait ToProChoiceOps extends ToProChoiceOps0 with ToProfunctorOps {

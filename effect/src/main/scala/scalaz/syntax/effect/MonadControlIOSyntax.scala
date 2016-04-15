@@ -12,8 +12,7 @@ final class MonadControlIOOps[F[_],A] private[syntax](val self: F[A])(implicit v
 }
 
 sealed trait ToMonadControlIOOps0 {
-  implicit def ToMonadControlIOOpsUnapply[FA](v: FA)(implicit F0: Unapply[MonadControlIO, FA]) =
-    new MonadControlIOOps[F0.M,F0.A](F0(v))(F0.TC)
+
 
 }
 

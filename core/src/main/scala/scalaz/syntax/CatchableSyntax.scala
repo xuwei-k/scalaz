@@ -9,8 +9,7 @@ final class CatchableOps[F[_],A] private[syntax](val self: F[A])(implicit val F:
 }
 
 sealed trait ToCatchableOps0 {
-  implicit def ToCatchableOpsUnapply[FA](v: FA)(implicit F0: Unapply[Catchable, FA]) =
-    new CatchableOps[F0.M,F0.A](F0(v))(F0.TC)
+
 
 }
 

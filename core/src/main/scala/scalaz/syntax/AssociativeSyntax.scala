@@ -16,9 +16,8 @@ final class AssociativeOps[F[_, _],A, B] private[syntax](val self: F[A, B])(impl
 }
 
 sealed trait ToAssociativeOps0 {
-    implicit def ToAssociativeOpsUnapply[FA](v: FA)(implicit F0: Unapply2[Associative, FA]) =
-      new AssociativeOps[F0.M,F0.A,F0.B](F0(v))(F0.TC)
   
+
 }
 
 trait ToAssociativeOps extends ToAssociativeOps0 {

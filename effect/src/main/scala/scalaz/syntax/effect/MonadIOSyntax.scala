@@ -12,8 +12,7 @@ final class MonadIOOps[F[_],A] private[syntax](val self: F[A])(implicit val F: M
 }
 
 sealed trait ToMonadIOOps0 {
-  implicit def ToMonadIOOpsUnapply[FA](v: FA)(implicit F0: Unapply[MonadIO, FA]) =
-    new MonadIOOps[F0.M,F0.A](F0(v))(F0.TC)
+
 
 }
 

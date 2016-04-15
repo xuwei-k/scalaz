@@ -10,8 +10,7 @@ final class ComonadOps[F[_],A] private[syntax](val self: F[A])(implicit val F: C
 }
 
 sealed trait ToComonadOps0 {
-  implicit def ToComonadOpsUnapply[FA](v: FA)(implicit F0: Unapply[Comonad, FA]) =
-    new ComonadOps[F0.M,F0.A](F0(v))(F0.TC)
+
 
 }
 
