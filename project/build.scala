@@ -250,7 +250,7 @@ object build extends Build {
   )
 
   private[this] lazy val jsProjects = Seq[ProjectReference](
-    coreJS, effectJS, iterateeJS // , scalacheckBindingJS, testsJS // TODO scalacheck 1.12.5 for Scala.js
+    coreJS, effectJS, iterateeJS, scalacheckBindingJS, testsJS
   )
 
   private[this] lazy val jvmProjects = Seq[ProjectReference](
