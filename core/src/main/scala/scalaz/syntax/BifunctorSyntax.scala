@@ -20,9 +20,8 @@ final class BifunctorOps[F[_, _],A, B] private[syntax](val self: F[A, B])(implic
 }
 
 sealed trait ToBifunctorOps0 {
-    implicit def ToBifunctorOpsUnapply[FA](v: FA)(implicit F0: Unapply2[Bifunctor, FA]) =
-      new BifunctorOps[F0.M,F0.A,F0.B](F0(v))(F0.TC)
   
+
 }
 
 trait ToBifunctorOps extends ToBifunctorOps0 {

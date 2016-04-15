@@ -15,8 +15,7 @@ final class ApplicativeOps[F[_],A] private[syntax](val self: F[A])(implicit val 
 }
 
 sealed trait ToApplicativeOps0 {
-  implicit def ToApplicativeOpsUnapply[FA](v: FA)(implicit F0: Unapply[Applicative, FA]) =
-    new ApplicativeOps[F0.M,F0.A](F0(v))(F0.TC)
+
 
 }
 

@@ -17,9 +17,8 @@ final class ArrowOps[F[_, _],A, B] private[syntax](val self: F[A, B])(implicit v
 }
 
 sealed trait ToArrowOps0 {
-    implicit def ToArrowOpsUnapply[FA](v: FA)(implicit F0: Unapply2[Arrow, FA]) =
-      new ArrowOps[F0.M,F0.A,F0.B](F0(v))(F0.TC)
   
+
 }
 
 trait ToArrowOps extends ToArrowOps0 with ToSplitOps with ToStrongOps with ToCategoryOps {

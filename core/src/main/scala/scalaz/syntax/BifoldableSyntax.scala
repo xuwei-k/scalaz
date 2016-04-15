@@ -16,9 +16,8 @@ final class BifoldableOps[F[_, _],A, B] private[syntax](val self: F[A, B])(impli
 }
 
 sealed trait ToBifoldableOps0 {
-    implicit def ToBifoldableOpsUnapply[FA](v: FA)(implicit F0: Unapply2[Bifoldable, FA]) =
-      new BifoldableOps[F0.M,F0.A,F0.B](F0(v))(F0.TC)
   
+
 }
 
 trait ToBifoldableOps extends ToBifoldableOps0 {

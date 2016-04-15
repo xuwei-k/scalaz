@@ -24,9 +24,8 @@ final class ProfunctorOps[F[_, _],A, B] private[syntax](val self: F[A, B])(impli
 }
 
 sealed trait ToProfunctorOps0 {
-    implicit def ToProfunctorOpsUnapply[FA](v: FA)(implicit F0: Unapply2[Profunctor, FA]) =
-      new ProfunctorOps[F0.M,F0.A,F0.B](F0(v))(F0.TC)
   
+
 }
 
 trait ToProfunctorOps extends ToProfunctorOps0 {

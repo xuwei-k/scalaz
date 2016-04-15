@@ -9,8 +9,7 @@ final class NondeterminismOps[F[_],A] private[syntax](val self: F[A])(implicit v
 }
 
 sealed trait ToNondeterminismOps0 {
-  implicit def ToNondeterminismOpsUnapply[FA](v: FA)(implicit F0: Unapply[Nondeterminism, FA]) =
-    new NondeterminismOps[F0.M,F0.A](F0(v))(F0.TC)
+
 
 }
 

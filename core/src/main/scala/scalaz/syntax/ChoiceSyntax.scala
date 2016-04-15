@@ -10,9 +10,8 @@ final class ChoiceOps[F[_, _],A, B] private[syntax](val self: F[A, B])(implicit 
 }
 
 sealed trait ToChoiceOps0 {
-    implicit def ToChoiceOpsUnapply[FA](v: FA)(implicit F0: Unapply2[Choice, FA]) =
-      new ChoiceOps[F0.M,F0.A,F0.B](F0(v))(F0.TC)
   
+
 }
 
 trait ToChoiceOps extends ToChoiceOps0 with ToCategoryOps {

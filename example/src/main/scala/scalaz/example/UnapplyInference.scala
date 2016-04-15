@@ -66,7 +66,6 @@ object UnapplyInference extends App {
     val e: String \/ Int = \/-(1)
 
     ToFunctorOps[String \/ ?, Int](e.map(1 +)).map(1 +)
-    ToFunctorOpsUnapply(e.map(1 +)).map(1 +)
 
     e.map(1 +).map(1 +)
 

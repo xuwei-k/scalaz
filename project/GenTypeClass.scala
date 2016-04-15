@@ -316,8 +316,7 @@ trait ${typeClassName}Syntax[F] ${extendsListText("Syntax", cti = "F")} {
 """
     case Kind.*->* =>
       val ToVUnapply =
-s"""  implicit def To${typeClassName}OpsUnapply[FA](v: FA)(implicit F0: Unapply[${typeClassName}, FA]) =
-    new ${typeClassName}Ops[F0.M,F0.A](F0(v))(F0.TC)
+s"""
 """
       val ToVMA =
 s"""  implicit def To${typeClassName}Ops[F[_],A](v: F[A])(implicit F0: ${typeClassName}[F]) =
@@ -356,9 +355,8 @@ trait ${typeClassName}Syntax[F[_]] ${extendsListText("Syntax", cti = "F")} {
       case Kind.*^*->* =>
 
         val ToVUnapply =
-  s"""  implicit def To${typeClassName}OpsUnapply[FA](v: FA)(implicit F0: Unapply2[${typeClassName}, FA]) =
-      new ${typeClassName}Ops[F0.M,F0.A,F0.B](F0(v))(F0.TC)
-  """
+  s"""
+"""
         val ToVKleisli =
   s"""
   implicit def To${typeClassName}VFromKleisliLike[G[_], F[G[_], _, _],A, B](v: F[G, A, B])(implicit F0: ${typeClassName}[F[G, ?, ?]]) =

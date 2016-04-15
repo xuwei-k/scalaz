@@ -15,8 +15,7 @@ final class InvariantFunctorOps[F[_],A] private[syntax](val self: F[A])(implicit
 }
 
 sealed trait ToInvariantFunctorOps0 {
-  implicit def ToInvariantFunctorOpsUnapply[FA](v: FA)(implicit F0: Unapply[InvariantFunctor, FA]) =
-    new InvariantFunctorOps[F0.M,F0.A](F0(v))(F0.TC)
+
 
 }
 
