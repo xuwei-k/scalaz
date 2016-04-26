@@ -7,7 +7,7 @@ import collection.mutable.ArraySeq
 import reflect.ClassTag
 
 /**
- * Instances of {@link scalacheck.Arbitrary} for many types in Scalaz.
+ * Instances of [[org.scalacheck.Arbitrary]] for many types in Scalaz.
  */
 object ScalazArbitrary extends ScalazArbitraryPlatform {
   import Scalaz._

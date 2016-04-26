@@ -109,66 +109,66 @@ trait EitherInstances extends EitherInstances0 {
         }
     }
 
-  /** [[scala.Either.LeftProjection]] is isomorphic to [[scala.Either]], when the type parameter `E` is partially applied. */
+  /** [[scala.util.Either.LeftProjection]] is isomorphic to [[scala.util.Either]], when the type parameter `E` is partially applied. */
   def LeftProjectionEIso2[E]: LeftProjection[E, ?] <~> Either[E, ?] =
     LeftProjectionIso2.unlift1[E]
 
-  /** [[scala.Either.LeftProjection]] is isomorphic to [[scala.Either]], when the type parameter `E` is partially applied. */
+  /** [[scala.util.Either.LeftProjection]] is isomorphic to [[scala.util.Either]], when the type parameter `E` is partially applied. */
   def FirstLeftProjectionEIso2[E]: λ[α => LeftProjection[E, α] @@ First] <~> Either[E, ?] =
     FirstLeftProjectionIso2.unlift1[E]
 
-  /** [[scala.Either.LeftProjection]] is isomorphic to [[scala.Either]], when the type parameter `E` is partially applied. */
+  /** [[scala.util.Either.LeftProjection]] is isomorphic to [[scala.util.Either]], when the type parameter `E` is partially applied. */
   def LastLeftProjectionEIso2[E]: λ[α => LeftProjection[E, α] @@ Last] <~> Either[E, ?] =
     LastLeftProjectionIso2.unlift1[E]
 
-  /** [[scala.Either.LeftProjection]] is isomorphic to [[scala.Either]] */
+  /** [[scala.util.Either.LeftProjection]] is isomorphic to [[scala.util.Either]] */
   val LeftProjectionIso2: LeftProjection <~~> Either =
     new IsoBifunctorTemplate[LeftProjection, Either] {
       def to[A, B](fa: LeftProjection[A, B]) = fa.e
       def from[A, B](ga: Either[A, B]) = ga.left
     }
 
-  /** [[scala.Either.LeftProjection]] is isomorphic to [[scala.Either]] */
+  /** [[scala.util.Either.LeftProjection]] is isomorphic to [[scala.util.Either]] */
   val FirstLeftProjectionIso2: λ[(α, β) => LeftProjection[α, β] @@ First] <~~> Either =
     new IsoBifunctorTemplate[λ[(α, β) => LeftProjection[α, β] @@ First], Either] {
       def to[A, B](fa: LeftProjection[A, B] @@ First) = Tag.unwrap(fa).e
       def from[A, B](ga: Either[A, B]) = First(ga.left)
     }
 
-  /** [[scala.Either.LeftProjection]] is isomorphic to [[scala.Either]] */
+  /** [[scala.util.Either.LeftProjection]] is isomorphic to [[scala.util.Either]] */
   val LastLeftProjectionIso2: λ[(α, β) => LeftProjection[α, β] @@ Last] <~~> Either =
     new IsoBifunctorTemplate[λ[(α, β) => LeftProjection[α, β] @@ Last], Either] {
       def to[A, B](fa: LeftProjection[A, B] @@ Last) = Tag.unwrap(fa).e
       def from[A, B](ga: Either[A, B]) = Last(ga.left)
     }
 
-  /** [[scala.Either.RightProjection]] is isomorphic to [[scala.Either]], when the type parameter `A` is partially applied. */
+  /** [[scala.util.Either.RightProjection]] is isomorphic to [[scala.util.Either]], when the type parameter `A` is partially applied. */
   def RightProjectionAIso2[A]: RightProjection[?, A] <~> Either[?, A] =
     RightProjectionIso2.unlift2[A]
 
-  /** [[scala.Either.RightProjection]] is isomorphic to [[scala.Either]], when the type parameter `A` is partially applied. */
+  /** [[scala.util.Either.RightProjection]] is isomorphic to [[scala.util.Either]], when the type parameter `A` is partially applied. */
   def FirstRightProjectionAIso2[A]: λ[α => RightProjection[α, A] @@ First] <~> Either[?, A] =
     FirstRightProjectionIso2.unlift2[A]
 
-  /** [[scala.Either.RightProjection]] is isomorphic to [[scala.Either]], when the type parameter `A` is partially applied. */
+  /** [[scala.util.Either.RightProjection]] is isomorphic to [[scala.util.Either]], when the type parameter `A` is partially applied. */
   def LastRightProjectionAIso2[A]: λ[α => RightProjection[α, A] @@ Last] <~> Either[?, A] =
     LastRightProjectionIso2.unlift2[A]
 
-  /** [[scala.Either.RightProjection]] is isomorphic to [[scala.Either]] */
+  /** [[scala.util.Either.RightProjection]] is isomorphic to [[scala.util.Either]] */
   val RightProjectionIso2: RightProjection <~~> Either =
     new IsoBifunctorTemplate[RightProjection, Either] {
       def to[A, B](fa: RightProjection[A, B]) = fa.e
       def from[A, B](ga: Either[A, B]) = ga.right
     }
 
-  /** [[scala.Either.RightProjection]] is isomorphic to [[scala.Either]] */
+  /** [[scala.util.Either.RightProjection]] is isomorphic to [[scala.util.Either]] */
   val FirstRightProjectionIso2: λ[(α, β) => RightProjection[α, β] @@ First] <~~> Either =
     new IsoBifunctorTemplate[λ[(α, β) => RightProjection[α, β] @@ First], Either] {
       def to[A, B](fa: RightProjection[A, B] @@ First) = Tag.unwrap(fa).e
       def from[A, B](ga: Either[A, B]) = First(ga.right)
     }
 
-  /** [[scala.Either.RightProjection]] is isomorphic to [[scala.Either]] */
+  /** [[scala.util.Either.RightProjection]] is isomorphic to [[scala.util.Either]] */
   val LastRightProjectionIso2: λ[(α, β) => RightProjection[α, β] @@ Last] <~~> Either =
     new IsoBifunctorTemplate[λ[(α, β) => RightProjection[α, β] @@ Last], Either] {
       def to[A, B](fa: RightProjection[A, B] @@ Last) = Tag.unwrap(fa).e

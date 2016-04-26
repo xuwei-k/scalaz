@@ -5,7 +5,7 @@ import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
 
 /**
- * Instances of {@link scalacheck.Arbitrary} for JVM-only parts of Scalaz.
+ * Instances of [[org.scalacheck.Arbitrary]] for JVM-only parts of Scalaz.
  */
 abstract class ScalazArbitraryPlatform {
 

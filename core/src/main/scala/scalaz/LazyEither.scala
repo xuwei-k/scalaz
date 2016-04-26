@@ -1,6 +1,6 @@
 package scalaz
 
-/** [[scala.Either]], but with a value by name. */
+/** [[scala.util.Either]], but with a value by name. */
 sealed abstract class LazyEither[+A, +B] {
 
   import LazyOption._
