@@ -79,6 +79,7 @@ object TypeClass {
   lazy val comonadStore = TypeClass("ComonadStore", |*->*|->*, extendsList = Seq(comonad), createSyntax = false)
 
   lazy val bindRec = TypeClass("BindRec", *->*, extendsList = Seq(bind))
+  lazy val monadRec = TypeClass("MonadRec", *->*, extendsList = Seq(bindRec, monad))
 
   def core: List[TypeClass] = List(semigroup,
     monoid,
@@ -130,6 +131,7 @@ object TypeClass {
     monadTell,
     monadReader,
     comonadStore,
+    monadRec,
     bindRec
   )
   lazy val concurrent = Seq[TypeClass]()

@@ -181,14 +181,14 @@ sealed abstract class Free[S[_], A] {
   /**
     * Run Free using constant stack.
     */
-  final def runRecM[M[_]](f: S[Free[S, A]] => M[Free[S, A]])(implicit S: Functor[S], M: Applicative[M], B: BindRec[M]): M[A] = {
+  final def runRecM[M[_]](f: S[Free[S, A]] => M[Free[S, A]])(implicit S: Functor[S], M: MonadRec[M]): M[A] = {
     def go(e: S[Free[S, A]] \/ A): M[Free[S, A] \/ A] =
       e match {
         case -\/(sf) => M.map(f(sf))(\/.left)
         case a @ \/-(_) => M.point(a)
       }
 
-    B.tailrecM[Free[S, A], A]((ma: Free[S, A]) => go(ma.resume))(this)
+    M.tailrecM[Free[S, A], A]((ma: Free[S, A]) => go(ma.resume))(this)
   }
 
   /**
@@ -220,8 +220,8 @@ sealed abstract class Free[S[_], A] {
       case a@Gosub() => M.bind(a.a foldMap f)(c => a.f(c) foldMap f)
     }
 
-  final def foldMapRec[M[_]](f: S ~> M)(implicit M: Applicative[M], B: BindRec[M]): M[A] =
-    B.tailrecM[Free[S, A], A]{
+  final def foldMapRec[M[_]](f: S ~> M)(implicit M: MonadRec[M]): M[A] =
+    M.tailrecM[Free[S, A], A]{
       _.step match {
         case Return(a) => M.point(\/-(a))
         case Suspend(t) => M.map(f(t))(\/.right)
@@ -349,8 +349,8 @@ object Trampoline extends TrampolineInstances {
 }
 
 sealed trait TrampolineInstances {
-  implicit val trampolineInstance: Monad[Trampoline] with Comonad[Trampoline] with BindRec[Trampoline] =
-    new Monad[Trampoline] with Comonad[Trampoline] with BindRec[Trampoline] {
+  implicit val trampolineInstance: MonadRec[Trampoline] with Comonad[Trampoline] =
+    new MonadRec[Trampoline] with Comonad[Trampoline] {
       override def point[A](a: => A) = return_[Function0, A](a)
       def bind[A, B](ta: Trampoline[A])(f: A => Trampoline[B]) = ta flatMap f
       def copoint[A](fa: Trampoline[A]) = fa.run
@@ -417,8 +417,8 @@ sealed abstract class FreeInstances0 extends FreeInstances1 {
 // Trampoline, Sink, and Source are type aliases. We need to add their type class instances
 // to Free to be part of the implicit scope.
 sealed abstract class FreeInstances extends FreeInstances0 with TrampolineInstances with SinkInstances with SourceInstances {
-  implicit def freeMonad[S[_]]: Monad[Free[S, ?]] with BindRec[Free[S, ?]] =
-    new Monad[Free[S, ?]] with BindRec[Free[S, ?]] {
+  implicit def freeMonad[S[_]]: MonadRec[Free[S, ?]] =
+    new MonadRec[Free[S, ?]] {
       override def map[A, B](fa: Free[S, A])(f: A => B) = fa map f
       def bind[A, B](a: Free[S, A])(f: A => Free[S, B]) = a flatMap f
       def point[A](a: => A) = Free.point(a)
