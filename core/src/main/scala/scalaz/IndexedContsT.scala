@@ -170,6 +170,17 @@ private sealed trait IndexedContsTBifunctor[W[_], M[_], O] extends Bifunctor[Ind
   override def rightMap[A, B, D](fa: IndexedContsT[W, M, A, O, B])(f: B => D): IndexedContsT[W, M, A, O, D] = fa.map(f)
 }
 
+private sealed trait ContTApply[M[_], R] extends Apply[ContT[M, R, ?]] with IndexedContsTFunctorRight[Id.Id, M, R, R] {
+  override final def ap[A, B](fa: => ContT[M, R, A])(f: => ContT[M, R, A => B]) =
+    ContT[M, R, B]{ k =>
+      f(g => fa.run(k compose g))
+    }
+}
+
+private sealed trait ContTApplicative[M[_], R] extends Applicative[ContT[M, R, ?]] with ContTApply[M, R] {
+  override def point[A](a: => A): ContT[M, R, A] = IndexedContsT.point(a)
+}
+
 private sealed trait ContsTBind[W[_], M[_], R] extends Bind[ContsT[W, M, R, ?]] with IndexedContsTFunctorRight[W, M, R, R] {
   implicit val W: Cobind[W]
 
