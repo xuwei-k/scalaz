@@ -5,7 +5,7 @@ import scalaz._
 object StateTUsage extends App {
   import StateT._
 
-  def f[M[_]: Functor] {
+  def f[M[_]: Applicative] {
     Functor[StateT[M, Int, ?]]
   }
 
