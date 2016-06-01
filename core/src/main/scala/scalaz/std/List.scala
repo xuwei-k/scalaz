@@ -51,21 +51,14 @@ trait ListInstances extends ListInstances0 {
         (a, b) => loop(a, b, Nil)
       }
       def traverseImpl[F[_], A, B](l: List[A])(f: A => F[B])(implicit F: Applicative[F]) = {
-        // implementation with `foldRight` leads to SOE in:
-        //
-        //  def wc(c: Char) = State[Boolean, Int]{(inWord) =>
-        //    val s = c != ' '
-        //    (test(!(inWord && s)), s)
-        //  }
-        //  val X = StateT.stateMonad[Boolean].traverse(List[Char]('a'))(wc)
-  
-        // foldRight(l, F.point(List[B]())) {
-        //   (a, fbs) => F.apply2(f(a), fbs)(_ :: _)
-        // }
-  
-        DList.fromList(l).foldr(F.point(List[B]())) {
-           (a, fbs) => F.apply2(f(a), fbs)(_ :: _)
-        }
+        def loop(as: List[A]): Need[F[List[B]]] =
+          as match {
+            case Nil =>
+              Need(F.pure(List.empty[B]))
+            case h :: t =>
+              Need(F.apply2(f(h), loop(t).value)(_ :: _))
+          }
+        loop(l).value
       }
 
       override def traverseS[S,A,B](l: List[A])(f: A => State[S,B]): State[S,List[B]] = {
