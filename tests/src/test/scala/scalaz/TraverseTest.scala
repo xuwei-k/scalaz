@@ -51,7 +51,16 @@ object TraverseTest extends SpecLite {
       val s = List.range(0,N).traverseS(x => modify((x: Int) => x+1))
       s.exec(0) must_=== (N)
     }
+  }
 
+  "issue 1176" in {
+    val xs = IList(Option(1), Option(2), None, Option(3), Option(4))
+    var ys = IList.empty[Option[Int]]
+    Traverse[IList].traverse(xs){ x =>
+      ys ::= x
+      x
+    }
+    ys must_=== IList(Option(1), Option(2))
   }
 
   "stream" should {
