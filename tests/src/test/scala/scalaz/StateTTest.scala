@@ -80,6 +80,16 @@ object StateTTest extends SpecLite {
     st.evalRec(0) must_=== (10000)
   }
 
+  "State with nasty flatMaps can be run without stack overflow" in {
+    def nasty: State[Int, Int] =
+      State[Int, Int](n => (n-1, n-1)).flatMap(i =>
+        if(i > 0) nasty
+        else State[Int, Int](n => (n, n))
+      )
+
+    nasty.evalRec(10000) must_=== (0)
+  }
+
   "iterated zoom on trampolined StateT is stack-safe" in {
     import scalaz.Free._
     val l: Lens[Int, Int] = Lens.lensId[Int]
