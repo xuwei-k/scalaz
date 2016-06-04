@@ -140,6 +140,7 @@ trait Syntaxes {
 trait ToDataOps
   extends ToIdOps
   with ToTreeOps
+  with ToStrictTreeOps
   with ToReducerOps
   with ToWriterOps
   with ToStateOps
