@@ -27,9 +27,9 @@ jdk:
 script:
   - git config core.whitespace tab-in-indent,trailing-space,blank-at-eol
   - git show --oneline --check
+  - git clone git://github.com/dotta/migration-manager.git && cd migration-manager && git checkout 85234f283 && sbt 'set version in ThisBuild := "0.1.10-SNAPSHOT"' publishLocal && cd ..
   # https://github.com/typesafehub/migration-manager/issues/114
-  - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m check-gen-type-classes "project $TEST_PROJECT" test:compile $(if [[ "${TRAVIS_SCALA_VERSION}" != "2.12.0-M4" ]]; then echo "mimaReportBinaryIssues"; fi)
-  - sbt ++$TRAVIS_SCALA_VERSION "project $TEST_PROJECT" test "project /" $(if [[ "${TEST_PROJECT}" == "rootJVM" ]]; then echo "publishLocal"; fi)
+  - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m "project $TEST_PROJECT" $(if [[ "${TRAVIS_SCALA_VERSION}" != "2.12.0-M4" ]]; then echo "mimaReportBinaryIssues"; fi)
 
   # Tricks to avoid unnecessary cache updates
   - find $HOME/.sbt -name "*.lock" | xargs rm

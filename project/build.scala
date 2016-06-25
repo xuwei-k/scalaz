@@ -247,8 +247,8 @@ object build extends Build {
           }.toSet
         }
       } else {
-        scalazMimaBasis.?.value.map {
-          organization.value % s"${name.value}_${scalaBinaryVersion.value}" % _
+        (0 to 4).map { bas =>
+          organization.value % (name.value + "_" + scalaBinaryVersion.value) % ("7.2." + bas)
         }.toSet
       }
     }
