@@ -191,8 +191,8 @@ object build extends Build {
   ) ++ osgiSettings ++ Seq[Sett](
     OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
   ) ++ mimaDefaultSettings ++ Seq[Sett](
-    mimaPreviousArtifacts := scalazMimaBasis.?.value.map { bas =>
-      organization.value % (name.value + "_" + scalaBinaryVersion.value) % bas
+    mimaPreviousArtifacts := (0 to 8).map { bas =>
+      organization.value % (name.value + "_" + scalaBinaryVersion.value) % ("7.1." + bas)
     }.toSet
   )
 

@@ -27,6 +27,7 @@ jdk:
   - openjdk6
 
 script:
+  - git clone git://github.com/dotta/migration-manager.git && cd migration-manager && git checkout 85234f283 && sbt 'set version in ThisBuild := "0.1.10-SNAPSHOT"' publishLocal && cd ..
   # https://github.com/typesafehub/migration-manager/issues/114
   - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m check-gen-type-classes test:compile test $(if [[ "${TRAVIS_SCALA_VERSION}" != "2.12.0-M4" ]]; then echo "mimaReportBinaryIssues"; fi)
 
