@@ -215,14 +215,9 @@ object build extends Build {
       ).map(exclude[MissingClassProblem])
     }
   ) ++ Seq[Sett](
-    mimaPreviousArtifacts <<= (organization, name, scalaBinaryVersion, scalazMimaBasis.?) { (o, n, sbv, basOpt) =>
-      basOpt match {
-        case Some(bas) =>
-          Set(o % (n + "_" + sbv) % bas)
-        case _ =>
-          Set()
-      }
-    }
+    mimaPreviousArtifacts := (0 to 9).map { bas =>
+      organization.value % (name.value + "_" + scalaBinaryVersion.value) % ("7.0." + bas)
+    }.toSet
   )
 
   lazy val scalaz = Project(
