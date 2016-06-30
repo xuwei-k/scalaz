@@ -105,10 +105,11 @@ object build extends Build {
   lazy val standardSettings: Seq[Sett] = Seq[Sett](
     organization := "org.scalaz",
 
-    scalaVersion := "2.10.6",
+    scalaVersion := "2.12.0-M5",
     crossScalaVersions := Seq("2.10.6", "2.11.8", "2.12.0-M4"),
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
+    resolvers += "Scala.js for Scala 2.12.0-M5" at "https://oss.sonatype.org/content/repositories/orgscala-js-1045",
     scalaCheckVersion := "1.12.5",
     scalacOptions ++= Seq(
       // contains -language:postfixOps (because 1+ as a parameter to a higher-order function is treated as a postfix op)
