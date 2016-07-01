@@ -81,7 +81,7 @@ object build extends Build {
     }
   )
 
-  lazy val notPublish = Seq(
+  lazy val notPublish = Seq[Sett](
     publishArtifact := false,
     publish := {},
     publishLocal := {},
@@ -295,7 +295,7 @@ object build extends Build {
   ).aggregate(jvmProjects: _*)
 
   lazy val core = crossProject.crossType(ScalazCrossType)
-    .settings(standardSettings: _*)
+    .settings(notPublish ++ standardSettings: _*)
     .settings(
       name := "scalaz-core",
       sourceGenerators in Compile <+= (sourceManaged in Compile) map {
@@ -319,7 +319,7 @@ object build extends Build {
   lazy val concurrent = Project(
     id = "concurrent",
     base = file("concurrent"),
-    settings = standardSettings ++ Seq(
+    settings = notPublish ++ standardSettings ++ Seq(
       name := ConcurrentName,
       typeClasses := TypeClass.concurrent,
       osgiExport("scalaz.concurrent"),
@@ -329,7 +329,7 @@ object build extends Build {
   )
 
   lazy val effect = crossProject.crossType(ScalazCrossType)
-    .settings(standardSettings: _*)
+    .settings(notPublish ++ standardSettings: _*)
     .settings(
       name := "scalaz-effect",
       osgiExport("scalaz.effect", "scalaz.std.effect", "scalaz.syntax.effect"))
@@ -343,7 +343,7 @@ object build extends Build {
   lazy val effectJS  = effect.js
 
   lazy val iteratee = crossProject.crossType(ScalazCrossType)
-    .settings(standardSettings: _*)
+    .settings(notPublish ++ standardSettings: _*)
     .settings(
       name := "scalaz-iteratee",
       osgiExport("scalaz.iteratee"))
@@ -357,7 +357,7 @@ object build extends Build {
     id = "example",
     base = file("example"),
     dependencies = Seq(coreJVM, iterateeJVM, concurrent),
-    settings = standardSettings ++ Seq[Sett](
+    settings = notPublish ++ standardSettings ++ Seq[Sett](
       name := "scalaz-example",
       mimaPreviousArtifacts := Set.empty,
       publishArtifact := false
@@ -366,7 +366,7 @@ object build extends Build {
 
   lazy val scalacheckBinding =
     CrossProject("scalacheck-binding", file("scalacheck-binding"), ScalazCrossType)
-      .settings(standardSettings: _*)
+      .settings(notPublish ++ standardSettings: _*)
       .settings(
         name := "scalaz-scalacheck-binding",
         libraryDependencies += "org.scalacheck" %%% "scalacheck" % scalaCheckVersion.value,
@@ -379,7 +379,7 @@ object build extends Build {
   lazy val scalacheckBindingJS  = scalacheckBinding.js
 
   lazy val tests = crossProject.crossType(ScalazCrossType)
-    .settings(standardSettings: _*)
+    .settings(notPublish ++ standardSettings: _*)
     .settings(
       name := "scalaz-tests",
       mimaPreviousArtifacts := Set.empty,
