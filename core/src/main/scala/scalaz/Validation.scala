@@ -466,19 +466,13 @@ final class ValidationFlatMap[E, A] private[scalaz](val self: Validation[E, A]) 
 
 sealed abstract class ValidationInstances1 extends ValidationInstances2 {
   implicit def ValidationEqual[E: Equal, A: Equal]: Equal[Validation[E, A]] =
-      new Equal[Validation[E, A]] {
-        def equal(a1: Validation[E, A], a2: Validation[E, A]) =
-          a1 === a2
-      }
+    (a1, a2) => a1 === a2
 
   implicit def ValidationShow[E: Show, A: Show]: Show[Validation[E, A]] =
     Show.show(_.show)
 
   implicit def ValidationSemigroup[E: Semigroup, A: Semigroup]: Semigroup[Validation[E, A]] =
-    new Semigroup[Validation[E, A]] {
-      def append(a1: Validation[E, A], a2: => Validation[E, A]) =
-        a1 +++ a2
-    }
+    (a1, a2) => a1 +++ a2
 }
 
 sealed abstract class ValidationInstances2 extends ValidationInstances3 {

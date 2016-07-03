@@ -221,9 +221,8 @@ sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
         }
     }
 
-  implicit def nonEmptyListSemigroup[A]: Semigroup[NonEmptyList[A]] = new Semigroup[NonEmptyList[A]] {
-    def append(f1: NonEmptyList[A], f2: => NonEmptyList[A]) = f1 append f2
-  }
+  implicit def nonEmptyListSemigroup[A]: Semigroup[NonEmptyList[A]] =
+    (f1, f2) => f1 append f2
 
   implicit def nonEmptyListShow[A: Show]: Show[NonEmptyList[A]] =
     Contravariant[Show].contramap(IList.show[A])(_.list)

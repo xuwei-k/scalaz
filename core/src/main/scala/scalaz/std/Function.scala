@@ -97,10 +97,8 @@ trait FunctionInstances extends FunctionInstances0 {
         }
     }
 
-  implicit def function0Equal[R: Equal] =
-    new Equal[() => R] {
-      def equal(a1: () => R, a2: () => R) = Equal[R].equal(a1(), a2())
-    }
+  implicit def function0Equal[R: Equal]: Equal[() => R] =
+    (a1, a2) => Equal[R].equal(a1(), a2())
 
   implicit val function1Instance: Arrow[Function1] with Choice[Function1] with ProChoice[Function1] =
     new Arrow[Function1] with Choice[Function1] with ProChoice[Function1] {

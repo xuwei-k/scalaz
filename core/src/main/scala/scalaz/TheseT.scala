@@ -123,9 +123,9 @@ sealed abstract class TheseTInstances0 extends TheseTInstances1 {
     = fab.bitraverse(f, g)
   }
 
-  implicit def theseTSemigroup[F[_]: Apply, A: Semigroup, B: Semigroup]: Semigroup[TheseT[F, A, B]] = new Semigroup[TheseT[F, A, B]] {
-    override def append(f1: TheseT[F, A, B], f2: => TheseT[F, A, B]) = TheseT(Apply[F].apply2(f1.run, f2.run)(_ append _))
-  }
+  implicit def theseTSemigroup[F[_]: Apply, A: Semigroup, B: Semigroup]: Semigroup[TheseT[F, A, B]] =
+    (f1, f2) => TheseT(Apply[F].apply2(f1.run, f2.run)(_ append _))
+
   implicit def theseTEqual[F[_], A, B](implicit F0: Equal[F[A \&/ B]]): Equal[TheseT[F, A, B]] =
     F0.contramap((_: TheseT[F, A, B]).run)
 

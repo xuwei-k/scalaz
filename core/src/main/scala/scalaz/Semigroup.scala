@@ -91,37 +91,27 @@ object Semigroup {
   ////
   /** Make an associative binary function into an instance. */
   def instance[A](f: (A, => A) => A): Semigroup[A] =
-    new Semigroup[A] {
-      def append(f1: A, f2: => A): A = f(f1,f2)
-    }
+    (f1, f2) => f(f1, f2)
 
   /** A purely left-biased semigroup. */
-  def firstSemigroup[A] =
-    new Semigroup[A] {
-      def append(f1: A, f2: => A): A = f1
-    }
+  def firstSemigroup[A]: Semigroup[A] =
+    (f1, _) => f1
 
   @inline implicit def firstTaggedSemigroup[A] = firstSemigroup[A @@ Tags.FirstVal]
 
   /** A purely right-biased semigroup. */
-  def lastSemigroup[A] =
-    new Semigroup[A] {
-      def append(f1: A, f2: => A): A = f2
-    }
+  def lastSemigroup[A]: Semigroup[A] =
+    (_, f2) => f2
 
   @inline implicit def lastTaggedSemigroup[A] = lastSemigroup[A @@ Tags.LastVal]
 
   def minSemigroup[A](implicit o: Order[A]): Semigroup[A @@ Tags.MinVal] =
-    new Semigroup[A @@ Tags.MinVal] {
-      def append(f1: A @@ Tags.MinVal, f2: => A @@ Tags.MinVal) = Tags.MinVal(o.min(Tag.unwrap(f1), Tag.unwrap(f2)))
-    }
+    (f1, f2) => Tags.MinVal(o.min(Tag.unwrap(f1), Tag.unwrap(f2)))
 
   @inline implicit def minTaggedSemigroup[A : Order] = minSemigroup[A]
 
   def maxSemigroup[A](implicit o: Order[A]): Semigroup[A @@ Tags.MaxVal] =
-    new Semigroup[A @@ Tags.MaxVal] {
-      def append(f1: A @@ Tags.MaxVal, f2: => A @@ Tags.MaxVal) = Tags.MaxVal(o.max(Tag.unwrap(f1), Tag.unwrap(f2)))
-    }
+    (f1, f2) => Tags.MaxVal(o.max(Tag.unwrap(f1), Tag.unwrap(f2)))
 
   @inline implicit def maxTaggedSemigroup[A : Order] = maxSemigroup[A]
 
