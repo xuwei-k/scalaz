@@ -122,11 +122,12 @@ case class StrictTree[A](
 
   def traverse1[G[_] : Apply, B](f: A => G[B]): G[StrictTree[B]] = {
     val G = Apply[G]
+    val F = Traverse1[OneAnd[Vector, ?]]
 
     subForest match {
       case Vector() => G.map(f(rootLabel))(Leaf(_))
-      case x +: xs => G.apply2(f(rootLabel), NonEmptyList.nel(x, IList.fromFoldable(xs)).traverse1(_.traverse1(f))) {
-        case (h, t) => Node(h, t.list.toVector)
+      case x +: xs => G.apply2(f(rootLabel), F.traverse1(OneAnd(x, xs))(_.traverse1(f))) {
+        case (h, t) => Node(h, F.toVector(t))
       }
     }
   }
