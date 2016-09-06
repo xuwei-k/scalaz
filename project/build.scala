@@ -62,9 +62,10 @@ object build extends Build {
   lazy val standardSettings: Seq[Sett] = Seq[Sett](
     organization := "org.scalaz",
 
-    scalaVersion := "2.10.6",
+    scalaVersion := "2.12.0-RC1",
     crossScalaVersions := Seq("2.9.3", "2.10.6", "2.11.8"),
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
+    resolvers += Opts.resolver.sonatypeReleases,
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
     scalacOptions ++= {
       val sv = scalaVersion.value
@@ -210,7 +211,7 @@ object build extends Build {
       artifacts <<= Classpaths.artifactDefs(Seq(packageDoc in Compile)),
       packagedArtifacts <<= Classpaths.packaged(Seq(packageDoc in Compile))
     ) ++ Defaults.packageTaskSettings(packageDoc in Compile, (unidoc in Compile).map(_.flatMap(Path.allSubpaths))),
-    aggregate = Seq(core, concurrent, effect, example, iteratee, scalacheckBinding, tests, typelevel, xml)
+    aggregate = Seq(core, concurrent, effect, example, iteratee, typelevel, xml)
   )
 
   // http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.scala-lang.modules%22%20
@@ -309,29 +310,6 @@ object build extends Build {
       name := "scalaz-example",
       mimaPreviousArtifacts := Set.empty,
       publishArtifact := false
-    )
-  )
-
-  lazy val scalacheckBinding = Project(
-    id           = "scalacheck-binding",
-    base         = file("scalacheck-binding"),
-    dependencies = Seq(core, concurrent, typelevel, xml, iteratee),
-    settings     = standardSettings ++ Seq[Sett](
-      name := "scalaz-scalacheck-binding",
-      libraryDependencies += "org.scalacheck" %% "scalacheck" % scalacheckVersion.value,
-      osgiExport("scalaz.scalacheck")
-    )
-  )
-
-  lazy val tests = Project(
-    id = "tests",
-    base = file("tests"),
-    dependencies = Seq(core, iteratee, concurrent, effect, typelevel, xml, scalacheckBinding % "test"),
-    settings = standardSettings ++Seq[Sett](
-      name := "scalaz-tests",
-      publishArtifact := false,
-      mimaPreviousArtifacts := Set.empty,
-      libraryDependencies += "org.scalacheck" %% "scalacheck" % scalacheckVersion.value % "test"
     )
   )
 
