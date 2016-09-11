@@ -44,8 +44,6 @@ object build {
   )
 
   val scalaCheckVersion = SettingKey[String]("scalaCheckVersion")
-  val kindProjectorVersion = SettingKey[String]("kindProjectorVersion")
-
   private[this] def gitHash(): String = sys.process.Process("git rev-parse HEAD").lines_!.head
 
   // no generic signatures for scala 2.10.x, see SI-7932, #571 and #828
@@ -88,7 +86,54 @@ object build {
       Some(shared(projectBase, conf))
   }
 
-  lazy val standardSettings: Seq[Sett] = Seq[Sett](
+  lazy val kindProjectorJar = TaskKey[String]("kindProjectorJar")
+
+  lazy val kindProjector = {
+    val kindProjectorRef = "d2b5be14c13f1a0eaca60eb08a0f717317577b6b"
+    val kindProjectorZip = url(s"https://github.com/paulp/kind-projector/archive/$kindProjectorRef.zip")
+
+    Project(
+      "kind-projector",
+      file("kindProjector")
+    ).settings(
+      coreSettings,
+      publishArtifact := false,
+      publish := {},
+      publishLocal := {},
+      libraryDependencies <+= scalaVersion("org.scala-lang" % "scala-compiler" % _ % "provided"),
+      kindProjectorJar <<= (packageBin in Compile).map(_.getAbsolutePath),
+      (sourceGenerators in Compile) += task{
+        IO.unzipURL(
+          kindProjectorZip,
+          (sourceManaged in Compile).value,
+          new SimpleFilter(
+            name => name.contains("src/main/scala/") && name.endsWith(".scala")
+          )
+        ).toSeq
+      },
+      (resourceGenerators in Compile) += task{
+        val resource = (resourceManaged in Compile).value / "scalac-plugin.xml"
+        val pluginXML = s"https://raw.githubusercontent.com/paulp/kind-projector/$kindProjectorRef/src/main/resources/scalac-plugin.xml"
+        IO.download(url(pluginXML), resource)
+        Seq(resource)
+      }
+    )
+  }
+
+  lazy val standardSettings: Seq[Sett] = coreSettings ++ Seq(
+    scalacOptions <+= (kindProjectorJar in kindProjector).map("-Xplugin:" + _)
+  )
+
+  lazy val coreSettings: Seq[Sett] = Seq[Sett](
+    libraryDependencies ++= (scalaBinaryVersion.value match {
+      case "2.10" =>
+        Seq(
+          compilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full),
+          "org.scalamacros" %% "quasiquotes" % "2.1.0"
+        )
+      case _ =>
+        Nil
+    }),
     organization := "org.scalaz",
     mappings in (Compile, packageSrc) ++= (managedSources in Compile).value.map{ f =>
       (f, f.relativeTo((sourceManaged in Compile).value).get.getPath)
@@ -223,9 +268,7 @@ object build {
         </developers>
       ),
     // kind-projector plugin
-    resolvers += Resolver.sonatypeRepo("releases"),
-    kindProjectorVersion := "0.8.2",
-    libraryDependencies += compilerPlugin("org.spire-math" % "kind-projector" % kindProjectorVersion.value cross CrossVersion.binary)
+    resolvers += Resolver.sonatypeRepo("releases")
   ) ++ osgiSettings ++ Seq[Sett](
     OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
   )

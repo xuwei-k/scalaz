@@ -1,4 +1,4 @@
-import build._
+import build.{kindProjector => _, _}
 import com.typesafe.sbt.osgi.OsgiKeys
 import org.scalajs.sbtplugin.cross._
 import sbtunidoc.Plugin.UnidocKeys._
@@ -11,6 +11,8 @@ lazy val jvmProjects = Seq[ProjectReference](
   coreJVM, effectJVM, iterateeJVM, scalacheckBindingJVM, testsJVM, concurrent, example
 )
 
+lazy val kindProjector = build.kindProjector
+
 lazy val scalaz = Project(
   id = "scalaz",
   base = file("."),
@@ -22,7 +24,7 @@ lazy val scalaz = Project(
     }
   ) ++ Defaults.packageTaskSettings(packageDoc in Compile, (unidoc in Compile).map(_.flatMap(Path.allSubpaths))),
   aggregate = jvmProjects ++ jsProjects
-)
+).dependsOn(kindProjector % "plugin->default(compile)")
 
 lazy val rootJS = Project(
   "rootJS",
@@ -30,7 +32,7 @@ lazy val rootJS = Project(
 ).settings(
   standardSettings,
   notPublish
-).aggregate(jsProjects: _*)
+).aggregate(jsProjects: _*).dependsOn(kindProjector % "plugin->default(compile)")
 
 lazy val rootJVM = Project(
   "rootJVM",
@@ -38,10 +40,10 @@ lazy val rootJVM = Project(
 ).settings(
   standardSettings,
   notPublish
-).aggregate(jvmProjects: _*)
+).aggregate(jvmProjects: _*).dependsOn(kindProjector % "plugin->default(compile)")
 
-lazy val coreJVM = core.jvm
-lazy val coreJS  = core.js
+lazy val coreJVM = core.jvm.dependsOn(kindProjector % "plugin->default(compile)")
+lazy val coreJS  = core.js.dependsOn(kindProjector % "plugin->default(compile)")
 
 lazy val concurrent = Project(
   id = "concurrent",
@@ -53,13 +55,13 @@ lazy val concurrent = Project(
     OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*")
   ),
   dependencies = Seq(coreJVM, effectJVM)
-)
+).dependsOn(kindProjector % "plugin->default(compile)")
 
-lazy val effectJVM = effect.jvm
-lazy val effectJS  = effect.js
+lazy val effectJVM = effect.jvm.dependsOn(kindProjector % "plugin->default(compile)")
+lazy val effectJS  = effect.js.dependsOn(kindProjector % "plugin->default(compile)")
 
-lazy val iterateeJVM = iteratee.jvm
-lazy val iterateeJS  = iteratee.js
+lazy val iterateeJVM = iteratee.jvm.dependsOn(kindProjector % "plugin->default(compile)")
+lazy val iterateeJS  = iteratee.js.dependsOn(kindProjector % "plugin->default(compile)")
 
 lazy val example = Project(
   id = "example",
@@ -69,7 +71,7 @@ lazy val example = Project(
     name := "scalaz-example",
     publishArtifact := false
   )
-)
+).dependsOn(kindProjector % "plugin->default(compile)")
 
 lazy val scalacheckBinding =
   CrossProject("scalacheck-binding", file("scalacheck-binding"), ScalazCrossType)
@@ -82,8 +84,8 @@ lazy val scalacheckBinding =
     .jvmConfigure(_ dependsOn concurrent)
     .jsSettings(scalajsProjectSettings : _*)
 
-lazy val scalacheckBindingJVM = scalacheckBinding.jvm
-lazy val scalacheckBindingJS  = scalacheckBinding.js
+lazy val scalacheckBindingJVM = scalacheckBinding.jvm.dependsOn(kindProjector % "plugin->default(compile)")
+lazy val scalacheckBindingJS  = scalacheckBinding.js.dependsOn(kindProjector % "plugin->default(compile)")
 
 lazy val tests = crossProject.crossType(ScalazCrossType)
   .settings(standardSettings: _*)
@@ -99,5 +101,5 @@ lazy val tests = crossProject.crossType(ScalazCrossType)
     scalaJSUseRhino in Global := false
   )
 
-lazy val testsJVM = tests.jvm
-lazy val testsJS  = tests.js
+lazy val testsJVM = tests.jvm.dependsOn(kindProjector % "plugin->default(compile)")
+lazy val testsJS  = tests.js.dependsOn(kindProjector % "plugin->default(compile)")
