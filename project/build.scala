@@ -102,7 +102,8 @@ object build {
     mappings in (Compile, packageSrc) ++= (managedSources in Compile).value.map{ f =>
       (f, f.relativeTo((sourceManaged in Compile).value).get.getPath)
     },
-    scalaVersion := "2.10.6",
+    scalaVersion := "2.12.0-RC1-ceaf419",
+    conflictWarning := ConflictWarning.disable,
     crossScalaVersions := Seq("2.10.6", "2.11.8", "2.12.0-RC1"),
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
@@ -230,7 +231,7 @@ object build {
     // kind-projector plugin
     resolvers += Resolver.sonatypeRepo("releases"),
     kindProjectorVersion := "0.8.2",
-    libraryDependencies += compilerPlugin("org.spire-math" % "kind-projector" % kindProjectorVersion.value cross CrossVersion.binary)
+    libraryDependencies += compilerPlugin("org.spire-math" % "kind-projector_2.12.0-RC1" % kindProjectorVersion.value)
   ) ++ osgiSettings ++ Seq[Sett](
     OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
   ) ++ mimaDefaultSettings ++ Seq[Sett](

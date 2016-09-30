@@ -82,7 +82,7 @@ lazy val scalacheckBinding =
     .settings(standardSettings: _*)
     .settings(
       name := "scalaz-scalacheck-binding",
-      libraryDependencies += "org.scalacheck" %%% "scalacheck" % scalaCheckVersion.value,
+      libraryDependencies += "org.scalacheck" % "scalacheck_2.12.0-RC1" % scalaCheckVersion.value,
       osgiExport("scalaz.scalacheck"))
     .dependsOn(core, iteratee)
     .jvmConfigure(_ dependsOn concurrent)
@@ -97,7 +97,7 @@ lazy val tests = crossProject.crossType(ScalazCrossType)
     name := "scalaz-tests",
     mimaPreviousArtifacts := Set.empty,
     publishArtifact := false,
-    libraryDependencies += "org.scalacheck" %%% "scalacheck" % scalaCheckVersion.value % "test")
+    libraryDependencies += "org.scalacheck" % "scalacheck_2.12.0-RC1" % scalaCheckVersion.value % "test")
   .dependsOn(core, effect, iteratee, scalacheckBinding)
   .jvmConfigure(_ dependsOn concurrent)
   .jsSettings(scalajsProjectSettings : _*)
