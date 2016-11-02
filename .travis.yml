@@ -23,4 +23,3 @@ matrix:
   include:
     - scala: 2.12.0
       jdk: oraclejdk8
-      script: sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3784m test && rm -rf $HOME/.ivy2/cache
