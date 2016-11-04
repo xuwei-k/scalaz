@@ -112,6 +112,9 @@ object build {
         "-Ydelambdafy:method",
         "-target:jvm-1.8"
       )
+      case Some((2, v)) if v >= 12 => Seq(
+        "-opt:l:project"
+      )
       case _ => Nil
     }),
 
