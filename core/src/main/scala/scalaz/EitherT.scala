@@ -381,8 +381,7 @@ private trait EitherTBindRec[F[_], E] extends BindRec[EitherT[F, E, ?]] with Eit
   final def tailrecM[A, B](a: A)(f: A => EitherT[F, E, A \/ B]): EitherT[F, E, B] =
     EitherT(
       B.tailrecM[A, E \/ B](a)(a => F.map(f(a).run) {
-        // E \/ (A \/ B) => A \/ (E \/ B) is _.sequenceU but can't use here
-        _.fold(e => \/-(-\/(e)), _.fold(\/.left, b => \/-(\/-(b))))
+        Traverse[E \/ ?].sequenceU(_)
       })
     )
 }
