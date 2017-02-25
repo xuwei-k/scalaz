@@ -98,6 +98,12 @@ object build {
       Some(shared(projectBase, conf))
   }
 
+  private val Scala211_jvm_and_js_options = Seq(
+    "-Ybackend:GenBCode",
+    "-Ydelambdafy:method",
+    "-target:jvm-1.8"
+  )
+
   lazy val standardSettings: Seq[Sett] = Seq[Sett](
     organization := "org.scalaz",
     mappings in (Compile, packageSrc) ++= (managedSources in Compile).value.map{ f =>
@@ -118,11 +124,7 @@ object build {
       "-unchecked"
     ) ++ (CrossVersion.partialVersion(scalaVersion.value) match {
       case Some((2,10)) => scalac210Options
-      case Some((2,11)) => Seq(
-        "-Ybackend:GenBCode",
-        "-Ydelambdafy:method",
-        "-target:jvm-1.8"
-      )
+      case Some((2,11)) => Scala211_jvm_and_js_options
       case _ => Nil
     }),
 
@@ -273,6 +275,9 @@ object build {
         case Some((2, 11)) => "org.scala-lang.modules" %% "scala-java8-compat" % "0.7.0"
       }.toList,
       typeClasses := TypeClass.core
+    )
+    .nativeSettings(
+      scalacOptions --= Scala211_jvm_and_js_options
     )
 
   final val ConcurrentName = "scalaz-concurrent"
