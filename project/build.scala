@@ -18,9 +18,9 @@ import com.typesafe.sbt.osgi.SbtOsgi._
 
 import sbtbuildinfo.BuildInfoPlugin.autoImport._
 
-import org.scalajs.sbtplugin.ScalaJSPlugin
-import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
-import org.scalajs.sbtplugin.cross._
+import scalanative.sbtplugin.ScalaNativePlugin.autoImport._
+import scalajscrossproject.ScalaJSCrossPlugin.autoImport.{toScalaJSGroupID => _, _}
+import sbtcrossproject.CrossPlugin.autoImport._
 
 object build {
   type Sett = Def.Setting[_]
@@ -77,9 +77,19 @@ object build {
 
   // avoid move files
   // https://github.com/scala-js/scala-js/blob/v0.6.7/sbt-plugin/src/main/scala/scala/scalajs/sbtplugin/cross/CrossProject.scala#L193-L206
-  object ScalazCrossType extends CrossType {
-    override def projectDir(crossBase: File, projectType: String) =
+  object ScalazCrossType extends sbtcrossproject.CrossType {
+    override def projectDir(crossBase: File, projectType: String) = {
       crossBase / projectType
+    }
+
+    override def projectDir(crossBase: File, projectType: sbtcrossproject.Platform) = {
+      val dir = projectType match {
+        case JVMPlatform => "jvm"
+        case JSPlatform => "js"
+        case NativePlatform => "native"
+      }
+      crossBase / dir
+    }
 
     def shared(projectBase: File, conf: String) =
       projectBase.getParentFile / "src" / conf / "scala"
@@ -93,7 +103,7 @@ object build {
     mappings in (Compile, packageSrc) ++= (managedSources in Compile).value.map{ f =>
       (f, f.relativeTo((sourceManaged in Compile).value).get.getPath)
     },
-    scalaVersion := "2.10.6",
+    scalaVersion := "2.11.8",
     crossScalaVersions := Seq("2.10.6", "2.11.8", "2.12.1"),
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
@@ -240,7 +250,7 @@ object build {
     OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
   )
 
-  lazy val core = crossProject.crossType(ScalazCrossType)
+  lazy val core = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
     .settings(standardSettings: _*)
     .settings(
       name := "scalaz-core",
@@ -267,7 +277,7 @@ object build {
 
   final val ConcurrentName = "scalaz-concurrent"
 
-  lazy val effect = crossProject.crossType(ScalazCrossType)
+  lazy val effect = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType)
     .settings(standardSettings: _*)
     .settings(
       name := "scalaz-effect",
@@ -278,7 +288,7 @@ object build {
       typeClasses := TypeClass.effect
     )
 
-  lazy val iteratee = crossProject.crossType(ScalazCrossType)
+  lazy val iteratee = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType)
     .settings(standardSettings: _*)
     .settings(
       name := "scalaz-iteratee",

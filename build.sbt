@@ -2,6 +2,7 @@ import build._
 import com.typesafe.sbt.osgi.OsgiKeys
 import org.scalajs.sbtplugin.cross._
 import sbtunidoc.Plugin.UnidocKeys._
+import sbtcrossproject.CrossPlugin.autoImport.crossProject
 
 lazy val jsProjects = Seq[ProjectReference](
   coreJS, effectJS, iterateeJS, scalacheckBindingJS, testsJS
@@ -40,6 +41,7 @@ lazy val rootJVM = Project(
   notPublish
 ).aggregate(jvmProjects: _*)
 
+lazy val coreNative = core.native
 lazy val coreJVM = core.jvm
 lazy val coreJS  = core.js
 
@@ -72,7 +74,8 @@ lazy val example = Project(
 )
 
 lazy val scalacheckBinding =
-  CrossProject("scalacheck-binding", file("scalacheck-binding"), ScalazCrossType)
+  crossProject(JVMPlatform, JSPlatform).crossType(ScalazCrossType)
+    .in(file("scalacheck-binding"))
     .settings(standardSettings)
     .settings(
       name := "scalaz-scalacheck-binding",
@@ -85,7 +88,7 @@ lazy val scalacheckBinding =
 lazy val scalacheckBindingJVM = scalacheckBinding.jvm
 lazy val scalacheckBindingJS  = scalacheckBinding.js
 
-lazy val tests = crossProject.crossType(ScalazCrossType)
+lazy val tests = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType)
   .settings(standardSettings)
   .settings(
     name := "scalaz-tests",
