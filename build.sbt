@@ -13,7 +13,7 @@ lazy val jvmProjects = Seq[ProjectReference](
 )
 
 lazy val nativeProjects = Seq[ProjectReference](
-  coreNative, effectNative, iterateeNative
+  coreNative, effectNative, iterateeNative, nativeTests
 )
 
 lazy val scalaz = Project(
@@ -23,7 +23,7 @@ lazy val scalaz = Project(
     artifacts := Classpaths.artifactDefs(Seq(packageDoc in Compile)).value,
     packagedArtifacts := Classpaths.packaged(Seq(packageDoc in Compile)).value,
     unidocProjectFilter in (ScalaUnidoc, unidoc) := {
-      jsProjects.foldLeft(inAnyProject)((acc, a) => acc -- inProjects(a))
+      (jsProjects ++ nativeProjects).foldLeft(inAnyProject)((acc, a) => acc -- inProjects(a))
     }
   ) ++ Defaults.packageTaskSettings(packageDoc in Compile, (unidoc in Compile).map(_.flatMap(Path.allSubpaths))),
   aggregate = jvmProjects ++ jsProjects
