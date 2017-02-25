@@ -267,6 +267,12 @@ object build {
     }
   )
 
+  val nativeSettings = Seq(
+    scalacOptions --= Scala211_jvm_and_js_options,
+    scalaVersion := Scala211,
+    crossScalaVersions := Scala211 :: Nil
+  )
+
   lazy val core = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
     .settings(standardSettings: _*)
     .settings(
@@ -293,7 +299,7 @@ object build {
       typeClasses := TypeClass.core
     )
     .nativeSettings(
-      scalacOptions --= Scala211_jvm_and_js_options
+      nativeSettings
     )
 
   final val ConcurrentName = "scalaz-concurrent"
@@ -309,7 +315,7 @@ object build {
       typeClasses := TypeClass.effect
     )
     .nativeSettings(
-      scalacOptions --= Scala211_jvm_and_js_options
+      nativeSettings
     )
 
   lazy val iteratee = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
@@ -320,17 +326,7 @@ object build {
     .dependsOn(core, effect)
     .jsSettings(scalajsProjectSettings : _*)
     .nativeSettings(
-      scalacOptions --= Scala211_jvm_and_js_options
-    )
-
-  lazy val nativeTest = crossProject(NativePlatform).crossType(ScalazCrossType)
-    .settings(
-      standardSettings,
-      notPublish,
-      name := "scalaz-native-test")
-    .dependsOn(iteratee)
-    .nativeSettings(
-      scalacOptions --= Scala211_jvm_and_js_options
+      nativeSettings
     )
 
   lazy val publishSetting = publishTo := {

@@ -13,7 +13,7 @@ lazy val jvmProjects = Seq[ProjectReference](
 )
 
 lazy val nativeProjects = Seq[ProjectReference](
-  coreNative, effectNative, iterateeNative, nativeTests
+  coreNative, effectNative, iterateeNative, nativeTest
 )
 
 lazy val scalaz = Project(
@@ -118,4 +118,10 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType
 lazy val testsJVM = tests.jvm
 lazy val testsJS  = tests.js
 
-lazy val nativeTests = nativeTest.native
+lazy val nativeTest = project.enablePlugins(ScalaNativePlugin)
+  .settings(
+    standardSettings,
+    nativeSettings,
+    notPublish
+  )
+  .dependsOn(iterateeNative)
