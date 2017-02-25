@@ -105,7 +105,39 @@ object build {
     "-target:jvm-1.8"
   )
 
-  private def Scala211 = "2.11.8"
+  private val Scala211 = "2.11.8"
+
+  private def ifNotScala211[A](key: TaskKey[A], value: A): Setting[Task[A]] = {
+    key := {
+      if (scalaVersion.value == Scala211) {
+        value
+      } else {
+        key.value
+      }
+    }
+  }
+
+  private def ifNotScala211[A](key: SettingKey[A], value: A): Setting[A] = {
+    key := {
+      if (scalaVersion.value == Scala211) {
+        value
+      } else {
+        key.value
+      }
+    }
+  }
+
+  private val nativeSettings = {
+    Seq(
+      scalacOptions --= Scala211_jvm_and_js_options,
+      ifNotScala211(publishArtifact, false),
+      ifNotScala211(publish, ()),
+      ifNotScala211(publishLocal, ()),
+      ifNotScala211(publishSigned, ()),
+      ifNotScala211(publishLocalSigned, ())
+    )
+  }
+
 
   private val SetScala211 = releaseStepCommand("++" + Scala211)
 
@@ -293,7 +325,7 @@ object build {
       typeClasses := TypeClass.core
     )
     .nativeSettings(
-      scalacOptions --= Scala211_jvm_and_js_options
+      nativeSettings
     )
 
   final val ConcurrentName = "scalaz-concurrent"
@@ -309,7 +341,7 @@ object build {
       typeClasses := TypeClass.effect
     )
     .nativeSettings(
-      scalacOptions --= Scala211_jvm_and_js_options
+      nativeSettings
     )
 
   lazy val iteratee = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
@@ -320,7 +352,7 @@ object build {
     .dependsOn(core, effect)
     .jsSettings(scalajsProjectSettings : _*)
     .nativeSettings(
-      scalacOptions --= Scala211_jvm_and_js_options
+      nativeSettings
     )
 
   lazy val nativeTest = crossProject(NativePlatform).crossType(ScalazCrossType)
@@ -330,7 +362,7 @@ object build {
       name := "scalaz-native-test")
     .dependsOn(iteratee)
     .nativeSettings(
-      scalacOptions --= Scala211_jvm_and_js_options
+      nativeSettings
     )
 
   lazy val publishSetting = publishTo := {
