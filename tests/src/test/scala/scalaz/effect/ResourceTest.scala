@@ -2,7 +2,7 @@ package scalaz
 package effect
 
 import java.io._
-import std.effect.closeable._
+import std.effect.AllEffectInstances._
 
 object ResourceTest extends SpecLite {
 
@@ -32,6 +32,13 @@ object ResourceTest extends SpecLite {
       }
     }
 
+  }
+
+  object instances {
+    Resource[java.sql.Connection]
+    Resource[java.sql.PreparedStatement]
+    Resource[java.sql.ResultSet]
+    Resource[java.sql.Statement]
   }
 
 }
