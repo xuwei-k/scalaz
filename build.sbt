@@ -3,6 +3,7 @@ import com.typesafe.sbt.osgi.OsgiKeys
 import org.scalajs.sbtplugin.cross._
 import sbtunidoc.Plugin.UnidocKeys._
 import sbtcrossproject.CrossPlugin.autoImport.crossProject
+import scalanative.sbtplugin.ScalaNativePluginInternal.nativeMissingDependencies
 
 lazy val jsProjects = Seq[ProjectReference](
   coreJS, effectJS, iterateeJS, scalacheckBindingJS, testsJS
@@ -34,7 +35,19 @@ lazy val rootNative = Project(
   file("rootNative")
 ).settings(
   standardSettings,
-  notPublish
+  notPublish,
+  TaskKey[Unit]("checkNativeMissingDependencies") := {
+    val Seq(coreMissing, effectMissing, iterateeMissing) = Seq(
+      (nativeMissingDependencies in Compile in coreNative),
+      (nativeMissingDependencies in Compile in effectNative),
+      (nativeMissingDependencies in Compile in iterateeNative)
+    ).join.value
+
+    // TODO https://github.com/scalaz/scalaz/blob/c609635a100/core/src/main/scala/scalaz/Forall.scala#L24
+    assert(coreMissing.size <= 1, coreMissing)
+    assert(effectMissing.isEmpty, effectMissing)
+    assert(iterateeMissing.isEmpty, iterateeMissing)
+  }
 ).aggregate(nativeProjects: _*)
 
 lazy val rootJS = Project(
