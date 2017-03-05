@@ -5,6 +5,10 @@ cache:
   directories:
     - $HOME/.ivy2/cache
 
+os:
+- linux
+- osx
+
 language: scala
 scala:
   - 2.12.1
