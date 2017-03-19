@@ -6,4 +6,6 @@ before_install:
   - brew install sbt
 script:
   - java -version
+  - which clang
+  - which clang++
   - sbt -J-Xmx3784m check-gen-type-classes test:compile
