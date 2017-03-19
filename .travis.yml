@@ -1,12 +1,5 @@
 os: osx
 sudo: true
 osx_image: xcode8.2
-before_install:
-  - brew install sbt
 script:
-  - java -version
-  - which clang
-  - which clang++
-  - sudo rm -rf $(which clang)
-  - sudo rm -rf $(which clang++)
-  - sbt -J-Xmx3784m check-gen-type-classes test:compile
+  - PATH="" ./sbt -J-Xmx3784m check-gen-type-classes test:compile
