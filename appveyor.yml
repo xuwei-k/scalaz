@@ -1,0 +1,23 @@
+environment:
+  matrix:
+    - SCALA_VERSION: 2.10.6
+    - SCALA_VERSION: 2.11.8
+    - SCALA_VERSION: 2.12.1
+install:
+  - ps: |
+      Add-Type -AssemblyName System.IO.Compression.FileSystem
+      if (!(Test-Path -Path "C:\sbt\sbt-launcher-packaging-0.13.13" )) {
+        (new-object System.Net.WebClient).DownloadFile(
+          'https://dl.bintray.com/sbt/native-packages/sbt/0.13.13/sbt-0.13.13.zip',
+          'C:\sbt-0.13.13.zip'
+        )
+        [System.IO.Compression.ZipFile]::ExtractToDirectory("C:\sbt-0.13.13.zip", "C:\sbt")
+      }
+  - cmd: SET JAVA_HOME=C:\Program Files\Java\jdk1.8.0
+  - cmd: SET PATH=C:\sbt\sbt-launcher-packaging-0.13.13\bin;%JAVA_HOME%\bin;%PATH%
+  - cmd: SET SBT_OPTS=-Xss2m -Xms1024m -Xmx4096m -XX:+TieredCompilation -XX:+CMSPermGenSweepingEnabled -XX:+CMSClassUnloadingEnabled -XX:+UseConcMarkSweepGC -XX:MaxPermSize=256m -XX:ReservedCodeCacheSize=256M
+test_script:
+  - sbt "++ %SCALA_VERSION%" test:compile test
+cache:
+  - C:\sbt\sbt-launcher-packaging-0.13.13
+  - C:\Users\appveyor\.ivy2 -> appveyor.yml
