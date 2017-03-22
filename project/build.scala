@@ -124,7 +124,7 @@ object build {
     },
     scalaVersion := "2.12.1",
     crossScalaVersions := Seq("2.10.6", Scala211, "2.12.1"),
-    resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
+    resolvers += "scala-integration" at "https://scala-ci.typesafe.com/artifactory/scala-integration/",
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
     scalaCheckVersion := "1.13.4",
     scalacOptions ++= Seq(
