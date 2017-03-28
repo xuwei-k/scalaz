@@ -113,7 +113,7 @@ object build {
     "-target:jvm-1.8"
   )
 
-  private def Scala211 = "2.11.8"
+  private def Scala211 = "2.11.9"
 
   private val SetScala211 = releaseStepCommand("++" + Scala211)
 
