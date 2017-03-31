@@ -137,7 +137,7 @@ object build {
       "-unchecked"
     ) ++ (CrossVersion.partialVersion(scalaVersion.value) match {
       case Some((2,10)) => scalac210Options
-      case Some((2,11)) => Scala211_jvm_and_js_options
+      case Some((2,11)) => Nil
       case _ => Nil
     }),
 
