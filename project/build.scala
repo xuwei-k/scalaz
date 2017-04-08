@@ -113,9 +113,9 @@ object build {
     "-target:jvm-1.8"
   )
 
-  private def Scala211 = "2.11.8"
+  private def Scala211 = "2.11.10"
 
-  private val SetScala211 = releaseStepCommand("++" + Scala211)
+  private val SetScala211 = releaseStepCommand("++ 2.11.8")
 
   lazy val standardSettings: Seq[Sett] = Seq[Sett](
     organization := "org.scalaz",
