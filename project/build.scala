@@ -60,6 +60,7 @@ object build {
     scalaVersion := "2.10.6",
     crossScalaVersions := Seq("2.9.3", "2.10.6", "2.11.8"),
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
+    resolvers += "staging" at "https://oss.sonatype.org/content/repositories/staging/",
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
     scalacOptions ++= {
       val sv = scalaVersion.value

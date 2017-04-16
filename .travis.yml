@@ -7,9 +7,7 @@ cache:
 
 language: scala
 scala:
-  - 2.11.8
-  - 2.10.6
-  - 2.9.3
+  - 2.11.11
 jdk:
   - oraclejdk7
   - openjdk6
@@ -25,12 +23,12 @@ script:
 
 matrix:
   include:
-    - scala: 2.12.1
+    - scala: 2.12.2
       jdk: oraclejdk8
     - dist: trusty
       group: edge
       sudo: required
-      scala: 2.12.1
+      scala: 2.12.2
       jdk: oraclejdk9
       script:
       # https://github.com/sbt/sbt/pull/2951
@@ -43,7 +41,6 @@ matrix:
       - mkdir -p $HOME/.sbt/0.13/java9-rt-ext; java -jar target/java9-rt-export-*.jar $HOME/.sbt/0.13/java9-rt-ext/rt.jar
       - jar tf $HOME/.sbt/0.13/java9-rt-ext/rt.jar | grep java/lang/Object
       - cd ..
-      - echo "sbt.version=0.13.14-RC1" > project/build.properties
       - ./sbt -Dscala.ext.dirs=$HOME/.sbt/0.13/java9-rt-ext ++$TRAVIS_SCALA_VERSION -J-Xmx3784m check-gen-type-classes test mimaReportBinaryIssues
 
 addons:
