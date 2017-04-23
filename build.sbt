@@ -36,9 +36,18 @@ lazy val core = Project(
     scalaXmlVersion := "1.0.6",
     libraryDependencies ++= {
       CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((2, v)) if 11 <= v && v <= 12 =>
+          Seq(
+            "org.scala-lang.modules" %% "scala-parser-combinators" % scalaParserCombinatorsVersion.value
+          )
+        case _ =>
+          Nil
+      }
+    },
+    libraryDependencies ++= {
+      CrossVersion.partialVersion(scalaVersion.value) match {
         case Some((2, scalaMajor)) if scalaMajor >= 11 =>
           Seq(
-            "org.scala-lang.modules" %% "scala-parser-combinators" % scalaParserCombinatorsVersion.value,
             "org.scala-lang.modules" %% "scala-xml" % scalaXmlVersion.value
           )
         case _ =>
@@ -112,6 +121,15 @@ lazy val example = Project(
   base = file("example"),
   dependencies = Seq(core, iteratee, concurrent, typelevel, xml),
   settings = standardSettings ++ Seq[Sett](
+    sources in Compile := {
+      val fs = (sources in Compile).value
+      CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((2, v)) if v >= 13 =>
+          fs.filterNot(_.getName == "ParserUsage.scala")
+        case _ =>
+          fs
+      }
+    },
     name := "scalaz-example",
     mimaPreviousArtifacts := Set.empty,
     publishArtifact := false

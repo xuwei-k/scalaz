@@ -56,6 +56,15 @@ object build {
     unmanagedSourceDirectories in Compile += {
       val base = (sourceDirectory in Compile).value
       CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((2, v)) if v >= 13 =>
+          base / "scala-2.13+"
+        case _ =>
+          base / "scala-2.13-"
+      }
+    },
+    unmanagedSourceDirectories in Compile += {
+      val base = (sourceDirectory in Compile).value
+      CrossVersion.partialVersion(scalaVersion.value) match {
         case Some((2, v)) if v >= 12 =>
           base / "scala-2.12+"
         case _ =>
