@@ -67,7 +67,7 @@ object Coyoneda extends CoyonedaInstances {
   def lift[F[_],A](fa: F[A]): Coyoneda[F, A] = apply(fa)(identity[A])
 
   /** See `by` method. */
-  final class By[F[_]] {
+  final class By[F[_]] private[Coyoneda](private val dummy: Boolean = false) extends AnyVal {
     @inline def apply[A, B](k: A => B)(implicit F: F[A]): Aux[F, B, A] =
       Coyoneda(F)(k)
   }
