@@ -114,8 +114,46 @@ object build {
 
   private val SetScala211 = releaseStepCommand("++" + Scala211)
 
+  def createJS(file: String, binary: String) = {
+    IO.withTemporaryDirectory{ dir =>
+      val js = dir / "gunzipjs"
+      IO.download(url("https://raw.githubusercontent.com/imaya/zlib.js/b99bd33d485d63e93310b911a1f8dbf9ceb265d5/bin/gunzip.min.js"), js)
+      IO.readLines(js).mkString("\n").replace("//@ sourceMappingURL=gunzip.min.js.map", "")
+    } + s"""
+var str = "$binary";
+var array = new Uint8Array(str.length / 2);
+var len = str.length * 2;
+for(var i = 0; i < len; i++){
+  var j = i * 2;
+  array[i] = parseInt(str.slice(j, j + 2), 16);
+}
+var plain = new Zlib.Gunzip(array).decompress();
+var script = document.createElement('script');
+script.setAttribute('type', 'text/javascript');
+script.setAttribute('src', window.URL.createObjectURL(new Blob([plain], {type: 'text/javascript'})));
+document.head.appendChild(script);"""
+  }
+
+  
   lazy val standardSettings: Seq[Sett] = Seq[Sett](
     organization := "org.scalaz",
+    packageDoc in Compile ~= { docJar =>
+      IO.withTemporaryDirectory { dir =>
+        val files = IO.unzip(docJar, dir)
+        val indexJs = dir / "index.js"
+        val gz = "index.js.gz"
+        val gzFile = dir / gz
+        if(indexJs.isFile) {
+          IO.gzip(indexJs, gzFile)
+          val binary = IO.readBytes(gzFile).iterator.map("%02x" format _).mkString
+          IO.write(indexJs, createJS(gz, binary))
+          val out = files.map(f => f -> f.getAbsolutePath.replace(dir.getAbsolutePath + "/", ""))
+          println(out)
+          IO.zip(out, docJar)
+        }
+      }
+      docJar
+    },
     mappings in (Compile, packageSrc) ++= (managedSources in Compile).value.map{ f =>
       (f, f.relativeTo((sourceManaged in Compile).value).get.getPath)
     },
