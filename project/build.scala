@@ -119,7 +119,8 @@ object build {
     mappings in (Compile, packageSrc) ++= (managedSources in Compile).value.map{ f =>
       (f, f.relativeTo((sourceManaged in Compile).value).get.getPath)
     },
-    scalaVersion := "2.12.2",
+    scalaOrganization := "org.typelevel",
+    scalaVersion := "2.12.2-bin-typelevel-4",
     crossScalaVersions := Seq(Scala211, "2.12.2"),
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
