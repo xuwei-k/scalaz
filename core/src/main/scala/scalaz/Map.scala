@@ -1007,6 +1007,16 @@ sealed abstract class ==>>[A, B] {
 }
 
 sealed abstract class MapInstances0 {
+  implicit def mapIntersectionBand[A: Order, B](implicit
+    B: Band[B]
+  ): Band[(A ==>> B) @@ Tags.Conjunction] =
+    Tag.subst(
+      new Band[A ==>> B] {
+        def append(a: A ==>> B, b: => A ==>> B) =
+          (a intersectionWith b)(B.append(_, _))
+      }
+    )
+
   implicit def mapBand[A, B](implicit A: Order[A], B: Band[B]): Band[A ==>> B] = new Band[A ==>> B] {
     def append(a: A ==>> B, b: => A ==>> B): A ==>> B =
       (a unionWith b)(B.append(_, _))

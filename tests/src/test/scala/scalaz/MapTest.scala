@@ -982,6 +982,7 @@ object MapTest extends SpecLite {
       Tag.subst(a)
 
     checkAll("conjunction", semigroup.laws[(Int ==>> Int) @@ Tags.Conjunction])
+    checkAll("conjunction", band.laws[(Int ==>> ISet[Int]) @@ Tags.Conjunction])
   }
 
   "align" ! forAll { (a: Int ==>> String, b: Int ==>> Long) =>
