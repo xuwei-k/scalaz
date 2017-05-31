@@ -1,22 +1,22 @@
 package scalaz
 
 import scalaz.scalacheck.ScalazProperties._
-import scalaz.scalacheck.ScalazArbitrary
+import scalaz.scalacheck.ScalazArbitrary._
 import std.AllInstances._
 
 object StateTTest extends SpecLite {
 
   type StateTList[S, A] = StateT[List, S, A]
+  type StateTDisjunction[S, A] = StateT[S \/ ?, S, A]
   type StateTListInt[A] = StateTList[Int, A]
   type IStateTList[S, A] = IndexedStateT[List, S, Int, A]
 
   implicit def stateTListEqual = Equal[List[(Int, Int)]].contramap((_: StateTListInt[Int]).runZero[Int])
-  implicit def stateTListArb = ScalazArbitrary.stateTArb[List, Int, Int]
-  implicit def stateTListArb2 = ScalazArbitrary.stateTArb[List, Int, Int => Int]
+  implicit val stateTDisjunctionEqual = Equal[Int \/ (Int, Int)].contramap((_: StateTDisjunction[Int, Int]).runZero[Int])
 
   checkAll(equal.laws[StateTListInt[Int]])
   checkAll(bindRec.laws[StateTListInt])
-  checkAll(monad.laws[StateTListInt])
+  checkAll(monadError.laws[StateTDisjunction[Int, ?], Int])
   checkAll(profunctor.laws[IStateTList])
   checkAll(monadTrans.laws[StateT[?[_], Int, ?], List])
 
@@ -26,6 +26,7 @@ object StateTTest extends SpecLite {
     def bindRec[S, F[_] : Monad : BindRec] = BindRec[StateT[F, S, ?]]
     def monadState[S, F[_] : Monad] = MonadState[StateT[F, S, ?], S]
     def monadPlus[S, F[_]: MonadPlus] = MonadPlus[StateT[F, S, ?]]
+    def monadError[S, F[_]](implicit F: MonadError[F, S]) = MonadError[StateT[F, S, ?], S]
 
     // F = Id
     def functor[S] = Functor[State[S, ?]]
@@ -34,6 +35,9 @@ object StateTTest extends SpecLite {
     // checking absence of ambiguity
     def functor[S, F[_] : Monad] = Functor[StateT[F, S, ?]]
     def plus[F[_]: MonadPlus, S] = Plus[StateT[F, S, ?]]
+    def monad[S, F[_]](implicit F: MonadError[F, S]) = Monad[StateT[F, S, ?]]
+    def monad[S, F[_]: MonadPlus] = Monad[StateT[F, S, ?]]
+    def monad[S, F[_]: MonadPlus](implicit F: MonadError[F, S]) = Monad[StateT[F, S, ?]]
   }
 
   "monadState.point" in {
