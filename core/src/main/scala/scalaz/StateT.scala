@@ -159,11 +159,11 @@ sealed abstract class StateTInstances4 extends IndexedStateTInstances {
   implicit def stateTMonadError[F[_], S](implicit F0: MonadError[F, S]): MonadError[StateT[F, S, ?], S] =
     new StateTMonadState[S, F] with MonadError[StateT[F, S, ?], S] {
       override def F = F0
-      override def handleError[A](fa: StateT[F, S, A])(f: S => StateT[F, S, A]): StateT[F, S, A] =
-        new StateT[F, S, A] {
-          def getF[S0 <: S] = _ =>
-            F.handleError(fa.getF[S0].apply(F))(f(_).getF[S0].apply(F))
-        }
+      override def handleError[A](fa: StateT[F, S, A])(f: S => StateT[F, S, A]): StateT[F, S, A] = {
+        StateT.StateMonadTrans[S].liftM(
+          F.handleError(fa.getF[S].apply(F))(f(_).getF[S].apply(F))
+        ).flatMap(IndexedStateT(_)(F))
+      }
       override def raiseError[A](e: S) =
         StateT.StateMonadTrans[S].liftM(F.raiseError[A](e))
     }
