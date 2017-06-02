@@ -627,6 +627,29 @@ object ScalazProperties {
       }
   }
 
+  object monadState {
+    def putPut[F[_], S: Arbitrary](implicit m: MonadState[F, S], e: Equal[F[Unit]]): Prop =
+      forAll(m.monadStateLaw.putPut _)
+
+    def putGet[F[_], S: Arbitrary](implicit m: MonadState[F, S], e: Equal[F[S]]): Prop =
+      forAll(m.monadStateLaw.putGet _)
+
+    def getPut[F[_], S](implicit m: MonadState[F, S], e: Equal[F[Unit]]): Prop =
+      forAll(m.monadStateLaw.getPut _)
+
+    def getGet[F[_], S](implicit m: MonadState[F, S], a: Arbitrary[(S, S) => F[Unit]], e: Equal[F[Unit]]): Prop =
+      forAll(m.monadStateLaw.getGet _)
+
+    def laws[F[_], E: Arbitrary](implicit m: MonadState[F, E], am: Arbitrary[F[Int]], af: Arbitrary[Int => F[Int]], ag: Arbitrary[F[Int => Int]], e: Equal[F[Int]]): Properties =
+      newProperties("monad state"){ p =>
+        p.include(monad.laws[F])
+        p.property("put put") = putPut[F, E]
+        p.property("put get") = putGet[F, E]
+        p.property("get put") = getPut[F, E]
+        p.property("get get") = getGet[F, E]
+      }
+  }
+
   object monadTrans {
     def identity[F[_[_], _], G[_], A](implicit F: MonadTrans[F], G: Monad[G], A: Arbitrary[A], Eq: Equal[F[G, A]]): Prop =
       forAll(F.monadTransLaw.identity[G, A] _)
