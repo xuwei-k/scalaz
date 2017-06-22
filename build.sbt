@@ -98,7 +98,7 @@ lazy val example = Project(
 )
 
 lazy val scalacheckBinding =
-  crossProject(JVMPlatform, JSPlatform).crossType(ScalazCrossType)
+  crossProject(JVMPlatform, JSPlatform, NativePlatform).crossType(ScalazCrossType)
     .in(file("scalacheck-binding"))
     .settings(standardSettings)
     .settings(
@@ -111,8 +111,11 @@ lazy val scalacheckBinding =
 
 lazy val scalacheckBindingJVM = scalacheckBinding.jvm
 lazy val scalacheckBindingJS  = scalacheckBinding.js
+lazy val scalacheckBindingNative = scalacheckBinding.native.dependsOn(
+  ProjectRef(uri("git://github.com/xuwei-k/scalacheck#0a88a0104d5f5f"), "native")
+)
 
-lazy val tests = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType)
+lazy val tests = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
   .settings(standardSettings)
   .settings(
     name := "scalaz-tests",
@@ -124,6 +127,7 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType
 
 lazy val testsJVM = tests.jvm
 lazy val testsJS  = tests.js
+lazy val testsNative  = tests.native
 
 // can't use "sbt test"
 // https://github.com/scala-native/scala-native/issues/339
