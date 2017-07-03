@@ -22,9 +22,8 @@ import com.typesafe.tools.mima.plugin.MimaPlugin.mimaDefaultSettings
 import com.typesafe.tools.mima.plugin.MimaKeys.mimaPreviousArtifacts
 
 import scalanative.sbtplugin.ScalaNativePlugin.autoImport._
-import scalajscrossproject.ScalaJSCrossPlugin.autoImport.{toScalaJSGroupID => _, _}
 import sbtcrossproject.CrossPlugin.autoImport._
-import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport.{isScalaJSProject, scalaJSOptimizerOptions}
+import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
 
 object build {
   type Sett = Def.Setting[_]
@@ -72,16 +71,6 @@ object build {
   }
 
   val scalajsProjectSettings = Seq[Sett](
-    scalaJSOptimizerOptions ~= { options =>
-      // https://github.com/scala-js/scala-js/issues/2798
-      try {
-        scala.util.Properties.isJavaAtLeast("1.8")
-        options
-      } catch {
-        case _: NumberFormatException =>
-          options.withParallel(false)
-      }
-    },
     scalacOptions += {
       val a = (baseDirectory in LocalRootProject).value.toURI.toString
       val g = "https://raw.githubusercontent.com/scalaz/scalaz/" + tagOrHash.value
@@ -172,10 +161,7 @@ object build {
     parallelExecution in Test := false,
     testOptions in Test += {
       val scalacheckOptions = Seq("-maxSize", "5", "-workers", "1", "-maxDiscardRatio", "50") ++ {
-        if(isScalaJSProject.value)
-          Seq("-minSuccessfulTests", "10")
-        else
-          Seq("-minSuccessfulTests", "33")
+        Seq("-minSuccessfulTests", "10")
       }
       Tests.Argument(TestFrameworks.ScalaCheck, scalacheckOptions: _*)
     },
@@ -290,18 +276,7 @@ object build {
   ) ++ osgiSettings ++ Seq[Sett](
     OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
   ) ++ mimaDefaultSettings ++ Seq[Sett](
-    mimaPreviousArtifacts := {
-      val artifactId =
-        if(isScalaJSProject.value) {
-          s"${name.value}_sjs0.6_${scalaBinaryVersion.value}"
-        } else {
-          s"${name.value}_${scalaBinaryVersion.value}"
-        }
-
-      scalazMimaBasis.?.value.map {
-        organization.value % artifactId % _
-      }.toSet
-    }
+    mimaPreviousArtifacts := Set.empty
   )
 
   val nativeSettings = Seq(

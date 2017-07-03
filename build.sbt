@@ -6,7 +6,7 @@ import sbtunidoc.Plugin.UnidocKeys._
 import sbtcrossproject.CrossPlugin.autoImport.crossProject
 
 lazy val jsProjects = Seq[ProjectReference](
-  coreJS, effectJS, iterateeJS, scalacheckBindingJS_1_12, scalacheckBindingJS_1_13, testsJS
+  coreJS, effectJS, iterateeJS
 )
 
 lazy val jvmProjects = Seq[ProjectReference](
@@ -129,7 +129,6 @@ def scalacheckBindingProject(id: String, base: String, scalacheckVersion: Settin
 lazy val scalacheckBinding_1_12 =
   scalacheckBindingProject("scalacheck-binding_1_12", "scalacheck-binding_1_12", scalaCheckVersion_1_12)
 lazy val scalacheckBindingJVM_1_12 = scalacheckBinding_1_12.jvm
-lazy val scalacheckBindingJS_1_12  = scalacheckBinding_1_12.js
 
 
 lazy val scalacheckBinding_1_13 = {
@@ -143,24 +142,11 @@ lazy val scalacheckBinding_1_13 = {
       } else {
         scalacheckBinding_1_13Version(v)
       }
-    },
-    mimaPreviousArtifacts := {
-      val artifactId =
-        if(isScalaJSProject.value) {
-          s"${name.value}_sjs0.6_${scalaBinaryVersion.value}"
-        } else {
-          s"${name.value}_${scalaBinaryVersion.value}"
-        }
-
-      scalazMimaBasis.?.value.map { v =>
-        organization.value % artifactId % scalacheckBinding_1_13Version(v)
-      }.toSet
     }
   )
 }
 
 lazy val scalacheckBindingJVM_1_13 = scalacheckBinding_1_13.jvm
-lazy val scalacheckBindingJS_1_13  = scalacheckBinding_1_13.js
 
 
 lazy val tests = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType)
@@ -175,7 +161,6 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType
   .jsSettings(scalajsProjectSettings)
 
 lazy val testsJVM = tests.jvm
-lazy val testsJS  = tests.js
 
 // can't use "sbt test"
 // https://github.com/scala-native/scala-native/issues/339
