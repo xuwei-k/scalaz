@@ -43,6 +43,18 @@ object AnyValTest extends SpecLite {
   checkAll("Long @@ Multiplication", monoid.laws[Long @@ Multiplication])
 
   checkAll("Unit", semilattice.laws[Unit])
+  checkAll("Short", semilattice.laws[Short])
+  checkAll("Int", semilattice.laws[Int])
+  checkAll("Long", semilattice.laws[Long])
+
+  checkAll("Boolean @@ Conjunction", semilattice.laws[Boolean @@ Conjunction])
+  checkAll("Boolean @@ Disjunction", semilattice.laws[Boolean @@ Disjunction])
+
+  checkAll("Int @@ Multiplication", semilattice.laws[Int @@ Multiplication])
+  checkAll("Byte @@ Multiplication", semilattice.laws[Byte @@ Multiplication])
+  checkAll("Long @@ Multiplication", semilattice.laws[Long @@ Multiplication])
+  checkAll("Short @@ Multiplication", semilattice.laws[Short @@ Multiplication])
+
 
   checkAll("Unit", monoid.laws[Unit])
   checkAll("Int", monoid.laws[Int])
