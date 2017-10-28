@@ -1,5 +1,11 @@
 import Scalaz._
 
+lazy val notPublish = Seq(
+  publishArtifact := false,
+  publish := {},
+  publishLocal := {}
+)
+
 lazy val root = project.in(file("."))
   .aggregate (baseJVM
             , baseJS
@@ -11,6 +17,7 @@ lazy val root = project.in(file("."))
             , exampleJS
             , benchmarks
 ).enablePlugins(ScalaJSPlugin)
+.settings(notPublish)
 
 lazy val base         = crossProject.module
   .dependsOn( meta )
@@ -30,6 +37,7 @@ lazy val benchmarks   = project.module
   .dependsOn( baseJVM, effectJVM )
   .enablePlugins(JmhPlugin)
   .settings(
+    notPublish,
     libraryDependencies ++=
       Seq ( "org.scala-lang"  %  "scala-reflect"  % scalaVersion.value
           , "org.scala-lang"  %  "scala-compiler" % scalaVersion.value % "provided"
@@ -51,6 +59,7 @@ lazy val metaJVM      = meta.jvm
 lazy val metaJS       = meta.js
 
 lazy val example      = crossProject.module
+  .settings(notPublish)
   .dependsOn( base )
 
 lazy val exampleJVM   = example.jvm

@@ -41,6 +41,14 @@ object Scalaz {
       Seq("-Ywarn-unused:imports",
           "-Xfatal-warnings"
       ),
+    organization := "org.scalaz",
+    publishTo := {
+      val nexus = "https://oss.sonatype.org/"
+      if (version.value.trim.endsWith("SNAPSHOT"))
+        Some("snapshots" at nexus + "content/repositories/snapshots")
+      else
+        None
+    },
     libraryDependencies ++= compileOnlyDeps ++ testDeps ++ Seq(
       compilerPlugin("org.spire-math" %% "kind-projector" % "0.9.4"),
       compilerPlugin("com.github.tomasmikula" %% "pascal" % "0.1"),
