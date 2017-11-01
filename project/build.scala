@@ -105,6 +105,7 @@ object build {
   )
 
   private val Scala211_jvm_and_js_options = Seq(
+    "-Xexperimental",
     "-Ybackend:GenBCode",
     "-Ydelambdafy:method",
     "-target:jvm-1.8"
@@ -305,7 +306,7 @@ object build {
     .jvmSettings(
       jvm_js_settings,
       libraryDependencies ++= PartialFunction.condOpt(CrossVersion.partialVersion(scalaVersion.value)){
-        case Some((2, 11)) => "org.scala-lang.modules" %% "scala-java8-compat" % "0.7.0"
+        case Some((2, 11)) => "org.scala-lang.modules" %% "scala-java8-compat" % "0.8.0"
       }.toList,
       typeClasses := TypeClass.core
     )
