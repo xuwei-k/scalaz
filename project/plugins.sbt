@@ -1,3 +1,5 @@
+scalaVersion := "2.10.7"
+
 scalacOptions += "-deprecation"
 
 addSbtPlugin("org.scala-native" % "sbt-scalajs-crossproject" % "0.2.2")
