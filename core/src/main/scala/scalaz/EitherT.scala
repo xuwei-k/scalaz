@@ -215,6 +215,10 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
 }
 
 object EitherT extends EitherTInstances {
+  def F[F[_], A, B](a: F[A \/ B]): EitherT[F, A, B] = apply(a)
+  def A[F[_]: Applicative, A, B](a: A): EitherT[F, A, B] = apply(Applicative[F].point(-\/(a)))
+  def B[F[_]: Applicative, A, B](b: B): EitherT[F, A, B] = apply(Applicative[F].point(\/-(b)))
+  def AB[F[_]: Applicative, A, B](d: A \/ B): EitherT[F, A, B] = apply(Applicative[F].point(d))
 
   def eitherT[F[_], A, B](a: F[A \/ B]): EitherT[F, A, B] = EitherT[F, A, B](a)
 
