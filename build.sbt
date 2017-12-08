@@ -64,7 +64,13 @@ lazy val rootJVM = Project(
 ).settings(
   standardSettings,
   notPublish,
-  mimaPreviousArtifacts := Set.empty
+  mimaPreviousArtifacts := Set.empty,
+  mimaBinaryIssueFilters ++= {
+    import com.typesafe.tools.mima.core._
+    Seq(
+      ProblemFilters.exclude[ReversedMissingMethodProblem]("scalaz.syntax.Syntaxes.eithert")
+    )
+  }
 ).aggregate(jvmProjects: _*)
 
 lazy val coreJVM = core.jvm
