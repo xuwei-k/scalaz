@@ -44,6 +44,34 @@ object EitherTTest extends SpecLite {
     Option(a.isLeft) must_=== EitherT.fromDisjunction[Option](a).isLeft
   }
 
+  "either, pureLeft, pure" ! forAll { (a: String \/ Int) =>
+    val e = EitherT.eitherT(Option(a))
+
+    e must_=== {
+      a match {
+        case -\/(v) => EitherT.pureLeft(v)
+        case \/-(v) => EitherT.pure(v)
+      }
+    }
+
+    e must_=== EitherT.either(a)
+  }
+
+  "eitherT, leftT, rightT syntax" ! forAll { (a: String \/ Int) =>
+    import scalaz.syntax.eithert._
+
+    val e = EitherT.eitherT(Option(a))
+
+    e must_=== {
+      a match {
+        case -\/(v) => v.leftT
+        case \/-(v) => v.rightT
+      }
+    }
+
+    e must_=== a.eitherT
+  }
+
   "flatMapF consistent with flatMap" ! forAll { (a: EitherTList[Int, Int], f: Int => List[Int \/ String]) =>
     a.flatMap(f andThen EitherT.apply) must_=== a.flatMapF(f)
   }

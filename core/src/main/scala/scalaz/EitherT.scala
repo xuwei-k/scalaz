@@ -215,12 +215,13 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
 }
 
 object EitherT extends EitherTInstances {
-  def F[F[_], A, B](a: F[A \/ B]): EitherT[F, A, B] = apply(a)
-  def A[F[_]: Applicative, A, B](a: A): EitherT[F, A, B] = apply(Applicative[F].point(-\/(a)))
-  def B[F[_]: Applicative, A, B](b: B): EitherT[F, A, B] = apply(Applicative[F].point(\/-(b)))
-  def AB[F[_]: Applicative, A, B](d: A \/ B): EitherT[F, A, B] = apply(Applicative[F].point(d))
-
-  def eitherT[F[_], A, B](a: F[A \/ B]): EitherT[F, A, B] = EitherT[F, A, B](a)
+  def eitherT[F[_], A, B](a: F[A \/ B]): EitherT[F, A, B] = apply(a)
+  def either[F[_]: Applicative, A, B](d: A \/ B): EitherT[F, A, B] = apply(Applicative[F].point(d))
+  def leftT[F[_]: Functor, A, B](fa: F[A]): EitherT[F, A, B] = apply(Functor[F].map(fa)(-\/(_)))
+  def rightT[F[_]: Functor, A, B](fb: F[B]): EitherT[F, A, B] = apply(Functor[F].map(fb)(\/-(_)))
+  // should really be left/right, but methods exist with those names already
+  def pureLeft[F[_]: Applicative, A, B](a: A): EitherT[F, A, B] = apply(Applicative[F].point(-\/(a)))
+  def pure[F[_]: Applicative, A, B](b: B): EitherT[F, A, B] = apply(Applicative[F].point(\/-(b)))
 
   def fromDisjunction[F[_]]: FromDisjunctionAux[F] = new FromDisjunctionAux
 
