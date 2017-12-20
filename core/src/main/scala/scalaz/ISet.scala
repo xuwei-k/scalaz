@@ -242,9 +242,13 @@ sealed abstract class ISet[A] {
       case Bin(y, l, r) =>
         o.order(x, y) match {
           case LT =>
-            balanceL(y, l.insertR(x), r)
+            val left = l.insertR(x)
+            if (l eq left) this
+            else balanceL(y, left, r)
           case GT =>
-            balanceR(y, l, r.insertR(x))
+            val right = r.insertR(x)
+            if (r eq right) this
+            else balanceR(y, l, right)
           case EQ =>
             this
         }
@@ -403,9 +407,13 @@ sealed abstract class ISet[A] {
         val sizeL = l.size
         Order[Int].order(i, sizeL) match {
           case LT =>
-            balanceR(x, l.deleteAt(i), r)
+            val left = l.deleteAt(i)
+            if (left eq l) this
+            else balanceR(x, left, r)
           case GT =>
-            balanceL(x, l, r.deleteAt(i - sizeL - 1))
+            val right = r.deleteAt(i - sizeL - 1)
+            if (right eq r) this
+            else balanceL(x, l, right)
           case EQ =>
             glue(l, r)
         }
@@ -638,7 +646,10 @@ sealed abstract class ISet[A] {
       case Tip() => ISet.empty
       case Bin(x, l, r) =>
         o.order(s, x) match {
-          case LT => join(x, l.filterGt(a), r)
+          case LT =>
+            val left = l.filterGt(a)
+            if (l eq left) this
+            else join(x, left, r)
           case EQ => r
           case GT => r.filterGt(a)
         }
@@ -649,7 +660,10 @@ sealed abstract class ISet[A] {
       case Tip() => ISet.empty
       case Bin(x, l, r) =>
         o.order(x, s) match {
-          case LT => join(x, l, r.filterLt(a))
+          case LT =>
+            val right = r.filterLt(a)
+            if (r eq right) this
+            else join(x, l, right)
           case EQ => l
           case GT => l.filterLt(a)
         }
