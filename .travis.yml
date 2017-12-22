@@ -18,6 +18,7 @@ script:
   - git config core.whitespace tab-in-indent,trailing-space,blank-at-eol
   - git show --oneline --check
   - sbt "++$TRAVIS_SCALA_VERSION!" -J-Xmx3784m checkGenTypeClasses "project $TEST_PROJECT" test:compile
+  - git diff --exit-code
   - sbt "++$TRAVIS_SCALA_VERSION!" "project $TEST_PROJECT" test "project /" $(if [[ "${TEST_PROJECT}" == "rootJVM" ]]; then echo "publishLocal"; fi)
 
 before_cache:
