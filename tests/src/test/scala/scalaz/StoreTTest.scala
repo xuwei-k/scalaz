@@ -21,14 +21,7 @@ object StoreTTest extends SpecLite {
 
   checkAll(comonad.laws[StoreT[Tuple1, Int, ?]])
 
-  checkAll {
-    // Not sure why this is needed explicitly
-    val am: Arbitrary[Store[Int, Int]]        = implicitly
-    val af: Arbitrary[Int => Store[Int, Int]] = implicitly
-    val ag: Arbitrary[Store[Int, Int => Int]] = implicitly
-    val eq: Equal[Store[Int, Int]]            = implicitly
-    monad.laws[Store[Int, ?]](implicitly, am, af, ag, eq)
-  }
+  checkAll(monad.laws[Store[Int, ?]])
 
   object instances {
     type A = Int

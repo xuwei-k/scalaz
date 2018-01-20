@@ -24,13 +24,7 @@ object StateTTest extends SpecLite {
   checkAll(monadTrans.laws[StateT[?[_], Int, ?], List])
   checkAll(monadError.laws[StateT[Either[Int, ?], Int, ?], Int])
 
-  checkAll {
-    // Not sure why this is needed explicitly
-    val am: Arbitrary[State[Int, Int]]        = implicitly
-    val af: Arbitrary[State[Int, Int] => Int] = implicitly
-    val eq: Equal[State[Int, Int]]            = implicitly
-    comonad.laws[State[Int, ?]](implicitly, am, af, eq)
-  }
+  checkAll(comonad.laws[State[Int, ?]])
 
   object instances {
     def functor[S, F[_] : Applicative] = Functor[StateT[F, S, ?]]
