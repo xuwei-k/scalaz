@@ -136,9 +136,10 @@ object build {
       }
       (f, path)
     },
-    scalaVersion := Scala212,
+    scalaVersion := "2.13.0-pre-8eb67ed",
     crossScalaVersions := Seq("2.10.6", Scala211, Scala212, "2.13.0-M2"),
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
+    resolvers += "scala-integration" at "https://scala-ci.typesafe.com/artifactory/scala-integration/",
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
     scalaCheckVersion_1_12 := {
       CrossVersion.partialVersion(scalaVersion.value) match {
@@ -287,7 +288,7 @@ object build {
     }),
     resolvers += Resolver.sonatypeRepo("releases"),
     kindProjectorVersion := "0.9.5",
-    libraryDependencies += compilerPlugin("org.spire-math" % "kind-projector" % kindProjectorVersion.value cross CrossVersion.binary)
+    libraryDependencies += compilerPlugin("org.spire-math" % "kind-projector_2.13.0-M2" % kindProjectorVersion.value)
   ) ++ osgiSettings ++ Seq[Sett](
     OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
   ) ++ mimaDefaultSettings ++ Seq[Sett](
