@@ -360,7 +360,7 @@ object Trampoline extends TrampolineInstances {
 }
 
 sealed trait TrampolineInstances {
-  implicit val trampolineInstance: Monad[Trampoline] with Comonad[Trampoline] with BindRec[Trampoline] =
+  val trampolineInstance: Monad[Trampoline] with Comonad[Trampoline] with BindRec[Trampoline] =
     new Monad[Trampoline] with Comonad[Trampoline] with BindRec[Trampoline] {
       override def point[A](a: => A) = return_[Function0, A](a)
       def bind[A, B](ta: Trampoline[A])(f: A => Trampoline[B]) = ta flatMap f

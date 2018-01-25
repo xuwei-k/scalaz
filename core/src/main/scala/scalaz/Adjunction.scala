@@ -117,7 +117,7 @@ sealed abstract class AdjunctionInstances {
     }
 
   implicit def writerReaderAdjunction[E]: Adjunction[Writer[E, ?], Reader[E, ?]] =
-    new Adjunction[Writer[E, ?], Reader[E, ?]] {
+    new Adjunction[Writer[E, ?], Reader[E, ?]]()(WriterT.writerTraverse[E], implicitly) {
       override def leftAdjunct[A, B](a: => A)(f: Writer[E, A] => B): Reader[E, B] =
         Reader(e => f(Writer(e, a)))
       override def rightAdjunct[A, B](w: Writer[E, A])(f: A => Reader[E, B]): B = {
