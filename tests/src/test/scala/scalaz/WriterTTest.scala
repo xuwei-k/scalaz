@@ -100,14 +100,16 @@ object WriterTTest extends SpecLite {
     def foldable[F[_]: Traverse, W] = Foldable[WriterT[F, W, ?]]
 
     object writer {
+      def equal[W: Equal, A: Equal] = Equal[Writer[W, A]]
       def functor[W] = Functor[Writer[W, ?]]
       def apply[W: Semigroup] = Apply[Writer[W, ?]]
       def apply[W: Monoid] = Apply[Writer[W, ?]]
       def applicative[W: Monoid] = Applicative[Writer[W, ?]]
       def bind[W: Semigroup] = Bind[Writer[W, ?]]
       def bind[W: Monoid] = Bind[Writer[W, ?]]
+      def bindRec[W: Semigroup] = BindRec[Writer[W, ?]]
       def monad[W: Monoid] = Monad[Writer[W, ?]]
-      def foldable[W] = Foldable[Writer[W, ?]](WriterT.writerTFoldable[Id, W])
+      def foldable[W] = Foldable[Writer[W, ?]]
       def traverse[W] = Traverse[Writer[W, ?]]
       def comonad[W] = Comonad[Writer[W, ?]]
     }
