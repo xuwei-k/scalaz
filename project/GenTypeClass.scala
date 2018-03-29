@@ -16,8 +16,8 @@ case class TypeClass(name: String, kind: Kind, pack: Seq[String] = Seq("scalaz")
 object TypeClass {
   import Kind._
 
-  lazy val semigroup = TypeClass("Semigroup", *)
-  lazy val monoid = TypeClass("Monoid", *, extendsList = Seq(semigroup))
+  lazy val semigroup = TypeClass("Semigroup", *, parent = true)
+  lazy val monoid = TypeClass("Monoid", *, extendsList = Seq(semigroup), parent = true)
   lazy val band = TypeClass("Band", *, extendsList = Seq(semigroup))
   lazy val semilattice = TypeClass("SemiLattice", *, extendsList = Seq(band))
   lazy val equal = TypeClass("Equal", *)
@@ -46,8 +46,8 @@ object TypeClass {
   lazy val comonad = TypeClass("Comonad", *->*, extendsList = Seq(cobind))
   lazy val cozip = TypeClass("Cozip", *->*)
 
-  lazy val plus = TypeClass("Plus", *->*, extendsList = Seq())
-  lazy val plusEmpty = TypeClass("PlusEmpty", *->*, extendsList = Seq(plus))
+  lazy val plus = TypeClass("Plus", *->*, extendsList = Seq(), parent = true)
+  lazy val plusEmpty = TypeClass("PlusEmpty", *->*, extendsList = Seq(plus), parent = true)
   lazy val isEmpty = TypeClass("IsEmpty", *->*, extendsList = Seq(plusEmpty))
   lazy val optional = TypeClass("Optional", *->*)
 

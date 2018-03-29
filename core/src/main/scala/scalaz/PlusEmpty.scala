@@ -5,7 +5,7 @@ package scalaz
  * Universally quantified [[scalaz.Monoid]].
  */
 ////
-trait PlusEmpty[F[_]] extends Plus[F] { self =>
+trait PlusEmpty[F[_]] extends Plus[F] with PlusEmptyParent[F] { self =>
   ////
   def empty[A]: F[A]
 

@@ -5,7 +5,7 @@ package scalaz
  * Universally quantified [[scalaz.Semigroup]].
  */
 ////
-trait Plus[F[_]]  { self =>
+trait Plus[F[_]] extends PlusParent[F] { self =>
   ////
 
   /**The composition of Plus `F` and `G`, `[x]F[G[x]]`, is a Plus */

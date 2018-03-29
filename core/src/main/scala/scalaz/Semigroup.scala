@@ -11,7 +11,7 @@ package scalaz
  * @see [[http://mathworld.wolfram.com/Semigroup.html]]
  */
 ////
-trait Semigroup[F]  { self =>
+trait Semigroup[F] extends SemigroupParent[F] { self =>
   ////
   /**
    * The binary operation to combine `f1` and `f2`.
