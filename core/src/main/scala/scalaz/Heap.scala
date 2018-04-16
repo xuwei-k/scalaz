@@ -1,6 +1,7 @@
 package scalaz
 
 import std.tuple._
+import scala.collection.compat._
 
 
 /**An efficient, asymptotically optimal, implementation of priority queues
@@ -36,7 +37,7 @@ sealed abstract class Heap[A] {
   /** Alias for insert */
   final def +(a: A)(implicit o: Order[A]): Heap[A] = this insert a
 
-  def insertAll(as: TraversableOnce[A])(implicit o: Order[A]): Heap[A] =
+  def insertAll(as: IterableOnce[A])(implicit o: Order[A]): Heap[A] =
     (this /: as)((h,a) => h insert a)
 
   def insertAllF[F[_]](as: F[A])(implicit F: Foldable[F], o: Order[A]): Heap[A] =

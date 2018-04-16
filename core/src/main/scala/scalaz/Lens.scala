@@ -2,6 +2,7 @@ package scalaz
 
 import Id._
 import scala.collection.immutable
+import scala.collection.compat._
 
 /**
  * A Lens Family, offering a purely functional means to access and retrieve
@@ -467,17 +468,17 @@ abstract class LensInstances extends LensInstances0 {
     def +=(elem1: K, elem2: K, elems: K*): IndexedState[S1, S2, Set[K]] =
       lens %= (_ + elem1 + elem2 ++ elems)
 
-    def ++=(xs: TraversableOnce[K]): IndexedState[S1, S2, Set[K]] =
-      lens %= (_ ++ xs)
+    def ++=(xs: IterableOnce[K]): IndexedState[S1, S2, Set[K]] =
+      lens %= (_ ++ xs.toIterable)
 
     def -=(elem: K): IndexedState[S1, S2, Set[K]] =
       lens %= (_ - elem)
 
     def -=(elem1: K, elem2: K, elems: K*): IndexedState[S1, S2, Set[K]] =
-      lens %= (_ - elem1 - elem2 -- elems)
+      lens %= (_ - elem1 - elem2 diff elems.toSet)
 
-    def --=(xs: TraversableOnce[K]): IndexedState[S1, S2, Set[K]] =
-      lens %= (_ -- xs)
+    def --=(xs: IterableOnce[K]): IndexedState[S1, S2, Set[K]] =
+      lens %= (_ diff xs.toSet)
   }
 
   /** A lens that views a Set can provide the appearance of in place mutation */
@@ -506,8 +507,8 @@ abstract class LensInstances extends LensInstances0 {
     def +=(elem: (K, V)): IndexedState[S1, S2, Map[K, V]] =
       lens %= (_ + elem)
 
-    def ++=(xs: TraversableOnce[(K, V)]): IndexedState[S1, S2, Map[K, V]] =
-      lens %= (_ ++ xs)
+    def ++=(xs: IterableOnce[(K, V)]): IndexedState[S1, S2, Map[K, V]] =
+      lens %= (_ ++ xs.toIterable)
 
     def update(key: K, value: V): IndexedState[S1, S2, Unit] =
       lens %== (_.updated(key, value))
@@ -518,7 +519,7 @@ abstract class LensInstances extends LensInstances0 {
     def -=(elem1: K, elem2: K, elems: K*): IndexedState[S1, S2, Map[K, V]] =
       lens %= (_ - elem1 - elem2 -- elems)
 
-    def --=(xs: TraversableOnce[K]): IndexedState[S1, S2, Map[K, V]] =
+    def --=(xs: IterableOnce[K]): IndexedState[S1, S2, Map[K, V]] =
       lens %= (_ -- xs)
   }
 
