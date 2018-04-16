@@ -1,10 +1,9 @@
 package scalaz
 
 import reflect.ClassTag
+import collection.BuildFrom
 import collection.immutable.IndexedSeq
 import collection.mutable.{ArrayBuilder, Builder}
-import collection.generic.CanBuildFrom
-import collection.IndexedSeqOptimized
 import syntax.Ops
 
 /**
@@ -135,18 +134,22 @@ object ImmutableArray extends ImmutableArrayInstances {
   def newStringArrayBuilder: Builder[Char, ImmutableArray[Char]] =
     (new StringBuilder).mapResult(fromString(_))
 
-  implicit def canBuildFrom[T](implicit m: ClassTag[T]): CanBuildFrom[ImmutableArray[_], T, ImmutableArray[T]] =
-    new CanBuildFrom[ImmutableArray[_], T, ImmutableArray[T]] {
-      def apply(from: ImmutableArray[_]): Builder[T, ImmutableArray[T]] = newBuilder(m)
+  implicit def buildFrom[T](implicit m: ClassTag[T]): BuildFrom[ImmutableArray[_], T, ImmutableArray[T]] =
+    new BuildFrom[ImmutableArray[_], T, ImmutableArray[T]] {
+      override def newBuilder(from: ImmutableArray[_]): Builder[T, ImmutableArray[T]] =
+        ImmutableArray.newBuilder(m)
 
-      def apply: Builder[T, ImmutableArray[T]] = newBuilder(m)
+      override def fromSpecificIterable(from: ImmutableArray[_])(it: Iterable[T]): ImmutableArray[T] =
+        ImmutableArray.fromArray(it.toArray)
     }
 
-  implicit val canBuildFromChar: CanBuildFrom[ImmutableArray[_], Char, ImmutableArray[Char]] =
-    new CanBuildFrom[ImmutableArray[_], Char, ImmutableArray[Char]] {
-      def apply(from: ImmutableArray[_]): Builder[Char, ImmutableArray[Char]] = newStringArrayBuilder
+  implicit val buildFromChar: BuildFrom[ImmutableArray[_], Char, ImmutableArray[Char]] =
+    new BuildFrom[ImmutableArray[_], Char, ImmutableArray[Char]] {
+      override def newBuilder(from: ImmutableArray[_]): Builder[Char, ImmutableArray[Char]] =
+        newStringArrayBuilder
 
-      def apply: Builder[Char, ImmutableArray[Char]] = newStringArrayBuilder
+      override def fromSpecificIterable(from: ImmutableArray[_])(it: Iterable[Char]): ImmutableArray[Char] =
+        ImmutableArray.fromArray(it.toArray)
     }
 
   sealed abstract class ImmutableArray1[+A](array: Array[A]) extends ImmutableArray[A] {
@@ -224,7 +227,14 @@ object ImmutableArray extends ImmutableArrayInstances {
 
     def length = str.length
     def toArray[B >: Char : ClassTag] = str.toArray
-    def copyToArray[B >: Char](xs: Array[B], start: Int, len: Int): Unit = { str.copyToArray(xs, start, len) }
+    def copyToArray[B >: Char](xs: Array[B], start: Int, len: Int): Unit = {
+      xs match {
+        case xs0: Array[Char] =>
+          str.copyToArray(xs0, start, len)
+        case _ =>
+          str.toCharArray.copyToArray(xs, start, len)
+      }
+    }
 
     def slice(from: Int, until: Int) = new StringArray(str.slice(from, until))
 
@@ -260,15 +270,11 @@ object ImmutableArray extends ImmutableArrayInstances {
   implicit def unwrapArray[A](immArrayOps: WrappedImmutableArray[A]): ImmutableArray[A] = immArrayOps.value
 
   abstract class WrappedImmutableArray[+A](val value: ImmutableArray[A]) extends
-          IndexedSeq[A] with IndexedSeqOptimized[A, WrappedImmutableArray[A]] {
+          IndexedSeq[A] {
     def apply(index: Int) = value(index)
     def length = value.length
 
-    override def stringPrefix = "ImmutableArray"
-
     protected[this] def arrayBuilder: Builder[A, ImmutableArray[A]]
-
-    override protected[this] def newBuilder: Builder[A, WrappedImmutableArray[A]] = arrayBuilder.mapResult(wrapArray)
   }
 
   object WrappedImmutableArray {

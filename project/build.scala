@@ -138,11 +138,18 @@ object build {
       }
       (f, path)
     },
-    scalaVersion := Scala212,
-    crossScalaVersions := Seq(Scala211, Scala212, "2.13.0-M3"),
+    scalaVersion := "2.13.0-M4",
+    crossScalaVersions := Seq(Scala211, Scala212, "2.13.0-M4"),
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
-    scalaCheckVersion := "1.14.0",
+    scalaCheckVersion := {
+      CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((2, v)) if v >= 13 =>
+          "1.14.0-newCollections"
+        case _ =>
+          "1.13.5"
+      }
+    },
     scalacOptions ++= stdOptions ++ (CrossVersion.partialVersion(scalaVersion.value) match {
       case Some((2,11)) => Scala211_jvm_and_js_options
       case _ => Seq("-opt:l:method")
@@ -299,13 +306,13 @@ object build {
     .settings(standardSettings: _*)
     .settings(
       name := "scalaz-core",
-      scalacOptions in (Compile, compile) += "-Xfatal-warnings",
       sourceGenerators in Compile += (sourceManaged in Compile).map{
         dir => Seq(GenerateTupleW(dir), TupleNInstances(dir))
       }.taskValue,
       buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
       buildInfoPackage := buildInfoPackageName,
       buildInfoObject := "ScalazBuildInfo",
+      libraryDependencies += "org.scala-lang.modules" %%% "scala-collection-compat" % "0.1.0",
       osgiExport("scalaz"),
       OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*"))
     .enablePlugins(sbtbuildinfo.BuildInfoPlugin)
@@ -331,7 +338,6 @@ object build {
     .settings(standardSettings: _*)
     .settings(
       name := "scalaz-effect",
-      scalacOptions in (Compile, compile) += "-Xfatal-warnings",
       osgiExport("scalaz.effect", "scalaz.std.effect", "scalaz.syntax.effect"))
     .dependsOn(core)
     .jsSettings(scalajsProjectSettings : _*)
@@ -346,7 +352,6 @@ object build {
     .settings(standardSettings: _*)
     .settings(
       name := "scalaz-iteratee",
-      scalacOptions in (Compile, compile) += "-Xfatal-warnings",
       osgiExport("scalaz.iteratee"))
     .dependsOn(core, effect)
     .jsSettings(scalajsProjectSettings : _*)
