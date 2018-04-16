@@ -8,43 +8,18 @@ cache:
 
 language: scala
 scala:
-  - 2.12.4
-  - 2.11.12
-  - 2.13.0-M3
+  - 2.13.0-M4-pre-20d3c21
 jdk:
   - oraclejdk8 # scalaz 7.3 does not support Java 7
 
 script:
-  - git config core.whitespace tab-in-indent,trailing-space,blank-at-eol
-  - git show --oneline --check
-  - sbt "++$TRAVIS_SCALA_VERSION!" -J-Xmx3784m checkGenTypeClasses "project $TEST_PROJECT" test:compile
-  - sbt "++$TRAVIS_SCALA_VERSION!" "project $TEST_PROJECT" test "project /" $(if [[ "${TEST_PROJECT}" == "rootJVM" ]]; then echo "publishLocal"; fi)
+  - git clone -b v0.9.6 https://github.com/non/kind-projector.git
+  - cd kind-projector
+  - sbt "++$TRAVIS_SCALA_VERSION!" publishLocal
+  - cd ..
+  - sbt "++$TRAVIS_SCALA_VERSION!" -J-Xmx3784m checkGenTypeClasses "project rootJVM" test:compile test
 
 before_cache:
   # Tricks to avoid unnecessary cache updates
   - find $HOME/.sbt -name "*.lock" | xargs rm
   - find $HOME/.ivy2 -name "ivydata-*.properties" | xargs rm
-
-env:
-  matrix:
-  - TEST_PROJECT="rootJVM"
-  - TEST_PROJECT="rootJS"
-
-addons:
-  apt:
-    packages:
-      - oracle-java8-installer
-
-matrix:
-  include:
-  - scala: 2.12.4
-    jdk: oraclejdk9
-    env: TEST_PROJECT="rootJVM"
-  - scala: 2.11.12
-    jdk: oraclejdk8
-    env: SCALA_NATIVE
-    sudo: required
-    before_install:
-    - curl https://raw.githubusercontent.com/scala-native/scala-native/21539aa97947f7/bin/travis_setup.sh | bash -
-    script:
-    - ./sbt "++$TRAVIS_SCALA_VERSION!" nativeTest/run nativeTest/publishLocal
