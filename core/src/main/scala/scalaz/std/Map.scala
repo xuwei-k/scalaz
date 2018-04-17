@@ -1,8 +1,6 @@
 package scalaz
 package std
 
-import collection.immutable.Map // Just so we're clear.
-
 trait MapSubInstances0 {
   import syntax.std.function2._
   private[scalaz] sealed trait MapMonoid[K, V] extends Monoid[Map[K, V]] {
