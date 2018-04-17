@@ -13,6 +13,48 @@ trait ListInstances extends ListInstances0 {
   implicit val listInstance: Traverse[List] with MonadPlus[List] with BindRec[List] with Zip[List] with Unzip[List] with Align[List] with IsEmpty[List] with Cobind[List] =
     new Traverse[List] with MonadPlus[List] with BindRec[List] with Zip[List] with Unzip[List] with Align[List] with IsEmpty[List] with Cobind[List] with IterableSubtypeFoldable[List] {
 
+      override def point[A](a: => A): List[A] =
+        List(a)
+
+      override def bind[A, B](fa: List[A])(f: A => List[B]): List[B] =
+        fa flatMap f
+
+      override def tailrecM[A, B](a: A)(f: A => List[A \/ B]): List[B] = {
+        val bs = List.newBuilder[B]
+        @scala.annotation.tailrec
+        def go(xs: List[Seq[A \/ B]]): Unit =
+          xs match {
+            case (\/-(b) +: tail) :: rest =>
+              bs += b
+              go(tail :: rest)
+            case (-\/(a0) +: tail) :: rest =>
+              go(f(a0) :: tail :: rest)
+            case _ :: rest =>
+              go(rest)
+            case Nil =>
+          }
+        go(List(f(a)))
+        bs.result
+      }
+
+      override def isEmpty[A](fa: List[A]): Boolean =
+        fa.isEmpty
+
+      override def plus[A](a: List[A], b: => List[A]): List[A] =
+        a ++ b
+
+      override def empty[A]: List[A] =
+        Nil
+
+      override def unzip[A, B](a: List[(A, B)]): (List[A], List[B]) =
+        a.unzip
+
+      override def zip[A, B](a: => List[A], b: => List[B]): List[(A, B)] = {
+        val _a = a
+        if(_a.isEmpty) empty
+        else _a zip b
+      }
+
       override def findLeft[A](fa: List[A])(f: A => Boolean) = fa.find(f)
       override def findRight[A](fa: List[A])(f: A => Boolean) = {
         @tailrec def loop(a: List[A], x: Option[A]): Option[A] =

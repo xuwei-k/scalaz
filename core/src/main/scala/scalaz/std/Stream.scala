@@ -5,6 +5,27 @@ package std
 trait StreamInstances {
   implicit val streamInstance: Traverse[Stream] with MonadPlus[Stream] with BindRec[Stream] with Zip[Stream] with Unzip[Stream] with Align[Stream] with IsEmpty[Stream] with Cobind[Stream] = new Traverse[Stream] with MonadPlus[Stream] with BindRec[Stream] with Zip[Stream] with Unzip[Stream] with Align[Stream] with IsEmpty[Stream] with Cobind[Stream] with IterableSubtypeFoldable[Stream] {
 
+    override def point[A](a: => A): Stream[A] =
+      Stream(a)
+
+    override def bind[A, B](fa: Stream[A])(f: A => Stream[B]): Stream[B] =
+      fa flatMap f
+
+    override def isEmpty[A](fa: Stream[A]): Boolean =
+      fa.isEmpty
+
+    override def empty[A]: Stream[A] =
+      Stream.empty[A]
+
+    override def unzip[A, B](a: Stream[(A, B)]): (Stream[A], Stream[B]) =
+      a.unzip
+
+    override def zip[A, B](a: => Stream[A],b: => Stream[B]): Stream[(A, B)] = {
+      val _a = a
+      if(_a.isEmpty) empty
+      else _a zip b
+    }
+
     override def cojoin[A](a: Stream[A]) = a.tails.toStream.init
     def cobind[A, B](fa: Stream[A])(f: Stream[A] => B): Stream[B] = map(cojoin(fa))(f)
     def traverseImpl[G[_], A, B](fa: Stream[A])(f: A => G[B])(implicit G: Applicative[G]): G[Stream[B]] = {
