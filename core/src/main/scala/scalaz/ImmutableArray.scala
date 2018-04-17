@@ -22,6 +22,8 @@ sealed abstract class ImmutableArray[+A] {
   def isEmpty: Boolean = length == 0
 
   def toArray[B >: A : ClassTag]: Array[B]
+  def toList[AA >: A]: List[AA] =
+    toArray(elemTag).toList 
   def slice(from: Int, until: Int): ImmutableArray[A]
 
   def ++[B >: A: ClassTag](other: ImmutableArray[B]): ImmutableArray[B]
@@ -37,7 +39,7 @@ sealed abstract class ImmutableArrayInstances {
   implicit val immutableArrayInstance: Foldable[ImmutableArray] with Zip[ImmutableArray] =
     new Foldable[ImmutableArray] with Zip[ImmutableArray] {
       override def foldLeft[A, B](fa: ImmutableArray[A], z: B)(f: (B, A) => B) =
-        fa.foldLeft(z)(f)
+        fa.toList.foldLeft(z)(f)
       def foldMap[A, B](fa: ImmutableArray[A])(f: A => B)(implicit F: Monoid[B]): B = {
         var i = 0
         var b = F.zero
@@ -48,11 +50,11 @@ sealed abstract class ImmutableArrayInstances {
         b
       }
       def foldRight[A, B](fa: ImmutableArray[A], z: => B)(f: (A, => B) => B) =
-        fa.foldRight(z)((a, b) => f(a, b))
+        fa.toList.foldRight(z)((a, b) => f(a, b))
       def zip[A, B](a: => ImmutableArray[A], b: => ImmutableArray[B]) = {
-        val _a = a
+        val _a = a.toList
         if(_a.isEmpty) new ImmutableArray.ofRef(Array[(A, B)]())
-        else new ImmutableArray.ofRef((_a.iterator zip b.iterator).toArray)
+        else new ImmutableArray.ofRef((_a.toList.iterator zip b.toList.iterator).toArray)
       }
       override def index[A](fa: ImmutableArray[A], i: Int) =
         if(0 <= i && i < fa.length) Some(fa(i)) else None
@@ -224,27 +226,10 @@ object ImmutableArray extends ImmutableArrayInstances {
       }
   }
 
-  implicit def wrapArray[A](immArray: ImmutableArray[A]): WrappedImmutableArray[A] = {
-    import ImmutableArray.{WrappedImmutableArray => IAO}
-    immArray match {
-      case a: StringArray => new IAO.ofStringArray(a)
-      case a: ofRef[_] => new IAO.ofRef(a)
-      case a: ofByte => new IAO.ofByte(a)
-      case a: ofShort => new IAO.ofShort(a)
-      case a: ofChar => new IAO.ofChar(a)
-      case a: ofInt => new IAO.ofInt(a)
-      case a: ofLong => new IAO.ofLong(a)
-      case a: ofFloat => new IAO.ofFloat(a)
-      case a: ofDouble => new IAO.ofDouble(a)
-      case a: ofBoolean => new IAO.ofBoolean(a)
-      case a: ofUnit => new IAO.ofUnit(a)
-    }
-  }
-
   sealed class ImmutableArrayCharW(val self: ImmutableArray[Char]) extends Ops[ImmutableArray[Char]] {
     def asString: String = self match {
       case a: StringArray => a.str
-      case a: ofChar => wrapArray(a).mkString
+      case a: ofChar => a.toList.mkString
       case _ => sys.error("Unknown subtype of ImmutableArray[Char]")
     }
   }

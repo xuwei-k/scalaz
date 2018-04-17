@@ -335,7 +335,6 @@ object build {
     .settings(standardSettings: _*)
     .settings(
       name := "scalaz-effect",
-      scalacOptions in (Compile, compile) += "-Xfatal-warnings",
       osgiExport("scalaz.effect", "scalaz.std.effect", "scalaz.syntax.effect"))
     .dependsOn(core)
     .jsSettings(scalajsProjectSettings : _*)
@@ -350,7 +349,6 @@ object build {
     .settings(standardSettings: _*)
     .settings(
       name := "scalaz-iteratee",
-      scalacOptions in (Compile, compile) += "-Xfatal-warnings",
       osgiExport("scalaz.iteratee"))
     .dependsOn(core, effect)
     .jsSettings(scalajsProjectSettings : _*)
