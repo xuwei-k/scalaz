@@ -3,9 +3,7 @@ package std
 
 
 trait StreamInstances {
-  implicit val streamInstance: Traverse[Stream] with MonadPlus[Stream] with BindRec[Stream] with Zip[Stream] with Unzip[Stream] with Align[Stream] with IsEmpty[Stream] with Cobind[Stream] = new Traverse[Stream] with MonadPlus[Stream] with BindRec[Stream] with Zip[Stream] with Unzip[Stream] with Align[Stream] with IsEmpty[Stream] with Cobind[Stream] with IterableSubtypeFoldable[Stream] with StrictOrLazySeqSubtypeCovariant[Stream] {
-    protected[this] override val Factory = Stream
-    protected[this] override def canBuildFrom[A] = Stream.canBuildFrom
+  implicit val streamInstance: Traverse[Stream] with MonadPlus[Stream] with BindRec[Stream] with Zip[Stream] with Unzip[Stream] with Align[Stream] with IsEmpty[Stream] with Cobind[Stream] = new Traverse[Stream] with MonadPlus[Stream] with BindRec[Stream] with Zip[Stream] with Unzip[Stream] with Align[Stream] with IsEmpty[Stream] with Cobind[Stream] with IterableSubtypeFoldable[Stream] {
 
     override def cojoin[A](a: Stream[A]) = a.tails.toStream.init
     def cobind[A, B](fa: Stream[A])(f: Stream[A] => B): Stream[B] = map(cojoin(fa))(f)

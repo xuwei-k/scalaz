@@ -11,9 +11,7 @@ trait ListInstances0 {
 
 trait ListInstances extends ListInstances0 {
   implicit val listInstance: Traverse[List] with MonadPlus[List] with BindRec[List] with Zip[List] with Unzip[List] with Align[List] with IsEmpty[List] with Cobind[List] =
-    new Traverse[List] with MonadPlus[List] with BindRec[List] with Zip[List] with Unzip[List] with Align[List] with IsEmpty[List] with Cobind[List] with IterableSubtypeFoldable[List] with StrictSeqSubtypeCovariant[List] {
-      protected[this] override val Factory = List
-      protected[this] override def canBuildFrom[A] = List.canBuildFrom
+    new Traverse[List] with MonadPlus[List] with BindRec[List] with Zip[List] with Unzip[List] with Align[List] with IsEmpty[List] with Cobind[List] with IterableSubtypeFoldable[List] {
 
       override def findLeft[A](fa: List[A])(f: A => Boolean) = fa.find(f)
       override def findRight[A](fa: List[A])(f: A => Boolean) = {
@@ -215,7 +213,7 @@ trait ListFunctions {
   final def groupBy1[A, B](as: List[A])(f: A => B): Map[B, NonEmptyList[A]] = (Map.empty[B, NonEmptyList[A]] /: as) { (nels, a) =>
     val b = f(a)
     nels + (b -> (nels get b map (a <:: _) getOrElse NonEmptyList(a)))
-  } mapValues (_.reverse)
+  } map { case (k, v) => k -> v.reverse }
 
   /** `groupWhenM` specialized to [[scalaz.Id.Id]]. */
   final def groupWhen[A](as: List[A])(p: (A, A) => Boolean): List[NonEmptyList[A]] = {

@@ -129,6 +129,15 @@ object build {
   private[this] val buildInfoPackageName = "scalaz"
 
   lazy val standardSettings: Seq[Sett] = Seq[Sett](
+    unmanagedSourceDirectories in Compile += {
+      val base = ScalazCrossType.shared(baseDirectory.value, "main").getParentFile
+      CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((2, v)) if v >= 13 =>
+          base / "scala-2.13+"
+        case _ =>
+          base / "scala-2.13-"
+      }
+    },
     organization := "org.scalaz",
     mappings in (Compile, packageSrc) ++= (managedSources in Compile).value.map{ f =>
       // https://github.com/sbt/sbt-buildinfo/blob/v0.7.0/src/main/scala/sbtbuildinfo/BuildInfoPlugin.scala#L58
@@ -295,7 +304,6 @@ object build {
     .settings(standardSettings: _*)
     .settings(
       name := "scalaz-core",
-      scalacOptions in (Compile, compile) += "-Xfatal-warnings",
       sourceGenerators in Compile += (sourceManaged in Compile).map{
         dir => Seq(GenerateTupleW(dir), TupleNInstances(dir))
       }.taskValue,

@@ -55,7 +55,6 @@ trait IterableInstances {
 }
 
 private[std] trait IterableSubtypeFoldable[I[X] <: Iterable[X]] extends Foldable[I] {
-  import collection.generic.CanBuildFrom
 
   override def foldMap[A,B](fa: I[A])(f: A => B)(implicit F: Monoid[B]) = foldLeft(fa, F.zero)((x,y) => Monoid[B].append(x, f(y)))
 
@@ -77,9 +76,6 @@ private[std] trait IterableSubtypeFoldable[I[X] <: Iterable[X]] extends Foldable
   override final def toVector[A](fa: I[A]) = fa.toVector
   override final def toSet[A](fa: I[A]) = fa.toSet
   override final def toStream[A](fa: I[A]) = fa.toStream
-
-  override final def to[A, G[_]](fa: I[A])(implicit c: CanBuildFrom[Nothing, A, G[A]]): G[A] =
-    fa.to[G]
 
   override final def empty[A](fa: I[A]) = fa.isEmpty
 
