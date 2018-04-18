@@ -46,6 +46,7 @@ object build {
   )
 
   val scalaCheckVersion = SettingKey[String]("scalaCheckVersion")
+  val scalaCheckGroupId = SettingKey[String]("scalaCheckGroupId")
   val kindProjectorVersion = SettingKey[String]("kindProjectorVersion")
 
   private[this] def gitHash(): String = sys.process.Process("git rev-parse HEAD").lineStream_!.head
@@ -153,7 +154,22 @@ object build {
     crossScalaVersions := Seq(Scala211, Scala212, "2.13.0-M3"),
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
-    scalaCheckVersion := "1.14.0-newCollections",
+    scalaCheckVersion := {
+      CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((2, v)) if v >= 13 =>
+          "1.14.0-newCollections"
+        case _ =>
+          "1.13.5"
+      }
+    },
+    scalaCheckGroupId := {
+      CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((2, v)) if v >= 13 =>
+          "org.scala-lang.modules"
+        case _ =>
+          "org.scalacheck"
+      }
+    },
     scalacOptions ++= stdOptions ++ (CrossVersion.partialVersion(scalaVersion.value) match {
       case Some((2,11)) => Scala211_jvm_and_js_options
       case _ => Seq("-opt:l:method")
