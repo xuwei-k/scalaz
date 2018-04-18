@@ -22,8 +22,10 @@ object SortedMapTest extends SpecLite {
 
   checkAll("satisfy equals laws when not natural", equal.laws[SortedMap[NotNatural, String]])
 
-  implicit def sortedMapArb[A: Arbitrary: SOrdering, B: Arbitrary]: Arbitrary[SortedMap[A, B]] =
+  implicit def sortedMapArb[A: Arbitrary: Order, B: Arbitrary]: Arbitrary[SortedMap[A, B]] = {
+    implicit val o = Order[A].toScalaOrdering
     Arbitrary(arbitrary[SMap[A, B]] map (m => SortedMap(m.toSeq:_*)))
+  }
 
   "SortedMap ordering" ! forAll {
     val O = implicitly[Order[SortedMap[String,Int]]]
@@ -51,9 +53,9 @@ object SortedMapTest extends SpecLite {
     ==>>.fromList(x.toList) must_=== Align[Int ==>> ?].align(==>>.fromList(a.toList), ==>>.fromList(b.toList))
     x.keySet must_== (keysA ++ keysB)
 
-    x.filter(_._2.isThis).keySet must_=== (keysA -- keysB)
-    x.filter(_._2.isThat).keySet must_=== (keysB -- keysA)
-    x.filter(_._2.isBoth).keySet must_=== (keysA & keysB)
+    x.filter(_._2.isThis).keySet must_== (keysA -- keysB)
+    x.filter(_._2.isThat).keySet must_== (keysB -- keysA)
+    x.filter(_._2.isBoth).keySet must_== (keysA & keysB)
 
     x.filter(_._2.isThis) must_=== F.map(a.filter{case (k, _) => ! keysB(k)})(This(_))
     x.filter(_._2.isThat) must_=== F.map(b.filter{case (k, _) => ! keysA(k)})(That(_))
