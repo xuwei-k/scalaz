@@ -345,7 +345,7 @@ object build {
       nativeSettings
     )
     .configure(
-      _ dependsOn RootProject(uri("git://github.com/scala/scala-collection-compat#2fca3b3cba8e2e"))
+      _ dependsOn RootProject(uri("git://github.com/scala/scala-collection-compat#29e1971c9c1c2d8b8d9e3ffec85849904b463f65"))
     )
 
   final val ConcurrentName = "scalaz-concurrent"
