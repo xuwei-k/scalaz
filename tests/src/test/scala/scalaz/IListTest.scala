@@ -247,7 +247,10 @@ object IListTest extends SpecLite {
   }
 
   "lastIndexOfSlice" ! forAll { (ns: IList[Int], ms: IList[Int]) =>
-    ns.lastIndexOfSlice(ms).getOrElse(-1) must_=== ns.toList.lastIndexOfSlice(ms.toList)
+    val v = scala.util.Properties.versionNumberString
+    if (v.startsWith("2.11") || v.startsWith("2.12")) {
+      ns.lastIndexOfSlice(ms).getOrElse(-1) must_=== ns.toList.lastIndexOfSlice(ms.toList)
+    }
   }
 
   "lastIndexWhere" ! forAll { (ns: IList[Int], f: Int => Boolean) =>
