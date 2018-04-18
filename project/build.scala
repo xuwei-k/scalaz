@@ -151,7 +151,7 @@ object build {
       (f, path)
     },
     scalaVersion := "2.13.0-M4-pre-20d3c21",
-    crossScalaVersions := Seq(Scala211, Scala212, "2.13.0-M3"),
+    crossScalaVersions := Seq(Scala211, Scala212, "2.13.0-M4-pre-20d3c21"),
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
     scalaCheckVersion := {

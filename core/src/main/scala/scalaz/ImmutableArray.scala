@@ -1,6 +1,8 @@
 package scalaz
 
 import reflect.ClassTag
+import collection.BuildFrom
+import collection.compat._
 import collection.immutable.IndexedSeq
 import collection.mutable.{ArrayBuilder, Builder}
 import syntax.Ops
@@ -22,8 +24,6 @@ sealed abstract class ImmutableArray[+A] {
   def isEmpty: Boolean = length == 0
 
   def toArray[B >: A : ClassTag]: Array[B]
-  def toList[AA >: A]: List[AA] =
-    toArray(elemTag).toList 
   def slice(from: Int, until: Int): ImmutableArray[A]
 
   def ++[B >: A: ClassTag](other: ImmutableArray[B]): ImmutableArray[B]
@@ -39,7 +39,7 @@ sealed abstract class ImmutableArrayInstances {
   implicit val immutableArrayInstance: Foldable[ImmutableArray] with Zip[ImmutableArray] =
     new Foldable[ImmutableArray] with Zip[ImmutableArray] {
       override def foldLeft[A, B](fa: ImmutableArray[A], z: B)(f: (B, A) => B) =
-        fa.toList.foldLeft(z)(f)
+        fa.foldLeft(z)(f)
       def foldMap[A, B](fa: ImmutableArray[A])(f: A => B)(implicit F: Monoid[B]): B = {
         var i = 0
         var b = F.zero
@@ -50,11 +50,11 @@ sealed abstract class ImmutableArrayInstances {
         b
       }
       def foldRight[A, B](fa: ImmutableArray[A], z: => B)(f: (A, => B) => B) =
-        fa.toList.foldRight(z)((a, b) => f(a, b))
+        fa.foldRight(z)((a, b) => f(a, b))
       def zip[A, B](a: => ImmutableArray[A], b: => ImmutableArray[B]) = {
-        val _a = a.toList
+        val _a = a
         if(_a.isEmpty) new ImmutableArray.ofRef(Array[(A, B)]())
-        else new ImmutableArray.ofRef((_a.toList.iterator zip b.toList.iterator).toArray)
+        else new ImmutableArray.ofRef((_a.iterator zip b.iterator).toArray)
       }
       override def index[A](fa: ImmutableArray[A], i: Int) =
         if(0 <= i && i < fa.length) Some(fa(i)) else None
@@ -134,6 +134,24 @@ object ImmutableArray extends ImmutableArrayInstances {
 
   def newStringArrayBuilder: Builder[Char, ImmutableArray[Char]] =
     (new StringBuilder).mapResult(fromString(_))
+
+  implicit def buildFrom[T](implicit m: ClassTag[T]): BuildFrom[ImmutableArray[_], T, ImmutableArray[T]] =
+    new BuildFrom[ImmutableArray[_], T, ImmutableArray[T]] {
+      override def newBuilder(from: ImmutableArray[_]): Builder[T, ImmutableArray[T]] =
+        ImmutableArray.newBuilder(m)
+
+      override def fromSpecificIterable(from: ImmutableArray[_])(it: Iterable[T]): ImmutableArray[T] =
+        ImmutableArray.fromArray(it.toArray)
+    }
+
+  implicit val buildFromChar: BuildFrom[ImmutableArray[_], Char, ImmutableArray[Char]] =
+    new BuildFrom[ImmutableArray[_], Char, ImmutableArray[Char]] {
+      override def newBuilder(from: ImmutableArray[_]): Builder[Char, ImmutableArray[Char]] =
+        newStringArrayBuilder
+
+      override def fromSpecificIterable(from: ImmutableArray[_])(it: Iterable[Char]): ImmutableArray[Char] =
+        ImmutableArray.fromArray(it.toArray)
+    }
 
   sealed abstract class ImmutableArray1[+A](array: Array[A]) extends ImmutableArray[A] {
     private[this] val arr = array.clone
@@ -226,10 +244,90 @@ object ImmutableArray extends ImmutableArrayInstances {
       }
   }
 
+  implicit def wrapArray[A](immArray: ImmutableArray[A]): WrappedImmutableArray[A] = {
+    import ImmutableArray.{WrappedImmutableArray => IAO}
+    immArray match {
+      case a: StringArray => new IAO.ofStringArray(a)
+      case a: ofRef[_] => new IAO.ofRef(a)
+      case a: ofByte => new IAO.ofByte(a)
+      case a: ofShort => new IAO.ofShort(a)
+      case a: ofChar => new IAO.ofChar(a)
+      case a: ofInt => new IAO.ofInt(a)
+      case a: ofLong => new IAO.ofLong(a)
+      case a: ofFloat => new IAO.ofFloat(a)
+      case a: ofDouble => new IAO.ofDouble(a)
+      case a: ofBoolean => new IAO.ofBoolean(a)
+      case a: ofUnit => new IAO.ofUnit(a)
+    }
+  }
+
+  implicit def unwrapArray[A](immArrayOps: WrappedImmutableArray[A]): ImmutableArray[A] = immArrayOps.value
+
+  abstract class WrappedImmutableArray[+A](val value: ImmutableArray[A]) extends
+          IndexedSeq[A] {
+    def apply(index: Int) = value(index)
+    def length = value.length
+
+    protected[this] def arrayBuilder: Builder[A, ImmutableArray[A]]
+  }
+
+  object WrappedImmutableArray {
+    import scalaz.{ImmutableArray => IA}
+    class ofStringArray(val strArray: StringArray) extends WrappedImmutableArray[Char](strArray) {
+      override protected[this] def arrayBuilder = (new StringBuilder).mapResult(str => new StringArray(str.toString))
+    }
+
+    abstract class ofImmutableArray1[+A](val immArray: ImmutableArray1[A]) extends WrappedImmutableArray[A](immArray) {
+      protected[this] def elemTag: ClassTag[A]
+
+      override protected[this] def arrayBuilder = ImmutableArray.newBuilder[A](elemTag)
+    }
+
+    final class ofRef[+A <: AnyRef](array: IA.ofRef[A]) extends ofImmutableArray1[A](array) {
+      protected[this] lazy val elemTag = ClassTag[A](array.componentType)
+    }
+
+    final class ofByte(array: IA.ofByte) extends ofImmutableArray1[Byte](array) {
+      protected[this] def elemTag = ClassTag.Byte
+    }
+
+    final class ofShort(array: IA.ofShort) extends ofImmutableArray1[Short](array) {
+      protected[this] def elemTag = ClassTag.Short
+    }
+
+    final class ofChar(array: IA.ofChar) extends ofImmutableArray1[Char](array) {
+      protected[this] def elemTag = ClassTag.Char
+    }
+
+    final class ofInt(array: IA.ofInt) extends ofImmutableArray1[Int](array) {
+      protected[this] def elemTag = ClassTag.Int
+    }
+
+    final class ofLong(array: IA.ofLong) extends ofImmutableArray1[Long](array) {
+      protected[this] def elemTag = ClassTag.Long
+    }
+
+    final class ofFloat(array: IA.ofFloat) extends ofImmutableArray1[Float](array) {
+      protected[this] def elemTag = ClassTag.Float
+    }
+
+    final class ofDouble(array: IA.ofDouble) extends ofImmutableArray1[Double](array) {
+      protected[this] def elemTag = ClassTag.Double
+    }
+
+    final class ofBoolean(array: IA.ofBoolean) extends ofImmutableArray1[Boolean](array) {
+      protected[this] def elemTag = ClassTag.Boolean
+    }
+
+    final class ofUnit(array: IA.ofUnit) extends ofImmutableArray1[Unit](array) {
+      protected[this] def elemTag = ClassTag.Unit
+    }
+  }
+
   sealed class ImmutableArrayCharW(val self: ImmutableArray[Char]) extends Ops[ImmutableArray[Char]] {
     def asString: String = self match {
       case a: StringArray => a.str
-      case a: ofChar => a.toList.mkString
+      case a: ofChar => wrapArray(a).mkString
       case _ => sys.error("Unknown subtype of ImmutableArray[Char]")
     }
   }

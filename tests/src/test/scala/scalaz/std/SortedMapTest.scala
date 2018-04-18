@@ -22,7 +22,7 @@ object SortedMapTest extends SpecLite {
 
   checkAll("satisfy equals laws when not natural", equal.laws[SortedMap[NotNatural, String]])
 
-  implicit def sortedMapArb[A: Arbitrary, B: Arbitrary]: Arbitrary[SortedMap[A, B]] =
+  implicit def sortedMapArb[A: Arbitrary: SOrdering, B: Arbitrary]: Arbitrary[SortedMap[A, B]] =
     Arbitrary(arbitrary[SMap[A, B]] map (m => SortedMap(m.toSeq:_*)))
 
   "SortedMap ordering" ! forAll {
@@ -49,7 +49,7 @@ object SortedMapTest extends SpecLite {
 
     x must_=== F.alignWith[String, Long, String \&/ Long](identity)(a, b)
     ==>>.fromList(x.toList) must_=== Align[Int ==>> ?].align(==>>.fromList(a.toList), ==>>.fromList(b.toList))
-    x.keySet must_=== (keysA ++ keysB)
+    x.keySet must_== (keysA ++ keysB)
 
     x.filter(_._2.isThis).keySet must_=== (keysA -- keysB)
     x.filter(_._2.isThat).keySet must_=== (keysB -- keysA)
