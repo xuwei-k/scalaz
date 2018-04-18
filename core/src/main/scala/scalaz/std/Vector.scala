@@ -11,7 +11,7 @@ sealed trait VectorInstances0 {
 }
 
 trait VectorInstances extends VectorInstances0 {
-  implicit val vectorInstance: Traverse[Vector] with MonadPlus[Vector] with BindRec[Vector] with Zip[Vector] with Unzip[Vector] with IsEmpty[Vector] with Align[Vector] = new Traverse[Vector] with MonadPlus[Vector] with BindRec[Vector] with Zip[Vector] with Unzip[Vector] with IsEmpty[Vector] with Align[Vector] with IterableSubtypeFoldable[Vector] {
+  implicit val vectorInstance: Traverse[Vector] with MonadPlus[Vector] with BindRec[Vector] with Zip[Vector] with Unzip[Vector] with IsEmpty[Vector] with Align[Vector] = new Traverse[Vector] with MonadPlus[Vector] with IterableBindRec[Vector] with Zip[Vector] with Unzip[Vector] with IsEmpty[Vector] with Align[Vector] with IterableSubtypeFoldable[Vector] {
 
     override def point[A](a: => A): Vector[A] =
       Vector(a)
@@ -19,23 +19,8 @@ trait VectorInstances extends VectorInstances0 {
     override def bind[A, B](fa: Vector[A])(f: A => Vector[B]): Vector[B] =
       fa flatMap f
 
-    override def tailrecM[A, B](a: A)(f: A => Vector[A \/ B]): Vector[B] = {
-      val bs = Vector.newBuilder[B]
-      @scala.annotation.tailrec
-      def go(xs: List[Seq[A \/ B]]): Unit =
-        xs match {
-          case (\/-(b) +: tail) :: rest =>
-            bs += b
-            go(tail :: rest)
-          case (-\/(a0) +: tail) :: rest =>
-            go(f(a0) :: tail :: rest)
-          case _ :: rest =>
-            go(rest)
-          case Nil =>
-        }
-      go(List(f(a)))
-      bs.result
-    }
+    override def createNewBuilder[A]() =
+      Vector.newBuilder[A]
 
     override def isEmpty[A](fa: Vector[A]): Boolean =
       fa.isEmpty

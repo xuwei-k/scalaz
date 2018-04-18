@@ -84,4 +84,26 @@ private[std] trait IterableSubtypeFoldable[I[X] <: Iterable[X]] extends Foldable
     fa forall p
 }
 
+private[std] trait IterableBindRec[F[X] <: Seq[X]] extends BindRec[F] {
+  protected[this] def createNewBuilder[A](): collection.mutable.Builder[A, F[A]]
+
+  override final def tailrecM[A, B](a: A)(f: A => F[A \/ B]): F[B] = {
+    val bs = createNewBuilder[B]()
+    @scala.annotation.tailrec
+    def go(xs: List[Seq[A \/ B]]): Unit =
+      xs match {
+        case (\/-(b) +: tail) :: rest =>
+          bs += b
+          go(tail :: rest)
+        case (-\/(a0) +: tail) :: rest =>
+          go(f(a0) :: tail :: rest)
+        case _ :: rest =>
+          go(rest)
+        case Nil =>
+      }
+    go(List(f(a)))
+    bs.result
+  }
+}
+
 object iterable extends IterableInstances

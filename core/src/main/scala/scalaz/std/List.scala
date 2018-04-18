@@ -11,7 +11,7 @@ trait ListInstances0 {
 
 trait ListInstances extends ListInstances0 {
   implicit val listInstance: Traverse[List] with MonadPlus[List] with BindRec[List] with Zip[List] with Unzip[List] with Align[List] with IsEmpty[List] with Cobind[List] =
-    new Traverse[List] with MonadPlus[List] with BindRec[List] with Zip[List] with Unzip[List] with Align[List] with IsEmpty[List] with Cobind[List] with IterableSubtypeFoldable[List] {
+    new Traverse[List] with MonadPlus[List] with IterableBindRec[List] with Zip[List] with Unzip[List] with Align[List] with IsEmpty[List] with Cobind[List] with IterableSubtypeFoldable[List] {
 
       override def point[A](a: => A): List[A] =
         List(a)
@@ -19,23 +19,8 @@ trait ListInstances extends ListInstances0 {
       override def bind[A, B](fa: List[A])(f: A => List[B]): List[B] =
         fa flatMap f
 
-      override def tailrecM[A, B](a: A)(f: A => List[A \/ B]): List[B] = {
-        val bs = List.newBuilder[B]
-        @scala.annotation.tailrec
-        def go(xs: List[Seq[A \/ B]]): Unit =
-          xs match {
-            case (\/-(b) +: tail) :: rest =>
-              bs += b
-              go(tail :: rest)
-            case (-\/(a0) +: tail) :: rest =>
-              go(f(a0) :: tail :: rest)
-            case _ :: rest =>
-              go(rest)
-            case Nil =>
-          }
-        go(List(f(a)))
-        bs.result
-      }
+      override def createNewBuilder[A]() =
+        List.newBuilder[A]
 
       override def isEmpty[A](fa: List[A]): Boolean =
         fa.isEmpty
