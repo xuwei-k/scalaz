@@ -1,7 +1,7 @@
 package scalaz
 package std
 
-trait MapSubInstances0 {
+trait MapInstances0 {
   import syntax.std.function2._
   private[scalaz] sealed trait MapMonoid[K, V] extends Monoid[Map[K, V]] {
     implicit def V: Semigroup[V]
@@ -67,7 +67,7 @@ trait MapSubInstances0 {
     }
 }
 
-trait MapSubInstances extends MapSubInstances0 with MapSubFunctions {
+trait MapInstances extends MapInstances0 with MapFunctions {
   import Liskov.<~<
 
   /** Covariant over the value parameter, where `plus` applies the
@@ -134,7 +134,7 @@ trait MapSubInstances extends MapSubInstances0 with MapSubFunctions {
     }
 }
 
-trait MapSubFunctions {
+trait MapFunctions {
   /** Vary the value of `m get k`. */
   final def alter[K, A](m: Map[K, A], k: K)(f: (Option[A] => Option[A])): Map[K, A] =
     f(m get k) map (x => m + ((k, x))) getOrElse (m - k)
@@ -186,9 +186,5 @@ trait MapSubFunctions {
   final def getOrAdd[F[_], K, A](m: Map[K, A], k: K)(fa: => F[A])(implicit F: Applicative[F]): F[(Map[K, A], A)] =
     (m get k).fold(F.map(fa)(a => (m + ((k, a)), a)))(a => F.point((m, a)))
 }
-
-trait MapInstances extends MapSubInstances
-
-trait MapFunctions extends MapSubFunctions
 
 object map extends MapInstances with MapFunctions
