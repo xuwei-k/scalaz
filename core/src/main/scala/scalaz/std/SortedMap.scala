@@ -1,10 +1,13 @@
 package scalaz
 package std
 
+import scala.collection.immutable.SortedMap
+
 trait SortedMapInstances0 {
   import syntax.std.function2._
   private[scalaz] sealed trait SortedMapMonoid[K, V] extends Monoid[SortedMap[K, V]] {
     implicit def V: Semigroup[V]
+    implicit def O: scala.Ordering[K]
 
     def zero = SortedMap.empty[K, V]
     def append(m1: SortedMap[K, V], m2: => SortedMap[K, V]) = {
@@ -29,7 +32,7 @@ trait SortedMapInstances0 {
     override def equal(a1: SortedMap[K, V], a2: SortedMap[K, V]): Boolean = {
       import set._
       if (equalIsNatural) a1 == a2
-      else Equal[Set[K]].equal(a1.keySet, a2.keySet) && {
+      else Equal[Set[K]].equal(a1.keySet.toSet, a2.keySet.toSet) && {
         a1.forall {
           case (k, v) => a2.get(k).exists(v2 => Equal[V].equal(v, v2))
         }
@@ -61,9 +64,10 @@ trait SortedMapInstances0 {
   implicit def sortedMapFoldable[K]: Foldable[SortedMap[K, ?]] =
     new SortedMapFoldable[K]{}
 
-  implicit def sortedMapBand[K, V](implicit S: Band[V]): Band[SortedMap[K, V]] =
+  implicit def sortedMapBand[K, V](implicit S: Band[V], K: scala.Ordering[K]): Band[SortedMap[K, V]] =
     new SortedMapMonoid[K, V] with Band[SortedMap[K, V]] {
-      implicit override def V = S
+      override def V = S
+      override def O = K
     }
 }
 
@@ -73,13 +77,13 @@ trait SortedMapInstances extends SortedMapInstances0 with SortedMapFunctions {
   /** Covariant over the value parameter, where `plus` applies the
     * `Last` semigroup to values.
     */
-  implicit def sortedMapInstance[K]: Traverse[SortedMap[K, ?]] with IsEmpty[SortedMap[K, ?]] with Bind[SortedMap[K, ?]] with Align[SortedMap[K, ?]] =
+  implicit def sortedMapInstance[K: scala.Ordering]: Traverse[SortedMap[K, ?]] with IsEmpty[SortedMap[K, ?]] with Bind[SortedMap[K, ?]] with Align[SortedMap[K, ?]] =
     new Traverse[SortedMap[K, ?]] with IsEmpty[SortedMap[K, ?]] with Bind[SortedMap[K, ?]] with SortedMapFoldable[K] with Align[SortedMap[K, ?]] {
       def empty[V] = SortedMap.empty[K, V]
       def plus[V](a: SortedMap[K, V], b: => SortedMap[K, V]) = a ++ b
       def isEmpty[V](fa: SortedMap[K, V]) = fa.isEmpty
       def bind[A, B](fa: SortedMap[K,A])(f: A => SortedMap[K, B]) = fa.collect{case (k, v) if f(v).isDefinedAt(k) => k -> f(v)(k)}
-      override def map[A, B](fa: SortedMap[K, A])(f: A => B) = fa.transform{case (_, v) => f(v)}
+      override def map[A, B](fa: SortedMap[K, A])(f: A => B) = fa.map{case (k, v) => (k, f(v))}
       override def widen[A, B](fa: SortedMap[K, A])(implicit ev: A <~< B) = Liskov.co[SortedMap[K, +?], A, B](ev)(fa)
       def traverseImpl[G[_],A,B](m: SortedMap[K,A])(f: A => G[B])(implicit G: Applicative[G]): G[SortedMap[K,B]] =
         G.map(list.listInstance.traverseImpl(m.toList)({ case (k, v) => G.map(f(v))(k -> _) }))(xs => SortedMap(xs:_*))
@@ -105,9 +109,10 @@ trait SortedMapInstances extends SortedMapInstances0 with SortedMapFunctions {
     }
 
   /** SortedMap union monoid, unifying values with `V`'s `append`. */
-  implicit def sortedMapMonoid[K, V](implicit S: Semigroup[V]): Monoid[SortedMap[K, V]] =
-    new SortedMapMonoid[K, V] { self =>
-      implicit override def V = S
+  implicit def sortedMapMonoid[K, V](implicit S: Semigroup[V], K: scala.Ordering[K]): Monoid[SortedMap[K, V]] =
+    new SortedMapMonoid[K, V] {
+      override def V = S
+      override def O = K
     }
 
   implicit def sortedMapShow[K, V](implicit K: Show[K], V: Show[V]): Show[SortedMap[K, V]] =
@@ -140,28 +145,28 @@ trait SortedMapFunctions {
     f(m get k) map (x => m + ((k, x))) getOrElse (m - k)
 
   /** Like `intersectWith`, but tell `f` about the key. */
-  final def intersectWithKey[K, A, B, C](m1: SortedMap[K, A], m2: SortedMap[K, B])(f: (K, A, B) => C): SortedMap[K, C] = m1 collect {
+  final def intersectWithKey[K: scala.Ordering, A, B, C](m1: SortedMap[K, A], m2: SortedMap[K, B])(f: (K, A, B) => C): SortedMap[K, C] = m1 collect {
     case (k, v) if m2 contains k => k -> f(k, v, m2(k))
   }
 
   /** Collect only elements with matching keys, joining their
     * associated values with `f`.
     */
-  final def intersectWith[K, A, B, C](m1: SortedMap[K, A], m2: SortedMap[K, B])(f: (A, B) => C): SortedMap[K, C] =
+  final def intersectWith[K: scala.Ordering, A, B, C](m1: SortedMap[K, A], m2: SortedMap[K, B])(f: (A, B) => C): SortedMap[K, C] =
     intersectWithKey(m1, m2)((_, x, y) => f(x, y))
 
   /** Exchange keys of `m` according to `f`.  Result may be smaller if
     * `f` maps two or more `K`s to the same `K2`, in which case the
     * resulting associated value is an arbitrary choice.
     */
-  final def mapKeys[K, K2, A](m: SortedMap[K, A])(f: K => K2): SortedMap[K2, A] =
+  final def mapKeys[K, K2: scala.Ordering, A](m: SortedMap[K, A])(f: K => K2): SortedMap[K2, A] =
     m map {case (k, v) => f(k) -> v}
 
   /** Like `unionWith`, but telling `f` about the key. */
-  final def unionWithKey[K, A](m1: SortedMap[K, A], m2: SortedMap[K, A])(f: (K, A, A) => A): SortedMap[K, A] = {
+  final def unionWithKey[K: scala.Ordering, A](m1: SortedMap[K, A], m2: SortedMap[K, A])(f: (K, A, A) => A): SortedMap[K, A] = {
     val diff = m2 -- m1.keySet
-    val aug = m1 transform {
-      case (k, v) => if (m2 contains k) f(k, v, m2(k)) else v
+    val aug = m1.map {
+      case (k, v) => (k, if (m2 contains k) f(k, v, m2(k)) else v)
     }
     aug ++ diff
   }
@@ -171,7 +176,7 @@ trait SortedMapFunctions {
     *
     * @note iff `f` gives rise to a [[scalaz.Semigroup]], so does
     *       `unionWith(_, _)(f)`.*/
-  final def unionWith[K, A](m1: SortedMap[K, A], m2: SortedMap[K, A])(f: (A, A) => A): SortedMap[K, A] =
+  final def unionWith[K: scala.Ordering, A](m1: SortedMap[K, A], m2: SortedMap[K, A])(f: (A, A) => A): SortedMap[K, A] =
     unionWithKey(m1, m2)((_, x, y) => f(x, y))
 
   /** As with `SortedMap.updated`, but resolve a collision with `f`.  The
