@@ -16,6 +16,12 @@ object ImmutableArrayTest extends SpecLite {
     t.toArray.toList must_==(Array().toList)
   }
 
+  "WrappedImmutableArray" in {
+    val xs = ImmutableArray.fromArray(Array(1, 2, 3))
+    val xs1: ImmutableArray[Int] = xs.map(_ + 1)
+    val xs2: ImmutableArray[Int] = xs.flatMap(x => ImmutableArray.fromArray(Array(x)))
+  }
+
   checkAll(equal.laws[ImmutableArray[Int]])
   checkAll(foldable.laws[ImmutableArray])
   checkAll(FoldableTests.anyAndAllLazy[ImmutableArray])

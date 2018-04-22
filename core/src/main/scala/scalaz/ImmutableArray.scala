@@ -273,6 +273,16 @@ object ImmutableArray extends ImmutableArrayInstances {
 
   object WrappedImmutableArray {
     import scalaz.{ImmutableArray => IA}
+
+    implicit def canBuildFrom[T](implicit m: ClassTag[T]): CanBuildFrom[WrappedImmutableArray[_], T, WrappedImmutableArray[T]] =
+      new CanBuildFrom[WrappedImmutableArray[_], T, WrappedImmutableArray[T]] {
+        def apply(from: WrappedImmutableArray[_]): Builder[T, WrappedImmutableArray[T]] =
+          ImmutableArray.newBuilder(m).mapResult(ImmutableArray.wrapArray)
+
+        def apply: Builder[T, WrappedImmutableArray[T]] =
+          ImmutableArray.newBuilder(m).mapResult(ImmutableArray.wrapArray)
+      }
+
     class ofStringArray(val strArray: StringArray) extends WrappedImmutableArray[Char](strArray) {
       override protected[this] def arrayBuilder = (new StringBuilder).mapResult(str => new StringArray(str.toString))
     }
