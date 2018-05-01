@@ -1,4 +1,5 @@
 -Xms3784m
 -Xmx3784m
--XX:MaxMetaspaceSize=1g
+-XX:+CMSClassUnloadingEnabled
+-XX:ReservedCodeCacheSize=1G
 -Xss4m
