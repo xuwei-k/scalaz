@@ -48,7 +48,7 @@ object build {
   val scalaCheckVersion = SettingKey[String]("scalaCheckVersion")
   val kindProjectorVersion = SettingKey[String]("kindProjectorVersion")
 
-  private[this] def gitHash(): String = sys.process.Process("git rev-parse HEAD").lineStream_!.head
+  private[this] def gitHash(): String = sys.process.Process("git rev-parse HEAD^").lineStream_!.head
 
   private[this] val tagName = Def.setting{
     s"v${if (releaseUseGlobalVersion.value) (version in ThisBuild).value else version.value}"
