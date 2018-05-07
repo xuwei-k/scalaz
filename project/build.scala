@@ -14,7 +14,7 @@ import sbtrelease.Utilities._
 import com.typesafe.sbt.pgp.PgpKeys._
 
 import com.typesafe.sbt.osgi.OsgiKeys
-import com.typesafe.sbt.osgi.SbtOsgi._
+import com.typesafe.sbt.osgi.SbtOsgi
 
 import sbtbuildinfo.BuildInfoPlugin.autoImport._
 
@@ -306,7 +306,7 @@ object build {
     resolvers += Resolver.sonatypeRepo("releases"),
     kindProjectorVersion := "0.9.6",
     libraryDependencies += compilerPlugin("org.spire-math" % "kind-projector" % kindProjectorVersion.value cross CrossVersion.binary)
-  ) ++ osgiSettings ++ Seq[Sett](
+  ) ++ SbtOsgi.projectSettings ++ SbtOsgi.autoImport.osgiSettings ++ Seq[Sett](
     OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
   ) ++ mimaDefaultSettings ++ Seq[Sett](
     mimaPreviousArtifacts := {
