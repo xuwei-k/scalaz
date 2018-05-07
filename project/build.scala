@@ -335,7 +335,17 @@ object build {
       }.taskValue,
       buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
       buildInfoPackage := buildInfoPackageName,
-      osgiExport("scalaz"),
+      OsgiKeys.exportPackage := {
+        val scalaV = scalaVersion.value
+        val packages = CrossVersion.partialVersion(scalaV) match {
+          case Some((2, v)) if v >= 13 && scalaV != "2.13.0-M3" =>
+            // https://github.com/scalaz/scalaz/blob/2571a08cfb28/core/src/main/scala-2.13%2B/scala/collection/IndexedSeqOptimized.scala
+            Seq("scala.collection")
+          case _ =>
+            Nil
+        }
+        osgiExportSetting("scalaz" +: packages)
+      },
       OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*"))
     .enablePlugins(sbtbuildinfo.BuildInfoPlugin)
     .jsSettings(scalajsProjectSettings)
@@ -404,7 +414,9 @@ object build {
 
   lazy val checkGenTypeClasses = taskKey[Unit]("")
 
-  def osgiExport(packs: String*) = OsgiKeys.exportPackage := packs.map(_ + ".*;version=${Bundle-Version}")
+  private def osgiExportSetting(packs: Seq[String]) = packs.map(_ + ".*;version=${Bundle-Version}")
+
+  def osgiExport(packs: String*) = OsgiKeys.exportPackage := osgiExportSetting(packs)
 }
 
 // vim: expandtab:ts=2:sw=2
