@@ -6,7 +6,7 @@ import syntax.foldable._
 import syntax.equal._
 import org.scalacheck.Prop.forAll
 import org.scalacheck.{Arbitrary, Properties}
-//import scalaz.Foldable.FromFoldMap
+import scalaz.Foldable.FromFoldMap
 
 object FoldableTest extends SpecLite {
   "to" ! forAll {
@@ -286,7 +286,6 @@ object FoldableTest extends SpecLite {
        must_===((l ++ l2).reverse))
   }
 
-  /*
   "foldRight from foldMap" should {
 
     val fromFoldMap: Foldable[EphemeralStream] = new FromFoldMap[EphemeralStream] {
@@ -302,7 +301,6 @@ object FoldableTest extends SpecLite {
       stream.take(100) must_=== infiniteStream.take(100).toStream
     }
   }
-  */
 }
 
 object FoldableTests {
