@@ -474,10 +474,10 @@ abstract class LensInstances extends LensInstances0 {
       lens %= (_ - elem)
 
     def -=(elem1: K, elem2: K, elems: K*): IndexedState[S1, S2, Set[K]] =
-      lens %= (_ - elem1 - elem2 -- elems.toSet)
+      lens %= (_ - elem1 - elem2 diff elems.toSet)
 
     def --=(xs: TraversableOnce[K]): IndexedState[S1, S2, Set[K]] =
-      lens %= (_ -- xs.toSet)
+      lens %= (_ diff xs.toSet)
   }
 
   /** A lens that views a Set can provide the appearance of in place mutation */
