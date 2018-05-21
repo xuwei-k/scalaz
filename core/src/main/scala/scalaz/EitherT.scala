@@ -253,7 +253,7 @@ object EitherT extends EitherTInstances {
   }
 
   def leftU[B]: EitherTLeft[B] =
-    new EitherTLeft[B](true)
+    new EitherTLeft[B](())
 
   /**
    * @example {{{
@@ -262,14 +262,14 @@ object EitherT extends EitherTInstances {
    * }}}
    */
   def rightU[A]: EitherTRight[A] =
-    new EitherTRight[A](true)
+    new EitherTRight[A](())
 
-  private[scalaz] final class EitherTLeft[B](private val dummy: Boolean) extends AnyVal {
+  private[scalaz] final class EitherTLeft[B](private val dummy: Unit) extends AnyVal {
     def apply[FA](fa: FA)(implicit F: Unapply[Functor, FA]): EitherT[F.M, F.A, B] =
       leftT[F.M, F.A, B](F(fa))(F.TC)
   }
 
-  private[scalaz] final class EitherTRight[A](private val dummy: Boolean) extends AnyVal {
+  private[scalaz] final class EitherTRight[A](private val dummy: Unit) extends AnyVal {
     def apply[FB](fb: FB)(implicit F: Unapply[Functor, FB]): EitherT[F.M, A, F.A] =
       rightT[F.M, A, F.A](F(fb))(F.TC)
   }
