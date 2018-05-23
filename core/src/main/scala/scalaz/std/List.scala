@@ -13,6 +13,9 @@ trait ListInstances extends ListInstances0 {
   implicit val listInstance: Traverse[List] with MonadPlus[List] with BindRec[List] with Zip[List] with Unzip[List] with Align[List] with IsEmpty[List] with Cobind[List] =
     new Traverse[List] with MonadPlus[List] with IterableBindRec[List] with Zip[List] with Unzip[List] with Align[List] with IsEmpty[List] with Cobind[List] with IterableSubtypeFoldable[List] {
 
+      override def toList[A](fa: List[A]) =
+        fa
+
       override def point[A](a: => A): List[A] =
         List(a)
 

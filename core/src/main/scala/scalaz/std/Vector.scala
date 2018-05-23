@@ -13,6 +13,9 @@ sealed trait VectorInstances0 {
 trait VectorInstances extends VectorInstances0 {
   implicit val vectorInstance: Traverse[Vector] with MonadPlus[Vector] with BindRec[Vector] with Zip[Vector] with Unzip[Vector] with IsEmpty[Vector] with Align[Vector] = new Traverse[Vector] with MonadPlus[Vector] with IterableBindRec[Vector] with Zip[Vector] with Unzip[Vector] with IsEmpty[Vector] with Align[Vector] with IterableSubtypeFoldable[Vector] {
 
+    override def toVector[A](fa: Vector[A]) =
+      fa
+
     override def point[A](a: => A): Vector[A] =
       Vector(a)
 
