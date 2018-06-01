@@ -51,6 +51,14 @@ trait ApplyDivide[F[_]] extends InvariantFunctor[F] { self =>
 object ApplyDivide {
   @inline def apply[F[_]](implicit F: ApplyDivide[F]): ApplyDivide[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: ApplyDivide[G]): ApplyDivide[F] =
+    new IsomorphismApplyDivide[F, G] {
+      override def G: ApplyDivide[G] = E
+      override def iso: F <~> G = D
+    }
+
   ////
 
 ////
