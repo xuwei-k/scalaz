@@ -37,9 +37,3 @@ object Associative {
 
 ////
 }
-
-trait IsomorphismAssociative[F[_, _], G[_, _]] extends Associative[F] {
-  implicit def G: Associative[G]
-////
-////
-}

@@ -47,5 +47,10 @@ trait IsomorphismMonadError[F[_], G[_], S] extends MonadError[F, S] with Isomorp
   implicit def G: MonadError[G, S]
 ////
 
+  override def raiseError[A](e: S): F[A] =
+    iso.from(G.raiseError(e))
+
+  override def handleError[A](fa: F[A])(f: S => F[A]): F[A] =
+    iso.from(G.handleError(iso.to(fa))(s => iso.to(f(s))))
 ////
 }

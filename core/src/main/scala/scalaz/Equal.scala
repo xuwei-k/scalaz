@@ -91,6 +91,10 @@ object Equal {
 trait IsomorphismEqual[F, G] extends Equal[F] {
   implicit def G: Equal[G]
 ////
+  import Isomorphism._
 
+  def iso: F <=> G
+
+  def equal(a1: F, a2: F): Boolean = G.equal(iso.to(a1), iso.to(a2))
 ////
 }

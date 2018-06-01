@@ -38,6 +38,14 @@ object Catchable {
 trait IsomorphismCatchable[F[_], G[_]] extends Catchable[F] {
   implicit def G: Catchable[G]
 ////
+  import Isomorphism._
 
+  def iso: F <~> G
+
+  override def attempt[A](f: F[A]): F[Throwable \/ A] =
+    iso.from(G.attempt(iso.to(f)))
+
+  override def fail[A](err: Throwable): F[A] =
+    iso.from(G.fail(err))
 ////
 }

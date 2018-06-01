@@ -73,6 +73,13 @@ object Unzip {
 trait IsomorphismUnzip[F[_], G[_]] extends Unzip[F] {
   implicit def G: Unzip[G]
 ////
+  import Isomorphism._
 
+  def iso: F <~> G
+
+  def unzip[A, B](a: F[(A, B)]): (F[A], F[B]) =
+    G.unzip(iso.to(a)) match {
+      case (f, s) => (iso.from(f), iso.from(s))
+    }
 ////
 }

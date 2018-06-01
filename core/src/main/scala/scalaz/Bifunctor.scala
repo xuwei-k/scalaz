@@ -81,6 +81,11 @@ object Bifunctor {
 trait IsomorphismBifunctor[F[_, _], G[_, _]] extends Bifunctor[F] {
   implicit def G: Bifunctor[G]
 ////
+  import Isomorphism._
 
+  def iso: F <~~> G
+
+  override def bimap[A, B, C, D](fab: F[A, B])(f: A => C, g: B => D): F[C, D] =
+    iso.from(G.bimap(iso.to(fab))(f, g))
 ////
 }

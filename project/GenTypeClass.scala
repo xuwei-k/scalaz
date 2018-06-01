@@ -61,7 +61,7 @@ object TypeClass {
   lazy val applicativePlus = TypeClass("ApplicativePlus", *->*, extendsList = Seq(applicative, plusEmpty))
   lazy val monadPlus = TypeClass("MonadPlus", *->*, extendsList = Seq(monad, applicativePlus))
 
-  lazy val associative = TypeClass("Associative", *^*->*)
+  lazy val associative = TypeClass("Associative", *^*->*, iso = false)
   lazy val bifunctor = TypeClass("Bifunctor", *^*->*)
   lazy val bifoldable = TypeClass("Bifoldable", *^*->*)
   lazy val bitraverse = TypeClass("Bitraverse", *^*->*, extendsList = Seq(bifunctor, bifoldable))
@@ -295,6 +295,7 @@ object GenTypeClass {
         case values =>
           values.map(t => s"Isomorphism${t.name}[F, G]").mkString("with ", " with ", "")
       }
+     
       kind match {
         case Kind.* =>
 s"""

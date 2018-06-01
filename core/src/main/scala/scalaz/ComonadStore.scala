@@ -37,5 +37,10 @@ trait IsomorphismComonadStore[F[_], G[_], S] extends ComonadStore[F, S] with Iso
   implicit def G: ComonadStore[G, S]
 ////
 
+  override def pos[A](w: F[A]): S
+    = G.pos(iso.to(w))
+
+  override def peek[A](s: S, w: F[A]): A
+    = G.peek(s, iso.to(w))
 ////
 }

@@ -111,5 +111,7 @@ trait IsomorphismTraverse1[F[_], G[_]] extends Traverse1[F] with IsomorphismTrav
   implicit def G: Traverse1[G]
 ////
 
+  override def traverse1Impl[H[_]: Apply, A, B](fa: F[A])(f: A => H[B]): H[F[B]] =
+    Apply[H].map(G.traverse1Impl(iso.to(fa))(f))(iso.from.apply)
 ////
 }

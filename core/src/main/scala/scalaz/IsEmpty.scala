@@ -37,5 +37,7 @@ trait IsomorphismIsEmpty[F[_], G[_]] extends IsEmpty[F] with IsomorphismPlusEmpt
   implicit def G: IsEmpty[G]
 ////
 
+  def isEmpty[A](fa: F[A]): Boolean =
+    G.isEmpty(iso.to(fa))
 ////
 }

@@ -94,7 +94,17 @@ object Profunctor {
 
 trait IsomorphismProfunctor[F[_, _], G[_, _]] extends Profunctor[F] {
   implicit def G: Profunctor[G]
+
+  import Isomorphism._
 ////
+
+  def iso: F <~~> G
+
+  override def mapfst[A, B, C](fab: F[A, B])(f: C => A): F[C, B] =
+    iso.from(G.mapfst(iso.to(fab))(f))
+
+  override def mapsnd[A, B, C](fab: F[A, B])(f: B => C): F[A, C] =
+    iso.from(G.mapsnd(iso.to(fab))(f))
 
 ////
 }

@@ -78,6 +78,11 @@ object Zip {
 trait IsomorphismZip[F[_], G[_]] extends Zip[F] {
   implicit def G: Zip[G]
 ////
+  import Isomorphism._
 
+  def iso: F <~> G
+
+  def zip[A, B](a: => F[A], b: => F[B]): F[(A, B)] =
+    iso.from(G.zip(iso.to(a), iso.to(b)))
 ////
 }

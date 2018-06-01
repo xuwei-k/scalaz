@@ -40,5 +40,6 @@ trait IsomorphismComonad[F[_], G[_]] extends Comonad[F] with IsomorphismCobind[F
   implicit def G: Comonad[G]
 ////
 
+  override def copoint[A](p: F[A]): A = G.copoint(iso.to(p))
 ////
 }

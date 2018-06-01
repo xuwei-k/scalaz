@@ -71,5 +71,6 @@ trait IsomorphismPlusEmpty[F[_], G[_]] extends PlusEmpty[F] with IsomorphismPlus
   implicit def G: PlusEmpty[G]
 ////
 
+  def empty[A]: F[A] = iso.from(G.empty[A])
 ////
 }

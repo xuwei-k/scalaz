@@ -183,6 +183,16 @@ sealed abstract class Isomorphisms {
 
 object Isomorphism extends Isomorphisms
 
-//
-// Derive a type class instance through an Isomorphism
-//
+import Isomorphism._
+
+trait IsomorphismAssociative[F[_, _], G[_, _]] extends Associative[F] {
+  implicit def G: Associative[G] with Bifunctor[G]
+
+  def iso: F <~~> G
+
+  override def reassociateLeft[A, B, C](f: F[A, F[B, C]]): F[F[A, B], C] =
+    iso.from(G.leftMap(G.reassociateLeft(G.rightMap(iso.to(f))(iso.to.apply _)))(iso.from.apply _))
+
+  override def reassociateRight[A, B, C](f: F[F[A, B], C]): F[A, F[B, C]] =
+    iso.from(G.rightMap(G.reassociateRight(G.leftMap(iso.to(f))(iso.to.apply _)))(iso.from.apply _))
+}

@@ -100,6 +100,11 @@ object Plus {
 trait IsomorphismPlus[F[_], G[_]] extends Plus[F] {
   implicit def G: Plus[G]
 ////
+  import Isomorphism._
 
+  def iso: F <~> G
+
+  def plus[A](a: F[A], b: => F[A]): F[A] =
+    iso.from(G.plus(iso.to(a), iso.to(b)))
 ////
 }

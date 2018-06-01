@@ -212,5 +212,9 @@ trait IsomorphismTraverse[F[_], G[_]] extends Traverse[F] with IsomorphismFuncto
   implicit def G: Traverse[G]
 ////
 
+  protected[this] override final def naturalTrans: F ~> G = iso.to
+
+  override def traverseImpl[H[_] : Applicative, A, B](fa: F[A])(f: A => H[B]): H[F[B]] =
+    Applicative[H].map(G.traverseImpl(iso.to(fa))(f))(iso.from.apply)
 ////
 }

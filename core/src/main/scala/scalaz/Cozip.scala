@@ -45,6 +45,11 @@ object Cozip {
 trait IsomorphismCozip[F[_], G[_]] extends Cozip[F] {
   implicit def G: Cozip[G]
 ////
+  import Isomorphism._
 
+  def iso: F <~> G
+
+  def cozip[A, B](x: F[A \/ B]): (F[A] \/ F[B]) =
+    G.cozip(iso.to(x)).bimap(iso.from.apply _, iso.from.apply _)
 ////
 }
