@@ -52,7 +52,7 @@ object Cozip {
 
 trait IsomorphismCozip[F[_], G[_]] extends Cozip[F] {
   implicit def G: Cozip[G]
-////
+  ////
   import Isomorphism._
 
   def iso: F <~> G

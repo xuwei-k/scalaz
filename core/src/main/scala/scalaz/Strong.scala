@@ -33,7 +33,7 @@ object Strong {
 
 trait IsomorphismStrong[F[_, _], G[_, _]] extends Strong[F] with IsomorphismProfunctor[F, G]{
   implicit def G: Strong[G]
-////
+  ////
 
   override def first[A, B, C](fa: F[A, B]): F[(A, C), (B, C)] =
     iso.from(G.first(iso.to(fa)))

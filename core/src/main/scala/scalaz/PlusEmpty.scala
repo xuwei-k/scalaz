@@ -77,7 +77,7 @@ object PlusEmpty {
 
 trait IsomorphismPlusEmpty[F[_], G[_]] extends PlusEmpty[F] with IsomorphismPlus[F, G]{
   implicit def G: PlusEmpty[G]
-////
+  ////
 
   def empty[A]: F[A] = iso.from(G.empty[A])
 ////

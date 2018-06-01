@@ -90,7 +90,7 @@ object Contravariant {
 
 trait IsomorphismContravariant[F[_], G[_]] extends Contravariant[F] with IsomorphismInvariantFunctor[F, G]{
   implicit def G: Contravariant[G]
-////
+  ////
   import Isomorphism._
 
   def iso: F <~> G

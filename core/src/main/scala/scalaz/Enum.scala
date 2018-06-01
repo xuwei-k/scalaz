@@ -264,7 +264,7 @@ object Enum {
 
 trait IsomorphismEnum[F, G] extends Enum[F] with IsomorphismOrder[F, G]{
   implicit def G: Enum[G]
-////
+  ////
 
   override def succ(a: F): F =
     iso.from(G.succ(iso.to(a)))

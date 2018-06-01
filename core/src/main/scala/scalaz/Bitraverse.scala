@@ -144,7 +144,7 @@ object Bitraverse {
 
 trait IsomorphismBitraverse[F[_, _], G[_, _]] extends Bitraverse[F] with IsomorphismBifunctor[F, G] with IsomorphismBifoldable[F, G]{
   implicit def G: Bitraverse[G]
-////
+  ////
 
   override final protected[this] def biNaturalTrans: F ~~> G = iso.to
 

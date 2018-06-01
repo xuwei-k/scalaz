@@ -57,7 +57,7 @@ object ApplicativePlus {
 
 trait IsomorphismApplicativePlus[F[_], G[_]] extends ApplicativePlus[F] with IsomorphismApplicative[F, G] with IsomorphismPlusEmpty[F, G]{
   implicit def G: ApplicativePlus[G]
-////
+  ////
 
 ////
 }

@@ -35,7 +35,7 @@ object MonadReader {
 
 trait IsomorphismMonadReader[F[_], G[_], S] extends MonadReader[F, S] with IsomorphismMonad[F, G]{
   implicit def G: MonadReader[G, S]
-////
+  ////
 
   override def ask: F[S] = iso.from(G.ask)
 

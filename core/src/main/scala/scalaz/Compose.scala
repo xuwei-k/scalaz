@@ -56,7 +56,7 @@ object Compose {
 
 trait IsomorphismCompose[F[_, _], G[_, _]] extends Compose[F] {
   implicit def G: Compose[G]
-////
+  ////
   import Isomorphism._
 
   def iso: F <~~> G

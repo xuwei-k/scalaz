@@ -66,7 +66,7 @@ object ApplyDivide {
 
 trait IsomorphismApplyDivide[F[_], G[_]] extends ApplyDivide[F] with IsomorphismInvariantFunctor[F, G]{
   implicit def G: ApplyDivide[G]
-////
+  ////
 
   override def xproduct2[Z, A1, A2](a1: => F[A1], a2: => F[A2])(f: (A1, A2) => Z, g: Z => (A1, A2)): F[Z] =
     iso.from(

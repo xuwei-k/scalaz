@@ -33,7 +33,7 @@ object Derives {
 
 trait IsomorphismDerives[F[_], G[_]] extends Derives[F] with IsomorphismCoapplicativeCodivide[F, G] with IsomorphismApplicativeDivisible[F, G]{
   implicit def G: Derives[G]
-////
+  ////
 
 ////
 }

@@ -242,7 +242,7 @@ object Apply {
 
 trait IsomorphismApply[F[_], G[_]] extends Apply[F] with IsomorphismFunctor[F, G] with IsomorphismApplyDivide[F, G]{
   implicit def G: Apply[G]
-////
+  ////
 
   override def ap[A, B](fa: => F[A])(f: => F[A => B]): F[B] =
     iso.from(G.ap(iso.to(fa))(iso.to(f)))

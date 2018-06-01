@@ -46,7 +46,7 @@ object MonadError {
 
 trait IsomorphismMonadError[F[_], G[_], S] extends MonadError[F, S] with IsomorphismMonad[F, G]{
   implicit def G: MonadError[G, S]
-////
+  ////
 
   override def raiseError[A](e: S): F[A] =
     iso.from(G.raiseError(e))

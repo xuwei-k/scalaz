@@ -218,7 +218,7 @@ object Traverse {
 
 trait IsomorphismTraverse[F[_], G[_]] extends Traverse[F] with IsomorphismFunctor[F, G] with IsomorphismFoldable[F, G]{
   implicit def G: Traverse[G]
-////
+  ////
 
   protected[this] override final def naturalTrans: F ~> G = iso.to
 

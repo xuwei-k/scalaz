@@ -107,7 +107,7 @@ object Plus {
 
 trait IsomorphismPlus[F[_], G[_]] extends Plus[F] {
   implicit def G: Plus[G]
-////
+  ////
   import Isomorphism._
 
   def iso: F <~> G

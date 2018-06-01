@@ -80,7 +80,7 @@ object Unzip {
 
 trait IsomorphismUnzip[F[_], G[_]] extends Unzip[F] {
   implicit def G: Unzip[G]
-////
+  ////
   import Isomorphism._
 
   def iso: F <~> G

@@ -67,7 +67,7 @@ object Show {
 
 trait IsomorphismShow[F, G] extends Show[F] {
   implicit def G: Show[G]
-////
+  ////
   import Isomorphism._
 
   def iso: F <=> G

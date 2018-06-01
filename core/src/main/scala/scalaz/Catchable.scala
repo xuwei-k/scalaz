@@ -45,7 +45,7 @@ object Catchable {
 
 trait IsomorphismCatchable[F[_], G[_]] extends Catchable[F] {
   implicit def G: Catchable[G]
-////
+  ////
   import Isomorphism._
 
   def iso: F <~> G

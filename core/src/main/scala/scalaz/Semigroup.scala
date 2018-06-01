@@ -228,7 +228,7 @@ object Semigroup {
 
 trait IsomorphismSemigroup[F, G] extends Semigroup[F] {
   implicit def G: Semigroup[G]
-////
+  ////
   import Isomorphism._
 
   def iso: F <=> G

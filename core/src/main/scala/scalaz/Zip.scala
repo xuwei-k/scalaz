@@ -85,7 +85,7 @@ object Zip {
 
 trait IsomorphismZip[F[_], G[_]] extends Zip[F] {
   implicit def G: Zip[G]
-////
+  ////
   import Isomorphism._
 
   def iso: F <~> G

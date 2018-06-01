@@ -465,7 +465,7 @@ object Foldable {
 
 trait IsomorphismFoldable[F[_], G[_]] extends Foldable[F] {
   implicit def G: Foldable[G]
-////
+  ////
   protected[this] def naturalTrans: F ~> G
 
   override def foldMap[A, B](fa: F[A])(f: A => B)(implicit F: Monoid[B]): B =

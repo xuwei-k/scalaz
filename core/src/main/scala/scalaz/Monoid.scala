@@ -142,7 +142,7 @@ object Monoid {
 
 trait IsomorphismMonoid[F, G] extends Monoid[F] with IsomorphismSemigroup[F, G]{
   implicit def G: Monoid[G]
-////
+  ////
 
   def zero: F = iso.from(G.zero)
 ////

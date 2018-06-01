@@ -66,7 +66,7 @@ object CoapplicativeCodivide {
 
 trait IsomorphismCoapplicativeCodivide[F[_], G[_]] extends CoapplicativeCodivide[F] {
   implicit def G: CoapplicativeCodivide[G]
-////
+  ////
   import Isomorphism._
   def iso: F <~> G
 

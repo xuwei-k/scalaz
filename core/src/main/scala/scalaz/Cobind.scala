@@ -51,7 +51,7 @@ object Cobind {
 
 trait IsomorphismCobind[F[_], G[_]] extends Cobind[F] with IsomorphismFunctor[F, G]{
   implicit def G: Cobind[G]
-////
+  ////
 
   override def cobind[A, B](fa: F[A])(f: F[A] => B): F[B] =
     iso.from(G.cobind(iso.to(fa))(f.compose(iso.from.apply)))

@@ -102,7 +102,7 @@ object Profunctor {
 
 trait IsomorphismProfunctor[F[_, _], G[_, _]] extends Profunctor[F] {
   implicit def G: Profunctor[G]
-////
+  ////
   import Isomorphism._
 
   def iso: F <~~> G

@@ -127,7 +127,7 @@ object Order {
 
 trait IsomorphismOrder[F, G] extends Order[F] with IsomorphismEqual[F, G]{
   implicit def G: Order[G]
-////
+  ////
   override def equal(x: F, y: F): Boolean =
     super[IsomorphismEqual].equal(x, y)
 

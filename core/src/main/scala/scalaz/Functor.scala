@@ -128,7 +128,7 @@ object Functor {
 
 trait IsomorphismFunctor[F[_], G[_]] extends Functor[F] with IsomorphismInvariantFunctor[F, G]{
   implicit def G: Functor[G]
-////
+  ////
   import Isomorphism._
 
   def iso: F <~> G

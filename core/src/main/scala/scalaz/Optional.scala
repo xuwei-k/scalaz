@@ -68,7 +68,7 @@ object Optional {
 
 trait IsomorphismOptional[F[_], G[_]] extends Optional[F] {
   implicit def G: Optional[G]
-////
+  ////
   import Isomorphism._
 
   def iso: F <~> G

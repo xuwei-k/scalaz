@@ -133,7 +133,7 @@ object Applicative {
 
 trait IsomorphismApplicative[F[_], G[_]] extends Applicative[F] with IsomorphismApply[F, G] with IsomorphismApplicativeDivisible[F, G]{
   implicit def G: Applicative[G]
-////
+  ////
 
   def point[A](a: => A): F[A] = iso.from(G.point(a))
 

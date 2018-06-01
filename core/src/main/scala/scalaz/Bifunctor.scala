@@ -88,7 +88,7 @@ object Bifunctor {
 
 trait IsomorphismBifunctor[F[_, _], G[_, _]] extends Bifunctor[F] {
   implicit def G: Bifunctor[G]
-////
+  ////
   import Isomorphism._
 
   def iso: F <~~> G

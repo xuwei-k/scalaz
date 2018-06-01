@@ -83,7 +83,7 @@ object Coapplicative {
 
 trait IsomorphismCoapplicative[F[_], G[_]] extends Coapplicative[F] with IsomorphismCoapplicativeCodivide[F, G]{
   implicit def G: Coapplicative[G]
-////
+  ////
 
   def coapply1[Z, A1](a1: => F[A1])(f: A1 => Z): F[Z] =
     iso.from(G.coapply1(iso.to(a1))(f))

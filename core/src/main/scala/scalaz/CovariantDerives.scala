@@ -30,7 +30,7 @@ object CovariantDerives {
 
 trait IsomorphismCovariantDerives[F[_], G[_]] extends CovariantDerives[F] with IsomorphismDerives[F, G] with IsomorphismCoapplicative[F, G] with IsomorphismApplicative[F, G]{
   implicit def G: CovariantDerives[G]
-////
+  ////
 
 ////
 }

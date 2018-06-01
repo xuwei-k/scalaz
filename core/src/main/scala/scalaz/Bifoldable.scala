@@ -125,7 +125,7 @@ object Bifoldable {
 
 trait IsomorphismBifoldable[F[_, _], G[_, _]] extends Bifoldable[F] {
   implicit def G: Bifoldable[G]
-////
+  ////
 
   protected[this] def biNaturalTrans: F ~~> G
 

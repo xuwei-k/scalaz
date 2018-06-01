@@ -98,7 +98,7 @@ object Equal {
 
 trait IsomorphismEqual[F, G] extends Equal[F] {
   implicit def G: Equal[G]
-////
+  ////
   import Isomorphism._
 
   def iso: F <=> G
