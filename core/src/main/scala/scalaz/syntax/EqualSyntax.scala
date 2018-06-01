@@ -15,7 +15,7 @@ final class EqualOps[F] private[syntax](val self: F)(implicit val F: Equal[F]) e
   final def assert_===[B](other: B)(implicit S: Show[F], ev: B <:< F): Unit =
       if (/==(other)) sys.error(S.shows(self) + " ≠ " + S.shows(ev(other)))
 
-  ////
+////
 }
 
 trait ToEqualOps  {
@@ -24,7 +24,7 @@ trait ToEqualOps  {
 
   ////
 
-  ////
+////
 }
 
 trait EqualSyntax[F]  {
@@ -33,5 +33,5 @@ trait EqualSyntax[F]  {
   def F: Equal[F]
   ////
 
-  ////
+////
 }

@@ -13,7 +13,7 @@ final class MonoidOps[F] private[syntax](val self: F)(implicit val F: Monoid[F])
   final def onNotEmpty[A](v: => A)(implicit ma: Monoid[A], e: Equal[F]): A = F.onNotEmpty(self)(v)
 
   final def onEmpty[A](v: => A)(implicit ma: Monoid[A], e: Equal[F]): A = F.onEmpty(self)(v)
-  ////
+////
 }
 
 trait ToMonoidOps extends ToSemigroupOps {
@@ -24,7 +24,7 @@ trait ToMonoidOps extends ToSemigroupOps {
 
   def mzero[F](implicit F: Monoid[F]): F = F.zero
   def ∅[F](implicit F: Monoid[F]): F = F.zero
-  ////
+////
 }
 
 trait MonoidSyntax[F] extends SemigroupSyntax[F] {
@@ -34,5 +34,5 @@ trait MonoidSyntax[F] extends SemigroupSyntax[F] {
   ////
   def mzero(implicit F: Monoid[F]): F = F.zero
   def ∅(implicit F: Monoid[F]): F = F.zero
-  ////
+////
 }

@@ -6,7 +6,7 @@ final class ChoiceOps[F[_, _],A, B] private[syntax](val self: F[A, B])(implicit 
   ////
   final def |||[C](x: => F[C, B]): F[A \/ C, B] =
     F.choice(self, x)
-  ////
+////
 }
 
 sealed trait ToChoiceOpsU[TC[F[_, _]] <: Choice[F]] {
@@ -26,7 +26,7 @@ trait ToChoiceOps0[TC[F[_, _]] <: Choice[F]] extends ToChoiceOpsU[TC] {
 
   ////
 
-  ////
+////
 }
 
 trait ToChoiceOps[TC[F[_, _]] <: Choice[F]] extends ToChoiceOps0[TC] with ToCategoryOps[TC]
@@ -37,5 +37,5 @@ trait ChoiceSyntax[F[_, _]] extends CategorySyntax[F] {
   def F: Choice[F]
   ////
 
-  ////
+////
 }

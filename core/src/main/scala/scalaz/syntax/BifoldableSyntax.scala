@@ -12,7 +12,7 @@ final class BifoldableOps[F[_, _],A, B] private[syntax](val self: F[A, B])(impli
   def bifoldR[C](z: => C)(f: A => (=> C) => C)(g: B => (=> C) => C): C = F.bifoldR(self, z)(f)(g)
   def bifoldL[C](z: C)(f: C => A => C)(g: C => B => C): C = F.bifoldL(self, z)(f)(g)
 
-  ////
+////
 }
 
 sealed trait ToBifoldableOpsU[TC[F[_, _]] <: Bifoldable[F]] {
@@ -32,7 +32,7 @@ trait ToBifoldableOps0[TC[F[_, _]] <: Bifoldable[F]] extends ToBifoldableOpsU[TC
 
   ////
 
-  ////
+////
 }
 
 trait ToBifoldableOps[TC[F[_, _]] <: Bifoldable[F]] extends ToBifoldableOps0[TC]
@@ -43,5 +43,5 @@ trait BifoldableSyntax[F[_, _]]  {
   def F: Bifoldable[F]
   ////
 
-  ////
+////
 }

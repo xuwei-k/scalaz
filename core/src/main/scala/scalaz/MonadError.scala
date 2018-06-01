@@ -24,7 +24,7 @@ trait MonadError[F[_], S] extends Monad[F] { self =>
   }
   def monadErrorLaw = new MonadErrorLaw {}
 
-  ////
+////
   val monadErrorSyntax = new scalaz.syntax.MonadErrorSyntax[F, S] { def F = MonadError.this }
 }
 
@@ -40,5 +40,12 @@ object MonadError {
       override def iso: F <~> G = D
     }
 
-  ////
+////
+}
+
+trait IsomorphismMonadError[F[_], G[_], S] extends MonadError[F, S] with IsomorphismMonad[F, G]{
+  implicit def G: MonadError[G, S]
+////
+
+////
 }

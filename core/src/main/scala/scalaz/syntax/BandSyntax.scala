@@ -5,7 +5,7 @@ package syntax
 final class BandOps[F] private[syntax](val self: F)(implicit val F: Band[F]) extends Ops[F] {
   ////
 
-  ////
+////
 }
 
 trait ToBandOps extends ToSemigroupOps {
@@ -14,7 +14,7 @@ trait ToBandOps extends ToSemigroupOps {
 
   ////
 
-  ////
+////
 }
 
 trait BandSyntax[F] extends SemigroupSyntax[F] {
@@ -23,5 +23,5 @@ trait BandSyntax[F] extends SemigroupSyntax[F] {
   def F: Band[F]
   ////
 
-  ////
+////
 }

@@ -183,7 +183,7 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
   }
   def foldable1Law = new Foldable1Law {}
 
-  ////
+////
   val foldable1Syntax = new scalaz.syntax.Foldable1Syntax[F] { def F = Foldable1.this }
 }
 
@@ -192,5 +192,11 @@ object Foldable1 {
 
   ////
 
-  ////
+////
+}
+
+trait IsomorphismFoldable1[F[_], G[_]] extends Foldable1[F] with IsomorphismFoldable[F, G]{
+  implicit def G: Foldable1[G]
+////
+////
 }

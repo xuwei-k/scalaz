@@ -29,7 +29,7 @@ final class Foldable1Ops[F[_],A] private[syntax](val self: F[A])(implicit val F:
   final def toNel: NonEmptyList[A] = F.toNel(self)
   final def scanLeft1(f: (A, A) => A): NonEmptyList[A] = F.scanLeft1(self)(f)
   final def scanRight1(f: (A, A) => A): NonEmptyList[A] = F.scanRight1(self)(f)
-  ////
+////
 }
 
 sealed trait ToFoldable1OpsU[TC[F[_]] <: Foldable1[F]] {
@@ -44,7 +44,7 @@ trait ToFoldable1Ops0[TC[F[_]] <: Foldable1[F]] extends ToFoldable1OpsU[TC] {
 
   ////
 
-  ////
+////
 }
 
 trait ToFoldable1Ops[TC[F[_]] <: Foldable1[F]] extends ToFoldable1Ops0[TC] with ToFoldableOps[TC]
@@ -55,5 +55,5 @@ trait Foldable1Syntax[F[_]] extends FoldableSyntax[F] {
   def F: Foldable1[F]
   ////
 
-  ////
+////
 }

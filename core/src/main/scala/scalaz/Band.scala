@@ -29,7 +29,7 @@ trait Band[F] extends Semigroup[F] { self =>
   }
   def bandLaw = new BandLaw {}
 
-  ////
+////
   val bandSyntax = new scalaz.syntax.BandSyntax[F] { def F = Band.this }
 }
 
@@ -38,5 +38,12 @@ object Band {
 
   ////
 
-  ////
+////
+}
+
+trait IsomorphismBand[F, G] extends Band[F] with IsomorphismSemigroup[F, G]{
+  implicit def G: Band[G]
+////
+
+////
 }

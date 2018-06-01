@@ -86,7 +86,7 @@ final class FoldableOps[F[_],A] private[syntax](val self: F[A])(implicit val F: 
   final def msuml[G[_], B](implicit ev: A === G[B], G: PlusEmpty[G]): G[B] = F.msuml(ev.subst[F](self))
   @deprecated("use psum", "7.3.0")
   final def msumlU(implicit G: Unapply[PlusEmpty, A]): G.M[G.A] = F.msumlU(self)
-  ////
+////
 }
 
 sealed trait ToFoldableOpsU[TC[F[_]] <: Foldable[F]] {
@@ -101,7 +101,7 @@ trait ToFoldableOps0[TC[F[_]] <: Foldable[F]] extends ToFoldableOpsU[TC] {
 
   ////
 
-  ////
+////
 }
 
 trait ToFoldableOps[TC[F[_]] <: Foldable[F]] extends ToFoldableOps0[TC]
@@ -112,5 +112,5 @@ trait FoldableSyntax[F[_]]  {
   def F: Foldable[F]
   ////
 
-  ////
+////
 }

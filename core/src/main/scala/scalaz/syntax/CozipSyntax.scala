@@ -5,7 +5,7 @@ package syntax
 final class CozipOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Cozip[F]) extends Ops[F[A]] {
   ////
 
-  ////
+////
 }
 
 sealed trait ToCozipOpsU[TC[F[_]] <: Cozip[F]] {
@@ -20,7 +20,7 @@ trait ToCozipOps0[TC[F[_]] <: Cozip[F]] extends ToCozipOpsU[TC] {
 
   ////
 
-  ////
+////
 }
 
 trait ToCozipOps[TC[F[_]] <: Cozip[F]] extends ToCozipOps0[TC]
@@ -31,5 +31,5 @@ trait CozipSyntax[F[_]]  {
   def F: Cozip[F]
   ////
 
-  ////
+////
 }

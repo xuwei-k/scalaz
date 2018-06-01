@@ -11,7 +11,7 @@ final class ApplicativeOps[F[_],A] private[syntax](val self: F[A])(implicit val 
 
   final def replicateM_(n: Int): F[Unit] =
     F.replicateM_(n, self)
-  ////
+////
 }
 
 sealed trait ToApplicativeOpsU[TC[F[_]] <: Applicative[F]] {
@@ -34,7 +34,7 @@ trait ToApplicativeOps0[TC[F[_]] <: Applicative[F]] extends ToApplicativeOpsU[TC
     def point[F[_] : TC]: F[A] = Applicative[F].point(self)
     def pure[F[_] : TC]: F[A] = Applicative[F].point(self)
     def η[F[_] : TC]: F[A] = Applicative[F].point(self)
-  }  ////
+  }////
 }
 
 trait ToApplicativeOps[TC[F[_]] <: Applicative[F]] extends ToApplicativeOps0[TC] with ToApplyOps[TC] with ToApplicativeDivisibleOps[TC]
@@ -64,5 +64,5 @@ trait ApplicativeSyntax[F[_]] extends ApplySyntax[F] with ApplicativeDivisibleSy
     def η(implicit F: Applicative[F]): F[A] = Applicative[F].point(self)
   }
 
-  ////
+////
 }

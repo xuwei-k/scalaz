@@ -61,7 +61,7 @@ trait Coapplicative[F[_]] extends CoapplicativeCodivide[F] { self =>
     g: Z => (A1 \/ (A2 \/ (A3 \/ A4)))
   ): F[Z] = coapply4(a1, a2, a3, a4)(f)
 
-  ////
+////
   val coapplicativeSyntax = new scalaz.syntax.CoapplicativeSyntax[F] { def F = Coapplicative.this }
 }
 
@@ -70,5 +70,12 @@ object Coapplicative {
 
   ////
 
-  ////
+////
+}
+
+trait IsomorphismCoapplicative[F[_], G[_]] extends Coapplicative[F] with IsomorphismCoapplicativeCodivide[F, G]{
+  implicit def G: Coapplicative[G]
+////
+
+////
 }

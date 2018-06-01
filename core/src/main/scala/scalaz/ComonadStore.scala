@@ -21,7 +21,7 @@ trait ComonadStore[F[_], S] extends Comonad[F] { self =>
 
   def experiment[G[_], A](s: S => G[S], w: F[A])(implicit FG: Functor[G]): G[A] =
     FG.map(s(pos(w)))(peek(_, w))
-  ////
+////
 
 }
 
@@ -30,5 +30,12 @@ object ComonadStore {
 
   ////
 
-  ////
+////
+}
+
+trait IsomorphismComonadStore[F[_], G[_], S] extends ComonadStore[F, S] with IsomorphismComonad[F, G]{
+  implicit def G: ComonadStore[G, S]
+////
+
+////
 }

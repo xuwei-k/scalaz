@@ -106,7 +106,7 @@ trait Functor[F[_]] extends InvariantFunctor[F] { self =>
     def composite[A, B, C](fa: F[A], f1: A => B, f2: B => C)(implicit FC: Equal[F[C]]): Boolean = FC.equal(map(map(fa)(f1))(f2), map(fa)(f2 compose f1))
   }
   def functorLaw = new FunctorLaw {}
-  ////
+////
   val functorSyntax = new scalaz.syntax.FunctorSyntax[F] { def F = Functor.this }
 }
 
@@ -115,5 +115,17 @@ object Functor {
 
   ////
 
-  ////
+////
+}
+
+trait IsomorphismFunctor[F[_], G[_]] extends Functor[F] with IsomorphismInvariantFunctor[F, G]{
+  implicit def G: Functor[G]
+////
+  import Isomorphism._
+
+  def iso: F <~> G
+
+  override def map[A, B](fa: F[A])(f: A => B): F[B] = iso.from(G.map(iso.to(fa))(f))
+
+////
 }

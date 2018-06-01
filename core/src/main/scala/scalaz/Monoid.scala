@@ -84,7 +84,7 @@ trait Monoid[F] extends Semigroup[F] { self =>
   }
   def monoidLaw = new MonoidLaw {}
 
-  ////
+////
   val monoidSyntax = new scalaz.syntax.MonoidSyntax[F] { def F = Monoid.this }
 }
 
@@ -129,5 +129,12 @@ object Monoid {
       }
     }
 
-  ////
+////
+}
+
+trait IsomorphismMonoid[F, G] extends Monoid[F] with IsomorphismSemigroup[F, G]{
+  implicit def G: Monoid[G]
+////
+
+////
 }

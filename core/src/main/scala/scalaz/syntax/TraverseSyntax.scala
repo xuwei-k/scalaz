@@ -64,7 +64,7 @@ final class TraverseOps[F[_],A] private[syntax](val self: F[A])(implicit val F: 
     F.mapAccumL(self, z)(f)
   final def mapAccumR[S,B](z: S)(f: (S,A) => (S,B)): (S, F[B]) =
     F.mapAccumR(self, z)(f)
-  ////
+////
 }
 
 sealed trait ToTraverseOpsU[TC[F[_]] <: Traverse[F]] {
@@ -79,7 +79,7 @@ trait ToTraverseOps0[TC[F[_]] <: Traverse[F]] extends ToTraverseOpsU[TC] {
 
   ////
 
-  ////
+////
 }
 
 trait ToTraverseOps[TC[F[_]] <: Traverse[F]] extends ToTraverseOps0[TC] with ToFunctorOps[TC] with ToFoldableOps[TC]
@@ -90,5 +90,5 @@ trait TraverseSyntax[F[_]] extends FunctorSyntax[F] with FoldableSyntax[F] {
   def F: Traverse[F]
   ////
 
-  ////
+////
 }

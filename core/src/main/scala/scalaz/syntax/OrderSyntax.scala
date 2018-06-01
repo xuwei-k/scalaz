@@ -16,7 +16,7 @@ final class OrderOps[F] private[syntax](val self: F)(implicit val F: Order[F]) e
   final def gte(other: F): Boolean = F.greaterThanOrEqual(self, other)
   final def lt(other: F): Boolean = F.lessThan(self, other)
   final def gt(other: F): Boolean = F.greaterThan(self, other)
-  ////
+////
 }
 
 trait ToOrderOps extends ToEqualOps {
@@ -25,7 +25,7 @@ trait ToOrderOps extends ToEqualOps {
 
   ////
 
-  ////
+////
 }
 
 trait OrderSyntax[F] extends EqualSyntax[F] {
@@ -34,5 +34,5 @@ trait OrderSyntax[F] extends EqualSyntax[F] {
   def F: Order[F]
   ////
 
-  ////
+////
 }

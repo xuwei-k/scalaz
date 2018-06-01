@@ -111,7 +111,7 @@ trait Applicative[F[_]] extends Apply[F] with ApplicativeDivisible[F] { self =>
   }
   def applicativeLaw = new ApplicativeLaw {}
 
-  ////
+////
   val applicativeSyntax = new scalaz.syntax.ApplicativeSyntax[F] { def F = Applicative.this }
 }
 
@@ -120,5 +120,15 @@ object Applicative {
 
   ////
 
-  ////
+////
+}
+
+trait IsomorphismApplicative[F[_], G[_]] extends Applicative[F] with IsomorphismApply[F, G] with IsomorphismApplicativeDivisible[F, G]{
+  implicit def G: Applicative[G]
+////
+
+  def point[A](a: => A): F[A] = iso.from(G.point(a))
+
+  override def ap[A, B](fa: => F[A])(f: => F[A => B]): F[B] = iso.from(G.ap(iso.to(fa))(iso.to(f)))
+////
 }

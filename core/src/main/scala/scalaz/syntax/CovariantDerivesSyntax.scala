@@ -5,7 +5,7 @@ package syntax
 final class CovariantDerivesOps[F[_],A] private[syntax](val self: F[A])(implicit val F: CovariantDerives[F]) extends Ops[F[A]] {
   ////
 
-  ////
+////
 }
 
 sealed trait ToCovariantDerivesOpsU[TC[F[_]] <: CovariantDerives[F]] {
@@ -20,7 +20,7 @@ trait ToCovariantDerivesOps0[TC[F[_]] <: CovariantDerives[F]] extends ToCovarian
 
   ////
 
-  ////
+////
 }
 
 trait ToCovariantDerivesOps[TC[F[_]] <: CovariantDerives[F]] extends ToCovariantDerivesOps0[TC] with ToDerivesOps[TC] with ToCoapplicativeOps[TC] with ToApplicativeOps[TC]
@@ -31,5 +31,5 @@ trait CovariantDerivesSyntax[F[_]] extends DerivesSyntax[F] with CoapplicativeSy
   def F: CovariantDerives[F]
   ////
 
-  ////
+////
 }

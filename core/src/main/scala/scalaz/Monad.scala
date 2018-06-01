@@ -80,7 +80,7 @@ trait Monad[F[_]] extends Applicative[F] with Bind[F] { self =>
     def leftIdentity[A, B](a: A, f: A => F[B])(implicit FB: Equal[F[B]]): Boolean = FB.equal(bind(point(a))(f), f(a))
   }
   def monadLaw = new MonadLaw {}
-  ////
+////
   val monadSyntax = new scalaz.syntax.MonadSyntax[F] { def F = Monad.this }
 }
 
@@ -89,5 +89,12 @@ object Monad {
 
   ////
 
-  ////
+////
+}
+
+trait IsomorphismMonad[F[_], G[_]] extends Monad[F] with IsomorphismApplicative[F, G] with IsomorphismBind[F, G]{
+  implicit def G: Monad[G]
+////
+
+////
 }

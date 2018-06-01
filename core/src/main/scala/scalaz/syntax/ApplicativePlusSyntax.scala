@@ -5,7 +5,7 @@ package syntax
 final class ApplicativePlusOps[F[_],A] private[syntax](val self: F[A])(implicit val F: ApplicativePlus[F]) extends Ops[F[A]] {
   ////
 
-  ////
+////
 }
 
 sealed trait ToApplicativePlusOpsU[TC[F[_]] <: ApplicativePlus[F]] {
@@ -20,7 +20,7 @@ trait ToApplicativePlusOps0[TC[F[_]] <: ApplicativePlus[F]] extends ToApplicativ
 
   ////
 
-  ////
+////
 }
 
 trait ToApplicativePlusOps[TC[F[_]] <: ApplicativePlus[F]] extends ToApplicativePlusOps0[TC] with ToApplicativeOps[TC] with ToPlusEmptyOps[TC]
@@ -31,5 +31,5 @@ trait ApplicativePlusSyntax[F[_]] extends ApplicativeSyntax[F] with PlusEmptySyn
   def F: ApplicativePlus[F]
   ////
 
-  ////
+////
 }

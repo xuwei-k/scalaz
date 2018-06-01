@@ -11,7 +11,7 @@ package scalaz
 trait ContravariantDerives[F[_]] extends Derives[F] with Codivide[F] with Divisible[F] { self =>
   ////
 
-  ////
+////
   val contravariantDerivesSyntax = new scalaz.syntax.ContravariantDerivesSyntax[F] { def F = ContravariantDerives.this }
 }
 
@@ -20,5 +20,12 @@ object ContravariantDerives {
 
   ////
 
-  ////
+////
+}
+
+trait IsomorphismContravariantDerives[F[_], G[_]] extends ContravariantDerives[F] with IsomorphismDerives[F, G] with IsomorphismCodivide[F, G] with IsomorphismDivisible[F, G]{
+  implicit def G: ContravariantDerives[G]
+////
+
+////
 }

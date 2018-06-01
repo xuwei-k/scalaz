@@ -6,7 +6,7 @@ final class ContravariantOps[F[_],A] private[syntax](val self: F[A])(implicit va
   ////
   final def contramap[B](f: B => A): F[B] = F.contramap(self)(f)
   final def ∙[B](f: B => A): F[B] = F.contramap(self)(f)
-  ////
+////
 }
 
 sealed trait ToContravariantOpsU[TC[F[_]] <: Contravariant[F]] {
@@ -21,7 +21,7 @@ trait ToContravariantOps0[TC[F[_]] <: Contravariant[F]] extends ToContravariantO
 
   ////
 
-  ////
+////
 }
 
 trait ToContravariantOps[TC[F[_]] <: Contravariant[F]] extends ToContravariantOps0[TC] with ToInvariantFunctorOps[TC]
@@ -32,5 +32,5 @@ trait ContravariantSyntax[F[_]] extends InvariantFunctorSyntax[F] {
   def F: Contravariant[F]
   ////
 
-  ////
+////
 }

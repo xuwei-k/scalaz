@@ -190,7 +190,7 @@ trait Nondeterminism[F[_]] extends Monad[F] { self =>
         Parallel(self.mapBoth(Tag.unwrap(fa), Tag.unwrap(fab))((a, f) => f(a)))
     }
 
-  ////
+////
   val nondeterminismSyntax = new scalaz.syntax.NondeterminismSyntax[F] { def F = Nondeterminism.this }
 }
 
@@ -199,5 +199,12 @@ object Nondeterminism {
 
   ////
 
-  ////
+////
+}
+
+trait IsomorphismNondeterminism[F[_], G[_]] extends Nondeterminism[F] with IsomorphismMonad[F, G]{
+  implicit def G: Nondeterminism[G]
+////
+
+////
 }

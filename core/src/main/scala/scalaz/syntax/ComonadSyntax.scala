@@ -6,7 +6,7 @@ final class ComonadOps[F[_],A] private[syntax](val self: F[A])(implicit val F: C
   ////
   def copoint: A = F.copoint(self)
 
-  ////
+////
 }
 
 sealed trait ToComonadOpsU[TC[F[_]] <: Comonad[F]] {
@@ -21,7 +21,7 @@ trait ToComonadOps0[TC[F[_]] <: Comonad[F]] extends ToComonadOpsU[TC] {
 
   ////
 
-  ////
+////
 }
 
 trait ToComonadOps[TC[F[_]] <: Comonad[F]] extends ToComonadOps0[TC] with ToCobindOps[TC]
@@ -32,5 +32,5 @@ trait ComonadSyntax[F[_]] extends CobindSyntax[F] {
   def F: Comonad[F]
   ////
 
-  ////
+////
 }

@@ -27,7 +27,7 @@ final class BindOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Bind
 
   def mproduct[B](f: A => F[B]): F[(A, B)] = F.mproduct(self)(f)
 
-  ////
+////
 }
 
 sealed trait ToBindOpsU[TC[F[_]] <: Bind[F]] {
@@ -42,7 +42,7 @@ trait ToBindOps0[TC[F[_]] <: Bind[F]] extends ToBindOpsU[TC] {
 
   ////
 
-  ////
+////
 }
 
 trait ToBindOps[TC[F[_]] <: Bind[F]] extends ToBindOps0[TC] with ToApplyOps[TC]
@@ -53,5 +53,5 @@ trait BindSyntax[F[_]] extends ApplySyntax[F] {
   def F: Bind[F]
   ////
 
-  ////
+////
 }

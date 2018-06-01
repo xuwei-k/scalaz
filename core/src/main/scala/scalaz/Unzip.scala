@@ -59,7 +59,7 @@ trait Unzip[F[_]]  { self =>
     (a, b, c, d, e, g, h)
   }
 
-  ////
+////
   val unzipSyntax = new scalaz.syntax.UnzipSyntax[F] { def F = Unzip.this }
 }
 
@@ -67,5 +67,12 @@ object Unzip {
   @inline def apply[F[_]](implicit F: Unzip[F]): Unzip[F] = F
 
   ////
-  ////
+////
+}
+
+trait IsomorphismUnzip[F[_], G[_]] extends Unzip[F] {
+  implicit def G: Unzip[G]
+////
+
+////
 }

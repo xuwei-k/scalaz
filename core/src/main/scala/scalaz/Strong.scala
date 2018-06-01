@@ -11,7 +11,7 @@ trait Strong[=>:[_, _]] extends Profunctor[=>:] { self =>
 
   def second[A, B, C](fa: A =>: B): (C, A) =>: (C, B)
 
-  ////
+////
   val strongSyntax = new scalaz.syntax.StrongSyntax[=>:] { def F = Strong.this }
 }
 
@@ -20,5 +20,12 @@ object Strong {
 
   ////
 
-  ////
+////
+}
+
+trait IsomorphismStrong[F[_, _], G[_, _]] extends Strong[F] with IsomorphismProfunctor[F, G]{
+  implicit def G: Strong[G]
+////
+
+////
 }

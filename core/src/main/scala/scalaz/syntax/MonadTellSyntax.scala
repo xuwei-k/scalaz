@@ -10,7 +10,7 @@ final class MonadTellOps[F[_], S, A] private[syntax](self: F[A])(implicit val F:
   final def :++>>(f: A => S): F[A] =
     F.bind(self)(a => F.map(F.tell(f(a)))(_ => a))
 
-  ////
+////
 }
 
 trait ToMonadTellOps0[TC[F[_], S] <: MonadTell[F, S]] {
@@ -19,7 +19,7 @@ trait ToMonadTellOps0[TC[F[_], S] <: MonadTell[F, S]] {
 
   ////
 
-  ////
+////
 }
 
 trait ToMonadTellOps[TC[F[_], S] <: MonadTell[F, S]] extends ToMonadTellOps0[TC] with ToMonadOps[λ[F[_] => TC[F, S] forSome { type S }]]
@@ -31,5 +31,5 @@ trait MonadTellSyntax[F[_], S] extends MonadSyntax[F] {
   def F: MonadTell[F, S]
   ////
 
-  ////
+////
 }

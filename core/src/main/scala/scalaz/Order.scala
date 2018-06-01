@@ -68,7 +68,7 @@ trait Order[F] extends Equal[F] { self =>
 
   def orderLaw = new OrderLaw {}
 
-  ////
+////
   val orderSyntax = new scalaz.syntax.OrderSyntax[F] { def F = Order.this }
 }
 
@@ -114,5 +114,12 @@ object Order {
     }
   }
 
-  ////
+////
+}
+
+trait IsomorphismOrder[F, G] extends Order[F] with IsomorphismEqual[F, G]{
+  implicit def G: Order[G]
+////
+
+////
 }

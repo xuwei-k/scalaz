@@ -19,7 +19,7 @@ final class MonadOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Mon
 
   def iterateUntil(p: A => Boolean): F[A] = F.iterateUntil(self)(p)
 
-  ////
+////
 }
 
 sealed trait ToMonadOpsU[TC[F[_]] <: Monad[F]] {
@@ -34,7 +34,7 @@ trait ToMonadOps0[TC[F[_]] <: Monad[F]] extends ToMonadOpsU[TC] {
 
   ////
 
-  ////
+////
 }
 
 trait ToMonadOps[TC[F[_]] <: Monad[F]] extends ToMonadOps0[TC] with ToApplicativeOps[TC] with ToBindOps[TC]
@@ -45,5 +45,5 @@ trait MonadSyntax[F[_]] extends ApplicativeSyntax[F] with BindSyntax[F] {
   def F: Monad[F]
   ////
 
-  ////
+////
 }

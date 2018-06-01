@@ -9,7 +9,7 @@ final class ZipOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Zip[F
   final def apzip[B](b: => F[A] => F[B]): F[(A, B)] = F.apzip(b, self)
   // alias for apzip
   final def <*|*>[B](b: => F[A] => F[B]): F[(A, B)] = F.apzip(b, self)
-  ////
+////
 }
 
 sealed trait ToZipOpsU[TC[F[_]] <: Zip[F]] {
@@ -24,7 +24,7 @@ trait ToZipOps0[TC[F[_]] <: Zip[F]] extends ToZipOpsU[TC] {
 
   ////
 
-  ////
+////
 }
 
 trait ToZipOps[TC[F[_]] <: Zip[F]] extends ToZipOps0[TC]
@@ -35,5 +35,5 @@ trait ZipSyntax[F[_]]  {
   def F: Zip[F]
   ////
 
-  ////
+////
 }

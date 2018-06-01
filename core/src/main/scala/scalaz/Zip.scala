@@ -61,7 +61,7 @@ trait Zip[F[_]]  { self =>
   }
   def zipLaw = new ZipLaw {}
 
-  ////
+////
   val zipSyntax = new scalaz.syntax.ZipSyntax[F] { def F = Zip.this }
 }
 
@@ -72,5 +72,12 @@ object Zip {
 
   def fzip[F[_], A, B](t: LazyTuple2[F[A], F[B]])(implicit F: Zip[F]): F[(A, B)] =
       F.zip(t._1, t._2)
-  ////
+////
+}
+
+trait IsomorphismZip[F[_], G[_]] extends Zip[F] {
+  implicit def G: Zip[G]
+////
+
+////
 }

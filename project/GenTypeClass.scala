@@ -1,6 +1,6 @@
 import sbt._
 
-case class TypeClass(name: String, kind: Kind, pack: Seq[String] = Seq("scalaz"), extendsList: Seq[TypeClass] = Seq(), createSyntax: Boolean = true) {
+case class TypeClass(name: String, kind: Kind, pack: Seq[String] = Seq("scalaz"), extendsList: Seq[TypeClass] = Seq(), createSyntax: Boolean = true, iso: Boolean = true) {
   require(pack.head == "scalaz")
   def syntaxPack = {
     Seq("scalaz", "syntax") ++ pack.drop(1)
@@ -288,6 +288,57 @@ object GenTypeClass {
       s"""@inline def apply[$classifiedTypeF](implicit F: $typeClassName[F]): $typeClassName[F] = F"""
     }
 
+    val iso = if (tc.iso) {
+      val extendsList = tc.extendsList match {
+        case Seq() =>
+          ""
+        case values =>
+          values.map(t => s"Isomorphism${t.name}[F, G]").mkString("with ", " with ", "")
+      }
+      kind match {
+        case Kind.* =>
+s"""
+trait Isomorphism${typeClassName}[F, G] extends ${typeClassName}[F] ${extendsList}{
+  implicit def G: ${typeClassName}[G]
+////
+
+////
+}
+"""
+        case Kind.*->* =>
+s"""
+trait Isomorphism${typeClassName}[F[_], G[_]] extends ${typeClassName}[F] ${extendsList}{
+  implicit def G: ${typeClassName}[G]
+////
+
+////
+}
+"""
+
+        case Kind.*^*->* =>
+ s"""
+trait Isomorphism${typeClassName}[F[_, _], G[_, _]] extends ${typeClassName}[F] ${extendsList}{
+  implicit def G: ${typeClassName}[G]
+////
+
+////
+}
+"""
+
+       case Kind.|*->*|->* =>
+ s"""
+trait Isomorphism${typeClassName}[F[_], G[_], S] extends ${typeClassName}[F, S] ${extendsList}{
+  implicit def G: ${typeClassName}[G, S]
+////
+
+////
+}
+"""
+     }
+    } else {
+      ""
+    }
+
     val mainSource = s"""${tc.packageString0}
 
 ////
@@ -309,7 +360,8 @@ object $typeClassName {
 
   ////
 }
-"""
+""" + iso
+
     val mainSourceFile = SourceFile(tc.pack, typeClassName + ".scala", mainSource)
 
     val syntaxSource = kind match {

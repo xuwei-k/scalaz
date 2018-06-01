@@ -40,7 +40,7 @@ final class EnumOps[F] private[syntax](val self: F)(implicit val F: Enum[F]) ext
   final def |-->(step: Int, to: F): IList[F] =
     F.fromStepToL(step, self, to)
 
-  ////
+////
 }
 
 trait ToEnumOps extends ToOrderOps {
@@ -49,7 +49,7 @@ trait ToEnumOps extends ToOrderOps {
 
   ////
 
-  ////
+////
 }
 
 trait EnumSyntax[F] extends OrderSyntax[F] {
@@ -58,5 +58,5 @@ trait EnumSyntax[F] extends OrderSyntax[F] {
   def F: Enum[F]
   ////
 
-  ////
+////
 }

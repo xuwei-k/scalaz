@@ -5,7 +5,7 @@ package syntax
 final class SemiLatticeOps[F] private[syntax](val self: F)(implicit val F: SemiLattice[F]) extends Ops[F] {
   ////
 
-  ////
+////
 }
 
 trait ToSemiLatticeOps extends ToBandOps {
@@ -14,7 +14,7 @@ trait ToSemiLatticeOps extends ToBandOps {
 
   ////
 
-  ////
+////
 }
 
 trait SemiLatticeSyntax[F] extends BandSyntax[F] {
@@ -23,5 +23,5 @@ trait SemiLatticeSyntax[F] extends BandSyntax[F] {
   def F: SemiLattice[F]
   ////
 
-  ////
+////
 }

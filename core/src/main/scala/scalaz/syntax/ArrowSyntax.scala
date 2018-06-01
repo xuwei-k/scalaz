@@ -13,7 +13,7 @@ final class ArrowOps[F[_, _],A, B] private[syntax](val self: F[A, B])(implicit v
   final def product: F[(A, A), (B, B)] =
     F.product(self)
 
-  ////
+////
 }
 
 sealed trait ToArrowOpsU[TC[F[_, _]] <: Arrow[F]] {
@@ -33,7 +33,7 @@ trait ToArrowOps0[TC[F[_, _]] <: Arrow[F]] extends ToArrowOpsU[TC] {
 
   ////
 
-  ////
+////
 }
 
 trait ToArrowOps[TC[F[_, _]] <: Arrow[F]] extends ToArrowOps0[TC] with ToSplitOps[TC] with ToStrongOps[TC] with ToCategoryOps[TC]
@@ -44,5 +44,5 @@ trait ArrowSyntax[F[_, _]] extends SplitSyntax[F] with StrongSyntax[F] with Cate
   def F: Arrow[F]
   ////
 
-  ////
+////
 }

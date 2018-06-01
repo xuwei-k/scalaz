@@ -20,7 +20,7 @@ final class FunctorOps[F[_],A] private[syntax](val self: F[A])(implicit val F: F
   final def >|[B](b: => B): F[B] = F.map(self)(_ => b)
   final def as[B](b: => B): F[B] = F.map(self)(_ => b)
   final def widen[B](implicit ev: A <~< B): F[B] = F.widen(self)
-  ////
+////
 }
 
 sealed trait ToFunctorOpsU[TC[F[_]] <: Functor[F]] {
@@ -48,7 +48,7 @@ trait ToFunctorOps0[TC[F[_]] <: Functor[F]] extends ToFunctorOpsU[TC] {
     def mapply[F[_], B](f: F[A => B])(implicit F: TC[F]): F[B] =
       F.map(f)(fab => fab(self))
   }
-  ////
+////
 }
 
 trait ToFunctorOps[TC[F[_]] <: Functor[F]] extends ToFunctorOps0[TC] with ToInvariantFunctorOps[TC]
@@ -65,5 +65,5 @@ trait FunctorSyntax[F[_]] extends InvariantFunctorSyntax[F] {
   trait LiftV[A,B] extends Ops[A => B] {
     def lift: F[A] => F[B] = F.lift(self)
   }
-  ////
+////
 }

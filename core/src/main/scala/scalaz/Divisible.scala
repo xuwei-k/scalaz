@@ -28,7 +28,7 @@ trait Divisible[F[_]] extends Divide[F] with ApplicativeDivisible[F] { self =>
 
   def divisibleLaw = new DivisibleLaw {}
 
-  ////
+////
   val divisibleSyntax = new scalaz.syntax.DivisibleSyntax[F] { def F = Divisible.this }
 }
 
@@ -37,5 +37,14 @@ object Divisible {
 
   ////
 
-  ////
+////
+}
+
+trait IsomorphismDivisible[F[_], G[_]] extends Divisible[F] with IsomorphismDivide[F, G] with IsomorphismApplicativeDivisible[F, G]{
+  implicit def G: Divisible[G]
+////
+
+  override def conquer[A]: F[A] =
+    iso.from(G.conquer)
+////
 }

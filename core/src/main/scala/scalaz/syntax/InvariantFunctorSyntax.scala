@@ -11,7 +11,7 @@ final class InvariantFunctorOps[F[_],A] private[syntax](val self: F[A])(implicit
   final def xmap[B](f: A => B, g: B => A): F[B] = F.xmap(self, f, g)
   final def xmapb[B](b: Bijection[A, B]): F[B] = F.xmapb(self)(b)
   final def xmapi[B](iso: A <=> B): F[B] = F.xmapi(self)(iso)
-  ////
+////
 }
 
 sealed trait ToInvariantFunctorOpsU[TC[F[_]] <: InvariantFunctor[F]] {
@@ -26,7 +26,7 @@ trait ToInvariantFunctorOps0[TC[F[_]] <: InvariantFunctor[F]] extends ToInvarian
 
   ////
 
-  ////
+////
 }
 
 trait ToInvariantFunctorOps[TC[F[_]] <: InvariantFunctor[F]] extends ToInvariantFunctorOps0[TC]
@@ -37,5 +37,5 @@ trait InvariantFunctorSyntax[F[_]]  {
   def F: InvariantFunctor[F]
   ////
 
-  ////
+////
 }

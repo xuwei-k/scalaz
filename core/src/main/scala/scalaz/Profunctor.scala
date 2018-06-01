@@ -46,7 +46,7 @@ trait Profunctor[=>:[_, _]]  { self =>
 
   def profunctorLaw = new ProfunctorLaw {}
 
-  ////
+////
   val profunctorSyntax = new scalaz.syntax.ProfunctorSyntax[=>:] { def F = Profunctor.this }
 }
 
@@ -89,5 +89,12 @@ object Profunctor {
       def map[A, B](f: DownStar[F, D, A])(k: A => B) =
         DownStar(k compose Tag.unwrap(f))
     }
-  ////
+////
+}
+
+trait IsomorphismProfunctor[F[_, _], G[_, _]] extends Profunctor[F] {
+  implicit def G: Profunctor[G]
+////
+
+////
 }

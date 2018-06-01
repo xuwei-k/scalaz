@@ -58,7 +58,7 @@ trait Align[F[_]] extends Functor[F] { self =>
 
   def alignLaw = new AlignLaw {}
 
-  ////
+////
   val alignSyntax = new scalaz.syntax.AlignSyntax[F] { def F = Align.this }
 }
 
@@ -67,5 +67,15 @@ object Align {
 
   ////
 
-  ////
+////
+}
+
+trait IsomorphismAlign[F[_], G[_]] extends Align[F] with IsomorphismFunctor[F, G]{
+  implicit def G: Align[G]
+////
+
+  override def alignWith[A, B, C](f: A \&/ B => C): (F[A], F[B]) => F[C] = {
+    case (fa, fb) => iso.from(G.alignWith(f)(iso.to(fa), iso.to(fb)))
+  }
+////
 }

@@ -7,7 +7,7 @@ final class IsEmptyOps[F[_],A] private[syntax](val self: F[A])(implicit val F: I
 
   def isEmpty: Boolean = F.isEmpty(self)
 
-  ////
+////
 }
 
 sealed trait ToIsEmptyOpsU[TC[F[_]] <: IsEmpty[F]] {
@@ -22,7 +22,7 @@ trait ToIsEmptyOps0[TC[F[_]] <: IsEmpty[F]] extends ToIsEmptyOpsU[TC] {
 
   ////
 
-  ////
+////
 }
 
 trait ToIsEmptyOps[TC[F[_]] <: IsEmpty[F]] extends ToIsEmptyOps0[TC] with ToPlusEmptyOps[TC]
@@ -33,5 +33,5 @@ trait IsEmptySyntax[F[_]] extends PlusEmptySyntax[F] {
   def F: IsEmpty[F]
   ////
 
-  ////
+////
 }

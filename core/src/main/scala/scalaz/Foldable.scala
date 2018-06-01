@@ -414,7 +414,7 @@ trait Foldable[F[_]]  { self =>
   }
   def foldableLaw = new FoldableLaw {}
 
-  ////
+////
   val foldableSyntax = new scalaz.syntax.FoldableSyntax[F] { def F = Foldable.this }
 }
 
@@ -458,5 +458,11 @@ object Foldable {
       foldRight[A, B](fa, F.zero)((x, y) => F.append(f(x),  y))
   }
 
-  ////
+////
+}
+
+trait IsomorphismFoldable[F[_], G[_]] extends Foldable[F] {
+  implicit def G: Foldable[G]
+////
+////
 }

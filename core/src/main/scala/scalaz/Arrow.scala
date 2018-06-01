@@ -63,7 +63,7 @@ trait Arrow[=>:[_, _]] extends Split[=>:] with Strong[=>:] with Category[=>:] { 
   def mapsnd[A, B, C](fab: (A =>: B))(f: B => C): (A =>: C) =
     <<<[A, B, C](arr(f), fab)
 
-  ////
+////
   val arrowSyntax = new scalaz.syntax.ArrowSyntax[=>:] { def F = Arrow.this }
 }
 
@@ -72,5 +72,12 @@ object Arrow {
 
   ////
 
-  ////
+////
+}
+
+trait IsomorphismArrow[F[_, _], G[_, _]] extends Arrow[F] with IsomorphismSplit[F, G] with IsomorphismStrong[F, G] with IsomorphismCategory[F, G]{
+  implicit def G: Arrow[G]
+////
+
+////
 }

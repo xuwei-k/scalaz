@@ -43,7 +43,7 @@ trait Category[=>:[_, _]] extends Compose[=>:] { self =>
 
   def categoryLaw = new CategoryLaw {}
 
-  ////
+////
   val categorySyntax = new scalaz.syntax.CategorySyntax[=>:] { def F = Category.this }
 }
 
@@ -51,5 +51,12 @@ object Category {
   @inline def apply[F[_, _]](implicit F: Category[F]): Category[F] = F
 
   ////
-  ////
+////
+}
+
+trait IsomorphismCategory[F[_, _], G[_, _]] extends Category[F] with IsomorphismCompose[F, G]{
+  implicit def G: Category[G]
+////
+
+////
 }

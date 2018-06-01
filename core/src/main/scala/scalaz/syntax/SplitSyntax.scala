@@ -6,7 +6,7 @@ final class SplitOps[F[_, _],A, B] private[syntax](val self: F[A, B])(implicit v
   ////
   final def -*-[C, D](k: F[C, D]): F[(A, C), (B, D)] =
     F.split(self, k)
-  ////
+////
 }
 
 sealed trait ToSplitOpsU[TC[F[_, _]] <: Split[F]] {
@@ -26,7 +26,7 @@ trait ToSplitOps0[TC[F[_, _]] <: Split[F]] extends ToSplitOpsU[TC] {
 
   ////
 
-  ////
+////
 }
 
 trait ToSplitOps[TC[F[_, _]] <: Split[F]] extends ToSplitOps0[TC] with ToComposeOps[TC]
@@ -37,5 +37,5 @@ trait SplitSyntax[F[_, _]] extends ComposeSyntax[F] {
   def F: Split[F]
   ////
 
-  ////
+////
 }

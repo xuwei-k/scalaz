@@ -35,7 +35,7 @@ trait Compose[=>:[_, _]]  { self =>
 
   def composeLaw = new ComposeLaw {}
 
-  ////
+////
   val composeSyntax = new scalaz.syntax.ComposeSyntax[=>:] { def F = Compose.this }
 }
 
@@ -43,5 +43,12 @@ object Compose {
   @inline def apply[F[_, _]](implicit F: Compose[F]): Compose[F] = F
 
   ////
-  ////
+////
+}
+
+trait IsomorphismCompose[F[_, _], G[_, _]] extends Compose[F] {
+  implicit def G: Compose[G]
+////
+
+////
 }

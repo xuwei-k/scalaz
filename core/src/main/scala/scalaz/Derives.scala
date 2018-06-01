@@ -11,7 +11,7 @@ package scalaz
 trait Derives[F[_]] extends CoapplicativeCodivide[F] with ApplicativeDivisible[F] { self =>
   ////
 
-  ////
+////
   val derivesSyntax = new scalaz.syntax.DerivesSyntax[F] { def F = Derives.this }
 }
 
@@ -20,5 +20,12 @@ object Derives {
 
   ////
 
-  ////
+////
+}
+
+trait IsomorphismDerives[F[_], G[_]] extends Derives[F] with IsomorphismCoapplicativeCodivide[F, G] with IsomorphismApplicativeDivisible[F, G]{
+  implicit def G: Derives[G]
+////
+
+////
 }

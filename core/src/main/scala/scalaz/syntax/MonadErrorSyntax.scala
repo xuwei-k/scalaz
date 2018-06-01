@@ -10,7 +10,7 @@ final class MonadErrorOps[F[_], S, A] private[syntax](self: F[A])(implicit val F
   final def emap[B](f: A => S \/ B): F[B] =
     F.emap(self)(f)
 
-  ////
+////
 }
 
 trait ToMonadErrorOps0[TC[F[_], S] <: MonadError[F, S]] {
@@ -22,7 +22,7 @@ trait ToMonadErrorOps0[TC[F[_], S] <: MonadError[F, S]] {
   implicit def ToMonadErrorIdOps[E](v: E): MonadErrorIdOps[E] =
     new MonadErrorIdOps[E](v)
 
-  ////
+////
 }
 
 trait ToMonadErrorOps[TC[F[_], S] <: MonadError[F, S]] extends ToMonadErrorOps0[TC] with ToMonadOps[λ[F[_] => TC[F, S] forSome { type S }]]
@@ -34,5 +34,5 @@ trait MonadErrorSyntax[F[_], S] extends MonadSyntax[F] {
   def F: MonadError[F, S]
   ////
 
-  ////
+////
 }

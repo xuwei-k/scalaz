@@ -46,7 +46,7 @@ trait Optional[F[_]]  { self =>
   /** Returns this context converted to the `Maybe` context. */
   def toMaybe[A](fa: F[A]): Maybe[A] = pextract(fa).toMaybe
 
-  ////
+////
   val optionalSyntax = new scalaz.syntax.OptionalSyntax[F] { def F = Optional.this }
 }
 
@@ -55,5 +55,12 @@ object Optional {
 
   ////
 
-  ////
+////
+}
+
+trait IsomorphismOptional[F[_], G[_]] extends Optional[F] {
+  implicit def G: Optional[G]
+////
+
+////
 }

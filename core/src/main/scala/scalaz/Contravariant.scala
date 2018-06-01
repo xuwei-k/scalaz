@@ -68,7 +68,7 @@ trait Contravariant[F[_]] extends InvariantFunctor[F] { self =>
   }
   def contravariantLaw = new ContravariantLaw {}
 
-  ////
+////
   val contravariantSyntax = new scalaz.syntax.ContravariantSyntax[F] { def F = Contravariant.this }
 }
 
@@ -77,5 +77,16 @@ object Contravariant {
 
   ////
 
-  ////
+////
+}
+
+trait IsomorphismContravariant[F[_], G[_]] extends Contravariant[F] with IsomorphismInvariantFunctor[F, G]{
+  implicit def G: Contravariant[G]
+////
+  import Isomorphism._
+
+  def iso: F <~> G
+
+  override def contramap[A, B](r: F[A])(f: B => A): F[B] = iso.from(G.contramap(iso.to(r))(f))
+////
 }

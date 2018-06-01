@@ -5,7 +5,7 @@ package syntax
 final class CategoryOps[F[_, _],A, B] private[syntax](val self: F[A, B])(implicit val F: Category[F]) extends Ops[F[A, B]] {
   ////
 
-  ////
+////
 }
 
 sealed trait ToCategoryOpsU[TC[F[_, _]] <: Category[F]] {
@@ -24,7 +24,7 @@ trait ToCategoryOps0[TC[F[_, _]] <: Category[F]] extends ToCategoryOpsU[TC] {
     new CategoryOps[F[G, ?, ?], A, B](v)(F0)
 
   ////
-  ////
+////
 }
 
 trait ToCategoryOps[TC[F[_, _]] <: Category[F]] extends ToCategoryOps0[TC] with ToComposeOps[TC]
@@ -35,5 +35,5 @@ trait CategorySyntax[F[_, _]] extends ComposeSyntax[F] {
   def F: Category[F]
   ////
 
-  ////
+////
 }

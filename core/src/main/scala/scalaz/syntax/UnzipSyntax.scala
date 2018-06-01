@@ -4,7 +4,7 @@ package syntax
 /** Wraps a value `self` and provides methods related to `Unzip` */
 final class UnzipOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Unzip[F]) extends Ops[F[A]] {
   ////
-  ////
+////
 }
 
 sealed trait ToUnzipOpsU[TC[F[_]] <: Unzip[F]] {
@@ -32,7 +32,7 @@ trait ToUnzipOps0[TC[F[_]] <: Unzip[F]] extends ToUnzipOpsU[TC] {
       F.seconds(self)
   }
 
-  ////
+////
 }
 
 trait ToUnzipOps[TC[F[_]] <: Unzip[F]] extends ToUnzipOps0[TC]
@@ -43,5 +43,5 @@ trait UnzipSyntax[F[_]]  {
   def F: Unzip[F]
   ////
 
-  ////
+////
 }

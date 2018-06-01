@@ -42,7 +42,7 @@ trait InvariantFunctor[F[_]]  { self =>
   }
 
   def invariantFunctorLaw = new InvariantFunctorLaw {}
-  ////
+////
   val invariantFunctorSyntax = new scalaz.syntax.InvariantFunctorSyntax[F] { def F = InvariantFunctor.this }
 }
 
@@ -50,5 +50,17 @@ object InvariantFunctor {
   @inline def apply[F[_]](implicit F: InvariantFunctor[F]): InvariantFunctor[F] = F
 
   ////
-  ////
+////
+}
+
+trait IsomorphismInvariantFunctor[F[_], G[_]] extends InvariantFunctor[F] {
+  implicit def G: InvariantFunctor[G]
+////
+  import Isomorphism._
+
+  def iso: F <~> G
+
+  override def xmap[A, B](ma: F[A], f: A => B, g: B => A): F[B] =
+    iso.from(G.xmap(iso.to(ma), f, g))
+////
 }

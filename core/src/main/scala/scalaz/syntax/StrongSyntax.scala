@@ -10,7 +10,7 @@ final class StrongOps[F[_, _],A, B] private[syntax](val self: F[A, B])(implicit 
   final def second[C]: F[(C, A), (C, B)] =
     F.second(self)
 
-  ////
+////
 }
 
 sealed trait ToStrongOpsU[TC[F[_, _]] <: Strong[F]] {
@@ -30,7 +30,7 @@ trait ToStrongOps0[TC[F[_, _]] <: Strong[F]] extends ToStrongOpsU[TC] {
 
   ////
 
-  ////
+////
 }
 
 trait ToStrongOps[TC[F[_, _]] <: Strong[F]] extends ToStrongOps0[TC] with ToProfunctorOps[TC]
@@ -41,5 +41,5 @@ trait StrongSyntax[F[_, _]] extends ProfunctorSyntax[F] {
   def F: Strong[F]
   ////
 
-  ////
+////
 }

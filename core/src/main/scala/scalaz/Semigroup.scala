@@ -134,7 +134,7 @@ trait Semigroup[F]  { self =>
   def semigroupLaw = new SemigroupLaw {}
 
 
-  ////
+////
   val semigroupSyntax = new scalaz.syntax.SemigroupSyntax[F] { def F = Semigroup.this }
 }
 
@@ -215,5 +215,12 @@ object Semigroup {
         }
     }
 
-  ////
+////
+}
+
+trait IsomorphismSemigroup[F, G] extends Semigroup[F] {
+  implicit def G: Semigroup[G]
+////
+
+////
 }

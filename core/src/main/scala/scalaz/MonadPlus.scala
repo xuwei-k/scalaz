@@ -60,7 +60,7 @@ trait MonadPlus[F[_]] extends Monad[F] with ApplicativePlus[F] { self =>
   }
   def monadPlusLaw = new MonadPlusLaw {}
   def strongMonadPlusLaw = new StrongMonadPlusLaw {}
-  ////
+////
   val monadPlusSyntax = new scalaz.syntax.MonadPlusSyntax[F] { def F = MonadPlus.this }
 }
 
@@ -69,5 +69,12 @@ object MonadPlus {
 
   ////
 
-  ////
+////
+}
+
+trait IsomorphismMonadPlus[F[_], G[_]] extends MonadPlus[F] with IsomorphismMonad[F, G] with IsomorphismApplicativePlus[F, G]{
+  implicit def G: MonadPlus[G]
+////
+
+////
 }

@@ -5,7 +5,7 @@ package syntax
 final class DerivesOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Derives[F]) extends Ops[F[A]] {
   ////
 
-  ////
+////
 }
 
 sealed trait ToDerivesOpsU[TC[F[_]] <: Derives[F]] {
@@ -20,7 +20,7 @@ trait ToDerivesOps0[TC[F[_]] <: Derives[F]] extends ToDerivesOpsU[TC] {
 
   ////
 
-  ////
+////
 }
 
 trait ToDerivesOps[TC[F[_]] <: Derives[F]] extends ToDerivesOps0[TC] with ToCoapplicativeCodivideOps[TC] with ToApplicativeDivisibleOps[TC]
@@ -31,5 +31,5 @@ trait DerivesSyntax[F[_]] extends CoapplicativeCodivideSyntax[F] with Applicativ
   def F: Derives[F]
   ////
 
-  ////
+////
 }

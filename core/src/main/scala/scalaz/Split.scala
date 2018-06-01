@@ -11,7 +11,7 @@ trait Split[=>:[_, _]] extends Compose[=>:] { self =>
 
   // derived functions
 
-  ////
+////
   val splitSyntax = new scalaz.syntax.SplitSyntax[=>:] { def F = Split.this }
 }
 
@@ -19,5 +19,12 @@ object Split {
   @inline def apply[F[_, _]](implicit F: Split[F]): Split[F] = F
 
   ////
-  ////
+////
+}
+
+trait IsomorphismSplit[F[_, _], G[_, _]] extends Split[F] with IsomorphismCompose[F, G]{
+  implicit def G: Split[G]
+////
+
+////
 }

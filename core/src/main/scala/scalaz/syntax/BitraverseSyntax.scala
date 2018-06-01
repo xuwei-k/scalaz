@@ -16,7 +16,7 @@ final class BitraverseOps[F[_, _],A, B] private[syntax](val self: F[A, B])(impli
 
   final def bisequenceU[GC, GD](implicit eva: A === GC, evb: B === GD, G1: UnapplyProduct[Applicative, GC, GD]): G1.M[F[G1.A, G1.B]] =
     bitraverseU(eva, evb)
-  ////
+////
 }
 
 sealed trait ToBitraverseOpsU[TC[F[_, _]] <: Bitraverse[F]] {
@@ -36,7 +36,7 @@ trait ToBitraverseOps0[TC[F[_, _]] <: Bitraverse[F]] extends ToBitraverseOpsU[TC
 
   ////
 
-  ////
+////
 }
 
 trait ToBitraverseOps[TC[F[_, _]] <: Bitraverse[F]] extends ToBitraverseOps0[TC] with ToBifunctorOps[TC] with ToBifoldableOps[TC]
@@ -47,5 +47,5 @@ trait BitraverseSyntax[F[_, _]] extends BifunctorSyntax[F] with BifoldableSyntax
   def F: Bitraverse[F]
   ////
 
-  ////
+////
 }

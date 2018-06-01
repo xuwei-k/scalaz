@@ -18,7 +18,7 @@ trait MonadState[F[_], S] extends Monad[F] { self =>
   def gets[A](f: S => A): F[A] = bind(init)(s => point(f(s)))
   def modify(f: S => S): F[Unit] = bind(init)(s => put(f(s)))
 
-  ////
+////
 
 }
 
@@ -27,5 +27,12 @@ object MonadState {
 
   ////
 
-  ////
+////
+}
+
+trait IsomorphismMonadState[F[_], G[_], S] extends MonadState[F, S] with IsomorphismMonad[F, G]{
+  implicit def G: MonadState[G, S]
+////
+
+////
 }

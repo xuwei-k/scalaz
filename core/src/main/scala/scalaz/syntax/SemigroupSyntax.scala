@@ -7,7 +7,7 @@ final class SemigroupOps[F] private[syntax](val self: F)(implicit val F: Semigro
   final def |+|(other: => F): F = F.append(self, other)
   final def mappend(other: => F): F = F.append(self, other)
   final def ⊹(other: => F): F = F.append(self, other)
-  ////
+////
 }
 
 trait ToSemigroupOps  {
@@ -15,7 +15,7 @@ trait ToSemigroupOps  {
     new SemigroupOps[F](v)
 
   ////
-  ////
+////
 }
 
 trait SemigroupSyntax[F]  {
@@ -25,5 +25,5 @@ trait SemigroupSyntax[F]  {
   ////
   def mappend(f1: F, f2: => F)(implicit F: Semigroup[F]): F = F.append(f1, f2)
 
-  ////
+////
 }

@@ -196,7 +196,7 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
   }
   def traverseLaw = new TraverseLaw {}
 
-  ////
+////
   val traverseSyntax = new scalaz.syntax.TraverseSyntax[F] { def F = Traverse.this }
 }
 
@@ -205,5 +205,12 @@ object Traverse {
 
   ////
 
-  ////
+////
+}
+
+trait IsomorphismTraverse[F[_], G[_]] extends Traverse[F] with IsomorphismFunctor[F, G] with IsomorphismFoldable[F, G]{
+  implicit def G: Traverse[G]
+////
+
+////
 }

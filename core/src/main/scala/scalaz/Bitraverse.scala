@@ -122,7 +122,7 @@ trait Bitraverse[F[_, _]] extends Bifunctor[F] with Bifoldable[F] { self =>
   def embedRight[H[_]](implicit H0: Traverse[H]): Bitraverse[λ[(α, β) => F[α, H[β]]]] =
     embed[Id.Id,H]
 
-  ////
+////
   val bitraverseSyntax = new scalaz.syntax.BitraverseSyntax[F] { def F = Bitraverse.this }
 }
 
@@ -131,5 +131,12 @@ object Bitraverse {
 
   ////
 
-  ////
+////
+}
+
+trait IsomorphismBitraverse[F[_, _], G[_, _]] extends Bitraverse[F] with IsomorphismBifunctor[F, G] with IsomorphismBifoldable[F, G]{
+  implicit def G: Bitraverse[G]
+////
+
+////
 }

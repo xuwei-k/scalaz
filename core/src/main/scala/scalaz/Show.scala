@@ -12,7 +12,7 @@ trait Show[F]  { self =>
   def shows(f: F): String = show(f).shows
 
   // derived functions
-  ////
+////
   val showSyntax = new scalaz.syntax.ShowSyntax[F] { def F = Show.this }
 }
 
@@ -54,5 +54,12 @@ object Show {
   final case class ShowInterpolator(sc: StringContext) extends AnyVal {
     def show(args: Shows*): String = sc.s(args: _*)
   }
-  ////
+////
+}
+
+trait IsomorphismShow[F, G] extends Show[F] {
+  implicit def G: Show[G]
+////
+
+////
 }

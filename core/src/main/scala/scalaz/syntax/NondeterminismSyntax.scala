@@ -5,7 +5,7 @@ package syntax
 final class NondeterminismOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Nondeterminism[F]) extends Ops[F[A]] {
   ////
 
-  ////
+////
 }
 
 sealed trait ToNondeterminismOpsU[TC[F[_]] <: Nondeterminism[F]] {
@@ -20,7 +20,7 @@ trait ToNondeterminismOps0[TC[F[_]] <: Nondeterminism[F]] extends ToNondetermini
 
   ////
 
-  ////
+////
 }
 
 trait ToNondeterminismOps[TC[F[_]] <: Nondeterminism[F]] extends ToNondeterminismOps0[TC] with ToMonadOps[TC]
@@ -31,5 +31,5 @@ trait NondeterminismSyntax[F[_]] extends MonadSyntax[F] {
   def F: Nondeterminism[F]
   ////
 
-  ////
+////
 }

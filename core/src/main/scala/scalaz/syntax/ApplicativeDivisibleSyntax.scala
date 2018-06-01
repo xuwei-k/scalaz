@@ -5,7 +5,7 @@ package syntax
 final class ApplicativeDivisibleOps[F[_],A] private[syntax](val self: F[A])(implicit val F: ApplicativeDivisible[F]) extends Ops[F[A]] {
   ////
 
-  ////
+////
 }
 
 sealed trait ToApplicativeDivisibleOpsU[TC[F[_]] <: ApplicativeDivisible[F]] {
@@ -20,7 +20,7 @@ trait ToApplicativeDivisibleOps0[TC[F[_]] <: ApplicativeDivisible[F]] extends To
 
   ////
 
-  ////
+////
 }
 
 trait ToApplicativeDivisibleOps[TC[F[_]] <: ApplicativeDivisible[F]] extends ToApplicativeDivisibleOps0[TC] with ToApplyDivideOps[TC]
@@ -31,5 +31,5 @@ trait ApplicativeDivisibleSyntax[F[_]] extends ApplyDivideSyntax[F] {
   def F: ApplicativeDivisible[F]
   ////
 
-  ////
+////
 }

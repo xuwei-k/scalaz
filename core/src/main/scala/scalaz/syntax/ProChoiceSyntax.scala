@@ -10,7 +10,7 @@ final class ProChoiceOps[F[_, _],A, B] private[syntax](val self: F[A, B])(implic
   final def proright[C]: F[C \/ A, C \/ B] =
     F.right(self)
 
-  ////
+////
 }
 
 sealed trait ToProChoiceOpsU[TC[F[_, _]] <: ProChoice[F]] {
@@ -30,7 +30,7 @@ trait ToProChoiceOps0[TC[F[_, _]] <: ProChoice[F]] extends ToProChoiceOpsU[TC] {
 
   ////
 
-  ////
+////
 }
 
 trait ToProChoiceOps[TC[F[_, _]] <: ProChoice[F]] extends ToProChoiceOps0[TC] with ToProfunctorOps[TC]
@@ -41,5 +41,5 @@ trait ProChoiceSyntax[F[_, _]] extends ProfunctorSyntax[F] {
   def F: ProChoice[F]
   ////
 
-  ////
+////
 }

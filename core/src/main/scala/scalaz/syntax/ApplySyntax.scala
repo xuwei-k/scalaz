@@ -41,7 +41,7 @@ final class ApplyOps[F[_],A] private[syntax](val self: F[A])(implicit val F: App
   final def forever[B]: F[B] = F.forever(self)
 
   // Do not remove this comment; used as delimiter by `genTypeClasses` sbt task.
-  ////
+////
 }
 
 sealed trait ToApplyOpsU[TC[F[_]] <: Apply[F]] {
@@ -80,7 +80,7 @@ trait ToApplyOps0[TC[F[_]] <: Apply[F]] extends ToApplyOpsU[TC] {
                          f: (A,B,C,D,E,I,J) => K)(implicit F: TC[F]): F[K] =
     F.apply7(fa, fb, fc, fd, fe, fi, fj)(f)
 
-  ////
+////
 }
 
 trait ToApplyOps[TC[F[_]] <: Apply[F]] extends ToApplyOps0[TC] with ToFunctorOps[TC] with ToApplyDivideOps[TC]
@@ -114,5 +114,5 @@ trait ApplySyntax[F[_]] extends FunctorSyntax[F] with ApplyDivideSyntax[F] {
                          f: (A,B,C,D,E,I,J) => K): F[K] =
     F.apply7(fa, fb, fc, fd, fe, fi, fj)(f)
 
-  ////
+////
 }

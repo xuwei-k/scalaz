@@ -18,7 +18,7 @@ trait SemiLattice[F] extends Band[F] { self =>
 
   def semiLatticeLaw = new SemiLatticeLaw {}
 
-  ////
+////
   val semiLatticeSyntax = new scalaz.syntax.SemiLatticeSyntax[F] { def F = SemiLattice.this }
 }
 
@@ -27,5 +27,12 @@ object SemiLattice {
 
   ////
 
-  ////
+////
+}
+
+trait IsomorphismSemiLattice[F, G] extends SemiLattice[F] with IsomorphismBand[F, G]{
+  implicit def G: SemiLattice[G]
+////
+
+////
 }

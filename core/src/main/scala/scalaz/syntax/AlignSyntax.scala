@@ -15,7 +15,7 @@ final class AlignOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Ali
   def alignThis[B](b: F[B]): F[Option[A]] = F.alignThis(self, b)
   def alignThat[B](b: F[B]): F[Option[B]] = F.alignThat(self, b)
   def alignBoth[B](b: F[B]): F[Option[(A, B)]] = F.alignBoth(self, b)
-  ////
+////
 }
 
 sealed trait ToAlignOpsU[TC[F[_]] <: Align[F]] {
@@ -30,7 +30,7 @@ trait ToAlignOps0[TC[F[_]] <: Align[F]] extends ToAlignOpsU[TC] {
 
   ////
 
-  ////
+////
 }
 
 trait ToAlignOps[TC[F[_]] <: Align[F]] extends ToAlignOps0[TC] with ToFunctorOps[TC]
@@ -41,5 +41,5 @@ trait AlignSyntax[F[_]] extends FunctorSyntax[F] {
   def F: Align[F]
   ////
 
-  ////
+////
 }

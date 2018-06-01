@@ -21,7 +21,7 @@ trait IsEmpty[F[_]] extends PlusEmpty[F] { self =>
 
   def isEmptyLaw = new IsEmptyLaw {}
 
-  ////
+////
   val isEmptySyntax = new scalaz.syntax.IsEmptySyntax[F] { def F = IsEmpty.this }
 }
 
@@ -30,5 +30,12 @@ object IsEmpty {
 
   ////
 
-  ////
+////
+}
+
+trait IsomorphismIsEmpty[F[_], G[_]] extends IsEmpty[F] with IsomorphismPlusEmpty[F, G]{
+  implicit def G: IsEmpty[G]
+////
+
+////
 }

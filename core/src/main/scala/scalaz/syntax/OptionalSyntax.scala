@@ -38,7 +38,7 @@ final class OptionalOps[F[_],A] private[syntax](val self: F[A])(implicit val F: 
   /** Returns this context converted to the `Maybe` context. */
   def toMaybe: Maybe[A] = F.toMaybe(self)
 
-  ////
+////
 }
 
 sealed trait ToOptionalOpsU[TC[F[_]] <: Optional[F]] {
@@ -53,7 +53,7 @@ trait ToOptionalOps0[TC[F[_]] <: Optional[F]] extends ToOptionalOpsU[TC] {
 
   ////
 
-  ////
+////
 }
 
 trait ToOptionalOps[TC[F[_]] <: Optional[F]] extends ToOptionalOps0[TC]
@@ -64,5 +64,5 @@ trait OptionalSyntax[F[_]]  {
   def F: Optional[F]
   ////
 
-  ////
+////
 }

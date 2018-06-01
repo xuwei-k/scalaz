@@ -94,7 +94,7 @@ trait Bifoldable[F[_, _]]  { self =>
   }
 
   def bifoldableLaw = new BifoldableLaw {}
-  ////
+////
   val bifoldableSyntax = new scalaz.syntax.BifoldableSyntax[F] { def F = Bifoldable.this }
 }
 
@@ -118,5 +118,11 @@ object Bifoldable {
       bifoldR(fa, F.zero)(x => y => F.append(f(x),  y))(x => y => F.append(g(x),  y))
   }
 
-  ////
+////
+}
+
+trait IsomorphismBifoldable[F[_, _], G[_, _]] extends Bifoldable[F] {
+  implicit def G: Bifoldable[G]
+////
+////
 }

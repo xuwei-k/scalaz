@@ -5,7 +5,7 @@ package syntax
 final class CatchableOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Catchable[F]) extends Ops[F[A]] {
   ////
   def attempt: F[Throwable \/ A] = F.attempt(self)
-  ////
+////
 }
 
 sealed trait ToCatchableOpsU[TC[F[_]] <: Catchable[F]] {
@@ -20,7 +20,7 @@ trait ToCatchableOps0[TC[F[_]] <: Catchable[F]] extends ToCatchableOpsU[TC] {
 
   ////
 
-  ////
+////
 }
 
 trait ToCatchableOps[TC[F[_]] <: Catchable[F]] extends ToCatchableOps0[TC]
@@ -31,5 +31,5 @@ trait CatchableSyntax[F[_]]  {
   def F: Catchable[F]
   ////
 
-  ////
+////
 }

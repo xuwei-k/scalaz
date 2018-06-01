@@ -23,7 +23,7 @@ trait Catchable[F[_]]  { self =>
   def fail[A](err: Throwable): F[A]
   // derived functions
 
-  ////
+////
   val catchableSyntax = new scalaz.syntax.CatchableSyntax[F] { def F = Catchable.this }
 }
 
@@ -32,5 +32,12 @@ object Catchable {
 
   ////
 
-  ////
+////
+}
+
+trait IsomorphismCatchable[F[_], G[_]] extends Catchable[F] {
+  implicit def G: Catchable[G]
+////
+
+////
 }

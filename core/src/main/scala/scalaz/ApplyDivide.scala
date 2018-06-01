@@ -44,7 +44,7 @@ trait ApplyDivide[F[_]] extends InvariantFunctor[F] { self =>
     g: Z => (A1, A2, A3, A4)
   )(implicit a1: F[A1], a2: F[A2], a3: F[A3], a4: F[A4]): F[Z] = xproduct4(a1, a2, a3, a4)(f, g)
 
-  ////
+////
   val applyDivideSyntax = new scalaz.syntax.ApplyDivideSyntax[F] { def F = ApplyDivide.this }
 }
 
@@ -53,5 +53,12 @@ object ApplyDivide {
 
   ////
 
-  ////
+////
+}
+
+trait IsomorphismApplyDivide[F[_], G[_]] extends ApplyDivide[F] with IsomorphismInvariantFunctor[F, G]{
+  implicit def G: ApplyDivide[G]
+////
+
+////
 }

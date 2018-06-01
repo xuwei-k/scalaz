@@ -69,7 +69,7 @@ trait Plus[F[_]]  { self =>
   }
   def plusLaw =
     new PlusLaw {}
-  ////
+////
   val plusSyntax = new scalaz.syntax.PlusSyntax[F] { def F = Plus.this }
 }
 
@@ -94,5 +94,12 @@ object Plus {
       def F = F0
     }
 
-  ////
+////
+}
+
+trait IsomorphismPlus[F[_], G[_]] extends Plus[F] {
+  implicit def G: Plus[G]
+////
+
+////
 }

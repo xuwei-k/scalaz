@@ -20,7 +20,7 @@ final class ProfunctorOps[F[_, _],A, B] private[syntax](val self: F[A, B])(impli
   final def dimap[C, D](f: C => A, g: B => D): F[C, D] =
     F.dimap(self)(f)(g)
 
-  ////
+////
 }
 
 sealed trait ToProfunctorOpsU[TC[F[_, _]] <: Profunctor[F]] {
@@ -40,7 +40,7 @@ trait ToProfunctorOps0[TC[F[_, _]] <: Profunctor[F]] extends ToProfunctorOpsU[TC
 
   ////
 
-  ////
+////
 }
 
 trait ToProfunctorOps[TC[F[_, _]] <: Profunctor[F]] extends ToProfunctorOps0[TC]
@@ -51,5 +51,5 @@ trait ProfunctorSyntax[F[_, _]]  {
   def F: Profunctor[F]
   ////
 
-  ////
+////
 }

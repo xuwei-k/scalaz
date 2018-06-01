@@ -216,7 +216,7 @@ trait Enum[F] extends Order[F] { self =>
 
   def enumLaw = new EnumLaw {}
 
-  ////
+////
   val enumSyntax = new scalaz.syntax.EnumSyntax[F] { def F = Enum.this }
 }
 
@@ -251,5 +251,12 @@ object Enum {
     }
     z
   }
-  ////
+////
+}
+
+trait IsomorphismEnum[F, G] extends Enum[F] with IsomorphismOrder[F, G]{
+  implicit def G: Enum[G]
+////
+
+////
 }

@@ -13,7 +13,7 @@ trait ApplicativeDivisible[F[_]] extends ApplyDivide[F] { self =>
   def xproduct0[Z](f: =>Z): F[Z]
   final def xderiving0[Z](z: Z): F[Z] = xproduct0(z)
 
-  ////
+////
   val applicativeDivisibleSyntax = new scalaz.syntax.ApplicativeDivisibleSyntax[F] { def F = ApplicativeDivisible.this }
 }
 
@@ -22,5 +22,12 @@ object ApplicativeDivisible {
 
   ////
 
-  ////
+////
+}
+
+trait IsomorphismApplicativeDivisible[F[_], G[_]] extends ApplicativeDivisible[F] with IsomorphismApplyDivide[F, G]{
+  implicit def G: ApplicativeDivisible[G]
+////
+
+////
 }

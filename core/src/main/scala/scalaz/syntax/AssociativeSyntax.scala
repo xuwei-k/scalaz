@@ -12,7 +12,7 @@ final class AssociativeOps[F[_, _],A, B] private[syntax](val self: F[A, B])(impl
   final def reassociateRight[TT, C](implicit ev: F[A, B] <~< F[F[TT, C], B]): F[TT, F[C, B]] =
     F.reassociateRight(ev(self))
 
-  ////
+////
 }
 
 sealed trait ToAssociativeOpsU[TC[F[_, _]] <: Associative[F]] {
@@ -32,7 +32,7 @@ trait ToAssociativeOps0[TC[F[_, _]] <: Associative[F]] extends ToAssociativeOpsU
 
   ////
 
-  ////
+////
 }
 
 trait ToAssociativeOps[TC[F[_, _]] <: Associative[F]] extends ToAssociativeOps0[TC]
@@ -43,5 +43,5 @@ trait AssociativeSyntax[F[_, _]]  {
   def F: Associative[F]
   ////
 
-  ////
+////
 }

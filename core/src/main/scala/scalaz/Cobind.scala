@@ -29,7 +29,7 @@ trait Cobind[F[_]] extends Functor[F] { self =>
 
   def cobindLaw = new CobindLaws {}
 
-  ////
+////
   val cobindSyntax = new scalaz.syntax.CobindSyntax[F] { def F = Cobind.this }
 }
 
@@ -38,5 +38,12 @@ object Cobind {
 
   ////
 
-  ////
+////
+}
+
+trait IsomorphismCobind[F[_], G[_]] extends Cobind[F] with IsomorphismFunctor[F, G]{
+  implicit def G: Cobind[G]
+////
+
+////
 }

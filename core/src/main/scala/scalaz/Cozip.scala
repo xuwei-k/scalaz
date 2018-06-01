@@ -25,7 +25,7 @@ trait Cozip[F[_]]  { self =>
   def cozip7[A, B, C, D, E, G, H](x: F[(A \/ (B \/ (C \/ (D \/ (E \/ (G \/ H))))))]): (F[A] \/ (F[B] \/ (F[C] \/ (F[D] \/ (F[E] \/ (F[G] \/ F[H])))))) =
     cozip(x).map(cozip(_) map (cozip(_) map (cozip(_) map (cozip(_) map cozip))))
 
-  ////
+////
   val cozipSyntax = new scalaz.syntax.CozipSyntax[F] { def F = Cozip.this }
 }
 
@@ -39,5 +39,12 @@ object Cozip {
   def cofzip5[F[_], A, B, C, D, E](x: F[(A \/ (B \/ (C \/ (D \/ E))))])(implicit F: Cozip[F]): (F[A] \/ (F[B] \/ (F[C] \/ (F[D] \/ F[E])))) = F.cozip5(x)
   def cofzip6[F[_], A, B, C, D, E, G](x: F[(A \/ (B \/ (C \/ (D \/ (E \/ G)))))])(implicit F: Cozip[F]): (F[A] \/ (F[B] \/ (F[C] \/ (F[D] \/ (F[E] \/ F[G]))))) = F.cozip6(x)
   def cofzip7[F[_], A, B, C, D, E, G, H](x: F[(A \/ (B \/ (C \/ (D \/ (E \/ (G \/ H))))))])(implicit F: Cozip[F]): (F[A] \/ (F[B] \/ (F[C] \/ (F[D] \/ (F[E] \/ (F[G] \/ F[H])))))) = F.cozip7(x)
-  ////
+////
+}
+
+trait IsomorphismCozip[F[_], G[_]] extends Cozip[F] {
+  implicit def G: Cozip[G]
+////
+
+////
 }

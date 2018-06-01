@@ -66,7 +66,7 @@ trait Bifunctor[F[_, _]]  { self =>
   def widen[A, B, C >: A, D >: B](fab: F[A, B]): F[C, D] =
     bimap(fab)(identity[C], identity[D])
 
-  ////
+////
   val bifunctorSyntax = new scalaz.syntax.BifunctorSyntax[F] { def F = Bifunctor.this }
 }
 
@@ -75,5 +75,12 @@ object Bifunctor {
 
   ////
 
-  ////
+////
+}
+
+trait IsomorphismBifunctor[F[_, _], G[_, _]] extends Bifunctor[F] {
+  implicit def G: Bifunctor[G]
+////
+
+////
 }

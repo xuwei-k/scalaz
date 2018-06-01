@@ -27,7 +27,7 @@ final class MonadPlusOps[F[_],A] private[syntax](val self: F[A])(implicit val F:
   final def separate[G[_, _], B, C](implicit ev: A === G[B, C], G: Bifoldable[G]): (F[B], F[C]) =
     F.separate(ev.subst(self))
 
-  ////
+////
 }
 
 sealed trait ToMonadPlusOpsU[TC[F[_]] <: MonadPlus[F]] {
@@ -42,7 +42,7 @@ trait ToMonadPlusOps0[TC[F[_]] <: MonadPlus[F]] extends ToMonadPlusOpsU[TC] {
 
   ////
 
-  ////
+////
 }
 
 trait ToMonadPlusOps[TC[F[_]] <: MonadPlus[F]] extends ToMonadPlusOps0[TC] with ToMonadOps[TC] with ToApplicativePlusOps[TC]
@@ -53,5 +53,5 @@ trait MonadPlusSyntax[F[_]] extends MonadSyntax[F] with ApplicativePlusSyntax[F]
   def F: MonadPlus[F]
   ////
 
-  ////
+////
 }

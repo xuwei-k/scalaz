@@ -5,7 +5,7 @@ package syntax
 final class BindRecOps[F[_],A] private[syntax](val self: F[A])(implicit val F: BindRec[F]) extends Ops[F[A]] {
   ////
 
-  ////
+////
 }
 
 sealed trait ToBindRecOpsU[TC[F[_]] <: BindRec[F]] {
@@ -20,7 +20,7 @@ trait ToBindRecOps0[TC[F[_]] <: BindRec[F]] extends ToBindRecOpsU[TC] {
 
   ////
 
-  ////
+////
 }
 
 trait ToBindRecOps[TC[F[_]] <: BindRec[F]] extends ToBindRecOps0[TC] with ToBindOps[TC]
@@ -31,5 +31,5 @@ trait BindRecSyntax[F[_]] extends BindSyntax[F] {
   def F: BindRec[F]
   ////
 
-  ////
+////
 }

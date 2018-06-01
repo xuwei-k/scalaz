@@ -5,7 +5,7 @@ package syntax
 final class PlusEmptyOps[F[_],A] private[syntax](val self: F[A])(implicit val F: PlusEmpty[F]) extends Ops[F[A]] {
   ////
 
-  ////
+////
 }
 
 sealed trait ToPlusEmptyOpsU[TC[F[_]] <: PlusEmpty[F]] {
@@ -21,7 +21,7 @@ trait ToPlusEmptyOps0[TC[F[_]] <: PlusEmpty[F]] extends ToPlusEmptyOpsU[TC] {
   ////
 
   def mempty[F[_], A](implicit F: PlusEmpty[F]): F[A] = F.empty[A]
-  ////
+////
 }
 
 trait ToPlusEmptyOps[TC[F[_]] <: PlusEmpty[F]] extends ToPlusEmptyOps0[TC] with ToPlusOps[TC]
@@ -32,5 +32,5 @@ trait PlusEmptySyntax[F[_]] extends PlusSyntax[F] {
   def F: PlusEmpty[F]
   ////
 
-  ////
+////
 }

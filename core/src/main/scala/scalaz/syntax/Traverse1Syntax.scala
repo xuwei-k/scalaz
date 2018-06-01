@@ -23,7 +23,7 @@ final class Traverse1Ops[F[_],A] private[syntax](val self: F[A])(implicit val F:
   final def sequence1U(implicit G: Unapply[Apply, A]): G.M[F[G.A]] =
     F.sequence1U(self)
 
-  ////
+////
 }
 
 sealed trait ToTraverse1OpsU[TC[F[_]] <: Traverse1[F]] {
@@ -38,7 +38,7 @@ trait ToTraverse1Ops0[TC[F[_]] <: Traverse1[F]] extends ToTraverse1OpsU[TC] {
 
   ////
 
-  ////
+////
 }
 
 trait ToTraverse1Ops[TC[F[_]] <: Traverse1[F]] extends ToTraverse1Ops0[TC] with ToTraverseOps[TC] with ToFoldable1Ops[TC]
@@ -49,5 +49,5 @@ trait Traverse1Syntax[F[_]] extends TraverseSyntax[F] with Foldable1Syntax[F] {
   def F: Traverse1[F]
   ////
 
-  ////
+////
 }

@@ -15,7 +15,7 @@ final class ComposeOps[F[_, _],A, B] private[syntax](val self: F[A, B])(implicit
 
   final def ⋙[C](x: F[B, C]): F[A, C] =
     >>>(x)
-  ////
+////
 }
 
 sealed trait ToComposeOpsU[TC[F[_, _]] <: Compose[F]] {
@@ -34,7 +34,7 @@ trait ToComposeOps0[TC[F[_, _]] <: Compose[F]] extends ToComposeOpsU[TC] {
     new ComposeOps[F[G, ?, ?], A, B](v)(F0)
 
   ////
-  ////
+////
 }
 
 trait ToComposeOps[TC[F[_, _]] <: Compose[F]] extends ToComposeOps0[TC]
@@ -45,5 +45,5 @@ trait ComposeSyntax[F[_, _]]  {
   def F: Compose[F]
   ////
 
-  ////
+////
 }

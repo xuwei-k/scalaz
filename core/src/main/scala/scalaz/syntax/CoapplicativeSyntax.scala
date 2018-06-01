@@ -5,7 +5,7 @@ package syntax
 final class CoapplicativeOps[F[_],A] private[syntax](val self: F[A])(implicit val F: Coapplicative[F]) extends Ops[F[A]] {
   ////
 
-  ////
+////
 }
 
 sealed trait ToCoapplicativeOpsU[TC[F[_]] <: Coapplicative[F]] {
@@ -20,7 +20,7 @@ trait ToCoapplicativeOps0[TC[F[_]] <: Coapplicative[F]] extends ToCoapplicativeO
 
   ////
 
-  ////
+////
 }
 
 trait ToCoapplicativeOps[TC[F[_]] <: Coapplicative[F]] extends ToCoapplicativeOps0[TC] with ToCoapplicativeCodivideOps[TC]
@@ -31,5 +31,5 @@ trait CoapplicativeSyntax[F[_]] extends CoapplicativeCodivideSyntax[F] {
   def F: Coapplicative[F]
   ////
 
-  ////
+////
 }

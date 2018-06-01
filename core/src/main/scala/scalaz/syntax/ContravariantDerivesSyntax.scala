@@ -5,7 +5,7 @@ package syntax
 final class ContravariantDerivesOps[F[_],A] private[syntax](val self: F[A])(implicit val F: ContravariantDerives[F]) extends Ops[F[A]] {
   ////
 
-  ////
+////
 }
 
 sealed trait ToContravariantDerivesOpsU[TC[F[_]] <: ContravariantDerives[F]] {
@@ -20,7 +20,7 @@ trait ToContravariantDerivesOps0[TC[F[_]] <: ContravariantDerives[F]] extends To
 
   ////
 
-  ////
+////
 }
 
 trait ToContravariantDerivesOps[TC[F[_]] <: ContravariantDerives[F]] extends ToContravariantDerivesOps0[TC] with ToDerivesOps[TC] with ToCodivideOps[TC] with ToDivisibleOps[TC]
@@ -31,5 +31,5 @@ trait ContravariantDerivesSyntax[F[_]] extends DerivesSyntax[F] with CodivideSyn
   def F: ContravariantDerives[F]
   ////
 
-  ////
+////
 }
