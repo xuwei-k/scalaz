@@ -101,6 +101,8 @@ trait Bifoldable[F[_, _]]  { self =>
 object Bifoldable {
   @inline def apply[F[_, _]](implicit F: Bifoldable[F]): Bifoldable[F] = F
 
+
+
   ////
   /**
    * Template trait to define `Bifoldable` in terms of `bifoldMap`.
@@ -118,5 +120,22 @@ object Bifoldable {
       bifoldR(fa, F.zero)(x => y => F.append(f(x),  y))(x => y => F.append(g(x),  y))
   }
 
+////
+}
+
+trait IsomorphismBifoldable[F[_, _], G[_, _]] extends Bifoldable[F] {
+  implicit def G: Bifoldable[G]
   ////
+
+  protected[this] def biNaturalTrans: F ~~> G
+
+  override final def bifoldMap[A, B, M: Monoid](fab: F[A, B])(f: A => M)(g: B => M): M =
+    G.bifoldMap(biNaturalTrans(fab))(f)(g)
+
+  override final def bifoldRight[A, B, C](fab: F[A, B], z: => C)(f: (A, => C) => C)(g: (B, => C) => C): C =
+    G.bifoldRight(biNaturalTrans(fab), z)(f)(g)
+
+  override final def bifoldLeft[A, B, C](fa: F[A, B], z: C)(f: (C, A) => C)(g: (C, B) => C): C =
+    G.bifoldLeft(biNaturalTrans(fa), z)(f)(g)
+////
 }

@@ -190,7 +190,23 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
 object Foldable1 {
   @inline def apply[F[_]](implicit F: Foldable1[F]): Foldable1[F] = F
 
-  ////
+
 
   ////
+
+////
+}
+
+trait IsomorphismFoldable1[F[_], G[_]] extends Foldable1[F] with IsomorphismFoldable[F, G]{
+  implicit def G: Foldable1[G]
+  ////
+  override final def foldMap1[A, B: Semigroup](fa: F[A])(f: A => B): B =
+    G.foldMap1(naturalTrans(fa))(f)
+
+  override final def foldMapLeft1[A, B](fa: F[A])(z: A => B)(f: (B, A) => B): B =
+    G.foldMapLeft1(naturalTrans(fa))(z)(f)
+
+  override final def foldMapRight1[A, B](fa: F[A])(z: A => B)(f: (A, => B) => B): B =
+    G.foldMapRight1(naturalTrans(fa))(z)(f)
+////
 }
