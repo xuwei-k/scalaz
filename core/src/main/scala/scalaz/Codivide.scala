@@ -83,5 +83,11 @@ trait IsomorphismCodivide[F[_], G[_]] extends Codivide[F] with IsomorphismCoappl
   implicit def G: Codivide[G]
 ////
 
+  def codivide1[Z, A1](a1: => F[A1])(f: Z => A1): F[Z] =
+    iso.from(G.codivide1(iso.to(a1))(f))
+
+  def codivide2[Z, A1, A2](a1: => F[A1], a2: => F[A2])(f: Z => A1 \/ A2): F[Z] =
+    iso.from(G.codivide2(iso.to(a1), iso.to(a2))(f))
+
 ////
 }

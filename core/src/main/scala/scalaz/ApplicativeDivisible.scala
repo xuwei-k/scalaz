@@ -37,5 +37,8 @@ trait IsomorphismApplicativeDivisible[F[_], G[_]] extends ApplicativeDivisible[F
   implicit def G: ApplicativeDivisible[G]
 ////
 
+  override def xproduct0[Z](f: => Z): F[Z] =
+    iso.from(G.xproduct0(f))
+
 ////
 }
