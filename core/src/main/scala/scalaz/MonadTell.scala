@@ -35,5 +35,7 @@ trait IsomorphismMonadTell[F[_], G[_], S] extends MonadTell[F, S] with Isomorphi
   implicit def G: MonadTell[G, S]
 ////
 
+  override def writer[A](w: S, v: A): F[A] =
+    iso.from(G.writer(w, v))
 ////
 }

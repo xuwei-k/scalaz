@@ -87,5 +87,7 @@ trait IsomorphismArrow[F[_, _], G[_, _]] extends Arrow[F] with IsomorphismSplit[
   implicit def G: Arrow[G]
 ////
 
+  override def arr[A, B](f: A => B): F[A, B] =
+    iso.from(G.arr(f))
 ////
 }
