@@ -304,24 +304,24 @@ object GenTypeClass {
         case values =>
           values.map(t => s"Isomorphism${t.name}[F, G]").mkString("with ", " with ", "")
       }
-     
+
       kind match {
         case Kind.* =>
 s"""
 trait Isomorphism${typeClassName}[F, G] extends ${typeClassName}[F] ${extendsList}{
   implicit def G: ${typeClassName}[G]
-////
+  ////
 
-////
+  ////
 }
 """
         case Kind.*->* =>
 s"""
 trait Isomorphism${typeClassName}[F[_], G[_]] extends ${typeClassName}[F] ${extendsList}{
   implicit def G: ${typeClassName}[G]
-////
+  ////
 
-////
+  ////
 }
 """
 
@@ -329,9 +329,9 @@ trait Isomorphism${typeClassName}[F[_], G[_]] extends ${typeClassName}[F] ${exte
  s"""
 trait Isomorphism${typeClassName}[F[_, _], G[_, _]] extends ${typeClassName}[F] ${extendsList}{
   implicit def G: ${typeClassName}[G]
-////
+  ////
 
-////
+  ////
 }
 """
 
@@ -339,9 +339,9 @@ trait Isomorphism${typeClassName}[F[_, _], G[_, _]] extends ${typeClassName}[F] 
  s"""
 trait Isomorphism${typeClassName}[F[_], G[_], S] extends ${typeClassName}[F, S] ${extendsList}{
   implicit def G: ${typeClassName}[G, S]
-////
+  ////
 
-////
+  ////
 }
 """
      }
