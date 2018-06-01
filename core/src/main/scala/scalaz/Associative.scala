@@ -33,6 +33,14 @@ trait Associative[=>:[_, _]]  { self =>
 object Associative {
   @inline def apply[F[_, _]](implicit F: Associative[F]): Associative[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_, _], G[_, _]](D: F <~~> G)(implicit E: Associative[G]): Associative[F] =
+    new IsomorphismAssociative[F, G] {
+      override def G: Associative[G] = E
+      override def iso: F <~~> G = D
+    }
+
   ////
 
   ////

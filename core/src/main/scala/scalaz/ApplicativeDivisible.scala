@@ -20,6 +20,14 @@ trait ApplicativeDivisible[F[_]] extends ApplyDivide[F] { self =>
 object ApplicativeDivisible {
   @inline def apply[F[_]](implicit F: ApplicativeDivisible[F]): ApplicativeDivisible[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: ApplicativeDivisible[G]): ApplicativeDivisible[F] =
+    new IsomorphismApplicativeDivisible[F, G] {
+      override def G: ApplicativeDivisible[G] = E
+      override def iso: F <~> G = D
+    }
+
   ////
 
   ////

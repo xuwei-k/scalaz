@@ -421,6 +421,8 @@ trait Foldable[F[_]]  { self =>
 object Foldable {
   @inline def apply[F[_]](implicit F: Foldable[F]): Foldable[F] = F
 
+
+
   ////
   /**
    * Template trait to define `Foldable` in terms of `foldMap`.

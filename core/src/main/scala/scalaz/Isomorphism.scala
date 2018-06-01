@@ -309,6 +309,14 @@ trait IsomorphismApplicative[F[_], G[_]] extends Applicative[F] with Isomorphism
   override def ap[A, B](fa: => F[A])(f: => F[A => B]): F[B] = iso.from(G.ap(iso.to(fa))(iso.to(f)))
 }
 
+trait IsomorphismAppliDivide[F[_], G[_]] extends ApplyDivide[F] with IsomorphismApply[F, G] {
+  implicit def G: ApplyDivide[G]
+}
+
+trait IsomorphismCovariantDerives[F[_], G[_]] extends CovariantDerives[F, G] {
+}
+
+
 trait IsomorphismBind[F[_], G[_]] extends Bind[F] with IsomorphismApply[F, G] {
   implicit def G: Bind[G]
 

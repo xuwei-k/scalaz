@@ -51,6 +51,14 @@ trait CoapplicativeCodivide[F[_]]  { self =>
 object CoapplicativeCodivide {
   @inline def apply[F[_]](implicit F: CoapplicativeCodivide[F]): CoapplicativeCodivide[F] = F
 
+  import Isomorphism._
+
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: CoapplicativeCodivide[G]): CoapplicativeCodivide[F] =
+    new IsomorphismCoapplicativeCodivide[F, G] {
+      override def G: CoapplicativeCodivide[G] = E
+      override def iso: F <~> G = D
+    }
+
   ////
 
   ////

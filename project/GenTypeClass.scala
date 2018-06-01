@@ -1,6 +1,6 @@
 import sbt._
 
-case class TypeClass(name: String, kind: Kind, pack: Seq[String] = Seq("scalaz"), extendsList: Seq[TypeClass] = Seq(), createSyntax: Boolean = true) {
+case class TypeClass(name: String, kind: Kind, pack: Seq[String] = Seq("scalaz"), extendsList: Seq[TypeClass] = Seq(), createSyntax: Boolean = true, fromIso: Boolean = true) {
   require(pack.head == "scalaz")
   def syntaxPack = {
     Seq("scalaz", "syntax") ++ pack.drop(1)
@@ -22,7 +22,7 @@ object TypeClass {
   lazy val equal = TypeClass("Equal", *)
   lazy val show = TypeClass("Show", *)
   lazy val order = TypeClass("Order", *, extendsList = Seq(equal))
-  lazy val enum = TypeClass("Enum", *, extendsList = Seq(order))
+  lazy val enum = TypeClass("Enum", *, extendsList = Seq(order), fromIso = false)
 
   lazy val invariantFunctor = TypeClass("InvariantFunctor", *->*)
   lazy val functor = TypeClass("Functor", *->*, extendsList = Seq(invariantFunctor))
@@ -41,8 +41,8 @@ object TypeClass {
   lazy val unzip = TypeClass("Unzip", *->*)
   lazy val bind = TypeClass("Bind", *->*, extendsList = Seq(apply))
   lazy val monad = TypeClass("Monad", *->*, extendsList = Seq(applicative, bind))
-  lazy val foldable = TypeClass("Foldable", *->*)
-  lazy val foldable1 = TypeClass("Foldable1", *->*, extendsList = Seq(foldable))
+  lazy val foldable = TypeClass("Foldable", *->*, fromIso = false)
+  lazy val foldable1 = TypeClass("Foldable1", *->*, extendsList = Seq(foldable), fromIso = false)
   lazy val traverse = TypeClass("Traverse", *->*, extendsList = Seq(functor, foldable))
   lazy val traverse1 = TypeClass("Traverse1", *->*, extendsList = Seq(traverse, foldable1))
 
@@ -54,7 +54,7 @@ object TypeClass {
   lazy val cozip = TypeClass("Cozip", *->*)
 
   lazy val plus = TypeClass("Plus", *->*, extendsList = Seq())
-  lazy val plusEmpty = TypeClass("PlusEmpty", *->*, extendsList = Seq(plus))
+  lazy val plusEmpty = TypeClass("PlusEmpty", *->*, extendsList = Seq(plus), fromIso = false)
   lazy val isEmpty = TypeClass("IsEmpty", *->*, extendsList = Seq(plusEmpty))
   lazy val optional = TypeClass("Optional", *->*)
 
@@ -63,7 +63,7 @@ object TypeClass {
 
   lazy val associative = TypeClass("Associative", *^*->*)
   lazy val bifunctor = TypeClass("Bifunctor", *^*->*)
-  lazy val bifoldable = TypeClass("Bifoldable", *^*->*)
+  lazy val bifoldable = TypeClass("Bifoldable", *^*->*, fromIso = false)
   lazy val bitraverse = TypeClass("Bitraverse", *^*->*, extendsList = Seq(bifunctor, bifoldable))
   lazy val compose = TypeClass("Compose", *^*->*)
   lazy val catchable = TypeClass("Catchable", *->*, extendsList = Seq())
@@ -288,6 +288,49 @@ object GenTypeClass {
       s"""@inline def apply[$classifiedTypeF](implicit F: $typeClassName[F]): $typeClassName[F] = F"""
     }
 
+    val fromIso: String = if (tc.fromIso) {
+      kind match {
+        case Kind.* =>
+          s"""  import Isomorphism._
+
+  def fromIso[F, G](D: F <=> G)(implicit M: $typeClassName[G]): $typeClassName[F] =
+    new Isomorphism$typeClassName[F, G] {
+      override def G: $typeClassName[G] = M
+      override def iso: F <=> G = D
+    }"""
+
+        case Kind.*->* =>
+          s"""  import Isomorphism._
+
+  def fromIso[F[_], G[_]](D: F <~> G)(implicit E: $typeClassName[G]): $typeClassName[F] =
+    new Isomorphism$typeClassName[F, G] {
+      override def G: $typeClassName[G] = E
+      override def iso: F <~> G = D
+    }"""
+
+        case Kind.*^*->* =>
+          s"""  import Isomorphism._
+
+  def fromIso[F[_, _], G[_, _]](D: F <~~> G)(implicit E: $typeClassName[G]): $typeClassName[F] =
+    new Isomorphism$typeClassName[F, G] {
+      override def G: $typeClassName[G] = E
+      override def iso: F <~~> G = D
+    }"""
+
+        case Kind.|*->*|->* =>
+          s"""  import Isomorphism._
+
+  def fromIso[F[_], G[_], E](D: F <~> G)(implicit A: $typeClassName[G, E]): $typeClassName[F, E] =
+    new Isomorphism$typeClassName[F, G, E] {
+      override def G: $typeClassName[G, E] = A
+      override def iso: F <~> G = D
+    }"""
+      }
+    } else {
+      ""
+    }
+
+
     val mainSource = s"""${tc.packageString0}
 
 ////
@@ -304,6 +347,8 @@ $syntaxMember
 
 object $typeClassName {
   $applyMethod
+
+$fromIso
 
   ////
 
