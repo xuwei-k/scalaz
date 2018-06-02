@@ -194,7 +194,7 @@ object Foldable1 {
 
   ////
 
-////
+  ////
 }
 
 trait IsomorphismFoldable1[F[_], G[_]] extends Foldable1[F] with IsomorphismFoldable[F, G]{
@@ -208,5 +208,5 @@ trait IsomorphismFoldable1[F[_], G[_]] extends Foldable1[F] with IsomorphismFold
 
   override final def foldMapRight1[A, B](fa: F[A])(z: A => B)(f: (A, => B) => B): B =
     G.foldMapRight1(naturalTrans(fa))(z)(f)
-////
+  ////
 }

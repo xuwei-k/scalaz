@@ -123,7 +123,7 @@ object Functor {
 
   ////
 
-////
+  ////
 }
 
 trait IsomorphismFunctor[F[_], G[_]] extends Functor[F] with IsomorphismInvariantFunctor[F, G]{
@@ -135,5 +135,5 @@ trait IsomorphismFunctor[F[_], G[_]] extends Functor[F] with IsomorphismInvarian
 
   override def map[A, B](fa: F[A])(f: A => B): F[B] = iso.from(G.map(iso.to(fa))(f))
 
-////
+  ////
 }

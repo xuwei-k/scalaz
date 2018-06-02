@@ -460,7 +460,7 @@ object Foldable {
       foldRight[A, B](fa, F.zero)((x, y) => F.append(f(x),  y))
   }
 
-////
+  ////
 }
 
 trait IsomorphismFoldable[F[_], G[_]] extends Foldable[F] {
@@ -476,5 +476,5 @@ trait IsomorphismFoldable[F[_], G[_]] extends Foldable[F] {
 
   override def foldRight[A, B](fa: F[A], z: => B)(f: (A, => B) => B): B =
     G.foldRight[A, B](naturalTrans(fa), z)(f)
-////
+  ////
 }
