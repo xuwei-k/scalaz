@@ -28,7 +28,7 @@ object ProChoice {
 
   ////
 
-////
+  ////
 }
 
 trait IsomorphismProChoice[F[_, _], G[_, _]] extends ProChoice[F] with IsomorphismProfunctor[F, G]{
@@ -40,5 +40,5 @@ trait IsomorphismProChoice[F[_, _], G[_, _]] extends ProChoice[F] with Isomorphi
 
   override def right[A, B, C](fa: F[A, B]): F[(C \/ A), (C \/ B)] =
     iso.from(G.right(iso.to(fa)))
-////
+  ////
 }

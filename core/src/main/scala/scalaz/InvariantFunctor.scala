@@ -58,7 +58,7 @@ object InvariantFunctor {
     }
 
   ////
-////
+  ////
 }
 
 trait IsomorphismInvariantFunctor[F[_], G[_]] extends InvariantFunctor[F] {
@@ -70,5 +70,5 @@ trait IsomorphismInvariantFunctor[F[_], G[_]] extends InvariantFunctor[F] {
 
   override def xmap[A, B](ma: F[A], f: A => B, g: B => A): F[B] =
     iso.from(G.xmap(iso.to(ma), f, g))
-////
+  ////
 }

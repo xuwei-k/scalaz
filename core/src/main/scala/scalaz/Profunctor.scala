@@ -97,7 +97,7 @@ object Profunctor {
       def map[A, B](f: DownStar[F, D, A])(k: A => B) =
         DownStar(k compose Tag.unwrap(f))
     }
-////
+  ////
 }
 
 trait IsomorphismProfunctor[F[_, _], G[_, _]] extends Profunctor[F] {
@@ -113,5 +113,5 @@ trait IsomorphismProfunctor[F[_, _], G[_, _]] extends Profunctor[F] {
   override def mapsnd[A, B, C](fab: F[A, B])(f: B => C): F[A, C] =
     iso.from(G.mapsnd(iso.to(fab))(f))
 
-////
+  ////
 }

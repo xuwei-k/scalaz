@@ -28,7 +28,7 @@ object Strong {
 
   ////
 
-////
+  ////
 }
 
 trait IsomorphismStrong[F[_, _], G[_, _]] extends Strong[F] with IsomorphismProfunctor[F, G]{
@@ -40,5 +40,5 @@ trait IsomorphismStrong[F[_, _], G[_, _]] extends Strong[F] with IsomorphismProf
 
   override def second[A, B, C](fa: F[A, B]): F[(C, A), (C, B)] =
     iso.from(G.second(iso.to(fa)))
-////
+  ////
 }

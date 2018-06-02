@@ -223,7 +223,7 @@ object Semigroup {
         }
     }
 
-////
+  ////
 }
 
 trait IsomorphismSemigroup[F, G] extends Semigroup[F] {
@@ -234,5 +234,5 @@ trait IsomorphismSemigroup[F, G] extends Semigroup[F] {
   def iso: F <=> G
 
   def append(f1: F, f2: => F): F = iso.from(G.append(iso.to(f1), iso.to(f2)))
-////
+  ////
 }

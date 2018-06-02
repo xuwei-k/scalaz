@@ -35,12 +35,12 @@ object SemiLattice {
 
   ////
 
-////
+  ////
 }
 
 trait IsomorphismSemiLattice[F, G] extends SemiLattice[F] with IsomorphismBand[F, G]{
   implicit def G: SemiLattice[G]
   ////
 
-////
+  ////
 }

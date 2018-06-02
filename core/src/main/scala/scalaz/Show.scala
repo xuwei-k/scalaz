@@ -62,7 +62,7 @@ object Show {
   final case class ShowInterpolator(sc: StringContext) extends AnyVal {
     def show(args: Shows*): String = sc.s(args: _*)
   }
-////
+  ////
 }
 
 trait IsomorphismShow[F, G] extends Show[F] {
@@ -73,5 +73,5 @@ trait IsomorphismShow[F, G] extends Show[F] {
   def iso: F <=> G
 
   override def show(f: F): Cord = G.show(iso.to(f))
-////
+  ////
 }

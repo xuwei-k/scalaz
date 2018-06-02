@@ -97,12 +97,12 @@ object Monad {
 
   ////
 
-////
+  ////
 }
 
 trait IsomorphismMonad[F[_], G[_]] extends Monad[F] with IsomorphismApplicative[F, G] with IsomorphismBind[F, G]{
   implicit def G: Monad[G]
   ////
 
-////
+  ////
 }

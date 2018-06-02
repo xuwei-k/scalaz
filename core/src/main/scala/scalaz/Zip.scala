@@ -80,7 +80,7 @@ object Zip {
 
   def fzip[F[_], A, B](t: LazyTuple2[F[A], F[B]])(implicit F: Zip[F]): F[(A, B)] =
       F.zip(t._1, t._2)
-////
+  ////
 }
 
 trait IsomorphismZip[F[_], G[_]] extends Zip[F] {
@@ -92,5 +92,5 @@ trait IsomorphismZip[F[_], G[_]] extends Zip[F] {
 
   def zip[A, B](a: => F[A], b: => F[B]): F[(A, B)] =
     iso.from(G.zip(iso.to(a), iso.to(b)))
-////
+  ////
 }

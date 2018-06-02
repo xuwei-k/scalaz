@@ -30,7 +30,7 @@ object MonadReader {
 
   ////
 
-////
+  ////
 }
 
 trait IsomorphismMonadReader[F[_], G[_], S] extends MonadReader[F, S] with IsomorphismMonad[F, G]{
@@ -41,5 +41,5 @@ trait IsomorphismMonadReader[F[_], G[_], S] extends MonadReader[F, S] with Isomo
 
   override def local[A](f: S => S)(fa: F[A]): F[A] =
     iso.from(G.local(f)(iso.to(fa)))
-////
+  ////
 }

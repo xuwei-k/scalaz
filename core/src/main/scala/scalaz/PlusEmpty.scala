@@ -72,7 +72,7 @@ object PlusEmpty {
       def F = P
       def empty[A] = M.point(P.empty[A])
     }
-////
+  ////
 }
 
 trait IsomorphismPlusEmpty[F[_], G[_]] extends PlusEmpty[F] with IsomorphismPlus[F, G]{
@@ -80,5 +80,5 @@ trait IsomorphismPlusEmpty[F[_], G[_]] extends PlusEmpty[F] with IsomorphismPlus
   ////
 
   def empty[A]: F[A] = iso.from(G.empty[A])
-////
+  ////
 }

@@ -122,7 +122,7 @@ object Order {
     }
   }
 
-////
+  ////
 }
 
 trait IsomorphismOrder[F, G] extends Order[F] with IsomorphismEqual[F, G]{
@@ -133,5 +133,5 @@ trait IsomorphismOrder[F, G] extends Order[F] with IsomorphismEqual[F, G]{
 
   override def order(x: F, y: F): Ordering =
     G.order(iso.to(x), iso.to(y))
-////
+  ////
 }

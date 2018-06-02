@@ -75,7 +75,7 @@ object Unzip {
     }
 
   ////
-////
+  ////
 }
 
 trait IsomorphismUnzip[F[_], G[_]] extends Unzip[F] {
@@ -89,5 +89,5 @@ trait IsomorphismUnzip[F[_], G[_]] extends Unzip[F] {
     G.unzip(iso.to(a)) match {
       case (f, s) => (iso.from(f), iso.from(s))
     }
-////
+  ////
 }

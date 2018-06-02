@@ -77,12 +77,12 @@ object MonadPlus {
 
   ////
 
-////
+  ////
 }
 
 trait IsomorphismMonadPlus[F[_], G[_]] extends MonadPlus[F] with IsomorphismMonad[F, G] with IsomorphismApplicativePlus[F, G]{
   implicit def G: MonadPlus[G]
   ////
 
-////
+  ////
 }

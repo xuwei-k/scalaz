@@ -102,7 +102,7 @@ object Plus {
       def F = F0
     }
 
-////
+  ////
 }
 
 trait IsomorphismPlus[F[_], G[_]] extends Plus[F] {
@@ -114,5 +114,5 @@ trait IsomorphismPlus[F[_], G[_]] extends Plus[F] {
 
   def plus[A](a: F[A], b: => F[A]): F[A] =
     iso.from(G.plus(iso.to(a), iso.to(b)))
-////
+  ////
 }

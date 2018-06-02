@@ -35,7 +35,7 @@ object MonadState {
 
   ////
 
-////
+  ////
 }
 
 trait IsomorphismMonadState[F[_], G[_], S] extends MonadState[F, S] with IsomorphismMonad[F, G]{
@@ -46,5 +46,5 @@ trait IsomorphismMonadState[F[_], G[_], S] extends MonadState[F, S] with Isomorp
 
   override def put(s: S): F[Unit] = iso.from(G.put(s))
 
-////
+  ////
 }

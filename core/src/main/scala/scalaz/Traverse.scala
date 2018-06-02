@@ -213,7 +213,7 @@ object Traverse {
 
   ////
 
-////
+  ////
 }
 
 trait IsomorphismTraverse[F[_], G[_]] extends Traverse[F] with IsomorphismFunctor[F, G] with IsomorphismFoldable[F, G]{
@@ -224,5 +224,5 @@ trait IsomorphismTraverse[F[_], G[_]] extends Traverse[F] with IsomorphismFuncto
 
   override def traverseImpl[H[_] : Applicative, A, B](fa: F[A])(f: A => H[B]): H[F[B]] =
     Applicative[H].map(G.traverseImpl(iso.to(fa))(f))(iso.from.apply)
-////
+  ////
 }

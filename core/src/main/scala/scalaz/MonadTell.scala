@@ -28,7 +28,7 @@ object MonadTell {
 
   ////
 
-////
+  ////
 }
 
 trait IsomorphismMonadTell[F[_], G[_], S] extends MonadTell[F, S] with IsomorphismMonad[F, G]{
@@ -37,5 +37,5 @@ trait IsomorphismMonadTell[F[_], G[_], S] extends MonadTell[F, S] with Isomorphi
 
   override def writer[A](w: S, v: A): F[A] =
     iso.from(G.writer(w, v))
-////
+  ////
 }

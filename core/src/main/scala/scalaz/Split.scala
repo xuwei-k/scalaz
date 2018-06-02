@@ -27,7 +27,7 @@ object Split {
     }
 
   ////
-////
+  ////
 }
 
 trait IsomorphismSplit[F[_, _], G[_, _]] extends Split[F] with IsomorphismCompose[F, G]{
@@ -36,5 +36,5 @@ trait IsomorphismSplit[F[_, _], G[_, _]] extends Split[F] with IsomorphismCompos
 
   override def split[A, B, C, D](f: F[A, B], g: F[C, D]): F[(A,  C), (B, D)] =
     iso.from(G.split(iso.to(f), iso.to(g)))
-////
+  ////
 }
