@@ -61,7 +61,7 @@ object CoapplicativeCodivide {
 
   ////
 
-////
+  ////
 }
 
 trait IsomorphismCoapplicativeCodivide[F[_], G[_]] extends CoapplicativeCodivide[F] {
@@ -79,5 +79,5 @@ trait IsomorphismCoapplicativeCodivide[F[_], G[_]] extends CoapplicativeCodivide
   override def xcoproduct4[Z, A1, A2, A3, A4](a1: => F[A1], a2: => F[A2], a3: => F[A3], a4: => F[A4])(f: A1 \/ (A2 \/ (A3 \/ A4)) => Z, g: Z => A1 \/ (A2 \/ (A3 \/ A4))): F[Z] =
     iso.from(G.xcoproduct4(iso.to(a1), iso.to(a2), iso.to(a3), iso.to(a4))(f, g))
 
-////
+  ////
 }

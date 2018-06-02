@@ -76,7 +76,7 @@ object Codivide {
 
   ////
 
-////
+  ////
 }
 
 trait IsomorphismCodivide[F[_], G[_]] extends Codivide[F] with IsomorphismCoapplicativeCodivide[F, G]{
@@ -89,5 +89,5 @@ trait IsomorphismCodivide[F[_], G[_]] extends Codivide[F] with IsomorphismCoappl
   def codivide2[Z, A1, A2](a1: => F[A1], a2: => F[A2])(f: Z => A1 \/ A2): F[Z] =
     iso.from(G.codivide2(iso.to(a1), iso.to(a2))(f))
 
-////
+  ////
 }

@@ -75,7 +75,7 @@ object Align {
 
   ////
 
-////
+  ////
 }
 
 trait IsomorphismAlign[F[_], G[_]] extends Align[F] with IsomorphismFunctor[F, G]{
@@ -85,5 +85,5 @@ trait IsomorphismAlign[F[_], G[_]] extends Align[F] with IsomorphismFunctor[F, G
   override def alignWith[A, B, C](f: A \&/ B => C): (F[A], F[B]) => F[C] = {
     case (fa, fb) => iso.from(G.alignWith(f)(iso.to(fa), iso.to(fb)))
   }
-////
+  ////
 }

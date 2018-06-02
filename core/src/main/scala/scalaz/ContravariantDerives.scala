@@ -28,12 +28,12 @@ object ContravariantDerives {
 
   ////
 
-////
+  ////
 }
 
 trait IsomorphismContravariantDerives[F[_], G[_]] extends ContravariantDerives[F] with IsomorphismDerives[F, G] with IsomorphismCodivide[F, G] with IsomorphismDivisible[F, G]{
   implicit def G: ContravariantDerives[G]
   ////
 
-////
+  ////
 }

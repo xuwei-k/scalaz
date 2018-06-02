@@ -46,12 +46,12 @@ object Band {
 
   ////
 
-////
+  ////
 }
 
 trait IsomorphismBand[F, G] extends Band[F] with IsomorphismSemigroup[F, G]{
   implicit def G: Band[G]
   ////
 
-////
+  ////
 }

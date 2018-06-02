@@ -51,7 +51,7 @@ object Compose {
     }
 
   ////
-////
+  ////
 }
 
 trait IsomorphismCompose[F[_, _], G[_, _]] extends Compose[F] {
@@ -63,5 +63,5 @@ trait IsomorphismCompose[F[_, _], G[_, _]] extends Compose[F] {
 
   override def compose[A, B, C](f: F[B, C], g: F[A, B]): F[A, C] =
     iso.from(G.compose(iso.to(f), iso.to(g)))
-////
+  ////
 }

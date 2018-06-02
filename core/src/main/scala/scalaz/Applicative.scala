@@ -128,7 +128,7 @@ object Applicative {
 
   ////
 
-////
+  ////
 }
 
 trait IsomorphismApplicative[F[_], G[_]] extends Applicative[F] with IsomorphismApply[F, G] with IsomorphismApplicativeDivisible[F, G]{
@@ -138,5 +138,5 @@ trait IsomorphismApplicative[F[_], G[_]] extends Applicative[F] with Isomorphism
   def point[A](a: => A): F[A] = iso.from(G.point(a))
 
   override def ap[A, B](fa: => F[A])(f: => F[A => B]): F[B] = iso.from(G.ap(iso.to(fa))(iso.to(f)))
-////
+  ////
 }

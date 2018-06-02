@@ -84,7 +84,7 @@ object Divide {
 
   ////
 
-////
+  ////
 }
 
 trait IsomorphismDivide[F[_], G[_]] extends Divide[F] with IsomorphismContravariant[F, G] with IsomorphismApplyDivide[F, G]{
@@ -93,5 +93,5 @@ trait IsomorphismDivide[F[_], G[_]] extends Divide[F] with IsomorphismContravari
 
   override def divide2[A, B, C](fa: =>F[A], fb: =>F[B])(f: C => (A, B)): F[C] =
     iso.from(G.divide(iso.to(fa), iso.to(fb))(f))
-////
+  ////
 }

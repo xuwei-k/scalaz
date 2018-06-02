@@ -80,7 +80,7 @@ object Arrow {
 
   ////
 
-////
+  ////
 }
 
 trait IsomorphismArrow[F[_, _], G[_, _]] extends Arrow[F] with IsomorphismSplit[F, G] with IsomorphismStrong[F, G] with IsomorphismCategory[F, G]{
@@ -89,5 +89,5 @@ trait IsomorphismArrow[F[_, _], G[_, _]] extends Arrow[F] with IsomorphismSplit[
 
   override def arr[A, B](f: A => B): F[A, B] =
     iso.from(G.arr(f))
-////
+  ////
 }

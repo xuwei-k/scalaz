@@ -38,7 +38,7 @@ object ComonadStore {
 
   ////
 
-////
+  ////
 }
 
 trait IsomorphismComonadStore[F[_], G[_], S] extends ComonadStore[F, S] with IsomorphismComonad[F, G]{
@@ -50,5 +50,5 @@ trait IsomorphismComonadStore[F[_], G[_], S] extends ComonadStore[F, S] with Iso
 
   override def peek[A](s: S, w: F[A]): A
     = G.peek(s, iso.to(w))
-////
+  ////
 }

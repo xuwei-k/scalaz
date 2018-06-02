@@ -45,7 +45,7 @@ object Divisible {
 
   ////
 
-////
+  ////
 }
 
 trait IsomorphismDivisible[F[_], G[_]] extends Divisible[F] with IsomorphismDivide[F, G] with IsomorphismApplicativeDivisible[F, G]{
@@ -54,5 +54,5 @@ trait IsomorphismDivisible[F[_], G[_]] extends Divisible[F] with IsomorphismDivi
 
   override def conquer[A]: F[A] =
     iso.from(G.conquer)
-////
+  ////
 }

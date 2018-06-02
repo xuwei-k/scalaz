@@ -259,7 +259,7 @@ object Enum {
     }
     z
   }
-////
+  ////
 }
 
 trait IsomorphismEnum[F, G] extends Enum[F] with IsomorphismOrder[F, G]{
@@ -271,5 +271,5 @@ trait IsomorphismEnum[F, G] extends Enum[F] with IsomorphismOrder[F, G]{
 
   override def pred(a: F): F =
     iso.from(G.pred(iso.to(a)))
-////
+  ////
 }

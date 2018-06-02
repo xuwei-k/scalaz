@@ -46,7 +46,7 @@ object Cobind {
 
   ////
 
-////
+  ////
 }
 
 trait IsomorphismCobind[F[_], G[_]] extends Cobind[F] with IsomorphismFunctor[F, G]{
@@ -58,5 +58,5 @@ trait IsomorphismCobind[F[_], G[_]] extends Cobind[F] with IsomorphismFunctor[F,
 
   override def cojoin[A](a: F[A]): F[F[A]] =
     iso.from(G.map(G.cojoin(iso.to(a)))(iso.from.apply))
-////
+  ////
 }

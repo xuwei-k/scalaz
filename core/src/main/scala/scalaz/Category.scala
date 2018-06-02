@@ -59,7 +59,7 @@ object Category {
     }
 
   ////
-////
+  ////
 }
 
 trait IsomorphismCategory[F[_, _], G[_, _]] extends Category[F] with IsomorphismCompose[F, G]{
@@ -68,5 +68,5 @@ trait IsomorphismCategory[F[_, _], G[_, _]] extends Category[F] with Isomorphism
 
   override def id[A]: F[A, A] =
     iso.from(G.id)
-////
+  ////
 }

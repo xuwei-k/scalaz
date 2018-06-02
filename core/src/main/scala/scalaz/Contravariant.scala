@@ -85,7 +85,7 @@ object Contravariant {
 
   ////
 
-////
+  ////
 }
 
 trait IsomorphismContravariant[F[_], G[_]] extends Contravariant[F] with IsomorphismInvariantFunctor[F, G]{
@@ -95,6 +95,7 @@ trait IsomorphismContravariant[F[_], G[_]] extends Contravariant[F] with Isomorp
 
   def iso: F <~> G
 
-  override def contramap[A, B](r: F[A])(f: B => A): F[B] = iso.from(G.contramap(iso.to(r))(f))
-////
+  override def contramap[A, B](r: F[A])(f: B => A): F[B] =
+    iso.from(G.contramap(iso.to(r))(f))
+  ////
 }

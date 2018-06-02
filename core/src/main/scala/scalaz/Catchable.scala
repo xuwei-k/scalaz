@@ -40,7 +40,7 @@ object Catchable {
 
   ////
 
-////
+  ////
 }
 
 trait IsomorphismCatchable[F[_], G[_]] extends Catchable[F] {
@@ -55,5 +55,5 @@ trait IsomorphismCatchable[F[_], G[_]] extends Catchable[F] {
 
   override def fail[A](err: Throwable): F[A] =
     iso.from(G.fail(err))
-////
+  ////
 }

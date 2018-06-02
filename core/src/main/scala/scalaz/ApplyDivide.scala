@@ -61,7 +61,7 @@ object ApplyDivide {
 
   ////
 
-////
+  ////
 }
 
 trait IsomorphismApplyDivide[F[_], G[_]] extends ApplyDivide[F] with IsomorphismInvariantFunctor[F, G]{
@@ -83,5 +83,5 @@ trait IsomorphismApplyDivide[F[_], G[_]] extends ApplyDivide[F] with Isomorphism
       G.xproduct4(iso.to(a1), iso.to(a2), iso.to(a3), iso.to(a4))(f, g)
     )
 
-////
+  ////
 }

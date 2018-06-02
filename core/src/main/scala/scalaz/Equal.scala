@@ -93,7 +93,7 @@ object Equal {
     def equal(a1: A, a2: A) = f(a1, a2)
   }
 
-////
+  ////
 }
 
 trait IsomorphismEqual[F, G] extends Equal[F] {
@@ -104,5 +104,5 @@ trait IsomorphismEqual[F, G] extends Equal[F] {
   def iso: F <=> G
 
   def equal(a1: F, a2: F): Boolean = G.equal(iso.to(a1), iso.to(a2))
-////
+  ////
 }

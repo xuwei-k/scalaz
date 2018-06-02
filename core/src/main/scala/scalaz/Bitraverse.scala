@@ -139,7 +139,7 @@ object Bitraverse {
 
   ////
 
-////
+  ////
 }
 
 trait IsomorphismBitraverse[F[_, _], G[_, _]] extends Bitraverse[F] with IsomorphismBifunctor[F, G] with IsomorphismBifoldable[F, G]{
@@ -150,5 +150,5 @@ trait IsomorphismBitraverse[F[_, _], G[_, _]] extends Bitraverse[F] with Isomorp
 
   def bitraverseImpl[H[_]: Applicative, A, B, C, D](fab: F[A, B])(f: A => H[C], g: B => H[D]): H[F[C, D]] =
     Applicative[H].map(G.bitraverseImpl(iso.to(fab))(f, g))(iso.from.apply)
-////
+  ////
 }

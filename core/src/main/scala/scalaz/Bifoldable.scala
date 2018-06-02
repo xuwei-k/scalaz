@@ -120,7 +120,7 @@ object Bifoldable {
       bifoldR(fa, F.zero)(x => y => F.append(f(x),  y))(x => y => F.append(g(x),  y))
   }
 
-////
+  ////
 }
 
 trait IsomorphismBifoldable[F[_, _], G[_, _]] extends Bifoldable[F] {
@@ -137,5 +137,5 @@ trait IsomorphismBifoldable[F[_, _], G[_, _]] extends Bifoldable[F] {
 
   override final def bifoldLeft[A, B, C](fa: F[A, B], z: C)(f: (C, A) => C)(g: (C, B) => C): C =
     G.bifoldLeft(biNaturalTrans(fa), z)(f)(g)
-////
+  ////
 }
