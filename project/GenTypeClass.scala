@@ -90,6 +90,7 @@ object TypeClass {
   lazy val liftControlIO = TypeClass("LiftControlIO", *->*, pack = Seq("scalaz", "effect"))
   lazy val monadControlIO = TypeClass("MonadControlIO", *->*, extendsList = Seq(liftControlIO, monad), pack = Seq("scalaz", "effect"))
   lazy val resource = TypeClass("Resource", *, pack = Seq("scalaz", "effect"))
+  lazy val monadCatchIO = TypeClass("MonadCatchIO", *->*, pack = Seq("scalaz", "effect"), extendsList = Seq(monadIO), createSyntax = false)
 
   lazy val monadState = TypeClass("MonadState", |*->*|->*, extendsList = Seq(monad), createSyntax = false)
   lazy val monadError = TypeClass("MonadError", |*->*|->*, extendsList = Seq(monad))
@@ -162,7 +163,7 @@ object TypeClass {
     bindRec
   )
   lazy val concurrent = Seq[TypeClass]()
-  def effect = Seq(liftIO, monadIO, liftControlIO, monadControlIO, resource)
+  def effect = Seq(liftIO, monadIO, liftControlIO, monadControlIO, resource, monadCatchIO)
 }
 
 sealed abstract class Kind(val multipleParam: Boolean)
