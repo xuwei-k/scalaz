@@ -346,7 +346,7 @@ object StrictTree extends StrictTreeInstances {
   private case class BottomUpStackElem[A, B](
     parent: Option[BottomUpStackElem[A, B]],
     tree: StrictTree[A]
-  ) extends Iterator[StrictTree[A]] {
+  ) extends collection.AbstractIterator[StrictTree[A]] {
     private[this] val subIterator = tree.subForest.iterator
 
     def rootLabel = tree.rootLabel
@@ -362,7 +362,7 @@ object StrictTree extends StrictTreeInstances {
     parent: Option[ZipStackElem[A, B]],
     a: StrictTree[A],
     b: StrictTree[B]
-  ) extends Iterator[(StrictTree[A], StrictTree[B])] {
+  ) extends collection.AbstractIterator[(StrictTree[A], StrictTree[B])] {
     private[this] val zippedSubIterator =
       a.subForest.iterator.zip(b.subForest.iterator)
 
@@ -376,7 +376,7 @@ object StrictTree extends StrictTreeInstances {
   private[scalaz] case class AlignStackElem[A, B, C](
     parent: Option[AlignStackElem[A, B, C]],
     trees: \&/[StrictTree[A], StrictTree[B]]
-  ) extends Iterator[\&/[StrictTree[A], StrictTree[B]]] {
+  ) extends collection.AbstractIterator[\&/[StrictTree[A], StrictTree[B]]] {
     private[this] val iterators =
       trees.bimap(_.subForest.iterator, _.subForest.iterator)
 
