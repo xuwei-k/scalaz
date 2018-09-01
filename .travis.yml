@@ -75,7 +75,7 @@ matrix:
       - sbt "++$TRAVIS_SCALA_VERSION!" publishLocal
       - cd ..
       script:
-      - sbt "++ ${TRAVIS_SCALA_VERSION}" -J-Xmx3784m checkGenTypeClasses example/compile
+      - sbt "++ ${TRAVIS_SCALA_VERSION}" -J-Xmx3784m checkGenTypeClasses example/compile iterateeJS/compile
 
 env:
   matrix:
