@@ -21,31 +21,29 @@ case class Timer(timeoutTickMs: Int = 100, workerName: String = "TimeoutContextW
   @volatile private[this] var lastNow: Long = alignTimeResolution(System.currentTimeMillis)
   private[this] val lock = new ReentrantReadWriteLock()
   private[this] var futures: SortedMap[Long, List[() => Unit]] = SortedMap()
-  private[this] val workerRunnable = new Runnable() {
-    def run(): Unit = {
-      @tailrec
-      def innerRun(): Unit = {
-        lastNow = alignTimeResolution(System.currentTimeMillis)
-        // Deal with stuff to expire.
-        futures.headOption match {
-          case Some((time, _)) if (time <= lastNow) => {
-            val expiredFutures: SortedMap[Long, List[() => Unit]] = withWrite{
-              val (past, future) = futures.span(pair => pair._1 < lastNow)
-              futures = future
-              past
-            }
-            expireFutures(expiredFutures)
+  private[this] val workerRunnable: Runnable = { () =>
+    @tailrec
+    def innerRun(): Unit = {
+      lastNow = alignTimeResolution(System.currentTimeMillis)
+      // Deal with stuff to expire.
+      futures.headOption match {
+        case Some((time, _)) if (time <= lastNow) => {
+          val expiredFutures: SortedMap[Long, List[() => Unit]] = withWrite{
+            val (past, future) = futures.span(pair => pair._1 < lastNow)
+            futures = future
+            past
           }
-          case _ => ()
+          expireFutures(expiredFutures)
         }
-        // Should we keep running?
-        if (continueRunning) {
-          Thread.sleep(safeTickMs.toLong)
-          innerRun()
-        }
+        case _ => ()
       }
-      innerRun()
+      // Should we keep running?
+      if (continueRunning) {
+        Thread.sleep(safeTickMs.toLong)
+        innerRun()
+      }
     }
+    innerRun()
   }
   private[this] val workerThread = new Thread(workerRunnable, workerName)
   workerThread.start()

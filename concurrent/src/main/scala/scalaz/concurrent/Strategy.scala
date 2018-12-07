@@ -73,9 +73,9 @@ trait StrategysLow {
     import java.util.concurrent.Callable
 
     def apply[A](a: => A) = {
-      val fut = s.submit(new Callable[A] {
-        def call = a
-      })
+      val fut = s.submit(
+        (() => a): Callable[A]
+      )
       () => fut.get
     }
   }
@@ -94,9 +94,9 @@ trait StrategysLow {
     def apply[A](a: => A) = {
       import java.util.concurrent.Callable
       val thread = java.util.concurrent.Executors.newSingleThreadExecutor
-      val fut = thread.submit(new Callable[A] {
-        def call = a
-      })
+      val fut = thread.submit(
+        (() => a): Callable[A]
+      )
       thread.shutdown()
       () => fut.get
     }
@@ -127,9 +127,9 @@ trait StrategysLow {
     import java.util.concurrent.{Callable, FutureTask}
 
     def apply[A](a: => A) = {
-      val task = new FutureTask[A](new Callable[A] {
-        def call = a
-      })
+      val task = new FutureTask[A](
+        (() => a): Callable[A]
+      )
       invokeLater(task)
       () => task.get
     }
