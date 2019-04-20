@@ -23,7 +23,7 @@ lazy val jvmProjects = Seq[ProjectReference](
 )
 
 lazy val nativeProjects = Seq[ProjectReference](
-  coreNative, effectNative, iterateeNative, nativeTest
+  coreNative, effectNative, iterateeNative, scalacheckBindingNative, testsNative, nativeTest
 )
 
 lazy val scalaz = Project(
@@ -99,22 +99,30 @@ lazy val example = Project(
   coreJVM, iterateeJVM
 )
 lazy val scalacheckBinding =
-  crossProject(JVMPlatform, JSPlatform).crossType(ScalazCrossType)
+  crossProject(JVMPlatform, JSPlatform, NativePlatform).crossType(ScalazCrossType)
     .in(file("scalacheck-binding"))
     .settings(standardSettings)
     .settings(
       name := "scalaz-scalacheck-binding",
       scalacOptions in (Compile, compile) -= "-Ywarn-value-discard",
-      libraryDependencies += "org.scalacheck" %%% "scalacheck" % scalaCheckVersion.value,
       osgiExport("scalaz.scalacheck")
+    )
+    .platformsSettings(JVMPlatform, JSPlatform)(
+      libraryDependencies += "org.scalacheck" %%% "scalacheck" % scalaCheckVersion.value,
+    )
+    .nativeSettings(
+      nativeSettings,
+      // https://github.com/rickynils/scalacheck/issues/396#issuecomment-467782592
+      libraryDependencies += "com.github.lolgab" %%% "scalacheck" % "1.14.1"
     )
     .dependsOn(core, iteratee)
     .jsSettings(scalajsProjectSettings)
 
 lazy val scalacheckBindingJVM = scalacheckBinding.jvm
 lazy val scalacheckBindingJS  = scalacheckBinding.js
+lazy val scalacheckBindingNative = scalacheckBinding.native
 
-lazy val tests = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType)
+lazy val tests = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
   .settings(standardSettings)
   .settings(
     name := "scalaz-tests",
@@ -128,8 +136,8 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType
       )
       Tests.Argument(TestFrameworks.ScalaCheck, scalacheckOptions: _*)
     },
-    libraryDependencies += "org.scalacheck" %%% "scalacheck" % scalaCheckVersion.value % "test")
-  .jvmSettings(
+  )
+  .platformsSettings(JVMPlatform, NativePlatform)(
     minSuccessfulTests := 33
   )
   .jsSettings(
@@ -137,9 +145,13 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType
   )
   .dependsOn(core, effect, iteratee, scalacheckBinding)
   .jsSettings(scalajsProjectSettings)
+  .nativeSettings(
+    nativeSettings
+  )
 
 lazy val testsJVM = tests.jvm
 lazy val testsJS  = tests.js
+lazy val testsNative = tests.native
 
 // can't use "sbt test"
 // https://github.com/rickynils/scalacheck/issues/396
