@@ -1,14 +1,14 @@
 # Use Docker-based container (instead of OpenVZ)
 sudo: false
-
+dist: trusty
 cache:
   directories:
     - $HOME/.ivy2/cache
     - $HOME/.sbt/launchers
 language: scala
 scala:
-  - 2.11.11
-  - 2.10.6
+  - 2.11.12
+  - 2.10.7
   - 2.9.3
 jdk:
   - openjdk7
@@ -25,7 +25,7 @@ before_cache:
 
 matrix:
   include:
-    - scala: 2.12.4
+    - scala: 2.12.8
       jdk: oraclejdk8
     - scala: 2.13.0-M3
       jdk: oraclejdk8
