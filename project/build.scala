@@ -1,5 +1,4 @@
 import sbt._
-import Project.Setting
 import Keys._
 
 import GenTypeClass._
@@ -14,12 +13,12 @@ import sbtrelease.Utilities._
 import com.typesafe.sbt.pgp.PgpKeys._
 
 import com.typesafe.sbt.osgi.OsgiKeys
-import com.typesafe.sbt.osgi.SbtOsgi._
+import com.typesafe.sbt.osgi.SbtOsgi
 
 import sbtbuildinfo.BuildInfoPlugin.autoImport._
 
 import com.typesafe.tools.mima.plugin.MimaPlugin.mimaDefaultSettings
-import com.typesafe.tools.mima.plugin.MimaKeys.{mimaPreviousArtifacts, mimaBinaryIssueFilters}
+import com.typesafe.tools.mima.plugin.MimaKeys.{mimaPreviousArtifacts, mimaBinaryIssueFilters, mimaReportBinaryIssues}
 
 import org.portablescala.sbtplatformdeps.PlatformDepsPlugin.autoImport._
 import scalanativecrossproject.ScalaNativeCrossPlugin.autoImport._
@@ -45,8 +44,9 @@ object build {
       // getPublishTo fails if no publish repository is set up.
       val ex = st.extract
       val ref = ex.get(thisProjectRef)
-      Classpaths.getPublishTo(ex.get(publishTo in Global in ref))
-      st
+      val (newState, value) = ex.runTask(publishTo in Global in ref, st)
+      Classpaths.getPublishTo(value)
+      newState
     },
     enableCrossBuild = true
   )
@@ -63,7 +63,7 @@ object build {
   val scalaCheckGroupId = SettingKey[String]("scalaCheckGroupId")
   val kindProjectorVersion = SettingKey[String]("kindProjectorVersion")
 
-  private[this] def gitHash(): String = sys.process.Process("git rev-parse HEAD").lines_!.head
+  private[this] def gitHash(): String = sys.process.Process("git rev-parse HEAD").lineStream_!.head
 
   // no generic signatures for scala 2.10.x, see SI-7932, #571 and #828
   def scalac210Options = Seq("-Yno-generic-signatures")
@@ -83,7 +83,7 @@ object build {
     },
     mimaPreviousArtifacts := {
       scalazMimaBasis.?.value.map {
-        organization.value % s"${name.value}_sjs0.6_${scalaBinaryVersion.value}" % _
+        organization.value %%% name.value % _
       }.toSet
     }
   )
@@ -94,7 +94,8 @@ object build {
     publishLocal := {},
     publishSigned := {},
     publishLocalSigned := {},
-    mimaPreviousArtifacts := Set.empty
+    mimaPreviousArtifacts := Set.empty,
+    mimaReportBinaryIssues := {},
   )
 
   // avoid move files
@@ -244,7 +245,7 @@ object build {
       publishSignedArtifacts,
       SetScala211,
       releaseStepCommandAndRemaining(s"${rootNativeId}/publishSigned"),
-      releaseStepCommandAndRemaining(s"; ++ ${Scala213} ; rootJVM_213/publishSigned ; rootJS_213/publishSigned "),
+      releaseStepCommandAndRemaining(s"; ++ ${Scala213}!; rootJVM_213/publishSigned ; rootJS_213/publishSigned "),
       setNextVersion,
       setMimaVersion,
       commitNextVersion,
@@ -309,12 +310,12 @@ object build {
   ) ++ Seq(packageBin, packageDoc, packageSrc).flatMap {
     // include LICENSE.txt in all packaged artifacts
     inTask(_)(Seq(mappings in Compile += licenseFile.value -> "LICENSE"))
-  } ++ osgiSettings ++ Seq[Sett](
+  } ++ SbtOsgi.projectSettings ++ Seq[Sett](
     OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
   ) ++ mimaDefaultSettings ++ Seq[Sett](
     mimaPreviousArtifacts := {
       scalazMimaBasis.?.value.map {
-        organization.value % s"${name.value}_${scalaBinaryVersion.value}" % _
+        organization.value %% name.value % _
       }.toSet
     }
   )

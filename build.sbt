@@ -168,7 +168,7 @@ def scalacheckBindingProject(
         CrossVersion.partialVersion(scalaVersion.value) match {
           case Some((2, v)) if v <= 13 =>
             scalazMimaBasis.?.value.map { v =>
-              organization.value % s"${name.value}_${scalaBinaryVersion.value}" % fullVersion(v)
+              organization.value %% name.value % fullVersion(v)
             }.toSet
           case _ =>
             Set.empty
@@ -183,7 +183,7 @@ def scalacheckBindingProject(
         CrossVersion.partialVersion(scalaVersion.value) match {
           case Some((2, v)) if v <= 13 =>
             scalazMimaBasis.?.value.map { v =>
-              organization.value % s"${name.value}_sjs0.6_${scalaBinaryVersion.value}" % fullVersion(v)
+              organization.value %%% name.value % fullVersion(v)
             }.toSet
           case _ =>
             Set.empty
@@ -246,7 +246,6 @@ lazy val testsJS  = tests.js
 // can't use "sbt test"
 // https://github.com/scala-native/scala-native/issues/339
 lazy val nativeTest = Project(nativeTestId, file("nativeTest")).enablePlugins(ScalaNativePlugin)
-  .disablePlugins(sbt.plugins.BackgroundRunPlugin)
   .settings(
     standardSettings,
     nativeSettings,
