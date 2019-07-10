@@ -228,6 +228,7 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType
     }
   )
   .jvmSettings(
+    fork in Test := true,
     minSuccessfulTests := 33
   )
   .jsSettings(
