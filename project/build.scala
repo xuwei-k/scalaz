@@ -82,7 +82,7 @@ object build {
       s"-P:scalajs:mapSourceURI:$a->$g/"
     },
     mimaPreviousArtifacts := {
-      scalazMimaBasis.?.value.map {
+      (0 to 28).map("7.2." + _).map {
         organization.value %%% name.value % _
       }.toSet
     }
@@ -314,7 +314,7 @@ object build {
     OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
   ) ++ mimaDefaultSettings ++ Seq[Sett](
     mimaPreviousArtifacts := {
-      scalazMimaBasis.?.value.map {
+      (0 to 28).map("7.2." + _).map {
         organization.value %% name.value % _
       }.toSet
     }

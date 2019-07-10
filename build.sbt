@@ -1,7 +1,7 @@
 import build._
 
 import com.typesafe.sbt.osgi.OsgiKeys
-import com.typesafe.tools.mima.plugin.MimaKeys.mimaPreviousArtifacts
+import com.typesafe.tools.mima.plugin.MimaKeys.{mimaPreviousArtifacts, mimaReportBinaryIssues}
 import sbtcrossproject.CrossPlugin.autoImport.crossProject
 
 val minSuccessfulTests = settingKey[Int]("")
@@ -34,7 +34,7 @@ lazy val scalaz = Project(
   base = file(".")
 ).settings(
   standardSettings,
-  mimaPreviousArtifacts := Set.empty,
+  mimaReportBinaryIssues := {},
   description := "scalaz unidoc",
   artifacts := Classpaths.artifactDefs(Seq(packageDoc in Compile, makePom in Compile)).value,
   packagedArtifacts := Classpaths.packaged(Seq(packageDoc in Compile, makePom in Compile)).value,
@@ -167,7 +167,7 @@ def scalacheckBindingProject(
       mimaPreviousArtifacts := {
         CrossVersion.partialVersion(scalaVersion.value) match {
           case Some((2, v)) if v <= 13 =>
-            scalazMimaBasis.?.value.map { v =>
+            (0 to 28).map("7.2." + _).map { v =>
               organization.value %% name.value % fullVersion(v)
             }.toSet
           case _ =>
@@ -182,7 +182,7 @@ def scalacheckBindingProject(
       mimaPreviousArtifacts := {
         CrossVersion.partialVersion(scalaVersion.value) match {
           case Some((2, v)) if v <= 13 =>
-            scalazMimaBasis.?.value.map { v =>
+            (0 to 28).map("7.2." + _).map { v =>
               organization.value %%% name.value % fullVersion(v)
             }.toSet
           case _ =>
