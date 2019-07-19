@@ -158,6 +158,7 @@ object build {
       s"""set version in ThisBuild := "${out.sonatypeVersion(date)}" """ :: state
     },
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
+    resolvers += "scala-snapshot" at "https://scala-ci.typesafe.com/artifactory/scala-integration",
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
     scalaCheckVersion := "1.14.0",
     scalacOptions ++= stdOptions ++ (CrossVersion.partialVersion(scalaVersion.value) match {
