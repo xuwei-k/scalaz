@@ -18,8 +18,7 @@ import com.typesafe.sbt.osgi.SbtOsgi._
 
 import sbtbuildinfo.BuildInfoPlugin.autoImport._
 
-import com.typesafe.tools.mima.plugin.MimaPlugin.mimaDefaultSettings
-import com.typesafe.tools.mima.plugin.MimaKeys.{mimaPreviousArtifacts, mimaBinaryIssueFilters}
+import mima013.Mima013Plugin.autoImport._
 
 import org.portablescala.sbtplatformdeps.PlatformDepsPlugin.autoImport._
 import scalanativecrossproject.ScalaNativeCrossPlugin.autoImport._
@@ -311,7 +310,7 @@ object build {
     inTask(_)(Seq(mappings in Compile += licenseFile.value -> "LICENSE"))
   } ++ osgiSettings ++ Seq[Sett](
     OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
-  ) ++ mimaDefaultSettings ++ Seq[Sett](
+  ) ++ Seq[Sett](
     mimaPreviousArtifacts := {
       scalazMimaBasis.?.value.map {
         organization.value % s"${name.value}_${scalaBinaryVersion.value}" % _
@@ -327,11 +326,6 @@ object build {
   lazy val core = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
     .settings(standardSettings)
     .settings(
-      mimaBinaryIssueFilters ++= {
-        import com.typesafe.tools.mima.core._
-        import com.typesafe.tools.mima.core.ProblemFilters._
-        Nil
-      },
       name := "scalaz-core",
       sourceGenerators in Compile += (sourceManaged in Compile).map{
         dir => Seq(GenerateTupleW(dir), TupleNInstances(dir))
