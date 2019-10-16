@@ -1,6 +1,7 @@
 import build._
 import com.typesafe.sbt.osgi.OsgiKeys
 import sbtcrossproject.CrossPlugin.autoImport.crossProject
+import scalanative.sbtplugin.ScalaNativePluginInternal.NativeTest
 
 val minSuccessfulTests = settingKey[Int]("")
 
@@ -23,7 +24,7 @@ lazy val jvmProjects = Seq[ProjectReference](
 )
 
 lazy val nativeProjects = Seq[ProjectReference](
-  coreNative, effectNative, iterateeNative, nativeTest
+  coreNative, effectNative, iterateeNative, scalacheckBindingNative, testsNative
 )
 
 lazy val scalaz = Project(
@@ -99,7 +100,7 @@ lazy val example = Project(
   coreJVM, iterateeJVM
 )
 lazy val scalacheckBinding =
-  crossProject(JVMPlatform, JSPlatform).crossType(ScalazCrossType)
+  crossProject(JVMPlatform, JSPlatform, NativePlatform).crossType(ScalazCrossType)
     .in(file("scalacheck-binding"))
     .settings(standardSettings)
     .settings(
@@ -110,11 +111,15 @@ lazy val scalacheckBinding =
     )
     .dependsOn(core, iteratee)
     .jsSettings(scalajsProjectSettings)
+    .nativeSettings(
+      nativeSettings
+    )
 
 lazy val scalacheckBindingJVM = scalacheckBinding.jvm
 lazy val scalacheckBindingJS  = scalacheckBinding.js
+lazy val scalacheckBindingNative = scalacheckBinding.native
 
-lazy val tests = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType)
+lazy val tests = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
   .settings(standardSettings)
   .settings(
     name := "scalaz-tests",
@@ -132,17 +137,29 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform).crossType(ScalazCrossType
   .jvmSettings(
     minSuccessfulTests := 33
   )
-  .jsSettings(
+  .platformsSettings(JSPlatform, NativePlatform)(
     minSuccessfulTests := 10
+  )
+  .nativeSettings(
+    // https://github.com/scala-native/scala-native/issues/1710
+    testOptions in NativeTest := (testOptions in Test).value,
+    // TODO fix tests or report bug to scala-native
+    testOptions in NativeTest += Tests.Exclude(Set(
+      "scalaz.std.StringTest",
+      "scalaz.DisjunctionTest",
+      "scalaz.std.math.BigIntTest",
+    )),
   )
   .dependsOn(core, effect, iteratee, scalacheckBinding)
   .jsSettings(scalajsProjectSettings)
+  .nativeSettings(
+    nativeSettings
+  )
 
 lazy val testsJVM = tests.jvm
 lazy val testsJS  = tests.js
+lazy val testsNative = tests.native
 
-// can't use "sbt test"
-// https://github.com/rickynils/scalacheck/issues/396
 lazy val nativeTest = Project(nativeTestId, file("nativeTest")).enablePlugins(ScalaNativePlugin)
   .settings(
     standardSettings,
