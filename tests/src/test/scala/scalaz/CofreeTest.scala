@@ -4,7 +4,7 @@ import scalaz.scalacheck.ScalazProperties
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import scalaz.scalacheck.ScalaCheckBinding._
-import std.AllInstances.{ enumInstance => _, _}
+import std.AllInstances._
 import org.scalacheck.{Arbitrary, Cogen}
 import org.scalacheck.Prop.forAll
 import Cofree._
