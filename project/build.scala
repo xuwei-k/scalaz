@@ -24,6 +24,8 @@ import sbtcrossproject.CrossPlugin.autoImport._
 
 import sbtdynver.DynVerPlugin.autoImport._
 
+import xerial.sbt.Sonatype.autoImport._
+
 object build {
   type Sett = Def.Setting[_]
 
@@ -159,7 +161,7 @@ object build {
     },
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
-    scalaCheckVersion := "1.14.0",
+    scalaCheckVersion := "1.14.3",
     scalacOptions ++= stdOptions ++ (CrossVersion.partialVersion(scalaVersion.value) match {
       case Some((2,11)) => Scala211_jvm_and_js_options
       case _ => Seq("-opt:l:method")
@@ -231,7 +233,10 @@ object build {
     },
 
     credentialsSetting,
-    publishSetting,
+    publishTo := sonatypePublishToBundle.value,
+    sonatypeBundleDirectory := {
+      (LocalRootProject / target).value / "sonatype-staging" / (ThisBuild / version).value
+    },
     publishArtifact in Test := false,
 
     // adapted from sbt-release defaults
@@ -248,6 +253,7 @@ object build {
       publishSignedArtifacts,
       SetScala211,
       releaseStepCommand(s"${rootNativeId}/publishSigned"),
+      releaseStepCommandAndRemaining("sonatypeBundleRelease"),
       setNextVersion,
       commitNextVersion,
       pushChanges
@@ -301,8 +307,8 @@ object build {
     },
     // kind-projector plugin
     resolvers += Resolver.sonatypeRepo("releases"),
-    kindProjectorVersion := "0.10.3",
-    libraryDependencies += compilerPlugin("org.typelevel" % "kind-projector" % kindProjectorVersion.value cross CrossVersion.binary)
+    kindProjectorVersion := "0.11.0",
+    libraryDependencies += compilerPlugin("org.typelevel" % "kind-projector" % kindProjectorVersion.value cross CrossVersion.full)
   ) ++ Seq(packageBin, packageDoc, packageSrc).flatMap {
     // include LICENSE.txt in all packaged artifacts
     inTask(_)(Seq(mappings in Compile += licenseFile.value -> "LICENSE"))
@@ -387,14 +393,6 @@ object build {
     .nativeSettings(
       nativeSettings
     )
-
-  lazy val publishSetting = publishTo := {
-    val nexus = "https://oss.sonatype.org/"
-    if (version.value.trim.endsWith("SNAPSHOT"))
-      Some("snapshots" at nexus + "content/repositories/snapshots")
-    else
-      Some("releases" at nexus + "service/local/staging/deploy/maven2")
-  }
 
   lazy val credentialsSetting = credentials ++= {
     val name = "Sonatype Nexus Repository Manager"
