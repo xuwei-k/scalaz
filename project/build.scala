@@ -172,6 +172,7 @@ object build {
       s"""set version in ThisBuild := "${out.sonatypeVersion(date)}" """ :: state
     },
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
+    resolvers += "scala-integration" at "https://scala-ci.typesafe.com/artifactory/scala-integration/",
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
     scalaCheckVersion := "1.14.3",
     scalacOptions ++= stdOptions ++ (CrossVersion.partialVersion(scalaVersion.value) match {
@@ -321,7 +322,7 @@ object build {
     },
     // kind-projector plugin
     kindProjectorVersion := "0.11.0",
-    libraryDependencies += compilerPlugin("org.typelevel" % "kind-projector" % kindProjectorVersion.value cross CrossVersion.full)
+    libraryDependencies += compilerPlugin("org.typelevel" % "kind-projector_2.12.10" % kindProjectorVersion.value)
   ) ++ Seq(packageBin, packageDoc, packageSrc).flatMap {
     // include LICENSE.txt in all packaged artifacts
     inTask(_)(Seq(mappings in Compile += licenseFile.value -> "LICENSE"))
