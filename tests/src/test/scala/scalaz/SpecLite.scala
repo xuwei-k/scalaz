@@ -47,7 +47,7 @@ abstract class SpecLite extends Properties("") {
   }
 
   def fail(msg: String): Nothing = throw new AssertionError(msg)
-  class AnyOps[A](actual: => A) {
+  final class AnyOps[A](actual: => A) {
     def must_===(expected: A)(implicit show: Show[A], equal: Equal[A]): Unit = {
       val act = actual
       def test = Equal[A].equal(expected, act)
@@ -99,10 +99,10 @@ abstract class SpecLite extends Properties("") {
   implicit def enrichAny[A](actual: => A): AnyOps[A] = new AnyOps(actual)
 
   def prop[T, R](result: T => R)(implicit toProp: (=>R) => Prop, a: Arbitrary[T], s: Shrink[T]): Prop = check1(result)
-  implicit def propToProp(p: => Prop): Prop = p
+//  final implicit protected def propToProp(p: => Prop): Prop = p
   implicit def check1[T, R](result: T => R)(implicit toProp: (=>R) => Prop, a: Arbitrary[T], s: Shrink[T]): Prop = Prop.forAll((t: T) => toProp(result(t)))
 //  implicit def unitToProp(u: => Unit): Prop = booleanToProp({u; true})
-  implicit def unitToProp2(u: Unit): Prop = booleanToProp(true)
+  final implicit protected def unitToProp2(u: Unit): Prop = booleanToProp(true)
 //  implicit def booleanToProp(b: => Boolean): Prop = Prop.secure(b)
 
 }
