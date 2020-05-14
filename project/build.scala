@@ -92,28 +92,9 @@ object build {
       Some(shared(projectBase, conf))
   }
 
-  private val stdOptions = Seq(
-    "-deprecation",
-    "-Xlint:adapted-args",
-    "-encoding", "UTF-8",
-    "-feature",
-    "-opt:l:method,inline",
-    "-opt-inline-from:scalaz.**",
-    "-language:implicitConversions", "-language:higherKinds", "-language:existentials",
-    "-unchecked"
-  )
-
   val unusedWarnOptions = Def.setting {
     Seq("-Ywarn-unused:imports")
   }
-
-  val lintOptions = Seq(
-    "-Xlint:_,-type-parameter-shadow,-missing-interpolator",
-    "-Ywarn-dead-code",
-    "-Ywarn-numeric-widen",
-    "-Ywarn-value-discard",
-    // "-Yrangepos" https://github.com/scala/bug/issues/10706
-  )
 
   private def Scala213 = "2.13.2"
 
@@ -143,7 +124,7 @@ object build {
       }
       (f, path)
     },
-    scalaVersion := Scala213,
+    scalaVersion := dotty.tools.sbtplugin.DottyPlugin.autoImport.dottyLatestNightlyBuild.get, //"0.24.0-RC1",
     crossScalaVersions := Seq(Scala213),
     commands += Command.command("setVersionUseDynver") { state =>
       val extracted = Project extract state
@@ -154,15 +135,48 @@ object build {
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
     scalaCheckVersion := "1.14.3",
-    scalacOptions ++= stdOptions,
-    scalacOptions ++= lintOptions,
-    scalacOptions ++= PartialFunction.condOpt(CrossVersion.partialVersion(scalaVersion.value)) {
-      case Some((0 | 3, _)) =>
-        Seq(
-          "-Ykind-projector"
-        )
-    }.toList.flatten,
-    scalacOptions ++= unusedWarnOptions.value,
+    Seq(Compile, Test).map { scope =>
+      unmanagedSourceDirectories in scope ++= {
+        val dir = Defaults.nameForSrc(scope.name)
+        val base = ScalazCrossType.shared(baseDirectory.value, dir).getParentFile
+        CrossVersion.partialVersion(scalaVersion.value) match {
+          case Some((2, _)) =>
+            Seq(base / "scala-2")
+          case Some((0 | 3, _)) =>
+            Seq(base / "scala-3")
+          case _ =>
+            Nil
+        }
+      }
+    },
+    scalacOptions ++= Seq(
+      "-deprecation",
+      "-encoding", "UTF-8",
+      "-feature",
+      "-unchecked"
+    ),
+    scalacOptions ++= {
+      val common = "implicitConversions,higherKinds,existentials"
+      CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((0 | 3, _)) =>
+          Seq(
+            "-Ykind-projector",
+            s"-language:Scala2Compat,$common",
+            "-rewrite",
+          )
+        case _ =>
+          Seq(
+            "-Xlint:_,-type-parameter-shadow,-missing-interpolator",
+            "-Ywarn-dead-code",
+            "-Ywarn-numeric-widen",
+            "-Ywarn-value-discard",
+            "-Xlint:adapted-args",
+            "-opt:l:method,inline",
+            "-opt-inline-from:scalaz.**",
+            s"-language:$common",
+          ) ++ unusedWarnOptions.value
+      }
+    },
     Seq(Compile, Test).flatMap(c =>
       scalacOptions in (c, console) --= unusedWarnOptions.value
     ),

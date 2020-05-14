@@ -42,7 +42,7 @@ object CofreeTest extends SpecLite {
       def to_[A](fa: OneAndStream[A]) =
         Cofree.unfold(fa){
           case OneAnd(a, h ##:: t) => (a, LazyOption.lazySome(OneAnd(h, t)))
-          case OneAnd(a, _)       => (a, LazyOption.lazyNone)
+          case OneAnd(a, _)       => (a, LazyOption.lazyNone[OneAndStream[A]])
         }
       def from_[A](fa: CofreeLazyOption[A]) =
         OneAnd(

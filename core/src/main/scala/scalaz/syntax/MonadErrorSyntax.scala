@@ -21,7 +21,7 @@ trait ToMonadErrorOps0[TC[F[_], S] <: MonadError[F, S]] {
   ////
 }
 
-trait ToMonadErrorOps[TC[F[_], S] <: MonadError[F, S]] extends ToMonadErrorOps0[TC] with ToMonadOps[λ[F[_] => TC[F, S] forSome { type S }]] with ToApplicativeErrorOps[TC]
+trait ToMonadErrorOps[TC[F[_], S] <: MonadError[F, S]] extends ToMonadErrorOps0[TC] with ToApplicativeErrorOps[TC]
 
 trait MonadErrorSyntax[F[_], S] extends MonadSyntax[F] with ApplicativeErrorSyntax[F, S] {
   implicit def ToMonadErrorOps[A](v: F[A]): MonadErrorOps[F, S, A] =

@@ -71,16 +71,5 @@ object UnapplyInference extends App {
 
     ToFunctorOps[\/[String, *], Int](e.map(1 + _)).map(1 + _)
     ToFunctorOpsUnapply(e.map(1 + _)).map(1 + _)
-
-    e.map(1 + _).map(1 + _)
-
-    import std.tuple._
-
-    (1, 2).map(1 + _).map(1 + _)
-    (1, 2, 3).map(1 + _).map(1 + _)
-    (1, 2, 3, 4).map(1 + _).map(1 + _)
-    (1, 2, 3, 4, 5).map(1 + _).map(1 + _)
-    (1, 2, 3, 4, 5, 6).map(1 + _).map(1 + _)
-    (1, 2, 3, 4, 5, 6, 7).map(1 + _).map(1 + _)
   }
 }

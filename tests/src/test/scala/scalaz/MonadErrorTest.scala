@@ -33,6 +33,7 @@ object MonadErrorTest extends SpecLite {
   }
 
   "fromIsoWithMonadError" in {
+    import scalaz.syntax.functor0._
     Decoder[String].map(_.toUpperCase).decode("hello") must_=== "HELLO".right
   }
 

@@ -36,10 +36,13 @@ trait NaturalTransformation[F[_], G[_]] {
 
   import LiskovF._
 
+  // TODO
   def widen[GG[_]](implicit ev: GG >~~> G): F ~> GG =
-    ev.substCo[F ~> *[_]](this)
+    this.asInstanceOf[F ~> GG] // ev.substCo[({type l[a[_]] = F ~> a})#l](this)
+
+  // TODO
   def narrow[FF[_]](implicit ev: FF <~~< F): FF ~> G =
-    ev.substCt[*[_] ~> G](this)
+    this.asInstanceOf[FF ~> G] // ev.substCt[({type l[a[_]] = a ~> G})#l](this)
 }
 
 trait NaturalTransformations {
