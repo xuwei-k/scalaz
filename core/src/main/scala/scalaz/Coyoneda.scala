@@ -90,8 +90,8 @@ object Coyoneda extends CoyonedaInstances {
 
   def iso[F[_]: Functor]: Coyoneda[F, *] <~> F =
     new IsoFunctorTemplate[Coyoneda[F, *], F] {
-      def from[A](fa: F[A]) = lift(fa)
-      def to[A](fa: Coyoneda[F, A]) = fa.run
+      def from_[A](fa: F[A]) = lift(fa)
+      def to_[A](fa: Coyoneda[F, A]) = fa.run
     }
 
   /** Turns a natural transformation F ~> G into CF ~> G */
@@ -105,7 +105,9 @@ object Coyoneda extends CoyonedaInstances {
 
   /** Turns a natural transformation F ~> G into CF ~> CG */
   def liftT[F[_], G[_]](fg: F ~> G): Coyoneda[F, *] ~> Coyoneda[G, *] =
-    λ[Coyoneda[F, *] ~> Coyoneda[G, *]](_.trans(fg))
+    new (Coyoneda[F, *] ~> Coyoneda[G, *]) {
+      def apply[A](c: Coyoneda[F, A]) = c.trans(fg)
+    }
 
 }
 
@@ -135,7 +137,7 @@ sealed abstract class CoyonedaInstances1 extends CoyonedaInstances2 {
   implicit def coyonedaEqual[A, F[_]](implicit A: Equal[F[A]], F: Functor[F]): Equal[Coyoneda[F, A]] =
     new IsomorphismEqual[Coyoneda[F, A], F[A]] {
       def G = A
-      def iso = Coyoneda.iso[F].unlift
+      def iso = Coyoneda.iso[F].unlift[A]
     }
 
   implicit def coyonedaCobind[F[_]: Cobind]: Cobind[Coyoneda[F, *]] =

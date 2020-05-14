@@ -4,7 +4,7 @@ import scalaz._, Scalaz._
 import effect._
 
 // Example of using Codensity for resource management
-object CodensityUsage extends SafeApp {
+object CodensityUsage {
   def bracketCodensity[A, B](
     before: IO[A])(after: A => IO[B]
   ): Codensity[IO, A] =
@@ -28,5 +28,4 @@ object CodensityUsage extends SafeApp {
     _ <- (r1 :: r2 :: rs).traverse(IO.putStrLn).liftM[Codensity]
   } yield ()
 
-  override def runc = prg.improve
 }

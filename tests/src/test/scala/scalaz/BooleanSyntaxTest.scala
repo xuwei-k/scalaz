@@ -55,21 +55,15 @@ object BooleanSyntaxTest extends SpecLite {
     }
 
     "boolean.whenM" ! forAll { (b: Boolean) =>
+      import syntax.validation._
       b.whenM(None).isDefined != b
+      b.whenM("false".failure[Int]).isSuccess != b
     }
 
     "boolean.unlessM" ! forAll { (b: Boolean) =>
+      import syntax.validation._
+      b.unlessM("false".failure[Int]).isSuccess == b
       b.unlessM(None).isDefined == b
-    }
-
-    "boolean.whenMU" ! forAll { (b: Boolean) =>
-      import syntax.validation._
-      b.whenMU("false".failure).isSuccess != b
-    }
-
-    "boolean.unlessMU" ! forAll { (b: Boolean) =>
-      import syntax.validation._
-      b.unlessMU("false".failure).isSuccess == b
     }
 
     "boolean.guard" ! forAll { (b: Boolean, s: String) =>

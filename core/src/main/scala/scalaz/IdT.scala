@@ -73,7 +73,9 @@ sealed abstract class IdTInstances extends IdTInstances0 {
   implicit val idTCohoist: Cohoist[IdT] =
     new Cohoist[IdT] {
       override def cohoist[M[_], N[_]: Comonad](f: M ~> N) =
-        Lambda[IdT[M, *] ~> IdT[N, *]](x => IdT(f(x.run)))
+        new (IdT[M, *] ~> IdT[N, *]){
+          def apply[A](x: IdT[M, A]) = IdT(f(x.run))
+        }
 
       override def lower[G[_]: Cobind, A](a: IdT[G, A]) =
         a.run
@@ -83,8 +85,8 @@ sealed abstract class IdTInstances extends IdTInstances0 {
 object IdT extends IdTInstances {
   import Isomorphism._
   def iso[F[_]]: IdT[F, *] <~> F = new IsoFunctorTemplate[IdT[F, *], F] {
-    def from[A](ga: F[A]): IdT[F, A] = IdT[F, A](ga)
-    def to[A](fa: IdT[F, A]): F[A] = fa.run
+    def from_[A](ga: F[A]): IdT[F, A] = IdT[F, A](ga)
+    def to_[A](fa: IdT[F, A]): F[A] = fa.run
   }
 }
 
@@ -93,7 +95,10 @@ private object IdTHoist extends Hoist[IdT] {
     new IdT[G, A](a)
 
   def hoist[M[_]: Monad, N[_]](f: M ~> N) =
-    λ[IdT[M, *] ~> IdT[N, *]](fa => new IdT(f(fa.run)))
+    new (IdT[M, *] ~> IdT[N, *]) {
+      def apply[A](fa: IdT[M, A]): IdT[N, A] =
+        new IdT[N, A](f(fa.run))
+    }
 
   implicit def apply[G[_] : Monad]: Monad[IdT[G, *]] =
     IdT.idTMonad[G]

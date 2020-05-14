@@ -65,7 +65,8 @@ final case class ListT[M[_], A](run: M[IList[A]]){
   /**Don't use iteratively! */
   def tail(implicit M: Functor[M]) : ListT[M, A] = new ListT(M.map(run)(_.tailMaybe.toOption.get))
 
-  def tailMaybe(implicit M: Functor[M]) : ListT[Lambda[a => M[Maybe[a]]], A] = new ListT[Lambda[a => M[Maybe[a]]], A](M.map(run)(_.tailMaybe))
+  def tailMaybe(implicit M: Functor[M]): ListT[({type l[a] = M[Maybe[a]]})#l, A] =
+    new ListT[({type l[a] = M[Maybe[a]]})#l, A](M.map(run)(_.tailMaybe))
 
   def foldLeft[B](z: => B)(f: (=> B, => A) => B)(implicit M: Functor[M]) : M[B] = M.map(run)(_.foldLeft(z){(left, right) => f(left, right)})
 
@@ -127,9 +128,9 @@ sealed abstract class ListTInstances extends ListTInstances1 {
 
 object ListT extends ListTInstances {
   def listT[M[_]]: (λ[α => M[IList[α]]] ~> ListT[M, *]) =
-    λ[λ[α => M[IList[α]]] ~> ListT[M, *]](
-      new ListT(_)
-    )
+    new (λ[α => M[IList[α]]] ~> ListT[M, *]) {
+      def apply[A](a: M[IList[A]]) = new ListT[M, A](a)
+    }
 
   def empty[M[_], A](implicit M: Applicative[M]): ListT[M, A] =
     new ListT[M, A](M.point(INil()))
@@ -201,5 +202,8 @@ private trait ListTHoist extends Hoist[ListT] {
     fromIList(G.map(a)(entry => entry :: INil()))
 
   def hoist[M[_], N[_]](f: M ~> N)(implicit M: Monad[M]): ListT[M, *] ~> ListT[N, *] =
-    λ[ListT[M, *] ~> ListT[N, *]](_ mapT f.apply)
+    new (ListT[M, *] ~> ListT[N, *]) {
+      def apply[A](a: ListT[M, A]): ListT[N, A] =
+        a.mapT(f.apply)
+    }
 }

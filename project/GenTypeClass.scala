@@ -277,15 +277,21 @@ object GenTypeClass {
           case es    => es.map(n => "To" + n + "Ops[TC]").mkString(" with ", " with ", "")
         })
       case Kind.|*->*|->* =>
-        "extends To" + typeClassName + "Ops0[TC]" + (tc.extendsList match {
-          case Seq() => ""
-          case es    => es.map(n => n.kind match {
-            case Kind.|*->*|->* => "To" + n.name + "Ops[TC]"
-            case _ => "To" + n.name + "Ops[λ[F[_] => TC[F, S] forSome { type S }]]"
+        "extends To" + typeClassName + "Ops0[TC]" + (
+          tc.extendsList.flatMap(
+            n => n.kind match {
+              case Kind.|*->*|->* =>
+                Some("To" + n.name + "Ops[TC]")
+              case _ =>
+                None
+            }
+          ) match {
+            case Seq() =>
+              ""
+            case es =>
+              es.mkString(" with ", " with ", "")
           }
-
-          ).mkString(" with ", " with ", "")
-        })
+        )
       case _    =>
         extendsList match {
           case Seq() => ""

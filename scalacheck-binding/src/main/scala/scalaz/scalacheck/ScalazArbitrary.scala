@@ -185,9 +185,6 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
   implicit def cogenName[A](implicit A: Cogen[A]): Cogen[Name[A]] =
     A.contramap(nameToValue)
 
-  implicit def cogenImmutableArray[A: Cogen]: Cogen[ImmutableArray[A]] =
-    Cogen[List[A]].contramap(_.toList)
-
   implicit def cogenEither3[A1: Cogen, A2: Cogen, A3: Cogen]: Cogen[Either3[A1, A2, A3]] =
     Cogen[A1 \/ A2 \/ A3].contramap{
       case Left3(a) => -\/(-\/(a))
@@ -250,9 +247,6 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
 
   implicit def CorecursiveListArbitrary[A : Arbitrary]: Arbitrary[CorecursiveList[A]] =
     Functor[Arbitrary].map(arb[Stream[A]])(CorecursiveList.fromStream)
-
-  implicit def ImmutableArrayArbitrary[A : Arbitrary : ClassTag]: Arbitrary[ImmutableArray[A]] =
-    Functor[Arbitrary].map(arb[Array[A]])(ImmutableArray.fromArray[A](_))
 
   implicit def ValueArbitrary[A: Arbitrary]: Arbitrary[Value[A]] = Functor[Arbitrary].map(arb[A])(a => Value(a))
   implicit def NameArbitrary[A: Arbitrary]: Arbitrary[Name[A]] = Functor[Arbitrary].map(arb[A])(a => Name(a))

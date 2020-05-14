@@ -103,7 +103,7 @@ sealed abstract class LazyOption[A] extends Product with Serializable {
 
 private final case class LazySome[A](a: () => A) extends LazyOption[A]
 
-private final case class LazyNone[A] private() extends LazyOption[A]
+private final case class LazyNone[A] private[scalaz] () extends LazyOption[A]
 
 sealed abstract class LazyOptionInstances {
   import LazyOption._

@@ -94,13 +94,12 @@ object build {
 
   private val stdOptions = Seq(
     // contains -language:postfixOps (because 1+ as a parameter to a higher-order function is treated as a postfix op)
-    "-deprecation",
+//    "-deprecation",
     "-Xlint:adapted-args",
     "-encoding", "UTF-8",
-    "-feature",
+//    "-feature",
     "-opt:l:method,inline",
     "-opt-inline-from:scalaz.**",
-    "-language:implicitConversions", "-language:higherKinds", "-language:existentials", "-language:postfixOps",
     "-unchecked"
   )
 
@@ -144,7 +143,7 @@ object build {
       }
       (f, path)
     },
-    scalaVersion := Scala213,
+    scalaVersion := dotty.tools.sbtplugin.DottyPlugin.autoImport.dottyLatestNightlyBuild.get, //"0.24.0-RC1",
     crossScalaVersions := Seq(Scala213),
     commands += Command.command("setVersionUseDynver") { state =>
       val extracted = Project extract state
@@ -157,12 +156,21 @@ object build {
     scalaCheckVersion := "1.14.3",
     scalacOptions ++= stdOptions,
     scalacOptions ++= lintOptions,
-    scalacOptions ++= PartialFunction.condOpt(CrossVersion.partialVersion(scalaVersion.value)) {
-      case Some((0 | 3, _)) =>
-        Seq(
-          "-Ykind-projector"
-        )
-    }.toList.flatten,
+    scalacOptions ++= {
+      val common = "implicitConversions,higherKinds,existentials,postfixOps"
+      CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((0 | 3, _)) =>
+          Seq(
+            "-Ykind-projector",
+            s"-language:Scala2Compat,$common",
+            "-rewrite",
+          )
+        case _ =>
+          Seq(
+            s"-language:$common",
+          )
+      }
+    },
     scalacOptions ++= unusedWarnOptions.value,
     Seq(Compile, Test).flatMap(c =>
       scalacOptions in (c, console) --= unusedWarnOptions.value

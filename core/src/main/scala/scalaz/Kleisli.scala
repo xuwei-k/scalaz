@@ -259,7 +259,7 @@ abstract class KleisliInstances extends KleisliInstances0 {
       implicit def FB = FB0
     }
 
-  implicit def kleisliMonadTrans[R]: Hoist[λ[(α[_], β) => Kleisli[α, R, β]]] =
+  implicit def kleisliMonadTrans[R]: Hoist[({type l[α[_], β] = Kleisli[α, R, β]})#l] =
     new KleisliHoist[R] {}
 
 }
@@ -295,8 +295,8 @@ object Kleisli extends KleisliInstances {
     decode:  D ~> λ[a => (I => O[a])]
   ): D <~> Kleisli[O, I, *] =
     new IsoFunctorTemplate[D, Kleisli[O, I, *]] {
-      def from[A](fa: Kleisli[O, I, A]): D[A] = instance(fa.run)
-      def to[A](fa: D[A]): Kleisli[O, I, A] = Kleisli[O, I, A](decode(fa))
+      def from_[A](fa: Kleisli[O, I, A]): D[A] = instance(fa.run)
+      def to_[A](fa: D[A]): Kleisli[O, I, A] = Kleisli[O, I, A](decode(fa))
     }
 }
 
@@ -378,9 +378,12 @@ private trait KleisliMonadReader[F[_], R] extends MonadReader[Kleisli[F, R, *], 
     fa.local(f)
 }
 
-private trait KleisliHoist[R] extends Hoist[Kleisli[*[_], R, *]] {
+private trait KleisliHoist[R] extends Hoist[({type l[α[_], β] = Kleisli[α, R, β]})#l] {
   def hoist[M[_]: Monad, N[_]](f: M ~> N): Kleisli[M, R, *] ~> Kleisli[N, R, *] =
-    λ[Kleisli[M, R, *] ~> Kleisli[N, R, *]](_ mapT f.apply)
+    new (Kleisli[M, R, *] ~> Kleisli[N, R, *]) {
+      def apply[A](m: Kleisli[M, R, A]): Kleisli[N, R, A] =
+        m.mapT(f.apply)
+    }
 
   def liftM[G[_] : Monad, A](a: G[A]): Kleisli[G, R, A] =
     Kleisli(_ => a)

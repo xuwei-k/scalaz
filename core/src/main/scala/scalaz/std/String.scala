@@ -24,7 +24,7 @@ trait StringInstances {
 }
 
 trait StringFunctions {
-  private[this] implicit val instance = new StringInstances {}.stringInstance
+  import string.stringInstance
 
   /**
    * Returns the same String value if the given value is 1 otherwise pluralises this String by appending an "s" unless
@@ -66,13 +66,13 @@ trait StringFunctions {
     asNumber(_.toDouble, Double.MinValue, Double.MaxValue, s)
       .filter(_ != Double.NegativeInfinity)
       .filter(_ != Double.PositiveInfinity)
-      .leftMap(e => if (e == instance.zero) s"${s} is outside of range for Double" else e)
+      .leftMap(e => if (e == stringInstance.zero) s"${s} is outside of range for Double" else e)
 
   def parseFloat(s: String): Validation[String, Float] =
     asNumber(_.toFloat, Float.MinValue, Float.MaxValue, s)
       .filter(_ != Float.NegativeInfinity)
       .filter(_ != Float.PositiveInfinity)
-      .leftMap(e => if (e == instance.zero) s"${s} is outside of range for Float" else e)
+      .leftMap(e => if (e == stringInstance.zero) s"${s} is outside of range for Float" else e)
 
   def parseBigInt(s: String): Validation[String, BigInteger] =
     try {

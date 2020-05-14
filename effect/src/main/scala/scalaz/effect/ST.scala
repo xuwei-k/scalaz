@@ -81,9 +81,6 @@ sealed abstract class STArray[S, A] {
     this
   })
 
-  /**Turns a mutable array into an immutable one which is safe to return. */
-  def freeze: ST[S, ImmutableArray[A]] = st(() => ImmutableArray.fromArray(value))
-
   /**Fill this array from the given association list. */
   def fill[B](f: (A, B) => A, xs: Iterable[(Int, B)]): ST[S, Unit] = xs.toList match {
     case Nil             => returnST(())
@@ -147,9 +144,9 @@ object ST extends STInstances {
 
   /**Allocates a fresh mutable reference. */
   def newVar[S]: Id ~> λ[α => ST[S, STRef[S, α]]] =
-    λ[Id ~> λ[α => ST[S, STRef[S, α]]]](
-      a => returnST(stRef[S](a))
-    )
+    new (Id ~> λ[α => ST[S, STRef[S, α]]]) {
+      def apply[A](a: A) = returnST(stRef[S](a))
+    }
 
   /**Allocates a fresh mutable array. */
   def newArr[S, A: ClassTag](size: Int, z: A): ST[S, STArray[S, A]] =
@@ -162,20 +159,6 @@ object ST extends STInstances {
     ans
   })
 
-  /**Accumulates an integer-associated list into an immutable array. */
-  def accumArray[F[_], A : ClassTag, B](size: Int, f: (A, B) => A, z: A, ivs: F[(Int, B)])(implicit F: Foldable[F]): ImmutableArray[A] = {
-    import std.anyVal.unitInstance
-    type STA[S] = ST[S, ImmutableArray[A]]
-    runST(new Forall[STA] {
-      def apply[S] = for {
-        a <- newArr(size, z)
-        _ <- {
-          F.foldMap(ivs)((x: (Int, B)) => a.update(f, x._1, x._2))(stMonoid[S, Unit])
-        }
-        frozen <- a.freeze
-      } yield frozen
-    })
-  }
 }
 
 sealed abstract class STInstance0 {

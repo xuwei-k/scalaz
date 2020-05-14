@@ -156,23 +156,12 @@ private trait LanApply[G[_], H[_]] extends Apply[Lan[G, H, *]] with LanFunctor[G
   def G: Functor[G]
   def H: Apply[H]
 
-  private[this] abstract class Internal[A] {
-    type T
-    def value: A
-  }
-
-  def ap[A,B](x: => Lan[G, H, A])(xf: => Lan[G, H, A => B]) = new Lan[G, H, B] {
-    val xfp = new Internal[Lan[G, H, A => B]] {
-      lazy val value = xf
-      type T = value.I
-    }
-    val xp = new Internal[Lan[G,H,A]] {
-      lazy val value = x
-      type T = value.I
-    }
-    type I = (xfp.T, xp.T)
-    private[this] val vc = Need(H.tuple2(xfp.value.v, xp.value.v))
-    def v = vc.value
-    def f(gi: G[I]) = xfp.value.f(G.map(gi)(_._1))(xp.value.f(G.map(gi)(_._2)))
+  def ap[A, B](x: => Lan[G, H, A])(xf: => Lan[G, H, A => B]): Lan[G, H, B] = new Lan[G, H, B] {
+    lazy val xfp = xf
+    lazy val xp = x
+    override type I = (xfp.I, xp.I)
+    private[this] val vc: Need[H[(xfp.I, xp.I)]] = Need(H.tuple2(xfp.v, xp.v))
+    override def v = vc.value
+    override def f(gi: G[I]) = xfp.f(G.map(gi)(_._1))(xp.f(G.map(gi)(_._2)))
   }
 }

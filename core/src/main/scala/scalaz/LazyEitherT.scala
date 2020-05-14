@@ -122,14 +122,14 @@ object LazyEitherT extends LazyEitherTInstances {
 
   def lazyEitherTLeftProjectionEIso2[F[_], E]: LazyEitherT.LeftProjectionT[F, E, *] <~> LazyEitherT[F, E, *] =
     new IsoFunctorTemplate[LazyEitherT.LeftProjectionT[F, E, *], LazyEitherT[F, E, *]] {
-      def to[A](fa: LazyEitherT.LeftProjectionT[F, E, A]): LazyEitherT[F, E, A] = fa.lazyEitherT
-      def from[A](ga: LazyEitherT[F, E, A]): LazyEitherT.LeftProjectionT[F, E, A] = ga.left
+      def to_[A](fa: LazyEitherT.LeftProjectionT[F, E, A]): LazyEitherT[F, E, A] = fa.lazyEitherT
+      def from_[A](ga: LazyEitherT[F, E, A]): LazyEitherT.LeftProjectionT[F, E, A] = ga.left
     }
 
   def lazyEitherTLeftProjectionIso2[F[_]]: LazyEitherT.LeftProjectionT[F, *, *] <~~> LazyEitherT[F, *, *] =
     new IsoBifunctorTemplate[LazyEitherT.LeftProjectionT[F, *, *], LazyEitherT[F, *, *]] {
-      def to[A, B](fa: LazyEitherT.LeftProjectionT[F, A, B]): LazyEitherT[F, A, B] = fa.lazyEitherT
-      def from[A, B](ga: LazyEitherT[F, A, B]): LazyEitherT.LeftProjectionT[F, A, B] = ga.left
+      def to_[A, B](fa: LazyEitherT.LeftProjectionT[F, A, B]): LazyEitherT[F, A, B] = fa.lazyEitherT
+      def from_[A, B](ga: LazyEitherT[F, A, B]): LazyEitherT.LeftProjectionT[F, A, B] = ga.left
     }
 
   final class LeftProjectionT[F[_], A, B](val lazyEitherT: LazyEitherT[F, A, B]) {
@@ -293,12 +293,12 @@ sealed abstract class LazyEitherTInstances extends LazyEitherTInstances0 {
       def iso = LazyEitherT.lazyEitherTLeftProjectionEIso2[F, L]
     }
 
-  implicit def lazyEitherTHoist[A]: Hoist[λ[(a[_], b) => LazyEitherT[a, A, b]]] =
-    new Hoist[λ[(a[_], b) => LazyEitherT[a, A, b]]] {
+  implicit def lazyEitherTHoist[A]: Hoist[({type l[a[_], b] = LazyEitherT[a, A, b]})#l] =
+    new Hoist[({type l[a[_], b] = LazyEitherT[a, A, b]})#l] {
       override def hoist[M[_]: Monad, N[_]](f: M ~> N) =
-        λ[LazyEitherT[M, A, *] ~> LazyEitherT[N, A, *]](
-          mb => LazyEitherT(f(mb.run))
-        )
+        new (LazyEitherT[M, A, *] ~> LazyEitherT[N, A, *]) {
+          def apply[B](mb: LazyEitherT[M, A, B]) = LazyEitherT(f(mb.run))
+        }
       override def liftM[M[_], B](mb: M[B])(implicit M: Monad[M]) =
         LazyEitherT(M.map(mb)(LazyEither.lazyRight[A].apply(_)))
       override def apply[M[_]: Monad] =

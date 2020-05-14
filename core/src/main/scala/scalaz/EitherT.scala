@@ -83,7 +83,7 @@ final case class EitherT[A, F[_], B](run: F[A \/ B]) {
 
   /** Traverse on the right of this disjunction. */
   def traverse[G[_], C](f: B => G[C])(implicit F: Traverse[F], G: Applicative[G]): G[EitherT[A, F, C]] =
-    G.map(F.traverse(run)(o => Traverse[A \/ *].traverse(o)(f)))(EitherT(_))
+    G.map(F.traverse(run)(o => Traverse[\/[A, *]].traverse(o)(f)))(EitherT(_))
 
   /** Apply a function in the environment of the right of this
     * disjunction.  Because it runs my `F` even when `f`'s `\/` fails,
@@ -261,13 +261,13 @@ object EitherT extends EitherTInstances {
     new EitherTRight[A](true)
 
   private[scalaz] final class EitherTLeft[B](private val dummy: Boolean) extends AnyVal {
-    def apply[FA](fa: FA)(implicit F: Unapply[Functor, FA]): EitherT[F.A, F.M, B] =
-      leftT[F.A, F.M, B](F(fa))(F.TC)
+    def apply[F[_]: Functor, A](fa: F[A]): EitherT[A, F, B] =
+      leftT[A, F, B](fa)
   }
 
   private[scalaz] final class EitherTRight[A](private val dummy: Boolean) extends AnyVal {
-    def apply[FB](fb: FB)(implicit F: Unapply[Functor, FB]): EitherT[A, F.M, F.A] =
-      rightT[A, F.M, F.A](F(fb))(F.TC)
+    def apply[F[_]: Functor, B](fb: F[B]): EitherT[A, F, B] =
+      rightT[A, F, B](fb)
   }
 
   /** Construct a disjunction value from a standard `scala.Either`. */
@@ -368,7 +368,7 @@ sealed abstract class EitherTInstances extends EitherTInstances0 {
       implicit def F = F0
     }
 
-  implicit def eitherTHoist[A]: Hoist[λ[(α[_], β) => EitherT[A, α, β]]] =
+  implicit def eitherTHoist[A]: Hoist[({type l[α[_], β] = EitherT[A, α, β]})#l] =
     new EitherTHoist[A] {}
 
   implicit def eitherTEqual[F[_], A, B](implicit F0: Equal[F[A \/ B]]): Equal[EitherT[A, F, B]] =
@@ -464,9 +464,11 @@ private trait EitherTBitraverse[F[_]] extends Bitraverse[EitherT[*, F, *]] with 
     fab.bitraverse(f, g)
 }
 
-private trait EitherTHoist[A] extends Hoist[λ[(α[_], β) => EitherT[A, α, β]]] {
-  def hoist[M[_], N[_]](f: M ~> N)(implicit M: Monad[M]) =
-    λ[EitherT[A, M, *] ~> EitherT[A, N, *]](_ mapT f.apply)
+private trait EitherTHoist[A] extends Hoist[({type l[α[_], β] = EitherT[A, α, β]})#l] {
+  def hoist[M[_], N[_]](f: M ~> N)(implicit M: Monad[M]) = new ~>[EitherT[A, M, *], EitherT[A, N, *]] {
+    def apply[B](mb: EitherT[A, M, B]): EitherT[A, N, B] =
+      mb.mapT(f.apply)
+  }
 
   def liftM[M[_], B](mb: M[B])(implicit M: Monad[M]): EitherT[A, M, B] = EitherT(M.map(mb)(\/.right))
 

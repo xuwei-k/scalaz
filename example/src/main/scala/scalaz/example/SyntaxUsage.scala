@@ -173,8 +173,6 @@ object SyntaxUsage extends App {
       import scalaz.syntax.monadTell._
       import scalaz.syntax.monadError0._
       import scalaz.syntax.applicativeError0._
-      // Monad syntax
-      fa flatMap (_ => fa)
 
       // MonadTell syntax
       fa :++> "foo"
