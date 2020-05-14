@@ -13,8 +13,6 @@ jdk:
 
 matrix:
   include:
-  - name: Scala2
-    script: sbt "++2.13.2!" -J-Xmx3784m checkGenTypeClasses testsJVM/test:compile
   - name: Dotty
     script: sbt -J-Xmx3784m checkGenTypeClasses testsJVM/test:compile
 
