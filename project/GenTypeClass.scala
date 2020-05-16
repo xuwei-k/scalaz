@@ -281,7 +281,7 @@ object GenTypeClass {
           case Seq() => ""
           case es    => es.map(n => n.kind match {
             case Kind.|*->*|->* => "To" + n.name + "Ops[TC]"
-            case _ => "To" + n.name + "Ops[λ[F[_] => TC[F, S] forSome { type S }]]"
+            case _ => "To" + n.name + "Ops[({type l[F[_]] = TC[F, _]})#l]"
           }
 
           ).mkString(" with ", " with ", "")
