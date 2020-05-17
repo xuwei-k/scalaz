@@ -53,6 +53,11 @@ trait ToFunctorOps0[TC[F[_]] <: Functor[F]] extends ToFunctorOpsU[TC] {
 
 trait ToFunctorOps[TC[F[_]] <: Functor[F]] extends ToFunctorOps0[TC] with ToInvariantFunctorOps[TC]
 
+trait ToFunctorOps2 extends ToInvariantFunctorOps2 {
+  implicit def ToFunctorOps2[F[_, _], A, B](v: F[A, B])(implicit F0: Functor[({type l[x] = F[A, x]})#l]): FunctorOps[({type l[x] = F[A, x]})#l, B] =
+    new FunctorOps[({type l[x] = F[A, x]})#l, B](v)
+}
+
 trait FunctorSyntax[F[_]] extends InvariantFunctorSyntax[F] {
   implicit def ToFunctorOps[A](v: F[A]): FunctorOps[F, A] = new FunctorOps[F,A](v)(FunctorSyntax.this.F)
 

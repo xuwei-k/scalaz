@@ -39,6 +39,11 @@ trait ToMonadOps0[TC[F[_]] <: Monad[F]] extends ToMonadOpsU[TC] {
 
 trait ToMonadOps[TC[F[_]] <: Monad[F]] extends ToMonadOps0[TC] with ToApplicativeOps[TC] with ToBindOps[TC]
 
+trait ToMonadOps2 extends ToApplicativeOps2 with ToBindOps2 {
+  implicit def ToMonadOps2[F[_, _], A, B](v: F[A, B])(implicit F0: Monad[({type l[x] = F[A, x]})#l]): MonadOps[({type l[x] = F[A, x]})#l, B] =
+    new MonadOps[({type l[x] = F[A, x]})#l, B](v)
+}
+
 trait MonadSyntax[F[_]] extends ApplicativeSyntax[F] with BindSyntax[F] {
   implicit def ToMonadOps[A](v: F[A]): MonadOps[F, A] = new MonadOps[F,A](v)(MonadSyntax.this.F)
 

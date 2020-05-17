@@ -41,6 +41,11 @@ trait ToApplicativeOps0[TC[F[_]] <: Applicative[F]] extends ToApplicativeOpsU[TC
 
 trait ToApplicativeOps[TC[F[_]] <: Applicative[F]] extends ToApplicativeOps0[TC] with ToApplyOps[TC] with ToInvariantApplicativeOps[TC]
 
+trait ToApplicativeOps2 extends ToApplyOps2 with ToInvariantApplicativeOps2 {
+  implicit def ToApplicativeOps2[F[_, _], A, B](v: F[A, B])(implicit F0: Applicative[({type l[x] = F[A, x]})#l]): ApplicativeOps[({type l[x] = F[A, x]})#l, B] =
+    new ApplicativeOps[({type l[x] = F[A, x]})#l, B](v)
+}
+
 trait ApplicativeSyntax[F[_]] extends ApplySyntax[F] with InvariantApplicativeSyntax[F] {
   implicit def ToApplicativeOps[A](v: F[A]): ApplicativeOps[F, A] = new ApplicativeOps[F,A](v)(ApplicativeSyntax.this.F)
 

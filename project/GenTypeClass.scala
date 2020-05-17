@@ -7,7 +7,8 @@ case class TypeClass(
   extendsList: Seq[TypeClass] = Seq(),
   createSyntax: Boolean = true,
   iso: Boolean = true,
-  fromIso: Boolean = true
+  fromIso: Boolean = true,
+  ops2: Boolean = false,
 ) {
 
   require(pack.head == "scalaz")
@@ -33,21 +34,21 @@ object TypeClass {
   lazy val order = TypeClass("Order", *, extendsList = Seq(equal))
   lazy val enum = TypeClass("Enum", *, extendsList = Seq(order))
 
-  lazy val invariantFunctor = TypeClass("InvariantFunctor", *->*)
-  lazy val functor = TypeClass("Functor", *->*, extendsList = Seq(invariantFunctor))
+  lazy val invariantFunctor = TypeClass("InvariantFunctor", *->*, ops2 = true)
+  lazy val functor = TypeClass("Functor", *->*, extendsList = Seq(invariantFunctor), ops2 = true)
   lazy val distributive = TypeClass("Distributive", *->*, extendsList = Seq(functor))
-  lazy val invariantApplicative = TypeClass("InvariantApplicative", *->*, extendsList = Seq(invariantFunctor))
+  lazy val invariantApplicative = TypeClass("InvariantApplicative", *->*, extendsList = Seq(invariantFunctor), ops2 = true)
   lazy val invariantAlt = TypeClass("InvariantAlt", *->*, extendsList = Seq(invariantApplicative))
   lazy val decidable = TypeClass("Decidable", *->*, extendsList = Seq(divisible, invariantAlt))
   lazy val alt = TypeClass("Alt", *->*, extendsList = Seq(applicative, invariantAlt))
-  lazy val apply: TypeClass = TypeClass("Apply", *->*, extendsList = Seq(functor))
-  lazy val applicative = TypeClass("Applicative", *->*, extendsList = Seq(apply, invariantApplicative))
+  lazy val apply: TypeClass = TypeClass("Apply", *->*, extendsList = Seq(functor), ops2 = true)
+  lazy val applicative = TypeClass("Applicative", *->*, extendsList = Seq(apply, invariantApplicative), ops2 = true)
   lazy val applicativeError = TypeClass("ApplicativeError", |*->*|->*, extendsList = Seq(applicative))
   lazy val align = TypeClass("Align", *->*, extendsList = Seq(functor))
   lazy val zip = TypeClass("Zip", *->*)
   lazy val unzip = TypeClass("Unzip", *->*)
-  lazy val bind = TypeClass("Bind", *->*, extendsList = Seq(apply))
-  lazy val monad = TypeClass("Monad", *->*, extendsList = Seq(applicative, bind))
+  lazy val bind = TypeClass("Bind", *->*, extendsList = Seq(apply), ops2 = true)
+  lazy val monad = TypeClass("Monad", *->*, extendsList = Seq(applicative, bind), ops2 = true)
   lazy val foldable = TypeClass("Foldable", *->*, fromIso = false)
   lazy val foldable1 = TypeClass("Foldable1", *->*, extendsList = Seq(foldable), fromIso = false)
   lazy val traverse = TypeClass("Traverse", *->*, extendsList = Seq(functor, foldable))
@@ -281,7 +282,7 @@ object GenTypeClass {
           case Seq() => ""
           case es    => es.map(n => n.kind match {
             case Kind.|*->*|->* => "To" + n.name + "Ops[TC]"
-            case _ => "To" + n.name + "Ops[λ[F[_] => TC[F, S] forSome { type S }]]"
+            case _ => "To" + n.name + "Ops2"
           }
 
           ).mkString(" with ", " with ", "")
@@ -468,6 +469,18 @@ trait ${typeClassName}Syntax[F] ${extendsListText("Syntax")} {
 }
 """
     case Kind.*->* =>
+      val ToOps2 = if (tc.ops2) {
+        val parents = if (tc.extendsList.isEmpty) "" else tc.extendsList.map(x => s"To${x.name}Ops2").mkString("extends ", " with ", " ")
+
+s"""
+trait To${typeClassName}Ops2 ${parents}{
+  implicit def To${typeClassName}Ops2[F[_, _], A, B](v: F[A, B])(implicit F0: ${typeClassName}[({type l[x] = F[A, x]})#l]): ${typeClassName}Ops[({type l[x] = F[A, x]})#l, B] =
+    new ${typeClassName}Ops[({type l[x] = F[A, x]})#l, B](v)
+}
+"""
+      } else {
+        ""
+      }
       val ToVUnapply =
 s"""  implicit def To${typeClassName}OpsUnapply[FA](v: FA)(implicit F0: Unapply[TC, FA]): ${typeClassName}Ops[F0.M, F0.A] =
     new ${typeClassName}Ops[F0.M, F0.A](F0(v))(F0.TC)
@@ -498,7 +511,7 @@ $ToVMA
 }
 
 trait To${typeClassName}Ops[TC[F[_]] <: ${typeClassName}[F]] $extendsToSyntaxListText
-
+${ToOps2}
 trait ${typeClassName}Syntax[F[_]] ${extendsListText("Syntax")} {
   implicit def To${typeClassName}Ops[A](v: F[A]): ${typeClassName}Ops[F, A] = new ${typeClassName}Ops[F,A](v)(${typeClassName}Syntax.this.F)
 

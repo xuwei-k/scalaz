@@ -85,6 +85,11 @@ trait ToApplyOps0[TC[F[_]] <: Apply[F]] extends ToApplyOpsU[TC] {
 
 trait ToApplyOps[TC[F[_]] <: Apply[F]] extends ToApplyOps0[TC] with ToFunctorOps[TC]
 
+trait ToApplyOps2 extends ToFunctorOps2 {
+  implicit def ToApplyOps2[F[_, _], A, B](v: F[A, B])(implicit F0: Apply[({type l[x] = F[A, x]})#l]): ApplyOps[({type l[x] = F[A, x]})#l, B] =
+    new ApplyOps[({type l[x] = F[A, x]})#l, B](v)
+}
+
 trait ApplySyntax[F[_]] extends FunctorSyntax[F] {
   implicit def ToApplyOps[A](v: F[A]): ApplyOps[F, A] = new ApplyOps[F,A](v)(ApplySyntax.this.F)
 

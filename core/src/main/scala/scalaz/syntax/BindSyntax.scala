@@ -47,6 +47,11 @@ trait ToBindOps0[TC[F[_]] <: Bind[F]] extends ToBindOpsU[TC] {
 
 trait ToBindOps[TC[F[_]] <: Bind[F]] extends ToBindOps0[TC] with ToApplyOps[TC]
 
+trait ToBindOps2 extends ToApplyOps2 {
+  implicit def ToBindOps2[F[_, _], A, B](v: F[A, B])(implicit F0: Bind[({type l[x] = F[A, x]})#l]): BindOps[({type l[x] = F[A, x]})#l, B] =
+    new BindOps[({type l[x] = F[A, x]})#l, B](v)
+}
+
 trait BindSyntax[F[_]] extends ApplySyntax[F] {
   implicit def ToBindOps[A](v: F[A]): BindOps[F, A] = new BindOps[F,A](v)(BindSyntax.this.F)
 
