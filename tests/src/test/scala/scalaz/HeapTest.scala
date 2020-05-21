@@ -5,7 +5,7 @@ import scalaz.scalacheck.ScalazArbitrary._
 import scalaz.std.AllInstances._
 import org.scalacheck.Prop.forAll
 
-object HeapTest extends SpecLite {
+class HeapTest extends SpecLite {
   checkAll(equal.laws[Heap[Int]])
   checkAll(monoid.laws[Heap[Int]])
   checkAll(foldable.laws[Heap])

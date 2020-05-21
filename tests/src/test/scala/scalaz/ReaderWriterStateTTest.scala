@@ -4,7 +4,7 @@ import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import std.AllInstances._
 
-object ReaderWriterStateTTest extends SpecLite {
+class ReaderWriterStateTTest extends SpecLite {
   type RWSOptInt[A] = RWST[Int, Int, Int, Option, A]
 
   implicit val RWSOptIntEqual: Equal[RWSOptInt[Int]] = new Equal[RWSOptInt[Int]] {

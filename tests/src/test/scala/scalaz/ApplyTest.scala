@@ -6,7 +6,7 @@ import std.option.some
 import scalaz.scalacheck.ScalazProperties.applicative
 import scalaz.scalacheck.ScalazArbitrary._
 
-object ApplyTest extends SpecLite {
+class ApplyTest extends SpecLite {
   checkAll("List applyApplicative", {
              implicit val F: Applicative[λ[α => List[α] \/ α]] = Apply[List].applyApplicative
              applicative.laws[λ[α => List[α] \/ α]]

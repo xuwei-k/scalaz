@@ -9,7 +9,7 @@ import Id._
 import org.scalacheck.Prop.forAll
 import Maybe.just
 
-object VectorTest extends SpecLite {
+class VectorTest extends SpecLite {
   import std.vector._
   checkAll(equal.laws[Vector[Int]])
   checkAll(monoid.laws[Vector[Int]])

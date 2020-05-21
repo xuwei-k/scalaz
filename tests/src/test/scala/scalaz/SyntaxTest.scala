@@ -1,6 +1,6 @@
 package scalaz
 
-object SyntaxTest extends SpecLite {
+class SyntaxTest extends SpecLite {
   "functor syntax" in {
     import syntax.functor._
     import std.tuple._, std.anyVal._

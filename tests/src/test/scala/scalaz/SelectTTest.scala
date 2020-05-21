@@ -7,7 +7,7 @@ import scalaz.scalacheck.ScalaCheckBinding._
 import scalaz.scalacheck.ScalazArbitrary._
 import scalaz.scalacheck.ScalazProperties._
 
-object SelectTTest extends SpecLite {
+class SelectTTest extends SpecLite {
   private implicit def selectTEqual[R, M[_], A](implicit E: Equal[(A => M[R]) => M[A]]): Equal[SelectT[R, M, A]] =
     E.contramap(_.run)
 

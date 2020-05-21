@@ -11,7 +11,7 @@ import syntax.equal._
 import WriterT._
 import org.scalacheck.Prop.forAll
 
-object FingerTreeTest extends SpecLite {
+class FingerTreeTest extends SpecLite {
   type SequenceTree[A] = FingerTree[Int, A]
   implicit def SizeReducer[A]: Reducer[A, Int] = UnitReducer(x => 1)
   import FingerTree._

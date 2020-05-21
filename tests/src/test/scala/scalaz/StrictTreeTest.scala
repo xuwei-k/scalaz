@@ -6,7 +6,7 @@ import scalaz.scalacheck.ScalazArbitrary._
 import StrictTree._
 import org.scalacheck.Prop.forAll
 
-object StrictTreeTest extends SpecLite {
+class StrictTreeTest extends SpecLite {
 
   checkAll("StrictTree", order.laws[StrictTree[Int]])
   checkAll("StrictTree", traverse1.laws[StrictTree])

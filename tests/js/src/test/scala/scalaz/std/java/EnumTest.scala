@@ -2,7 +2,7 @@ package scalaz
 package std.java
 
 
-object EnumTest extends SpecLite {
+class EnumTest extends SpecLite {
 
   import syntax.equal._
   import std.java.`enum`._

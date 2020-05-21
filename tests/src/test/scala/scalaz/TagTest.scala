@@ -6,7 +6,7 @@ import std.AllInstances._
 import Tags.{Multiplication => Mult}
 import org.scalacheck.Prop.forAll
 
-object TagTest extends SpecLite {
+class TagTest extends SpecLite {
   "k.@@" should {
     "be abstract" in {
       val r = (List[Int](42) ++ List[Int @@ Mult]()).toSet

@@ -6,7 +6,7 @@ import scalaz.scalacheck.ScalazArbitrary._
 import Const._
 import org.scalacheck.Prop.forAll
 
-object ConstTest extends SpecLite {
+class ConstTest extends SpecLite {
   checkAll("Const", order.laws[Const[Int, String]])
 
   checkAll("Const List"  , applicative.laws[λ[α => Const[List[Int], α]]])

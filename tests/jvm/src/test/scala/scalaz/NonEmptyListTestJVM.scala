@@ -2,7 +2,7 @@ package scalaz
 
 import std.AllInstances._
 
-object NonEmptyListTestJVM extends SpecLite {
+class NonEmptyListTestJVM extends SpecLite {
 
   "NonEmptyList.foldRight1 large list" in {
     import NonEmptyList._

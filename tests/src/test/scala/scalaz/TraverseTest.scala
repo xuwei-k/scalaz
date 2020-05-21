@@ -2,7 +2,7 @@ package scalaz
 import org.scalacheck.Prop.forAll
 
 
-object TraverseTest extends SpecLite {
+class TraverseTest extends SpecLite {
 
   import scalaz._
   import scalaz.State._

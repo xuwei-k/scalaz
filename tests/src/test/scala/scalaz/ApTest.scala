@@ -4,7 +4,7 @@ import scalaz.scalacheck.ScalazArbitrary._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.std.AllInstances._
 
-object ApTest extends SpecLite {
+class ApTest extends SpecLite {
 
   checkAll(equal.laws[Ap[IList, Int]])
 

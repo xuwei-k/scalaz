@@ -6,7 +6,7 @@ import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import std.AllInstances._
 
-object StateTTest extends SpecLite {
+class StateTTest extends SpecLite {
 
   type StateTList[S, A] = StateT[S, List, A]
   type StateTListInt[A] = StateTList[Int, A]

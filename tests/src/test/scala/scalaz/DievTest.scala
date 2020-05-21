@@ -6,7 +6,7 @@ import scalaz.scalacheck.ScalazArbitrary._
 import scala.util.Random
 import org.scalacheck.Prop.forAll
 
-object DievTest extends SpecLite {
+class DievTest extends SpecLite {
   val random = new Random()
 
   "insert order makes no difference" ! forAll {

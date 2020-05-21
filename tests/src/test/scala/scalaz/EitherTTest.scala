@@ -7,7 +7,7 @@ import scalaz.scalacheck.ScalazArbitrary._
 import std.AllInstances._
 import org.scalacheck.Prop.forAll
 
-object EitherTTest extends SpecLite {
+class EitherTTest extends SpecLite {
 
   type EitherTList[A, B] = EitherT[A, List, B]
   type EitherTListInt[A] = EitherT[Int, List, A]

@@ -4,7 +4,7 @@ import scalaz.Scalaz._
 import scalaz.Strong.uncurry
 import org.scalacheck.Prop.forAll
 
-object StrongSpec extends SpecLite {
+class StrongSpec extends SpecLite {
 
   "first" ! forAll {
     (f: String => Int, pair: (String, Int)) =>

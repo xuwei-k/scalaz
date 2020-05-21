@@ -6,7 +6,7 @@ import KleisliTest._
 import CokleisliTest._
 import std.AllInstances._
 
-object EndomorphicTest extends SpecLite {
+class EndomorphicTest extends SpecLite {
 
   implicit def endoEqual[F[_], G[_[_], _, _], A](
     implicit F: Equal[G[F, A, A]]

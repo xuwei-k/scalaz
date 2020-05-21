@@ -3,7 +3,7 @@ package scalaz
 import scalaz.std.AllInstances._
 import scalaz.syntax.`enum`._
 
-object EnumTest extends SpecLite {
+class EnumTest extends SpecLite {
 
   "|--> with step 1" in {
     val expected = IList(120.toByte, 121.toByte, 122.toByte, 123.toByte, 124.toByte, 125.toByte, 126.toByte, 127.toByte)

@@ -8,7 +8,7 @@ import std.AllInstances._
 import OneAnd.oneAndNelIso
 import org.scalacheck.Prop.forAll
 
-object OneAndTest extends SpecLite {
+class OneAndTest extends SpecLite {
   type OneAndOption[A] = OneAnd[Option, A]
   type OneAndList[A] = OneAnd[List, A]
   type OneAndNel[A] = OneAnd[NonEmptyList, A]

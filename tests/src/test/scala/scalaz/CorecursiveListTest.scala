@@ -12,7 +12,7 @@ import std.lazylist._
 import std.tuple._
 import syntax.contravariant._
 
-object CorecursiveListTest extends SpecLite {
+class CorecursiveListTest extends SpecLite {
   type CL[A] = CorecursiveList[A]
   val CL = CorecursiveList
   checkAll(monadPlus.laws[CL])

@@ -4,7 +4,7 @@ package std
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 
-object EitherTest extends SpecLite {
+class EitherTest extends SpecLite {
   checkAll("Either", order.laws[Either[Int, Int]])
   checkAll("Either", bindRec.laws[Either[Int, *]])
   checkAll("Either", monadError.laws[Either[Int, *], Int])

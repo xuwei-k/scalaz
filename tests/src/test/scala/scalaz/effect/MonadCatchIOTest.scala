@@ -3,7 +3,7 @@ package effect
 
 import java.io.{ StringReader, IOException }
 
-object MonadCatchIOTest extends SpecLite {
+class MonadCatchIOTest extends SpecLite {
   import Kleisli.kleisli
   import syntax.monad._
   import syntax.effect.monadCatchIO._

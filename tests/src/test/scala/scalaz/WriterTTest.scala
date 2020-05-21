@@ -8,7 +8,7 @@ import org.scalacheck.{Arbitrary, Cogen}
 import Id._
 import org.scalacheck.Prop.forAll
 
-object WriterTTest extends SpecLite {
+class WriterTTest extends SpecLite {
 
   type WriterTOpt[W, A] = WriterT[W, Option, A]
   type WriterTOptInt[A] = WriterTOpt[Int, A]

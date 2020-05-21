@@ -9,7 +9,7 @@ import scala.collection.immutable.{Map => SMap}
 import scala.math.{Ordering => SOrdering}
 import org.scalacheck.Prop.forAll
 
-object MapTest extends SpecLite {
+class MapTest extends SpecLite {
 
   checkAll(traverse.laws[Map[Int, *]])
   checkAll(FoldableTests.anyAndAllLazy[Map[Int, *]])

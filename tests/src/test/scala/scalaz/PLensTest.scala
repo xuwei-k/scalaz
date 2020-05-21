@@ -2,7 +2,7 @@ package scalaz
 
 import std.AllInstances._
 
-object PLensTest extends SpecLite {
+class PLensTest extends SpecLite {
   import PLens._
 
   "list head" in {

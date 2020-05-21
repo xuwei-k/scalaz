@@ -6,7 +6,7 @@ import scalaz.syntax.contravariant._
 import scalaz.scalacheck.ScalazArbitrary._
 import scalaz.scalacheck.ScalazProperties.reducer
 
-object ReducerTest extends SpecLite {
+class ReducerTest extends SpecLite {
   import EndoTest.endoIntEqual
 
   implicit val intDualEqual: Equal[Int @@ Dual] =

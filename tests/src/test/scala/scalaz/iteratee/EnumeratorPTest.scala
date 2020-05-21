@@ -8,7 +8,7 @@ import Iteratee._
 import Id._
 import NaturalTransformation.id
 
-object EnumeratorPTest extends SpecLite {
+class EnumeratorPTest extends SpecLite {
   "cogroupE" should {
     "work the same as directly using the nested iteratee " in {
       val enum1 = enumPStream[Int, Id](Stream(1, 3, 3, 5, 7, 8, 8))

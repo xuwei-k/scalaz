@@ -9,7 +9,7 @@ import scalaz.scalacheck.ScalazProperties._
 import org.scalacheck._
 import org.scalacheck.Prop.forAll
 
-object StringTest extends SpecLite {
+class StringTest extends SpecLite {
   import ArbitraryNumbers._
 
   checkAll(monoid.laws[String])

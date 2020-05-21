@@ -6,7 +6,7 @@ import std.AllInstances._
 import org.scalacheck.Prop.forAll
 import scalaz.Maybe.just
 
-object NonEmptyListTest extends SpecLite {
+class NonEmptyListTest extends SpecLite {
   checkAll("NonEmptyList", monad.laws[NonEmptyList])
   checkAll("NonEmptyList", bindRec.laws[NonEmptyList])
   checkAll("NonEmptyList", plus.laws[NonEmptyList])

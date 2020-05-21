@@ -1,7 +1,7 @@
 package scalaz
 
 
-object UnapplyTest extends SpecLite {
+class UnapplyTest extends SpecLite {
   def teq[A[_], B[X] >: A[X] <: A[X]]: Unit = ()
   def teq2[A[_, _], B[X, Y] >: A[X, Y] <: A[X, Y]]: Unit = ()
 

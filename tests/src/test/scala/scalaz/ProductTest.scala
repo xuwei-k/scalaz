@@ -4,7 +4,7 @@ import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 
-object ProductTest extends SpecLite {
+class ProductTest extends SpecLite {
   type OptionList[α] = (Option[α], List[α])
   type OneAndOption[α] = OneAnd[Option, α]
   type OneAndOptionPair[α] = (OneAndOption[α], OneAndOption[α])

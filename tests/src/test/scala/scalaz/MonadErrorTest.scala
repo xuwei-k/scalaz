@@ -5,7 +5,7 @@ import syntax.either._
 import syntax.monadError._
 import Isomorphism.{ <~>, IsoFunctorTemplate }
 
-object MonadErrorTest extends SpecLite {
+class MonadErrorTest extends SpecLite {
 
   trait Decoder[A] {
     def decode(s: String): Int \/ A

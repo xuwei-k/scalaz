@@ -5,7 +5,7 @@ import Dual._
 import scalaz.scalacheck.ScalazArbitrary._
 import org.scalacheck.Prop.forAll
 
-object OrderTest extends SpecLite {
+class OrderTest extends SpecLite {
   "duals" ! forAll {
     (xs: List[Int]) =>
       val F = Foldable[List]

@@ -1,6 +1,6 @@
 package scalaz
 
-object MemoTest extends SpecLite {
+class MemoTest extends SpecLite {
 
   "Memo.doubleArrayMemo should not throw exceptions" in {
     import scalaz.std.anyVal._

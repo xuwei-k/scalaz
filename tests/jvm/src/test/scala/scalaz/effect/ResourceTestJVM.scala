@@ -3,7 +3,7 @@ package effect
 
 import std.effect.autoCloseable._
 
-object ResourceTestJVM extends SpecLite {
+class ResourceTestJVM extends SpecLite {
 
   // scala-js does not have java.sql classes
   // https://github.com/scala-js/scala-js/tree/v0.6.14/javalib/src/main/scala/java

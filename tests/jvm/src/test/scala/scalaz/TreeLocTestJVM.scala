@@ -4,7 +4,7 @@ import scalaz.scalacheck.ScalazArbitrary
 import org.scalacheck.Gen
 import org.scalacheck.Prop.forAll
 
-object TreeLocTestJVM extends SpecLite {
+class TreeLocTestJVM extends SpecLite {
 
   "ScalazArbitrary.treeLocGenSized" ! forAll(Gen.choose(1, 200)){ size =>
     val gen = ScalazArbitrary.treeLocGenSized[Unit](size)

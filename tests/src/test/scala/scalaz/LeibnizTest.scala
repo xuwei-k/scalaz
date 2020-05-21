@@ -1,6 +1,6 @@
 package scalaz
 
-object LeibnizTest extends SpecLite {
+class LeibnizTest extends SpecLite {
   import Leibniz.refl, std.function._
 
   // That these compile.

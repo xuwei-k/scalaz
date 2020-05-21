@@ -4,7 +4,7 @@ package std
 import std.AllInstances._
 import org.scalacheck.Prop.forAll
 
-object PartialFunctionTest extends SpecLite {
+class PartialFunctionTest extends SpecLite {
   private type PF[-A, +B] = PartialFunction[A, B]
 
   private val A = Arrow[PartialFunction]

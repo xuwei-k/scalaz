@@ -6,7 +6,7 @@ import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import std.AllInstances._
 
-object MaybeTTest extends SpecLite {
+class MaybeTTest extends SpecLite {
 
   type MaybeTList[A] = MaybeT[List, A]
   type IntOr[A] = Int \/ A

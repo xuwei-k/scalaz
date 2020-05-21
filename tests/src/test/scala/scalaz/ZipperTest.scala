@@ -10,7 +10,7 @@ import org.scalacheck.{Gen, Prop}
 import org.scalacheck.Prop.forAll
 import scalaz.Maybe.just
 
-object ZipperTest extends SpecLite {
+class ZipperTest extends SpecLite {
 
   "Zipper From LazyList" ! forAll { (xs: LazyList[Int]) =>
     (xs.toZipper map (_.toLazyList)).getOrElse(LazyList()) === xs

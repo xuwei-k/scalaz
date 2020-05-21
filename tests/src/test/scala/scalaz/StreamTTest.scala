@@ -5,7 +5,7 @@ import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import org.scalacheck.Prop.forAll
 
-object StreamTTest extends SpecLite {
+class StreamTTest extends SpecLite {
   type StreamTOpt[A] = StreamT[Option, A]
 
   "fromLazyList / toLazyList" ! forAll {

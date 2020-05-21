@@ -46,7 +46,7 @@ object ContravariantCoyonedaGens {
       aToString[Int], evensFirst, negated, probablePrime)
 }
 
-object ContravariantCoyonedaTest extends SpecLite {
+class ContravariantCoyonedaTest extends SpecLite {
   import ContravariantCoyonedaGens._
 
   implicit val arbIntOrders: Arbitrary[CtCoOrder[Int]] = Arbitrary(intOrders)

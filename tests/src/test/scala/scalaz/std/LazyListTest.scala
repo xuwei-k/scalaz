@@ -5,7 +5,7 @@ import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import org.scalacheck.Prop.forAll
 
-object LazyListTest extends SpecLite {
+class LazyListTest extends SpecLite {
   checkAll(order.laws[LazyList[Int]])
   checkAll(monoid.laws[LazyList[Int]])
   checkAll(monadPlus.strongLaws[LazyList])

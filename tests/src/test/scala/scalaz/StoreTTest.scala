@@ -5,7 +5,7 @@ import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 
-object StoreTTest extends SpecLite {
+class StoreTTest extends SpecLite {
 
   private[this] val storeTestInts = (-10 to 10).toList
 

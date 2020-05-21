@@ -4,7 +4,7 @@ import scalaz.std.AllInstances.{tuple2Instance => _, _}
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 
-object BitraverseTest extends SpecLite {
+class BitraverseTest extends SpecLite {
 
   implicit val LE: Traverse[\/[*, Int]] = Bitraverse[\/].leftTraverse[Int]
   implicit val RE: Traverse[\/[Int, *]] = Bitraverse[\/].rightTraverse[Int]

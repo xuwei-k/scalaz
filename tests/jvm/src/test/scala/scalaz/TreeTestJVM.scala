@@ -6,7 +6,7 @@ import org.scalacheck.Gen
 import org.scalacheck.Prop.forAll
 import std.AllInstances._
 
-object TreeTestJVM extends SpecLite {
+class TreeTestJVM extends SpecLite {
 
   val E = Equal[Tree[Int]]
 

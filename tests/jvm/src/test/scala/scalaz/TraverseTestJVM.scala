@@ -4,7 +4,7 @@ import scalaz.State._
 import std.AllInstances._
 import syntax.traverse._
 
-object TraverseTestJVM extends SpecLite {
+class TraverseTestJVM extends SpecLite {
 
   "list" should {
     "sequenceS, traverseS, traversalS does not blow stack" in {

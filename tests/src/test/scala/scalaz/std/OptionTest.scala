@@ -8,7 +8,7 @@ import Tags._
 import org.scalacheck.Prop._
 import org.scalacheck.Prop.forAll
 
-object OptionTest extends SpecLite {
+class OptionTest extends SpecLite {
 
   checkAll("Option", order.laws[Option[Int]])
   checkAll("Option @@ First", order.laws[FirstOption[Int]])

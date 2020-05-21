@@ -9,7 +9,7 @@ import org.scalacheck.Arbitrary
 import scalaz.scalacheck.ScalaCheckBinding._
 import Id._
 
-object EnumeratorTTest extends SpecLite {
+class EnumeratorTTest extends SpecLite {
   implicit def enumeratorTArb[F[_], A](implicit FA: Arbitrary[List[A]], F: Monad[F]): Arbitrary[EnumeratorT[A, F]] = Functor[Arbitrary].map(FA)(l => EnumeratorT.enumStream[A, F](l.toStream))
 
   implicit def enumeratorEqual[A](implicit EQ: Equal[A]): Equal[Enumerator[A]] = new Equal[Enumerator[A]] {

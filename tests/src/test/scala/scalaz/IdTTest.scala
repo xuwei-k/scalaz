@@ -4,7 +4,7 @@ import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 
-object IdTTest extends SpecLite {
+class IdTTest extends SpecLite {
 
   type ConstInt[A] = Const[Int, A]
 

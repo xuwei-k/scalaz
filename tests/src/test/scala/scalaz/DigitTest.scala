@@ -5,7 +5,7 @@ import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import org.scalacheck.Prop.forAll
 
-object DigitTest extends SpecLite {
+class DigitTest extends SpecLite {
   checkAll(`enum`.laws[Digit])
   checkAll(monoid.laws[Digit])
 

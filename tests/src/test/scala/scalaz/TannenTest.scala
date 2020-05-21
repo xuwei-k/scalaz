@@ -4,7 +4,7 @@ import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 
-object TannenTest extends SpecLite {
+class TannenTest extends SpecLite {
 
   checkAll(traverse.laws[Tannen[IList, \/, Int, *]])
   checkAll(bitraverse.laws[Tannen[Maybe, Tuple2, *, *]])

@@ -2,7 +2,7 @@ package scalaz
 
 import std.AllInstances._
 
-object EitherTTest2 extends SpecLite {
+class EitherTTest2 extends SpecLite {
 
   "rightU" should {
     val a: String \/ Int = \/-(1)

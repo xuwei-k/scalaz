@@ -3,7 +3,7 @@ package scalaz
 import std.AllInstances._
 import org.scalacheck.Prop.forAll
 
-object BooleanSyntaxTest extends SpecLite {
+class BooleanSyntaxTest extends SpecLite {
   "boolean syntax" in {
     import syntax.std.boolean._
 

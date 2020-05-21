@@ -2,7 +2,7 @@ package scalaz
 
 import std.AllInstances._
 
-object SemigroupTest extends SpecLite {
+class SemigroupTest extends SpecLite {
   "invariant functor" in {
     import InvariantFunctorTest._
     import syntax.invariantFunctor._

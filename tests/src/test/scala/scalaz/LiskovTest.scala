@@ -1,6 +1,6 @@
 package scalaz
 
-object LiskovTest extends SpecLite {
+class LiskovTest extends SpecLite {
 
   trait Co1[+A]
 

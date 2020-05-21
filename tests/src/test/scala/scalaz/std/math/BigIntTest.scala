@@ -7,7 +7,7 @@ import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import Tags._
 
-object BigIntTest extends SpecLite {
+class BigIntTest extends SpecLite {
   checkAll("BigInt", `enum`.laws[BigInt])
   checkAll("BigInt @@ Multiplication", order.laws[BigInt @@ Multiplication])
 

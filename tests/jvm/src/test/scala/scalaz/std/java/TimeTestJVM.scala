@@ -9,7 +9,7 @@ import scalaz.scalacheck.ScalazProperties._
 import scalaz.std.java.time._
 import scala.jdk.CollectionConverters._
 
-object TimeTestJVM extends SpecLite {
+class TimeTestJVM extends SpecLite {
 
   private[this] def arb[A](implicit A: Arbitrary[A]): Arbitrary[A] = A
   private[this] def gen[A](implicit A: Arbitrary[A]): Gen[A] = A.arbitrary

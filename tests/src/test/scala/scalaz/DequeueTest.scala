@@ -5,7 +5,7 @@ import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import org.scalacheck.Prop.forAll
 
-object DequeueTest extends SpecLite {
+class DequeueTest extends SpecLite {
   checkAll(monoid.laws[Dequeue[Int]])
   checkAll(isEmpty.laws[Dequeue])
   checkAll(traverse.laws[Dequeue])

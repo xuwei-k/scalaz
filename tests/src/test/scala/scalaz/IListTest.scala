@@ -8,7 +8,7 @@ import scalaz.Maybe.just
 import syntax.bifunctor._
 import syntax.foldable._
 
-object IListTest extends SpecLite {
+class IListTest extends SpecLite {
 
   // Same laws that hold for List
   checkAll(equal.laws[IList[Int]])

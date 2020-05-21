@@ -9,7 +9,7 @@ import org.scalacheck.Arbitrary
 import Tags._
 import syntax.contravariant._
 
-object AnyValTest extends SpecLite {
+class AnyValTest extends SpecLite {
 
   private[this] implicit def tagArb[A, B](implicit A: Arbitrary[A]): Arbitrary[A @@ B] =
     Functor[Arbitrary].map(A)(Tag.apply[A, B])

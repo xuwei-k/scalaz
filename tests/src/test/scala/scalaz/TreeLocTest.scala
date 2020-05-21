@@ -4,7 +4,7 @@ import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 
-object TreeLocTest extends SpecLite {
+class TreeLocTest extends SpecLite {
 
   checkAll("TreeLoc", order.laws[TreeLoc[Int]])
   checkAll("TreeLoc", traverse1.laws[TreeLoc])

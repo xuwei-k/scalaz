@@ -3,7 +3,7 @@ package scalaz
 import std.AllInstances._
 import org.scalacheck.Prop.forAll
 
-object AlignTest extends SpecLite {
+class AlignTest extends SpecLite {
 
   val F = Align[List]
 

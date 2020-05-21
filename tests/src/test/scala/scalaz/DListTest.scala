@@ -6,7 +6,7 @@ import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import org.scalacheck.Prop.forAll
 
-object DListTest extends SpecLite {
+class DListTest extends SpecLite {
 
   checkAll(equal.laws[DList[Int]])
   checkAll(monoid.laws[DList[Int]])

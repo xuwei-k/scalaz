@@ -9,7 +9,7 @@ import scalaz.syntax.monoid._
 import scalaz.std.anyVal._
 import scalaz.std.string._
 
-object CordTest extends SpecLite {
+class CordTest extends SpecLite {
 
   ".toString should be .shows" ! forAll { (c: Cord) =>
     // potentially flushes out a bunch of problems, but the cords aren't that

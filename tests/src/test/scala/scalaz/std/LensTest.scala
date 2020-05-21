@@ -8,7 +8,7 @@ import org.scalacheck.{Gen, Arbitrary}
 import Lens.{lens => _, _}
 import org.scalacheck.Prop.forAll
 
-object LensTest extends SpecLite {
+class LensTest extends SpecLite {
 
   {
     implicit def lensArb: Arbitrary[Lens[Int, Int]] = Arbitrary(Gen.const(Lens.lensId[Int]))

@@ -2,7 +2,7 @@ package scalaz
 
 import std.AllInstances._
 
-object IdSyntaxTest extends SpecLite {
+class IdSyntaxTest extends SpecLite {
   "smorgasbord" in {
     import syntax.id._
     2 |> (_ * 3) must_===(6)

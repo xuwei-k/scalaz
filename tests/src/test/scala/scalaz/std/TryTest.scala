@@ -6,7 +6,7 @@ import scalaz.scalacheck.ScalazArbitrary._
 import org.scalacheck.Prop.forAll
 import scala.util.{Failure, Success}
 
-object TryTest extends SpecLite {
+class TryTest extends SpecLite {
 
   // these probably aren't a great idea, but they are just for tests
   implicit val showThrowable: Show[Throwable] = Show.showA

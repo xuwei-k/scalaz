@@ -4,7 +4,7 @@ import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import org.scalacheck.Prop.forAll
 
-object ValidationTest extends SpecLite {
+class ValidationTest extends SpecLite {
   import std.AllInstances._
 
   checkAll("Validation", order.laws[Validation[Int, Int]])

@@ -7,7 +7,7 @@ import syntax.contravariant._
 import syntax.foldable._
 import org.scalacheck.Prop.forAll
 
-object IStreamTest extends SpecLite {
+class IStreamTest extends SpecLite {
 
   checkAll(monadPlus.strongLaws[IStream])
   checkAll(isEmpty.laws[IStream])

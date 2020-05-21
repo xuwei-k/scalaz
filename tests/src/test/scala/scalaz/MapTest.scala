@@ -5,7 +5,7 @@ import scalaz.Maybe.{Empty, Just, just}
 
 import scala.util.Random
 
-object MapTest extends SpecLite {
+class MapTest extends SpecLite {
   import org.scalacheck.Arbitrary
   import scalaz.scalacheck.ScalazProperties._
   import scalaz.scalacheck.ScalazArbitrary._

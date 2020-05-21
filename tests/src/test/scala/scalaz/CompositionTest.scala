@@ -4,7 +4,7 @@ import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 
-object CompositionTest extends SpecLite {
+class CompositionTest extends SpecLite {
   type OptionList[α] = Option[List[α]]
 
   implicit val optionListApplicative: ApplicativePlus[λ[α => Option[List[α]]]] = ApplicativePlus[Option].compose[List]

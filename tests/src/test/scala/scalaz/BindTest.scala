@@ -3,7 +3,7 @@ package scalaz
 import std.AllInstances._
 import syntax.bind._
 
-object BindTest extends SpecLite {
+class BindTest extends SpecLite {
 
   ">>=" in {
     (List(1, 2, 3) >>= (x => List(x, x))) must_===(List(1, 1, 2, 2, 3, 3))

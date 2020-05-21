@@ -7,7 +7,7 @@ import syntax.equal._
 import org.scalacheck.Prop.forAll
 import scalaz.Maybe.{Empty, Just}
 
-object FoldableTest extends SpecLite {
+class FoldableTest extends SpecLite {
   "maximum" ! forAll {
     (xs: List[Int]) =>
       if (xs.isEmpty)

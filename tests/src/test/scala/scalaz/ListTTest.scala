@@ -5,7 +5,7 @@ import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import org.scalacheck.Prop.forAll
 
-object ListTTest extends SpecLite {
+class ListTTest extends SpecLite {
   type ListTOpt[A] = ListT[Option, A]
   type ConstInt[A] = Const[Int, A]
 

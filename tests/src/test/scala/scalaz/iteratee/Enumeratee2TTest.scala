@@ -8,7 +8,7 @@ import Either3._
 import Id._
 import NaturalTransformation.id
 
-object Enumeratee2TTest extends SpecLite {
+class Enumeratee2TTest extends SpecLite {
   val vt = IterateeT.IterateeTMonadTrans[Int]
   val intO = Order[Int].order _
 

@@ -5,7 +5,7 @@ import syntax.foldable._
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 
-object SetTest extends SpecLite {
+class SetTest extends SpecLite {
 
   checkAll(order.laws[Set[Int]])
   checkAll(monoid.laws[Set[Int]])

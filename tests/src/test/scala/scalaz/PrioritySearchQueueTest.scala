@@ -10,7 +10,7 @@ import scalaz.std.list._
 import scalaz.std.set._
 import scalaz.syntax.foldable._
 
-object PrioritySearchQueueTest extends SpecLite {
+class PrioritySearchQueueTest extends SpecLite {
   case class Entry(priority: Int, key: Int)
   object Entry {
     implicit val arb: Arbitrary[Entry] =

@@ -6,7 +6,7 @@ import std.AllInstances._
 import syntax.std.option._
 import org.scalacheck.Prop.forAll
 
-object OptionTTest extends SpecLite {
+class OptionTTest extends SpecLite {
 
   type OptionTList[A] = OptionT[List, A]
   type OptionTOption[A] = OptionT[Option, A]

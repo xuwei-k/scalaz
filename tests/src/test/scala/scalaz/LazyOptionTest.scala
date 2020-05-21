@@ -5,7 +5,7 @@ import scalaz.scalacheck.ScalazArbitrary._
 import std.AllInstances._
 import org.scalacheck.Prop.forAll
 
-object LazyOptionTest extends SpecLite {
+class LazyOptionTest extends SpecLite {
   checkAll(equal.laws[LazyOption[Int]])
   checkAll(bindRec.laws[LazyOption])
   checkAll(monadPlus.strongLaws[LazyOption])

@@ -5,7 +5,7 @@ import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import org.scalacheck.Prop.forAll
 
-object StreamTest extends SpecLite {
+class StreamTest extends SpecLite {
   checkAll(order.laws[Stream[Int]])
   checkAll(monoid.laws[Stream[Int]])
   checkAll(monadPlus.strongLaws[Stream])

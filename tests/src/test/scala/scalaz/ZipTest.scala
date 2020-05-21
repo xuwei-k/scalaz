@@ -2,7 +2,7 @@ package scalaz
 
 import std.list._, std.tuple._, std.anyVal._
 
-object ZipTest extends SpecLite {
+class ZipTest extends SpecLite {
 
   "Zip.ap laziness" ! {
     val F = Zip[List].ap

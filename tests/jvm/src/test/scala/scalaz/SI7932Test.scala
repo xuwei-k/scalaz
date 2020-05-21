@@ -4,7 +4,7 @@ package scalaz
  * - [[https://issues.scala-lang.org/browse/SI-7932]]
  * - [[https://github.com/scalaz/scalaz/pull/932]]
  */
-object SI7932Test extends SpecLite {
+class SI7932Test extends SpecLite {
 
   "SI-7932" in {
     classOf[C].getMethods.map(_.toGenericString)

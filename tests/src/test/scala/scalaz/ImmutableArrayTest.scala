@@ -3,7 +3,7 @@ import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import std.anyVal._
 
-object ImmutableArrayTest extends SpecLite {
+class ImmutableArrayTest extends SpecLite {
 
   "Issue #525" in {
     val xs = ImmutableArray.fromArray(Array(1)) ++ ImmutableArray.fromArray(Array("a"))

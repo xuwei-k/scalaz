@@ -5,7 +5,7 @@ import std.option.some
 import syntax.functor._
 import org.scalacheck.Prop.forAll
 
-object FunctorTest extends SpecLite {
+class FunctorTest extends SpecLite {
 
   "mapply" in {
     1.mapply(some((a: Int) => a)) must_===(some(1))

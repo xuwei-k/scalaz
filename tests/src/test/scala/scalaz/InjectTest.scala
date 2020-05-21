@@ -3,7 +3,7 @@ package scalaz
 import syntax.all._
 import Inject._
 
-object InjectTest extends SpecLite {
+class InjectTest extends SpecLite {
   import std.AllInstances._
   import Test1Algebra._, Test2Algebra._, Test3Algebra._
 

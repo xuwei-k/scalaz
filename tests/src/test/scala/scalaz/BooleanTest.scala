@@ -2,7 +2,7 @@ package scalaz
 import org.scalacheck.Prop.forAll
 
 
-object BooleanTest extends SpecLite {
+class BooleanTest extends SpecLite {
   "boolean functions" in {
 
     import scalaz.std.{boolean => b}

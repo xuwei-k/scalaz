@@ -3,7 +3,7 @@ package scalaz
 import std.tuple._
 import syntax.associative._
 
-object AssociativeTest extends SpecLite {
+class AssociativeTest extends SpecLite {
 
   def compilationTest: Unit = {
     val a1 = (1, (2, 3))

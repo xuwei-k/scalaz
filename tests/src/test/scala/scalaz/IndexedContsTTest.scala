@@ -5,7 +5,7 @@ import scalaz.scalacheck.ScalazArbitrary._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.std.anyVal._
 
-object IndexedContsTTest extends SpecLite {
+class IndexedContsTTest extends SpecLite {
 
   type ContTMaybeBoolean[A] = ContT[Boolean, Maybe, A]
 

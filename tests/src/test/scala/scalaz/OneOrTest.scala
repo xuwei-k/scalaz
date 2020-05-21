@@ -7,7 +7,7 @@ import scalaz.scalacheck.ScalazArbitrary._
 import std.AllInstances._
 import org.scalacheck.Prop.forAll
 
-object OneOrTest extends SpecLite {
+class OneOrTest extends SpecLite {
   import OneOr._
   checkAll("OneOr", equal.laws[OneOr[List, Int]])
   checkAll("OneOr", order.laws[OneOr[List, Int]])

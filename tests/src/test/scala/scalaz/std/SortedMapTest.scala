@@ -9,7 +9,7 @@ import scala.collection.immutable.{Map => SMap, SortedMap}
 import scala.math.{Ordering => SOrdering}
 import org.scalacheck.Prop.forAll
 
-object SortedMapTest extends SpecLite {
+class SortedMapTest extends SpecLite {
 
   checkAll(traverse.laws[SortedMap[Int, *]])
   checkAll(FoldableTests.anyAndAllLazy[SortedMap[Int, *]])

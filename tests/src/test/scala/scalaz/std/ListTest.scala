@@ -6,7 +6,7 @@ import scalaz.scalacheck.ScalazProperties._
 import Id._
 import org.scalacheck.Prop.forAll
 
-object ListTest extends SpecLite {
+class ListTest extends SpecLite {
   checkAll(equal.laws[List[Int]])
   checkAll(monoid.laws[List[Int]])
   checkAll(bindRec.laws[List])

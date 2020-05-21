@@ -3,7 +3,7 @@ package scalaz
 import std.AllInstances._
 import org.scalacheck.Prop.forAll
 
-object MonoidTest extends SpecLite {
+class MonoidTest extends SpecLite {
   "multiply" ! forAll{ (a: Int, b: Int) =>
     if(b <= 0) {
       Monoid[Int].multiply(a, b) must_=== 0

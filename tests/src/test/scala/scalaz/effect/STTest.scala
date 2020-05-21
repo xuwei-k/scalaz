@@ -4,7 +4,7 @@ package effect
 import std.AllInstances._
 import ST._
 
-object STTest extends SpecLite {
+class STTest extends SpecLite {
   type ForallST[A] = Forall[ST[*, A]]
 
   "STArray#fill" in {

@@ -5,7 +5,7 @@ import scalaz.scalacheck.ScalazArbitrary._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.std.anyVal._
 
-object TracedTTest extends SpecLite {
+class TracedTTest extends SpecLite {
 
   private[this] implicit def tracedTNelEqual[A, B](implicit
     A: Arbitrary[A],

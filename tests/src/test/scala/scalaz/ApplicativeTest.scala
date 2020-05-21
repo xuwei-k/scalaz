@@ -5,7 +5,7 @@ import org.scalacheck.Prop.forAll
 import scalaz.scalacheck.ScalazArbitrary._
 
 
-object ApplicativeTest extends SpecLite {
+class ApplicativeTest extends SpecLite {
 
   // In c44c206461fe, the functions `replicateM`, `replicateM_`, `filterM`
   // and `partitionM` have been generalized from `Monad` to `Applicative`.

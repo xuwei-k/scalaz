@@ -2,7 +2,7 @@ package scalaz
 
 import std.AllInstances._
 
-object FreeTestJVM extends SpecLite {
+class FreeTestJVM extends SpecLite {
   "foldMapRec is stack safe" ! {
     val n = 1000000
     trait FTestApi[A]

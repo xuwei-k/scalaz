@@ -4,7 +4,7 @@ import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import std.AllInstances._
 
-object LazyEitherTTest extends SpecLite {
+class LazyEitherTTest extends SpecLite {
 
   import LazyEitherTest.LazyEitherEqual
 

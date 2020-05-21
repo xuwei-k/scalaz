@@ -6,7 +6,7 @@ import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import scalaz.scalacheck.ScalaCheckBinding._
 
-object DayTest extends SpecLite {
+class DayTest extends SpecLite {
 
   private[this] def dayArb0[F[_], G[_], X: Cogen, Y: Cogen, A: Arbitrary](implicit
     F: Arbitrary[F[X]],

@@ -7,7 +7,7 @@ import Iteratee._
 import effect._
 import Id._
 
-object IterateeTTest extends SpecLite {
+class IterateeTTest extends SpecLite {
   "head" in {
     (head[Int, Id] &= enumStream(Stream(1, 2, 3))).run must_===(Some(1))
   }

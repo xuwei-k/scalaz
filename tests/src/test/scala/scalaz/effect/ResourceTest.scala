@@ -4,7 +4,7 @@ package effect
 import java.io._
 import std.effect.autoCloseable._
 
-object ResourceTest extends SpecLite {
+class ResourceTest extends SpecLite {
 
   "Resource" should {
 

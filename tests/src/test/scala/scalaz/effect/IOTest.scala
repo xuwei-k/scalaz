@@ -4,7 +4,7 @@ package effect
 import syntax.foldable._
 import std.lazylist._
 
-object IOTest extends SpecLite {
+class IOTest extends SpecLite {
   "IO" should {
     // as reported in <https://groups.google.com/d/msg/scalaz/BIhItmdejeI/zZ-fSH7ZzfwJ>
     // fix in bb4ebd650

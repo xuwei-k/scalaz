@@ -5,7 +5,7 @@ import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import org.scalacheck.Prop.forAll
 
-object CaseInsensitiveTest extends SpecLite {
+class CaseInsensitiveTest extends SpecLite {
 
   "map identity" ! forAll {
     (a: CaseInsensitive[String]) =>

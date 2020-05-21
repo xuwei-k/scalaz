@@ -5,7 +5,7 @@ import Maybe._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 
-object DisjunctionTest extends SpecLite {
+class DisjunctionTest extends SpecLite {
 
   checkAll(order.laws[Int \/ Int])
   checkAll(monoid.laws[Int \/ Int])

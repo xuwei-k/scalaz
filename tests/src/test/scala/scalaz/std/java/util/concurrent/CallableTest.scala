@@ -9,7 +9,7 @@ import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 
-object CallableTest extends SpecLite {
+class CallableTest extends SpecLite {
   checkAll("Callable", order.laws[Callable[Int]])
   checkAll("Callable", monad.laws[Callable])
 }

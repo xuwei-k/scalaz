@@ -7,7 +7,7 @@ import \&/._
 import syntax.contravariant._
 import org.scalacheck.Prop.forAll
 
-object TheseTest extends SpecLite {
+class TheseTest extends SpecLite {
   type TheseInt[a] = Int \&/ a
 
   checkAll(bindRec.laws[TheseInt])

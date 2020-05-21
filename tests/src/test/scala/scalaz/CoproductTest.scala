@@ -4,7 +4,7 @@ import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 
-object CoproductTest extends SpecLite {
+class CoproductTest extends SpecLite {
 
   checkAll(comonad.laws[Coproduct[NonEmptyList, Tree, *]])
   checkAll(traverse.laws[Coproduct[Option, List, *]])

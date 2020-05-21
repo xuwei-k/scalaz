@@ -4,7 +4,7 @@ import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 
-object LazyTupleTest extends SpecLite {
+class LazyTupleTest extends SpecLite {
 
   type A = Int
   type B = Int

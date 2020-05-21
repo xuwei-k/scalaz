@@ -6,7 +6,7 @@ import scalaz.scalacheck.ScalaCheckBinding._
 import std.AllInstances._
 import org.scalacheck.{Cogen, Arbitrary}
 
-object UnwriterTTest extends SpecLite {
+class UnwriterTTest extends SpecLite {
 
   type UnwriterTOpt[W, A] = UnwriterT[Option, W, A]
   type UnwriterTOptInt[A] = UnwriterTOpt[Int, A]

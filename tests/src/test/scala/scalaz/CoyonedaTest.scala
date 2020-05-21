@@ -6,7 +6,7 @@ import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import scalaz.scalacheck.ScalaCheckBinding._
 
-object CoyonedaTest extends SpecLite {
+class CoyonedaTest extends SpecLite {
 
   implicit def coyonedaArb[F[_], A](implicit A: Arbitrary[F[A]]): Arbitrary[Coyoneda[F, A]] =
     Functor[Arbitrary].map(A)(Coyoneda.lift)

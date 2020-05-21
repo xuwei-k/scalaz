@@ -2,7 +2,7 @@ package scalaz
 
 import scalaz.std.AllInstances._
 
-object BitraverseTest2 extends SpecLite {
+class BitraverseTest2 extends SpecLite {
 
   "bitraverseU" in {
     import syntax.bitraverse._

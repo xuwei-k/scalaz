@@ -4,7 +4,7 @@ package std
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 
-object IterableTest extends SpecLite {
+class IterableTest extends SpecLite {
   import std.iterable._
   import std.anyVal._
 

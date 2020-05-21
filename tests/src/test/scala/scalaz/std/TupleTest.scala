@@ -7,7 +7,7 @@ import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 
-object TupleTest extends SpecLite {
+class TupleTest extends SpecLite {
 
   type A = Int
   type B = Int
