@@ -110,6 +110,7 @@ object build {
 
   lazy val standardSettings: Seq[Sett] = Def.settings(
     organization := "org.scalaz",
+    Test / fork := true,
     mappings in (Compile, packageSrc) ++= (managedSources in Compile).value.map{ f =>
       // https://github.com/sbt/sbt-buildinfo/blob/v0.7.0/src/main/scala/sbtbuildinfo/BuildInfoPlugin.scala#L58
       val buildInfoDir = "sbt-buildinfo"
