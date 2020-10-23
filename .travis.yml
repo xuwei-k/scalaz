@@ -11,65 +11,83 @@ language: scala
 jdk:
   - openjdk8
 
-script:
-  - git config core.whitespace tab-in-indent,trailing-space,blank-at-eol
-  - git show --oneline --check
-  - sbt -J-Xmx3784m checkGenTypeClasses "project $TEST_PROJECT" test:compile $(if [[ "${TEST_PROJECT}" == "rootJS" ]]; then echo "test:fastOptJS"; fi)
-  # restart sbt for avoid OutOfMemoryError
-  - sbt "project $TEST_PROJECT" test "project /" $(if [[ "${TEST_PROJECT}" == "rootJVM" ]]; then echo "publishLocal"; echo "example/runAllMain"; fi)
-  - if [[ "${JAVA_HOME}" == $(jdk_switcher home openjdk8) && "${TEST_PROJECT}" == "rootJVM" && "${TRAVIS_BRANCH}" == "master" && "${TRAVIS_EVENT_TYPE}" == "push" && "${TRAVIS_REPO_SLUG}" == "scalaz/scalaz" ]];
-    then sbt setVersionUseDynver publish ; fi
-
 before_cache:
   # Tricks to avoid unnecessary cache updates
   - find $HOME/.sbt -name "*.lock" | xargs rm
   - find $HOME/.ivy2 -name "ivydata-*.properties" | xargs rm
 
-env:
-  matrix:
-  - TEST_PROJECT="rootJVM"
-  - TEST_PROJECT="rootJS"
-  global:
-  - secure: f9sDrym/MfYK1hBBSaILMxn4VCfyzJREqpuGXhEggrdZpYTNjp8GMXrqKfla3AwVAuWCveXk9u+skUYqKQ6LTG7RdQS5PzA2I9kx8afNRA5nxMmVQjuCKYM0/aF4egY5i98tGXG0NiMO3t72XuxtR+OeWLysUVB8hoNghpOOVMw=
-  - secure: PPURD7/Lj6+kqE342Ty99XhO5SR7GlrakSbZeKm5RKXS2Q5yFrexdf+UcS3KUbq6LaWnH75q+UgC2mcRMIspRmz37CtVXkGbJYp3VBYFJbmIga+w0bBVvlSw8QWIGhdz3xnOOuiEYpgeOKnAzShr59HYKG2O90jlMdt4cPRUrwg=
-
 matrix:
   include:
-  - jdk: openjdk11
-    env: TEST_PROJECT="rootJVM"
-  - scala: 0.27.0-RC1
-    name: dotty
-    jdk: openjdk8
-    script:
-    - sbt
-      "++$TRAVIS_SCALA_VERSION!"
-      -J-Xmx3784m
-      checkGenTypeClasses
-      rootJVM/compile
-      rootJVM/test:compile
-      rootJVM/test
-      example/runAllMain
-      rootJVM/publishLocal
-      rootJS/compile
-      rootJS/test:compile
-      rootJS/test
-      rootJS/publishLocal
-  - name: dotty-nightly
-    jdk: openjdk8
-    script:
-    - sbt
-      -J-Xmx3784m
-      checkGenTypeClasses
-      SetDottyNightlyVersion
-      rootJVM/compile
-      rootJVM/test:compile
-      rootJVM/test
-      example/runAllMain
-      rootJVM/publishLocal
-      rootJS/compile
-      rootJS/test:compile
-      rootJS/test
-      rootJS/publishLocal
-  allow_failures:
-  - name: dotty-nightly
-  - name: dotty
+  - script:
+    - sbt "project rootJVM"
+      update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+  - script:
+    - sbt "project rootJVM" "set ThisBuild / usePipelining := true" "show usePipelining"
+      update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
+      clean update test:compile
