@@ -7,32 +7,15 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 120
     strategy:
       fail-fast: false
       matrix:
         include:
           - java: 8
             scala: 2
-            project: rootJVM
-          - java: 8
-            scala: 2
-            project: rootJS
-          - java: 8
-            scala: 2
-            project: rootNative
-
-          - java: 11
-            scala: 2
-            project: rootJVM
-
           - java: 8
             scala: 3
-            project: rootJVM
-          - java: 8
-            scala: 3
-            project: rootJS
-
     steps:
     - uses: actions/checkout@v2.3.4
     - uses: olafurpg/setup-scala@v10
@@ -40,15 +23,45 @@ jobs:
         java-version: "adopt@1.${{ matrix.java }}"
     - uses: coursier/cache-action@v6
     - run: sbt -v
-           checkGenTypeClasses
            $(if [[ "${{ matrix.scala }}" == "3" ]]; then echo SetScala3; fi)
-           "project ${{ matrix.project }}"
-           Test/compile
-           $(if [[ "${ matrix.project }}" == "rootJS" ]]; then echo "test:fastOptJS"; fi)
-    - run: sbt -v
-           $(if [[ "${{ matrix.scala }}" == "3" ]]; then echo SetScala3; fi)
-           "project ${{ matrix.project }}"
-           test
-           "project /"
-           $(if [[ "${{ matrix.project }}" == "rootJVM" ]]; then echo "publishLocal"; echo "example/runAllMain"; fi)
-    - run: rm -rf "$HOME/.ivy2/local" || true
+           "project rootJVM"
+           update compile
+           clean update compile
+           clean update compile
+           clean update compile
+           clean update compile
+           clean update compile
+           clean update compile
+           clean update compile
+           clean update compile
+           clean update compile
+           clean update compile
+           clean update compile
+           clean update compile
+           clean update compile
+           clean update compile
+           clean update compile
+           clean update compile
+           clean update compile
+           clean update compile
+           clean update compile
+           clean update compile
+           clean update compile
+           clean update compile
+           clean update compile
+           clean update compile
+           clean update compile
+           clean update compile
+           clean update compile
+           clean update compile
+           clean update compile
+           clean update compile
+           clean update compile
+           clean update compile
+           clean update compile
+           clean update compile
+           clean update compile
+           clean update compile
+           clean update compile
+           clean update compile
+           clean update compile
