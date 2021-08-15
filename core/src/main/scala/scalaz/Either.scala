@@ -520,7 +520,7 @@ sealed abstract class DisjunctionInstances1 extends DisjunctionInstances2 {
     }
 
   implicit def DisjunctionInstances1[L]: Traverse[\/[L, *]] with Monad[\/[L, *]] with BindRec[\/[L, *]] with Cozip[\/[L, *]] with Plus[\/[L, *]] with Alt[\/[L, *]] with Optional[\/[L, *]] with MonadError[\/[L, *], L] =
-    new Traverse[\/[L, *]] with Monad[\/[L, *]] with BindRec[\/[L, *]] with Cozip[\/[L, *]] with Plus[\/[L, *]] with Alt[\/[L, *]] with Optional[\/[L, *]] with MonadError[\/[L, *], L] {
+    new Traverse[\/[L, *]] with Monad[\/[L, *]] with BindRec[\/[L, *]] with Cozip[\/[L, *]] with Plus[\/[L, *]] with Alt[\/[L, *]] with Optional.UnfoldrFromOptional[\/[L, *]] with MonadError[\/[L, *], L] {
       override def map[A, B](fa: L \/ A)(f: A => B) =
         fa map f
 

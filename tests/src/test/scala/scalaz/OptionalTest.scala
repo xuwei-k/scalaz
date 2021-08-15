@@ -5,6 +5,21 @@ import std.AllInstances._
 
 object OptionalTest extends SpecLite {
 
+  def unfoldrOptShortCircuiting[F[_]](empty: F[Int])(implicit
+    F: Applicative[F]
+  ): Unit = {
+    val reducer: Reducer[F[Int], F[Int]] =
+      F.liftReducer(Reducer.identityReducer[Int])
+
+    val f: Int => Maybe[(F[Int], Int)] = i => {
+      if (i > 0) Maybe.just((F.point(i), i - 1))
+      else if (i == 0) Maybe.just((empty, i - 1))
+      else sys.error("BOOM!")
+    }
+
+    reducer.unfoldrOpt(5)(f) must_== Maybe.just(empty)
+  }
+
   def definedTests[F[_],A](context: F[A], value: A, default: => A, alternative: => F[A])(implicit O: Optional[F], EA: Equal[A], EFA: Equal[F[A]], SA: Show[A], SFA: Show[F[A]]) = {
     O.getOrElse(context)(default)  must_===(value)
     O.isDefined(context)           must_===(true)

@@ -1,6 +1,8 @@
 package scalaz
 
 ////
+import scala.annotation.tailrec
+
 /** Abstraction over a container/context which may or may not provide a value.
   *
   * @tparam F the container/context type
@@ -63,6 +65,32 @@ object Optional {
     }
 
   ////
+
+  private[scalaz] trait UnfoldrFromOptional[F[_]] extends Optional[F] with Applicative[F] {
+    final override def unfoldrOpt[S, A, B](seed: S)(f: S => Maybe[(F[A], S)])(implicit r: Reducer[A, B]): Maybe[F[B]] = {
+      @tailrec
+      def go(acc: B, s1: S): F[B] = f(s1) match {
+        case Maybe.Just((ma, s2)) =>
+          pextract[B, A](ma) match {
+            case \/-(a) =>
+              go(r.snoc(acc, a), s2)
+            case -\/(l) =>
+              l
+          }
+        case _ =>
+          point(acc)
+      }
+      f(seed).map {
+        case (x, s) =>
+          pextract[B, A](x) match {
+            case \/-(a) =>
+              go(r.unit(a), s)
+            case -\/(l) =>
+              l
+          }
+      }
+    }
+  }
 
   ////
 }

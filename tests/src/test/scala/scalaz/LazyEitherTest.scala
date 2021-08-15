@@ -29,4 +29,19 @@ object LazyEitherTest extends SpecLite {
       }
     result.getOrElse(0) must_=== times
   }
+
+  "lifted Reducer is short-circuiting" in {
+    val reducer =
+      Apply[LazyEither[Int, *]].liftReducer(Reducer.identityReducer[Int])
+
+    val left: LazyEither[Int, Int] = LazyEither.lazyLeft(42)
+
+    val f: Int => Maybe[(LazyEither[Int, Int], Int)] = i => {
+      if (i > 0) Maybe.just((LazyEither.lazyRight(i), i - 1))
+      else if (i == 0) Maybe.just((left, i - 1))
+      else sys.error("BOOM!")
+    }
+
+    reducer.unfoldrOpt(5)(f).toOption.get.toEither must_== left.toEither
+  }
 }
