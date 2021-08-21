@@ -62,4 +62,59 @@ object IStreamTest extends SpecLite {
     counter must_=== 0
   }
 
+  "take from infinite LazyList" in {
+    val n = util.Random.nextInt(1000)
+    val list = LazyList.iterate(0)(_ + 1).take(n)
+    list must_=== Foldable[IStream].toLazyList(IStream.fromLazyList(LazyList.iterate(0)(_ + 1).take(n)))
+  }
+
+  "index infinite LazyList" in {
+    val i = util.Random.nextInt(1000)
+    val xs = LazyList from 0
+    Foldable[IStream].index(IStream.fromLazyList(xs), i) must_===(xs.lift.apply(i))
+  }
+
+  "foldMap evaluates lazily" in {
+    val infiniteStream = IStream.fromLazyList(LazyList.iterate(false)(identity))
+    Foldable[IStream].foldMap(infiniteStream)(identity)(booleanInstance.conjunction) must_===(false)
+  }
+
+  "foldMap1Opt identity" ! forAll {
+    (xs: IStream[Int]) =>
+    Foldable[IStream].foldMap1Opt(xs)(Vector(_)).getOrElse(Vector.empty) must_===(Foldable[IStream].toVector(xs))
+  }
+
+  /* TODO
+  "foldMap1Opt evaluates lazily" in {
+    val infiniteStream = IStream.fromLazyList(LazyList.iterate(false)(identity))
+    Foldable[IStream].foldMap1Opt(infiniteStream)(identity)(booleanInstance.conjunction) must_===(Some(false))
+  }
+  */
+
+  "foldRight evaluates lazily" in {
+    val infiniteStream = IStream.fromLazyList(LazyList.iterate(true)(identity))
+    Foldable[IStream].foldRight(infiniteStream, true)(_ || _) must_===(true)
+  }
+
+  "foldMapLeft1Opt identity" ! forAll {
+    (xs: IStream[Int]) =>
+    Foldable[IStream].foldMapLeft1Opt(xs.reverse)(IStream.Strict(_))((xs, x) => IStream.Strict.cons(x, xs)) must_===(
+      if (IsEmpty[IStream].isEmpty(xs)) None else Some(xs)
+    )
+  }
+
+  "foldMapRight1Opt identity" ! forAll {
+    (xs: IStream[Int]) =>
+    Foldable[IStream].foldMapRight1Opt(xs)(IStream.Strict(_))((x, xs) => IStream.Lazy.cons(x, xs)) must_===(
+      if (IsEmpty[IStream].isEmpty(xs)) None else Some(xs)
+    )
+  }
+
+  /* TODO
+  "foldMapRight1Opt evaluates lazily" in {
+    val infiniteStream = IStream.fromLazyList(LazyList.iterate(true)(identity))
+    Foldable[IStream].foldMapRight1Opt(infiniteStream)(identity)(_ || _) must_===(Some(true))
+  }
+  */
+
 }
