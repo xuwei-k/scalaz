@@ -113,11 +113,6 @@ object FreeTTest extends SpecLite {
     Equal[FreeOption[Int]].equal(FreeOption(iso.to(iso.from(a.f))), a)
   }
 
-  private def compilationTest = {
-    val a: String \/ Int = \/-(42)
-    val b: FreeT[Maybe, String \/ *, Int] = FreeT.liftMU[Maybe, String \/ Int](a)
-  }
-
   object instances {
     def bind[S[_]: Functor, F[_]: Functor] = Bind[FreeT[S, F, *]]
     def foldable[S[_]: Foldable: Functor, F[_]: Foldable: Applicative: BindRec] = Foldable[FreeT[S, F, *]]
