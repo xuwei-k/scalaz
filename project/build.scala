@@ -139,7 +139,7 @@ object build {
         (scope / unmanagedSourceDirectories) += {
           val base = ScalazCrossType.shared(baseDirectory.value, dir).getParentFile
           CrossVersion.partialVersion(scalaVersion.value) match {
-            case Some((2, v)) if v >= scalaV =>
+            case Some((x, y)) if ((x == 2) && (y >= scalaV)) || (x >= 3) =>
               base / s"scala-2.${scalaV}+"
             case _ =>
               base / s"scala-2.${scalaV}-"
@@ -153,10 +153,10 @@ object build {
         val dir = Defaults.nameForSrc(scope.name)
         val base = ScalazCrossType.shared(baseDirectory.value, dir).getParentFile
         CrossVersion.partialVersion(scalaVersion.value) match {
-          case Some((2, v)) if v >= 13 =>
-            base / s"scala-2.13+"
+          case Some((2, v)) if v <= 12 =>
+            base / "scala-2.13-"
           case _ =>
-            base / s"scala-2.13-"
+            base / "scala-2.13+"
         }
       }
     },
@@ -198,6 +198,17 @@ object build {
       CrossVersion.partialVersion(scalaVersion.value) match {
         case Some((2, v)) if v <= 12 =>
           Seq("-Xfuture")
+        case _ =>
+          Nil
+      }
+    },
+    scalacOptions ++= {
+      scalaBinaryVersion.value match {
+        case "3" =>
+          Seq(
+            "-source", "3.0-migration",
+            "-Ykind-projector",
+          )
         case _ =>
           Nil
       }
@@ -326,7 +337,13 @@ object build {
         Nil
     }),
     kindProjectorVersion := "0.13.2",
-    libraryDependencies += compilerPlugin("org.typelevel" % "kind-projector" % kindProjectorVersion.value cross CrossVersion.full)
+    libraryDependencies ++= {
+      if (scalaBinaryVersion.value == "3") {
+        Nil
+      } else {
+        Seq(compilerPlugin("org.typelevel" % "kind-projector" % kindProjectorVersion.value cross CrossVersion.full))
+      }
+    }
   ) ++ Seq(packageBin, packageDoc, packageSrc).flatMap {
     // include LICENSE.txt in all packaged artifacts
     inTask(_)(Seq((Compile / mappings) += licenseFile.value -> "LICENSE"))
