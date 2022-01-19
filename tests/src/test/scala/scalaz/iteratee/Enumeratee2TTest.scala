@@ -32,12 +32,12 @@ object Enumeratee2TTest extends SpecLite {
     type E3I = Either3[Int, (Int, Int), Int]
     type E3LI = List[E3I]
     "match equal elements, retaining unequal elements on the \"side\" they came from" in {
-      val enum  = enumStream[Int, IterateeM](Stream(1, 3, 3, 5, 7, 8, 8))
+      val enum1 = enumStream[Int, IterateeM](Stream(1, 3, 3, 5, 7, 8, 8))
       val enum2 = enumStream[Int, Id](Stream(2, 3, 4, 5, 5, 6, 8, 8))
 
       val consumer = consume[E3I, Id, List]
       val outer = consumer.advance[Int, StepT[E3I, Id, E3LI], IterateeM](cogroupI[Int, Int, Id].apply[E3LI])(mpo)
-      val outer2 = outer &= enum
+      val outer2 = outer &= enum1
       val inner = outer2.run &= enum2
 
       inner.run.pointI.run must_== List[Either3[Int, (Int, Int), Int]](
@@ -59,10 +59,10 @@ object Enumeratee2TTest extends SpecLite {
   }
 
   "merge sorted iteratees" in {
-    val enum  = enumStream[Int, IterateeM](Stream(1, 3, 5))
+    val enum1 = enumStream[Int, IterateeM](Stream(1, 3, 5))
     val enum2 = enumStream[Int, Id](Stream(2, 3, 3, 4, 5, 6))
 
-    val outer = mergeI[Int, Id].apply(consume[Int, Id, List].value) &= enum
+    val outer = mergeI[Int, Id].apply(consume[Int, Id, List].value) &= enum1
     val inner = outer.run &= enum2
 
     inner.run.pointI.run must_===(List(1, 2, 3, 3, 3, 4, 5, 5, 6))

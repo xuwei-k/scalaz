@@ -3,6 +3,7 @@ import build._
 import com.typesafe.sbt.osgi.OsgiKeys
 import com.typesafe.tools.mima.plugin.MimaKeys.mimaPreviousArtifacts
 import sbtcrossproject.CrossPlugin.autoImport.crossProject
+import sbtcrossproject.CrossProject
 import sbtcrossproject.Platform
 
 val minSuccessfulTests = settingKey[Int]("")
@@ -105,22 +106,24 @@ lazy val iterateeJVM = iteratee.jvm
 lazy val iterateeJS  = iteratee.js
 lazy val iterateeNative = iteratee.native
 
-lazy val example = Project(
-  id = "example",
-  base = file("example")
-).settings(
-  standardSettings,
-  name := "scalaz-example",
-  notPublish,
-  TaskKey[Unit]("runAllMain") := {
-    val r = (run / runner).value
-    val classpath = (Compile / fullClasspath).value
-    val log = streams.value.log
-    (Compile / discoveredMainClasses).value.sorted.foreach(c =>
-      r.run(c, classpath.map(_.data), Nil, log)
-    )
-  },
-).dependsOn(
+lazy val exampleBase = CrossProject(id = "example", base = file("example"))(JVMPlatform)
+  .crossType(ScalazCrossType)
+  .withoutSuffixFor(JVMPlatform)
+  .settings(
+    standardSettings,
+    name := "scalaz-example",
+    notPublish,
+    TaskKey[Unit]("runAllMain") := {
+      val r = (run / runner).value
+      val classpath = (Compile / fullClasspath).value
+      val log = streams.value.log
+      (Compile / discoveredMainClasses).value.sorted.foreach(c =>
+        r.run(c, classpath.map(_.data), Nil, log)
+      )
+    },
+  )
+
+lazy val example = exampleBase.jvm.dependsOn(
   coreJVM, iterateeJVM, concurrent
 )
 
