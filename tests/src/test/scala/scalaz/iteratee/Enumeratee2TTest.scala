@@ -19,10 +19,10 @@ object Enumeratee2TTest extends SpecLite {
   type IterateeM[A] = IterateeT[Int, Id, A]
 
   "join equal pairs" in {
-    val enum  = enumStream[Int, IterateeM](Stream(1, 3, 5, 7))
+    val enum1 = enumStream[Int, IterateeM](Stream(1, 3, 5, 7))
     val enum2 = enumStream[Int, Id](Stream(2, 3, 4, 5, 6))
 
-    val outer = joinI[Int, Int, Id].apply(consume[(Int, Int), Id, List].value) &= enum
+    val outer = joinI[Int, Int, Id].apply(consume[(Int, Int), Id, List].value) &= enum1
     val inner = outer.run &= enum2
 
     inner.run.pointI.run must_===(List((3, 3), (5, 5)))
