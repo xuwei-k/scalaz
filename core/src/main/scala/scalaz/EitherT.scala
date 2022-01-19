@@ -79,7 +79,7 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
 
   /** Traverse on the right of this disjunction. */
   def traverse[G[_], C](f: B => G[C])(implicit F: Traverse[F], G: Applicative[G]): G[EitherT[F, A, C]] =
-    G.map(F.traverse(run)(o => Traverse[A \/ *].traverse(o)(f)))(EitherT(_))
+    G.map(F.traverse(run)(o => Traverse[\/[A, *]].traverse(o)(f)))(EitherT(_))
 
   /** Apply a function in the environment of the right of this
     * disjunction.  Because it runs my `F` even when `f`'s `\/` fails,
@@ -368,7 +368,7 @@ sealed abstract class EitherTInstances extends EitherTInstances0 {
       implicit def F = F0
     }
 
-  implicit def eitherTHoist[A]: Hoist[λ[(α[_], β) => EitherT[α, A, β]]] =
+  implicit def eitherTHoist[A]: Hoist[({type l[α[_], β] = EitherT[α, A, β]})#l] =
     new EitherTHoist[A] {}
 
   implicit def eitherTEqual[F[_], A, B](implicit F0: Equal[F[A \/ B]]): Equal[EitherT[F, A, B]] =
@@ -467,7 +467,7 @@ private trait EitherTBitraverse[F[_]] extends Bitraverse[EitherT[F, *, *]] with 
     fab.bitraverse(f, g)
 }
 
-private trait EitherTHoist[A] extends Hoist[λ[(α[_], β) => EitherT[α, A, β]]] {
+private trait EitherTHoist[A] extends Hoist[({type l[α[_], β] = EitherT[α, A, β]})#l] {
   def hoist[M[_], N[_]](f: M ~> N)(implicit M: Monad[M]) =
     λ[EitherT[M, A, *] ~> EitherT[N, A, *]](_ mapT f)
 

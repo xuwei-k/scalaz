@@ -387,7 +387,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
 
   /** Prepends an element to the left of the tree. O(1). */
   def +:(a: => A): FingerTree[V, A] = {
-    implicit val nm = nodeMeasure[A, V]
+    implicit val nm: Reducer[Node[V, A], V] = nodeMeasure[A, V]
     val az = Need(a)
     fold(
       v => single(measurer.cons(az.value, v), az.value),
@@ -783,7 +783,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
 
   /** Maps the given function across the tree, annotating nodes in the resulting tree according to the provided `Reducer`. */
   def map[B, V2](f: A => B)(implicit m: Reducer[B, V2]): FingerTree[V2, B] = {
-    implicit val nm = nodeMeasure[B, V2]
+    implicit val nm: Reducer[Node[V2, B], V2] = nodeMeasure[B, V2]
     fold(
       v => empty,
       (v, x) => single(f(x)),

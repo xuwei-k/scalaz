@@ -213,7 +213,7 @@ sealed abstract class FreeTInstances2 extends FreeTInstances3 {
       implicit def M: Functor[M] = M0
     }
 
-  implicit def freeTHoist[S[_]: Functor]: Hoist[FreeT[S, *[_], *]] =
+  implicit def freeTHoist[S[_]: Functor]: Hoist[({type l[a[_], b] = FreeT[S, a, b]})#l] =
     new Hoist[FreeT[S, *[_], *]] {
       def hoist[M[_]: Monad, N[_]](f: M ~> N) =
         λ[FreeT[S, M, *] ~> FreeT[S, N, *]](_ hoistM f)
