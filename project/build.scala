@@ -92,9 +92,13 @@ object build {
       s"${key}:$a->$g/"
     },
     mimaPreviousArtifacts := {
-      scalazMimaBasis.?.value.map {
-        organization.value % s"${name.value}_sjs1_${scalaBinaryVersion.value}" % _
-      }.toSet
+      if ((scalaBinaryVersion.value == "3") && (scalazMimaBasis.?.value == Some("7.2.33"))) {
+        Set.empty
+      } else {
+        scalazMimaBasis.?.value.map {
+          organization.value % s"${name.value}_sjs1_${scalaBinaryVersion.value}" % _
+        }.toSet
+      }
     }
   )
 
@@ -131,6 +135,7 @@ object build {
   private def Scala211 = "2.11.12"
   private def Scala212 = "2.12.15"
   private def Scala213 = "2.13.8"
+  private def Scala3 = "3.1.0"
 
   private[this] val buildInfoPackageName = "scalaz"
 
@@ -172,7 +177,7 @@ object build {
       (f, path)
     },
     scalaVersion := Scala212,
-    crossScalaVersions := Seq(Scala211, Scala212, Scala213),
+    crossScalaVersions := Seq(Scala211, Scala212, Scala213, Scala3),
     commands += Command.command("setVersionUseDynver") { state =>
       val extracted = Project extract state
       val out = extracted get dynverGitDescribeOutput
@@ -373,17 +378,34 @@ object build {
       }
     },
     mimaPreviousArtifacts := {
-      scalazMimaBasis.?.value.map {
-        organization.value % s"${name.value}_${scalaBinaryVersion.value}" % _
-      }.toSet
+      if ((scalaBinaryVersion.value == "3") && (scalazMimaBasis.?.value == Some("7.2.33"))) {
+        Set.empty
+      } else {
+        scalazMimaBasis.?.value.map {
+          organization.value % s"${name.value}_${scalaBinaryVersion.value}" % _
+        }.toSet
+      }
     }
   )
 
   val nativeSettings = Seq(
+    Compile / doc / scalacOptions --= {
+      // TODO remove this workaround
+      // https://github.com/scala-native/scala-native/issues/2503
+      if (scalaBinaryVersion.value == "3") {
+        (Compile / doc / scalacOptions).value.filter(_.contains("-Xplugin"))
+      } else {
+        Nil
+      }
+    },
     mimaPreviousArtifacts := {
-      scalazMimaBasis.?.value.map {
-        organization.value % s"${name.value}_native0.4_${scalaBinaryVersion.value}" % _
-      }.toSet
+      if ((scalaBinaryVersion.value == "3") && (scalazMimaBasis.?.value == Some("7.2.33"))) {
+        Set.empty
+      } else {
+        scalazMimaBasis.?.value.map {
+          organization.value % s"${name.value}_native0.4_${scalaBinaryVersion.value}" % _
+        }.toSet
+      }
     }
   )
 
