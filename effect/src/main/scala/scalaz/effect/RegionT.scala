@@ -40,7 +40,7 @@ sealed abstract class RegionTInstances1 {
     implicit def M = M0
   }
 
-  implicit def RegionTHoist[S]: Hoist[λ[(α[_], β) => RegionT[S, α, β]]] = new Hoist[λ[(α[_], β) => RegionT[S, α, β]]] {
+  implicit def RegionTHoist[S]: Hoist[({type l[a[_], b] = RegionT[S, a, b]})#l] = new Hoist[({type l[a[_], b] = RegionT[S, a, b]})#l] {
     def hoist[M[_]: Monad, N[_]](f: M ~> N) =
       new (RegionT[S, M, *] ~> RegionT[S, N, *]) {
         override def apply[B](fa: RegionT[S, M, B]): RegionT[S, N, B] =

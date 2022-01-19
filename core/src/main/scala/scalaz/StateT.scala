@@ -309,7 +309,10 @@ private trait StateTHoist[S] extends Hoist[({type l[g[_], a] = StateT[g, S, a]})
   def liftM[G[_], A](ga: G[A])(implicit G: Monad[G]): StateT[G, S, A] =
     StateT(s => G.map(ga)(a => (s, a)))
 
-  def hoist[M[_]: Monad, N[_]](f: M ~> N) = λ[StateTF[M, S]#f ~> StateTF[N, S]#f](_ mapT f)
+  def hoist[M[_]: Monad, N[_]](f: M ~> N) = new (StateTF[M, S]#f ~> StateTF[N, S]#f) {
+    def apply[A](action: StateT[M, S, A]) =
+      action.mapT(f.apply)
+  }
 
   implicit def apply[G[_] : Monad]: Monad[StateT[G, S, *]] = StateT.stateTMonadState[S, G]
 }

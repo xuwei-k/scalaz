@@ -19,6 +19,7 @@ import sbtbuildinfo.BuildInfoPlugin.autoImport._
 
 import com.typesafe.tools.mima.core.ProblemFilters
 import com.typesafe.tools.mima.core.IncompatibleSignatureProblem
+import com.typesafe.tools.mima.core.InheritedNewAbstractMethodProblem
 import com.typesafe.tools.mima.plugin.MimaPlugin
 import com.typesafe.tools.mima.plugin.MimaKeys.{mimaPreviousArtifacts, mimaReportSignatureProblems, mimaBinaryIssueFilters}
 
@@ -180,7 +181,14 @@ object build {
     },
     resolvers ++= (if (scalaVersion.value.endsWith("-SNAPSHOT")) List(Opts.resolver.sonatypeSnapshots) else Nil),
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
-    scalaCheckVersion_1_15 := "1.15.2",
+    scalaCheckVersion_1_15 := {
+      scalaBinaryVersion.value match {
+        case "3" =>
+          "1.15.4"
+        case _ =>
+          "1.15.2"
+      }
+    },
     scalaCheckGroupId := "org.scalacheck",
     scalacOptions ++= Seq(
       // contains -language:postfixOps (because 1+ as a parameter to a higher-order function is treated as a postfix op)
@@ -355,6 +363,10 @@ object build {
       if (scalaBinaryVersion.value == "2.11") {
         Seq(
           ProblemFilters.exclude[IncompatibleSignatureProblem]("scalaz.*"),
+          ProblemFilters.exclude[InheritedNewAbstractMethodProblem]("scalaz.Isomorphisms#IsoFunctorTemplate.to_"),
+          ProblemFilters.exclude[InheritedNewAbstractMethodProblem]("scalaz.Isomorphisms#IsoFunctorTemplate.from_"),
+          ProblemFilters.exclude[InheritedNewAbstractMethodProblem]("scalaz.Isomorphisms#IsoBifunctorTemplate.to_"),
+          ProblemFilters.exclude[InheritedNewAbstractMethodProblem]("scalaz.Isomorphisms#IsoBifunctorTemplate.from_"),
         )
       } else {
         Nil
