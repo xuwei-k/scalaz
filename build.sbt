@@ -25,33 +25,29 @@ lazy val nativeProjects = Seq[ProjectReference](
   coreNative, effectNative, iterateeNative, scalacheckBindingNative, testsNative, exampleNative
 )
 
-lazy val scalaz = Project(
-  id = "scalaz",
-  base = file(".")
-).settings(
-  standardSettings,
-  description := "scalaz unidoc",
-  artifacts := Classpaths.artifactDefs(Seq(Compile / packageDoc, Compile / makePom)).value,
-  packagedArtifacts := Classpaths.packaged(Seq(Compile / packageDoc, Compile / makePom)).value,
-  pomPostProcess := { node =>
-    import scala.xml._
-    import scala.xml.transform._
-    val rule = new RewriteRule {
-      override def transform(n: Node) =
-        if (n.label == "dependencies") NodeSeq.Empty else n
-    }
-    new RuleTransformer(rule).transform(node)(0)
-  },
-  ScalaUnidoc / unidoc / unidocProjectFilter := {
-    (jsProjects ++ nativeProjects :+ (site: ProjectReference)).foldLeft(inAnyProject)((acc, a) => acc -- inProjects(a))
-  },
-  Defaults.packageTaskSettings(Compile / packageDoc, (Compile / unidoc).map(_.flatMap(Path.allSubpaths)))
-).aggregate(
-  jvmProjects ++ jsProjects : _*
-).enablePlugins(ScalaUnidocPlugin)
+name := "scalaz"
+standardSettings
+description := "scalaz unidoc"
+artifacts := Classpaths.artifactDefs(Seq(Compile / packageDoc, Compile / makePom)).value
+packagedArtifacts := Classpaths.packaged(Seq(Compile / packageDoc, Compile / makePom)).value
+pomPostProcess := { node =>
+  import scala.xml._
+  import scala.xml.transform._
+  val rule = new RewriteRule {
+    override def transform(n: Node) =
+      if (n.label == "dependencies") NodeSeq.Empty else n
+  }
+  new RuleTransformer(rule).transform(node)(0)
+}
+ScalaUnidoc / unidoc / unidocProjectFilter := {
+  (jsProjects ++ nativeProjects :+ (site: ProjectReference)).foldLeft(inAnyProject)((acc, a) => acc -- inProjects(a))
+}
+Defaults.packageTaskSettings(Compile / packageDoc, (Compile / unidoc).map(_.flatMap(Path.allSubpaths)))
+
+enablePlugins(ScalaUnidocPlugin)
 
 lazy val rootNative = Project(
-  rootNativeId,
+  "rootNative",
   file("rootNative")
 ).settings(
   standardSettings,
