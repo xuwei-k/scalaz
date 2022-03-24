@@ -26,6 +26,9 @@ import sbtdynver.DynVerPlugin.autoImport._
 
 import xerial.sbt.Sonatype.autoImport._
 
+import wartremover.WartRemover.autoImport._
+import org.wartremover.contrib.ContribWarts.autoImport.ContribWart
+
 object build {
   type Sett = Def.Setting[_]
 
@@ -150,6 +153,10 @@ object build {
     commands += Command.command("SetScala3") {
       s"""++ ${Scala3}! -v""" :: _
     },
+    wartremoverWarnings ++= Warts.all,
+    wartremoverWarnings ++= ContribWart.All.filterNot(_ == ContribWart.NoNeedForMonad),
+    wartremoverCrossVersion := CrossVersion.binary,
+    scalacOptions += "-P:wartremover:loglevel:debug",
     scalaVersion := Scala213,
     crossScalaVersions := Seq(Scala213, Scala3),
     commands += Command.command("setVersionUseDynver") { state =>
