@@ -1,6 +1,6 @@
 package scalaz
 
-import scalaz.Id.Id
+import scalaz.Id._
 
 // TODO separate each file?
 

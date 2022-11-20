@@ -1,7 +1,7 @@
 package scalaz
 
 ////
-import scalaz.Id.Id
+import scalaz.Id._
 
 /**
  * A type giving rise to two unrelated [[scalaz.Traverse]]s.

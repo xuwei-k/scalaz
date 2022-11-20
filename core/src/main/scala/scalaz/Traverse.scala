@@ -1,7 +1,7 @@
 package scalaz
 
 ////
-import scalaz.Id.Id
+import scalaz.Id._
 
 /**
  * Idiomatic traversal of a structure, as described in
@@ -115,7 +115,7 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
     G.map(sequence(fgfa))(F.join)
 
   override def map[A,B](fa: F[A])(f: A => B): F[B] =
-    traversal[Id](Id.id).run(fa)(f)
+    traversal[Id](Id.idInstance).run(fa)(f)
 
   def foldLShape[A,B](fa: F[A], z: B)(f: (B,A) => B): (B, F[Unit]) =
     runTraverseS(fa, z)(a => State.modify(f(_, a)))

@@ -1,6 +1,8 @@
 package scalaz
 
 ////
+import scalaz.Id._
+
 /**
  * An [[scalaz.Order]]able with discrete values.
  */

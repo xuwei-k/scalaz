@@ -1,6 +1,7 @@
 package scalaz
 
 ////
+import scalaz.Id._
 /**
  * A type giving rise to two unrelated [[scalaz.Foldable]]s.
  */

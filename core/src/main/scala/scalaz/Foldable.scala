@@ -1,6 +1,7 @@
 package scalaz
 
 ////
+import scalaz.Id._
 import scala.annotation.nowarn
 /**
  * A type parameter implying the ability to extract zero or more
