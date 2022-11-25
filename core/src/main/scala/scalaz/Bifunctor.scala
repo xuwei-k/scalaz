@@ -1,6 +1,8 @@
 package scalaz
 
 ////
+import Id._
+
 /**
  * A type giving rise to two unrelated [[scalaz.Functor]]s.
  */

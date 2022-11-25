@@ -1,5 +1,6 @@
 package scalaz
 
+import Id._
 import org.scalacheck.Arbitrary
 import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._

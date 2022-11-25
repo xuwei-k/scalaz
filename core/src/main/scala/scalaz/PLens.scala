@@ -1,5 +1,7 @@
 package scalaz
 
+import Id._
+
 /**
  * Partial Lens Families, offering a purely functional means to access and retrieve
  * an optional field transitioning from type `B1` to type `B2` in a record that is

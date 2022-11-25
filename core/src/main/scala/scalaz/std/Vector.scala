@@ -1,6 +1,7 @@
 package scalaz
 package std
 
+import Id._
 import Liskov.<~<
 import vector._
 import annotation.tailrec

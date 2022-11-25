@@ -1,6 +1,7 @@
 package scalaz.example
 
 import scalaz._
+import scalaz.Id._
 import scalaz.syntax.contT._
 
 object ContTUsage extends App {

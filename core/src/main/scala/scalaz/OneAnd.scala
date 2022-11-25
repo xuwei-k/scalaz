@@ -1,5 +1,6 @@
 package scalaz
 
+import scalaz.Id._
 import scalaz.Isomorphism.{<~>, IsoFunctorTemplate}
 import scalaz.std.option.{optionMonoid, none, some}
 import scalaz.Ordering.orderingInstance

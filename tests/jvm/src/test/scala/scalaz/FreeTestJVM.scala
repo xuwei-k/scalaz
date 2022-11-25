@@ -1,5 +1,6 @@
 package scalaz
 
+import Id._
 import std.AllInstances._
 
 object FreeTestJVM extends SpecLite {

@@ -76,4 +76,6 @@ trait IdInstances {
     }
 }
 
-object Id extends IdInstances
+object Id extends IdInstances {
+  implicit def scalazIdInstance: Traverse1[Id] with Monad[Id] with BindRec[Id] with Comonad[Id] with Distributive[Id] with Zip[Id] with Unzip[Id] with Align[Id] with Cozip[Id] with Optional[Id] = id
+}

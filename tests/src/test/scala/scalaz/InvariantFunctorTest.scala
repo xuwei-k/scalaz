@@ -1,7 +1,7 @@
 package scalaz
 
 import BijectionT.{Bijection, liftBijection}
-import Id.Id
+import Id._
 import Isomorphism.{<=>, IsoSet}
 import std.AllInstances._
 import std.option.some

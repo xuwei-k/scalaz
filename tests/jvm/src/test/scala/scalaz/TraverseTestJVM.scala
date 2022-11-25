@@ -1,5 +1,6 @@
 package scalaz
 
+import Id._
 import scalaz.State._
 import std.AllInstances._
 import syntax.traverse._

@@ -1,6 +1,7 @@
 package scalaz
-import org.scalacheck.Prop.forAll
 
+import Id._
+import org.scalacheck.Prop.forAll
 
 object TraverseTest extends SpecLite {
 

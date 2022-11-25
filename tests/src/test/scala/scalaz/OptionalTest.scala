@@ -1,6 +1,7 @@
 package scalaz
 
 import Scalaz.Id
+import Id._
 import std.AllInstances._
 
 object OptionalTest extends SpecLite {

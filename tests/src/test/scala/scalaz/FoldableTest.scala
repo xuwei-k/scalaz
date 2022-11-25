@@ -1,5 +1,6 @@
 package scalaz
 
+import Id._
 import std.AllInstances._
 import syntax.apply._
 import syntax.foldable._

@@ -1,6 +1,8 @@
 package scalaz
 
 ////
+import scalaz.Id._
+
 /**
  * A type parameter implying the ability to extract zero or more
  * values of that type.

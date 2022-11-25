@@ -2,7 +2,7 @@ package scalaz.example
 
 object TraverseUsage extends App {
   import scalaz._
-
+  import Id._
   import scalaz.std.list._
   import scalaz.std.vector._
   import scalaz.std.option._

@@ -1,7 +1,7 @@
 package scalaz
 
 ////
-import scalaz.Id.Id
+import scalaz.Id._
 
 /**
  * Idiomatic traversal of a structure, as described in

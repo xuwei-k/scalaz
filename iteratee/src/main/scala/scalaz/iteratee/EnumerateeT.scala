@@ -1,6 +1,7 @@
 package scalaz
 package iteratee
 
+import Id._
 import Iteratee._
 import Ordering._
 

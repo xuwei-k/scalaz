@@ -1,6 +1,7 @@
 package scalaz.example
 
 import scalaz._
+import Id._
 
 object StateTUsage extends App {
   import StateT._

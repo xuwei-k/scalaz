@@ -1,7 +1,7 @@
 package scalaz.example
 
 import scalaz.{Monoid, StateT}
-
+import scalaz.Id._
 
 /**
  * Character/Line/Word Count from "The Essence of the Iterator Pattern".

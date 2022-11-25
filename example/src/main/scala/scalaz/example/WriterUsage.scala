@@ -7,6 +7,7 @@ object WriterUsage extends App {
   import syntax.writer._
   import syntax.semigroup._ // for |+|
   import syntax.apply._     // for |@|
+  import Id._
 
   type Logger[A] = Writer[List[String], A]
 
