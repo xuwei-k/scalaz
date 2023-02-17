@@ -1,5 +1,6 @@
 scalacOptions += "-deprecation"
 
+addSbtPlugin("net.virtual-void" % "sbt-hackers-digest" % "0.1.0")
 addSbtPlugin("com.47deg" % "sbt-microsites" % "1.4.2")
 addSbtPlugin("com.dwijnand" % "sbt-dynver" % "4.1.1")
 addSbtPlugin("com.eed3si9n" % "sbt-buildinfo" % "0.11.0")
