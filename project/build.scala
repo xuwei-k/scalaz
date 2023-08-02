@@ -179,8 +179,6 @@ object build {
             "-Ywarn-numeric-widen",
             "-Ywarn-value-discard",
             "-Xlint:adapted-args",
-            "-opt:l:method,inline",
-            "-opt-inline-from:scalaz.**",
             s"-language:$common",
           ) ++ unusedWarnOptions.value
       }
