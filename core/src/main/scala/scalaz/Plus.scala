@@ -23,7 +23,7 @@ trait Plus[F[_]]  { self =>
       case Just((s, fa)) => go(s, plus(fa, acc))
       case _ => acc
     }
-    f(seed) map { case (s, a) => go(s, a) }
+    f(seed).map({ case (s, a) => go(s, a) })
   }
 
   /**
@@ -36,7 +36,7 @@ trait Plus[F[_]]  { self =>
       case Just((fa, s)) => go(plus(acc, fa), s)
       case _ => acc
     }
-    f(seed) map { case (a, s) => go(a, s) }
+    f(seed).map({ case (a, s) => go(a, s) })
   }
 
 

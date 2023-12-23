@@ -46,7 +46,7 @@ trait Apply[F[_]] extends Functor[F] { self =>
       case Maybe.Just((fa, s)) => go(apply2(acc, fa)(R.snoc), s)
       case _ => acc
     }
-    f(seed) map { case (fa, s) => go(map(fa)(R.unit), s) }
+    f(seed).map({ case (fa, s) => go(map(fa)(R.unit), s) })
   }
 
   /**The composition of Applys `F` and `G`, `[x]F[G[x]]`, is a Apply */
@@ -204,7 +204,7 @@ trait Apply[F[_]] extends Functor[F] { self =>
     /** Lifted functions can be fused. */
     def composition[A, B, C](fbc: F[B => C], fab: F[A => B], fa: F[A])(implicit FC: Equal[F[C]]): Boolean =
       FC.equal(ap(ap(fa)(fab))(fbc),
-               ap(fa)(ap(fab)(map(fbc)((bc: B => C) => (ab: A => B) => bc compose ab))))
+               ap(fa)(ap(fab)(map(fbc)((bc: B => C) => (ab: A => B) => bc.compose(ab)))))
   }
   def applyLaw: ApplyLaw = new ApplyLaw {}
 

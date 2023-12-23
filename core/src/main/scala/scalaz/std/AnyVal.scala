@@ -89,7 +89,7 @@ trait AnyValInstances {
         case Just((b, s)) => b || go(s)
         case _ => false
       }
-      f0(s) map { case (b, s) => Disjunction(b || go(s)) }
+      f0(s).map({ case (b, s) => Disjunction(b || go(s)) })
     }
 
     override def unfoldlSumOpt[S](s: S)(f: S => Maybe[(S, Boolean @@ Disjunction)]): Maybe[Boolean @@ Disjunction] = {
@@ -99,7 +99,7 @@ trait AnyValInstances {
         case Just((s, b)) => b || go(s)
         case _ => false
       }
-      f0(s) map { case (s, b) => Disjunction(b || go(s)) }
+      f0(s).map({ case (s, b) => Disjunction(b || go(s)) })
     }
 
   }
@@ -130,7 +130,7 @@ trait AnyValInstances {
         case Just((b, s)) => b && go(s)
         case _ => true
       }
-      f0(s) map { case (b, s) => Conjunction(b && go(s)) }
+      f0(s).map({ case (b, s) => Conjunction(b && go(s)) })
     }
 
     override def unfoldlSumOpt[S](s: S)(f: S => Maybe[(S, Boolean @@ Conjunction)]): Maybe[Boolean @@ Conjunction] = {
@@ -140,7 +140,7 @@ trait AnyValInstances {
         case Just((s, b)) => b && go(s)
         case _ => true
       }
-      f0(s) map { case (s, b) => Conjunction(b && go(s)) }
+      f0(s).map({ case (s, b) => Conjunction(b && go(s)) })
     }
 
   }
@@ -321,11 +321,11 @@ trait AnyValInstances {
           case _ => acc
         }
 
-      f0(s) map { case (s, i) => Multiplication(go(s, i)) }
+      f0(s).map({ case (s, i) => Multiplication(go(s, i)) })
     }
 
     override def unfoldrSumOpt[S](s: S)(f: S => Maybe[(Int @@ Multiplication, S)]) =
-      unfoldlSumOpt[S](s)(f(_) map (_.swap))
+      unfoldlSumOpt[S](s)(f(_).map((_.swap)))
   }
 
   implicit val longInstance: Monoid[Long] & Enum[Long] & Show[Long] = new Monoid[Long] with Enum[Long] with Show[Long] {

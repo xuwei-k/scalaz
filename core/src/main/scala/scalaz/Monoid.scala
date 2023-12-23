@@ -45,10 +45,10 @@ trait Monoid[F] extends Semigroup[F] { self =>
     ifEmpty(a)(v)(mb.zero)
 
   def unfoldlSum[S](seed: S)(f: S => Maybe[(S, F)]): F =
-    unfoldlSumOpt(seed)(f) getOrElse zero
+    unfoldlSumOpt(seed)(f).getOrElse(zero)
 
   def unfoldrSum[S](seed: S)(f: S => Maybe[(F, S)]): F =
-    unfoldrSumOpt(seed)(f) getOrElse zero
+    unfoldrSumOpt(seed)(f).getOrElse(zero)
 
   /** Every `Monoid` gives rise to a [[scalaz.Category]], for which
     * the type parameters are phantoms.

@@ -646,7 +646,7 @@ sealed abstract class ==>>[A, B] {
         case (t1, Tip()) =>
           t1
         case (Tip(), Bin(kx, x, l, r)) =>
-          link(kx, x, l filterGt blo, r filterLt bhi)
+          link(kx, x, l.filterGt(blo), r.filterLt(bhi))
         case (t1, Bin(kx, x, Tip(), Tip())) =>
           insertR(kx, x, t1)
         case (Bin(kx, x, l, r), t2) =>
@@ -693,12 +693,12 @@ sealed abstract class ==>>[A, B] {
         case (Tip(), _) =>
           empty
         case (Bin(kx, x, l, r), Tip()) =>
-          link(kx, x, l filterGt blo, r filterLt bhi)
+          link(kx, x, l.filterGt(blo), r.filterLt(bhi))
         case (t, Bin(kx, _, l, r)) =>
           val bmi = just(kx)
           val aa = hedgeDiff(blo, bmi, ==>>.trim(blo, bmi, t), l)
           val bb = hedgeDiff(bmi, bhi, ==>>.trim(bmi, bhi, t), r)
-          aa merge bb
+          aa.merge(bb)
       }
 
     (this, other) match {
@@ -730,8 +730,8 @@ sealed abstract class ==>>[A, B] {
           val l2 = hedgeInt(blo, bmi, l, ==>>.trim(blo, bmi, t2))
           val r2 = hedgeInt(bmi, bhi, r, ==>>.trim(bmi, bhi, t2))
 
-          if (t2 member kx) link(kx, x, l2, r2)
-          else l2 merge r2
+          if (t2.member(kx)) link(kx, x, l2, r2)
+          else l2.merge(r2)
       }
 
     (this, other) match {
@@ -761,7 +761,7 @@ sealed abstract class ==>>[A, B] {
       case (_, Tip()) =>
         false
       case (Bin(kx, x, l, r), t) =>
-        val (lt, found, gt) = t splitLookup kx
+        val (lt, found, gt) = t.splitLookup(kx)
         found match {
           case Empty() =>
             false
@@ -782,7 +782,7 @@ sealed abstract class ==>>[A, B] {
         if (p(kx, x))
           link(kx, x, l.filterWithKey(p), r.filterWithKey(p))
         else
-          l.filterWithKey(p) merge r.filterWithKey(p)
+          l.filterWithKey(p).merge(r.filterWithKey(p))
     }
 
   // Partition
@@ -794,13 +794,13 @@ sealed abstract class ==>>[A, B] {
       case Tip() =>
         (empty, empty)
       case Bin(kx, x, l, r) =>
-        val (l1, l2) = l partitionWithKey p
-        val (r1, r2) = r partitionWithKey p
+        val (l1, l2) = l.partitionWithKey(p)
+        val (r1, r2) = r.partitionWithKey(p)
 
         if (p(kx, x))
-          (link(kx, x, l1, r1), l2 merge r2)
+          (link(kx, x, l1, r1), l2.merge(r2))
         else
-          (l1 merge r1, link(kx, x, l2, r2))
+          (l1.merge(r1), link(kx, x, l2, r2))
     }
 
   def mapMaybe[C](f: B => Maybe[C])(implicit o: Order[A]): A ==>> C =
@@ -830,9 +830,9 @@ sealed abstract class ==>>[A, B] {
 
         f(kx, x) match {
           case -\/(y) =>
-            (link(kx, y, l1, r1), l2 merge r2)
+            (link(kx, y, l1, r1), l2.merge(r2))
           case \/-(z) =>
-            (l1 merge r1, link(kx, z, l2, r2))
+            (l1.merge(r1), link(kx, z, l2, r2))
         }
     }
 
@@ -861,10 +861,10 @@ sealed abstract class ==>>[A, B] {
       case Bin(kx, x, l, r) =>
         o.order(k, kx) match {
           case LT =>
-            val (lt, z, gt) = l splitLookup k
+            val (lt, z, gt) = l.splitLookup(k)
             (lt, z, link(kx, x, gt, r))
           case GT =>
-            val (lt, z, gt) = r splitLookup k
+            val (lt, z, gt) = r.splitLookup(k)
             (link(kx, x, l, lt), z, gt)
           case EQ =>
             (l, just(x), r)
@@ -878,10 +878,10 @@ sealed abstract class ==>>[A, B] {
       case Bin(kx, x, l, r) =>
         o.order(k, kx) match {
           case LT =>
-            val (lt, z, gt) = l splitLookupWithKey k
+            val (lt, z, gt) = l.splitLookupWithKey(k)
             (lt, z, link(kx, x, gt, r))
           case GT =>
-            val (lt, z, gt) = r splitLookupWithKey k
+            val (lt, z, gt) = r.splitLookupWithKey(k)
             (link(kx, x, l, lt), z, gt)
           case EQ =>
             (l, just((kx, x)), r)
@@ -950,7 +950,7 @@ sealed abstract class ==>>[A, B] {
           case LT =>
             cmphi(kx) match {
               case GT =>
-                (t lookupAssoc lo, t)
+                (t.lookupAssoc(lo), t)
               case _ =>
                 l.trimLookupLo(lo, cmphi)
           }
@@ -1010,14 +1010,14 @@ sealed abstract class ==>>[A, B] {
 sealed abstract class MapInstances2 {
   implicit def mapBand[A, B](implicit A: Order[A], B: Band[B]): Band[A ==>> B] = new Band[A ==>> B] {
     def append(a: A ==>> B, b: => A ==>> B): A ==>> B =
-      (a unionWith b)(B.append(_, _))
+      (a.unionWith(b))(B.append(_, _))
   }
 }
 
 sealed abstract class MapInstances1 extends MapInstances2 {
   implicit def mapLattice[A, B](implicit A: Order[A], B: SemiLattice[B]): SemiLattice[A ==>> B] = new SemiLattice[A ==>> B] {
     def append(a: A ==>> B, b: => A ==>> B): A ==>> B =
-      (a unionWith b)(B.append(_, _))
+      (a.unionWith(b))(B.append(_, _))
   }
 }
 
@@ -1026,7 +1026,7 @@ sealed abstract class MapInstances0 extends MapInstances1 {
   implicit def scalazMapInstance[S: Order]: Bind[==>>[S, *]] & Align[==>>[S, *]] & Zip[==>>[S, *]] =
     new Bind[==>>[S, *]] with Align[==>>[S, *]] with Zip[==>>[S, *]] {
       override def map[A, B](fa: S ==>> A)(f: A => B) =
-        fa map f
+        fa.map(f)
 
       def bind[A, B](fa: S ==>> A)(f: A => (S ==>> B)) =
         fa.mapMaybeWithKey((k, v) => f(v).lookup(k))
@@ -1091,12 +1091,12 @@ sealed abstract class MapInstances extends MapInstances0 {
     }
 
   implicit def mapUnion[A, B](implicit A: Order[A], B: Semigroup[B]): Monoid[A ==>> B] =
-    Monoid.instance((l, r) => (l unionWith r)(B.append(_, _)), Tip())
+    Monoid.instance((l, r) => (l.unionWith(r))(B.append(_, _)), Tip())
 
   implicit def mapIntersection[A, B](implicit A: Order[A], B: Semigroup[B]
                                    ): Semigroup[(A ==>> B) @@ Tags.Conjunction] =
     Tag.subst(Semigroup.instance((l, r) =>
-      (l intersectionWith r)(B.append(_, _))))
+      (l.intersectionWith(r))(B.append(_, _))))
 
   implicit def mapCovariant[S]: Traverse[==>>[S, *]] =
     new Traverse[==>>[S, *]] {
@@ -1133,7 +1133,7 @@ sealed abstract class MapInstances extends MapInstances0 {
         }
 
       override def map[A, B](fa: S ==>> A)(f: A => B): S ==>> B =
-        fa map f
+        fa.map(f)
 
       override def foldMap[A, B](fa: S ==>> A)(f: A => B)(implicit F: Monoid[B]): B =
         fa match {
@@ -1569,7 +1569,7 @@ object ==>> extends MapInstances {
             case Maybe.Empty() =>
               g1(singleton(kx, x)) match {
                 case Tip() =>
-                  l2 merge r2
+                  l2.merge(r2)
                 case Bin(_, x2, Tip(), Tip()) =>
                   link(kx, x2, l2, r2)
                 case _ =>
@@ -1578,7 +1578,7 @@ object ==>> extends MapInstances {
             case Just(x2) =>
               f(kx, x, x2) match {
                 case Maybe.Empty() =>
-                  l2 merge r2
+                  l2.merge(r2)
                 case Just(xx) =>
                   link(kx, xx, l2, r2)
               }

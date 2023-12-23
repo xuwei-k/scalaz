@@ -73,7 +73,7 @@ sealed abstract class Maybe[A] {
     cata(_ => false, true)
 
   final def map[B](f: A => B): Maybe[B] =
-    cata(f andThen just[B], empty[B])
+    cata(f.andThen(just[B]), empty[B])
 
   final def flatMap[B](f: A => Maybe[B]): Maybe[B] =
     cata(f, empty[B])
@@ -269,7 +269,7 @@ sealed abstract class MaybeInstances extends MaybeInstances0 {
   implicit def maybeMin[A](implicit o: Order[A]): Monoid[MinMaybe[A]] & Band[MinMaybe[A]] = new Monoid[MinMaybe[A]] with Band[MinMaybe[A]] {
     def zero: MinMaybe[A] = Tag(empty)
 
-    def append(f1: MinMaybe[A], f2: => MinMaybe[A]) = Tag( (Tag unwrap f1, Tag unwrap f2) match {
+    def append(f1: MinMaybe[A], f2: => MinMaybe[A]) = Tag( (Tag.unwrap(f1), Tag.unwrap(f2)) match {
       case (Just(v1), Just(v2)) => Just(Order[A].min(v1, v2))
       case (_f1 @ Just(_), Empty()) => _f1
       case (Empty(), _f2 @ Just(_)) => _f2
@@ -286,7 +286,7 @@ sealed abstract class MaybeInstances extends MaybeInstances0 {
   implicit def maybeMax[A](implicit o: Order[A]): Monoid[MaxMaybe[A]] & Band[MaxMaybe[A]] = new Monoid[MaxMaybe[A]] with Band[MaxMaybe[A]] {
     def zero: MaxMaybe[A] = Tag(empty)
 
-    def append(f1: MaxMaybe[A], f2: => MaxMaybe[A]) = Tag( (Tag unwrap f1, Tag unwrap f2) match {
+    def append(f1: MaxMaybe[A], f2: => MaxMaybe[A]) = Tag( (Tag.unwrap(f1), Tag.unwrap(f2)) match {
       case (Just(v1), Just(v2)) => Just(Order[A].max(v1, v2))
       case (_f1 @ Just(_), Empty()) => _f1
       case (Empty(), _f2 @ Just(_)) => _f2
@@ -309,9 +309,9 @@ sealed abstract class MaybeInstances extends MaybeInstances0 {
       def point[A](a: => A) = just(a)
 
       override def ap[A, B](fa: => Maybe[A])(mf: => Maybe[A => B]) =
-        mf.cata(f => fa.cata(f andThen just, empty), empty)
+        mf.cata(f => fa.cata(f.andThen(just), empty), empty)
 
-      def bind[A, B](fa: Maybe[A])(f: A => Maybe[B]) = fa flatMap f
+      def bind[A, B](fa: Maybe[A])(f: A => Maybe[B]) = fa.flatMap(f)
 
       @tailrec def tailrecM[A, B](a: A)(f: A => Maybe[A \/ B]): Maybe[B] =
         f(a) match {
@@ -320,14 +320,14 @@ sealed abstract class MaybeInstances extends MaybeInstances0 {
           case Just(\/-(b)) => Just(b)
         }
 
-      override def map[A, B](fa: Maybe[A])(f: A => B) = fa map f
+      override def map[A, B](fa: Maybe[A])(f: A => B) = fa.map(f)
 
       def traverseImpl[F[_], A, B](fa: Maybe[A])(f: A => F[B])(implicit F: Applicative[F]) =
         fa.cata(a => F.map(f(a))(just), F.point(empty))
 
       def empty[A]: Maybe[A] = Maybe.empty
 
-      def plus[A](a: Maybe[A], b: => Maybe[A]) = a orElse b
+      def plus[A](a: Maybe[A], b: => Maybe[A]) = a.orElse(b)
 
       override def unfoldrPsumOpt[S, A](seed: S)(f: S => Maybe[(Maybe[A], S)]): Maybe[Maybe[A]] = {
         @tailrec def go(s: S): Maybe[A] = f(s) match {
@@ -337,10 +337,10 @@ sealed abstract class MaybeInstances extends MaybeInstances0 {
           }
           case Empty() => Empty()
         }
-        f(seed) map { case (ma, s) => ma match {
+        f(seed).map({ case (ma, s) => ma match {
           case a @ Just(_) => a
           case Empty() => go(s)
-        }}
+        }})
       }
 
       override def unfoldrOpt[S, A, B](seed: S)(f: S => Maybe[(Maybe[A], S)])(implicit r: Reducer[A, B]): Maybe[Maybe[B]] = {
@@ -351,10 +351,10 @@ sealed abstract class MaybeInstances extends MaybeInstances0 {
           }
           case _ => Just(acc)
         }
-        f(seed) map { case (ma, s) => ma match {
+        f(seed).map({ case (ma, s) => ma match {
           case Just(a) => go(r.unit(a), s)
           case _ => Empty()
-        }}
+        }})
       }
 
       override def foldRight[A, B](fa: Maybe[A], z: => B)(f: (A, => B) => B) =
@@ -395,7 +395,7 @@ sealed abstract class MaybeInstances extends MaybeInstances0 {
       override def filter[A](fa: Maybe[A])(f: A => Boolean): Maybe[A] =
         fa.filter(f)
 
-      override def alt[A](a1: => Maybe[A], a2: => Maybe[A]): Maybe[A] = a1 orElse a2
+      override def alt[A](a1: => Maybe[A], a2: => Maybe[A]): Maybe[A] = a1.orElse(a2)
 
       // performance optimisation
       override def altly2[Z, A1, A2](a1: => Maybe[A1], a2: => Maybe[A2])(f: A1 \/ A2 => Z): Maybe[Z] = a1 match {

@@ -134,7 +134,7 @@ sealed abstract class IndexedStateT[S1, S2, F[_], A] { self =>
 
   def zoom[S0, S3, S <: S1](l: LensFamily[S0, S3, S, S2])(implicit F: Applicative[F]): IndexedStateT[S0, S3, F, A] =
     IndexedStateT((s0: S0) => F.point((s0, ()))).flatMapS((s0, _) =>
-      this.contramap(l get (_: S0)).imap[S3](l.set(s0, _))
+      this.contramap(l.get((_: S0))).imap[S3](l.set(s0, _))
     )
 
   def liftF: Free[IndexedStateT[S1, S2, F, *], A] =
@@ -252,7 +252,7 @@ sealed abstract class StateTInstances0 extends StateTInstances1 {
           State((t: S) => fa.run(S.append(s, t)))))
 
       override def map[A, B](fa: State[S, A])(f: A => B): State[S, B] =
-        fa map f
+        fa.map(f)
 
       override def cobind[A, B](fa: State[S, A])(f: State[S, A] => B): State[S, B] =
         cojoin(fa).map(f)
@@ -380,7 +380,7 @@ private trait StateTMonadError[S, F[_], E] extends MonadError[StateT[S, F, *], E
     StateT(s => F.handleError(fa(s))(f(_)(s)))
 
   override def bind[A, B](fa: StateT[S, F, A])(f: (A) => StateT[S, F, B]): StateT[S, F, B] =
-    fa flatMap f
+    fa.flatMap(f)
 
   override def point[A](a: => A): StateT[S, F, A] =
     StateT(s => F.point((s, a)))

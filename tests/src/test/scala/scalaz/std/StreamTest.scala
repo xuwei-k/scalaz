@@ -118,7 +118,7 @@ object StreamTest extends SpecLite {
     val F = Traverse[Stream]
     F.zipL(infinite, infinite)
     F.zipL(finite, infinite).length must_===(size)
-    F.zipL(finite, infinite) must_===((finite zip infinite).map{x => (x._1, Option(x._2))})
+    F.zipL(finite, infinite) must_===((finite.zip(infinite)).map{x => (x._1, Option(x._2))})
     F.zipL(infinite, finite).take(1000).length must_===(1000)
     F.zipL(infinite, finite).takeWhile(_._2.isDefined).length must_===(size)
   }

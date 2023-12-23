@@ -14,7 +14,7 @@ final case class Zipper[A](lefts: LazyList[A], focus: A, rights: LazyList[A]) {
   import Zipper._
 
   def map[B](f: A => B): Zipper[B] =
-    zipper(lefts map f, f(focus), rights map f)
+    zipper(lefts.map(f), f(focus), rights.map(f))
 
   /**
    * Get the Stream representation of this Zipper. This fully traverses `lefts`. `rights` is
@@ -54,7 +54,7 @@ final case class Zipper[A](lefts: LazyList[A], focus: A, rights: LazyList[A]) {
    * Possibly moves to next element to the right of focus.
    */
   def nextOr(z: => Zipper[A]): Zipper[A] =
-    next getOrElse z
+    next.getOrElse(z)
 
   /**
    * Possibly moves to the previous element to the left of focus.
@@ -68,7 +68,7 @@ final case class Zipper[A](lefts: LazyList[A], focus: A, rights: LazyList[A]) {
    * Possibly moves to previous element to the left of focus.
    */
   def previousOr(z: => Zipper[A]): Zipper[A] =
-    previous getOrElse z
+    previous.getOrElse(z)
 
   /**
    * Moves to the previous element to the left of focus, or error if there is no element on the left.
@@ -112,7 +112,7 @@ final case class Zipper[A](lefts: LazyList[A], focus: A, rights: LazyList[A]) {
    * focus is moved to the right.
    */
   def deleteLeftOr(z: => Zipper[A]): Zipper[A] =
-    deleteLeft getOrElse z
+    deleteLeft.getOrElse(z)
 
   /**
    * Deletes the element at focus and moves the focus to the right. If there is no element on the right,
@@ -131,7 +131,7 @@ final case class Zipper[A](lefts: LazyList[A], focus: A, rights: LazyList[A]) {
    * focus is moved to the left.
    */
   def deleteRightOr(z: => Zipper[A]): Zipper[A] =
-    deleteRight getOrElse z
+    deleteRight.getOrElse(z)
 
   /**
    * Deletes all elements except the focused element.
@@ -173,8 +173,8 @@ final case class Zipper[A](lefts: LazyList[A], focus: A, rights: LazyList[A]) {
       if (n > 0 && rights.isEmpty || n < 0 && lefts.isEmpty) Maybe.empty
       else {
         if (n == 0) z
-        else if (n > 0) move0(z flatMap ((_: Zipper[A]).next), n - 1)
-        else move0(z flatMap ((_: Zipper[A]).previous), n + 1)
+        else if (n > 0) move0(z.flatMap(((_: Zipper[A]).next)), n - 1)
+        else move0(z.flatMap(((_: Zipper[A]).previous)), n + 1)
       }
     move0(just(this), n)
   }
@@ -199,7 +199,7 @@ final case class Zipper[A](lefts: LazyList[A], focus: A, rights: LazyList[A]) {
    * Moves focus to the nth element of the zipper, or the default if there is no such element.
    */
   def moveOr(n: Int, z: => Zipper[A]): Zipper[A] =
-    move(n) getOrElse z
+    move(n).getOrElse(z)
 
   /**
    * Moves focus to the nearest element matching the given predicate, preferring the left,
@@ -217,7 +217,7 @@ final case class Zipper[A](lefts: LazyList[A], focus: A, rights: LazyList[A]) {
    * or the default if no element matches.
    */
   def findZor(p: A => Boolean, z: => Zipper[A]): Zipper[A] =
-    findZ(p) getOrElse z
+    findZ(p).getOrElse(z)
 
   /**
    * Given a traversal function, find the first element along the traversal that matches a given predicate.
@@ -300,7 +300,7 @@ final case class Zipper[A](lefts: LazyList[A], focus: A, rights: LazyList[A]) {
    * focus is moved to the last element.
    */
   def deleteLeftCOr(z: => Zipper[A]): Zipper[A] =
-    deleteLeftC getOrElse z
+    deleteLeftC.getOrElse(z)
 
   /**
    * Deletes the focused element and moves focus to the right. If the focus was on the last element,
@@ -324,7 +324,7 @@ final case class Zipper[A](lefts: LazyList[A], focus: A, rights: LazyList[A]) {
    * focus is moved to the first element.
    */
   def deleteRightCOr(z: => Zipper[A]): Zipper[A] =
-    deleteRightC getOrElse z
+    deleteRightC.getOrElse(z)
 
   def traverse[G[_] : Applicative, B](f: A => G[B]): G[Zipper[B]] = {
     val z = (Zipper.zipper(_: LazyList[B], _: B, _: LazyList[B])).curried
@@ -334,12 +334,12 @@ final case class Zipper[A](lefts: LazyList[A], focus: A, rights: LazyList[A]) {
   }
 
   def ap[B](f: => Zipper[A => B]): Zipper[B] = {
-    val ls = lefts.zip(f.lefts) map {
+    val ls = lefts.zip(f.lefts).map({
       case (aa, ff) => ff(aa)
-    }
-    val rs = rights.zip(f.rights) map {
+    })
+    val rs = rights.zip(f.rights).map({
       case (aa, ff) => ff(aa)
-    }
+    })
     zipper(ls, f.focus(focus), rs)
   }
 
@@ -365,7 +365,7 @@ sealed abstract class ZipperInstances {
     def copoint[A](p: Zipper[A]): A =
       p.focus
     override def traverseImpl[G[_] : Applicative, A, B](za: Zipper[A])(f: A => G[B]): G[Zipper[B]] =
-      za traverse f
+      za.traverse(f)
     override def foldRight[A, B](fa: Zipper[A], z: => B)(f: (A, => B) => B): B =
       fa.foldRight(z)(f)
     override def foldLeft[A, B](fa: Zipper[A], z: B)(f: (B, A) => B): B =
@@ -375,9 +375,9 @@ sealed abstract class ZipperInstances {
     def point[A](a: => A): Zipper[A] =
       zipper(LazyList.continually(a), a, LazyList.continually(a))
     def ap[A, B](fa: => Zipper[A])(f: => Zipper[A => B]): Zipper[B] =
-      fa ap f
+      fa.ap(f)
     override def map[A, B](fa: Zipper[A])(f: A => B): Zipper[B] =
-      fa map f
+      fa.map(f)
     override def all[A](fa: Zipper[A])(f: A => Boolean) =
       fa.lefts.forall(f) && f(fa.focus) && fa.rights.forall(f)
     override def any[A](fa: Zipper[A])(f: A => Boolean) =

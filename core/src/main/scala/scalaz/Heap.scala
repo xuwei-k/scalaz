@@ -36,13 +36,13 @@ sealed abstract class Heap[A] {
   def insert(a: A)(implicit o: Order[A]): Heap[A] = insertWith(o.lessThanOrEqual, a)
 
   /** Alias for insert */
-  final def +(a: A)(implicit o: Order[A]): Heap[A] = this insert a
+  final def +(a: A)(implicit o: Order[A]): Heap[A] = this.insert(a)
 
   def insertAll(as: IterableOnce[A])(implicit o: Order[A]): Heap[A] =
-    as.iterator.foldLeft(this)((h,a) => h insert a)
+    as.iterator.foldLeft(this)((h,a) => h.insert(a))
 
   def insertAllF[F[_]](as: F[A])(implicit F: Foldable[F], o: Order[A]): Heap[A] =
-    F.foldLeft(as, this)((h,a) => h insert a)
+    F.foldLeft(as, this)((h,a) => h.insert(a))
 
   /**Meld the values from two heaps into one heap. O(1)*/
   def union(as: Heap[A]): Heap[A] = (this, as) match {
@@ -112,7 +112,7 @@ sealed abstract class Heap[A] {
 
   /**Filter the heap, retaining only values that satisfy the predicate. O(n)*/
   def filter(p: A => Boolean): Heap[A] =
-    fold(Empty[A], (_, leq, t) => t foldMap (x => if (p(x.value)) singletonWith(leq, x.value) else Empty[A]))
+    fold(Empty[A], (_, leq, t) => t.foldMap((x => if (p(x.value)) singletonWith(leq, x.value) else Empty[A])))
 
   /**Builds a new heap by applying a partial function to all elements of this heap on which the function is defined. O(n)*/
   def collect[B: Order](pf: PartialFunction[A, B]): Heap[B] =
@@ -134,7 +134,7 @@ sealed abstract class Heap[A] {
         (singletonWith(leq, x), Empty[A], Empty[A])
       else
         (Empty[A], Empty[A], singletonWith(leq, x))
-      t foldMap (x => f(x.value))
+      t.foldMap((x => f(x.value)))
     })
   }
 
@@ -180,7 +180,7 @@ sealed abstract class Heap[A] {
 
   /**Construct heaps from each element in this heap and union them together into a new heap. O(n)*/
   def flatMap[B: Order](f: A => Heap[B]): Heap[B] =
-    fold(Empty[B], (_, _, t) => t foldMap (x => f(x.value)))
+    fold(Empty[B], (_, _, t) => t.foldMap((x => f(x.value))))
 
   /**Traverse the elements of the heap in sorted order and produce a new heap with applicative effects.
    * O(n log n)*/
@@ -239,10 +239,10 @@ object Heap extends HeapInstances {
   import Heap.impl._
 
   def fromData[F[_] : Foldable, A: Order](as: F[A]): Heap[A] =
-    Foldable[F].foldLeft(as, Empty[A])((b, a) => b insert a)
+    Foldable[F].foldLeft(as, Empty[A])((b, a) => b.insert(a))
 
   def fromCodata[F[_] : Foldable, A: Order](as: F[A]): Heap[A] =
-    Foldable[F].foldr(as, Empty[A])(x => y => y insert x)
+    Foldable[F].foldr(as, Empty[A])(x => y => y.insert(x))
 
   def fromDataWith[F[_] : Foldable, A](f: (A, A) => Boolean, as: F[A]): Heap[A] =
     Foldable[F].foldLeft(as, Empty[A])((x, y) => x.insertWith(f, y))
@@ -260,18 +260,18 @@ object Heap extends HeapInstances {
   def replicate[A: Order](a: A, i: Int): Heap[A] = {
     @tailrec
     def f(x: Heap[A], y: Int): Heap[A] =
-      if (y % 2 == 0) f(x union x, y / 2)
+      if (y % 2 == 0) f(x.union(x), y / 2)
       else
       if (y == 1) x
       else
-        g(x union x, (y - 1) / 2, x)
+        g(x.union(x), (y - 1) / 2, x)
     @tailrec
     def g(x: Heap[A], y: Int, z: Heap[A]): Heap[A] =
-      if (y % 2 == 0) g(x union x, y / 2, z)
+      if (y % 2 == 0) g(x.union(x), y / 2, z)
       else
-      if (y == 1) x union z
+      if (y == 1) x.union(z)
       else
-        g(x union x, (y - 1) / 2, x union z)
+        g(x.union(x), (y - 1) / 2, x.union(z))
     if (i < 0) sys.error("Heap.replicate: negative length")
     else
     if (i == 0) Empty[A]
@@ -434,10 +434,10 @@ sealed abstract class HeapInstances {
   }
 
   implicit def heapMonoid[A]: Monoid[Heap[A]] = new Monoid[Heap[A]] {
-    def append(f1: Heap[A], f2: => Heap[A]) = f1 union f2
+    def append(f1: Heap[A], f2: => Heap[A]) = f1.union(f2)
     def zero = Heap.Empty.apply
   }
 
   // implicit def heapEqual[A: Equal]: Equal[Heap[A]] = Equal.equalBy((_: Heap[A]).toStream)
-  implicit def healEqual[A : Equal](implicit H : Foldable[Heap]): Equal[Heap[A]] = Equal[EStream[A]] contramap {H.toEphemeralStream(_: Heap[A])}
+  implicit def healEqual[A : Equal](implicit H : Foldable[Heap]): Equal[Heap[A]] = Equal[EStream[A]].contramap({H.toEphemeralStream(_: Heap[A])})
 }

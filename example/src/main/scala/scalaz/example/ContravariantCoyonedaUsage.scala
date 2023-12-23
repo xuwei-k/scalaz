@@ -36,12 +36,12 @@ object ContravariantCoyonedaUsage {
     // Which is a silly way to write this.  Let’s try again:
 
     def numerically2: Order[String] =
-      Order orderBy parseCommaNum
+      Order.orderBy(parseCommaNum)
 
     // Which is a shorthand way of writing
 
     def numerically3: Order[String] =
-      Order[Long \/ String] contramap parseCommaNum
+      Order[Long \/ String].contramap(parseCommaNum)
 
     // All of them have the same behavior: to compare two strings, do
     // `parseCommaNum' on them, and compare the results.  The
@@ -52,19 +52,18 @@ object ContravariantCoyonedaUsage {
     // and the other two we’ll be using for this example.
 
     def parseCommaNum(s: String): Long \/ String =
-      ("""-?[0-9,]+""".r findFirstIn s
-         flatMap (_.filter(_ != ',').parseLong.toOption)) <\/ s
+      ("""-?[0-9,]+""".r.findFirstIn(s).flatMap((_.filter(_ != ',').parseLong.toOption))) <\/ s
 
     def caseInsensitively(s: String): String =
       s.toUpperCase.toLowerCase
 
     def parseDate(s: String): (Int, Option[(Int, Int)]) \/ String =
       (for {
-         grps <- """([0-9]+)-([0-9]+)-([0-9]+)""".r findFirstMatchIn s
+         grps <- """([0-9]+)-([0-9]+)-([0-9]+)""".r.findFirstMatchIn(s)
          List(y, m, d) <- grps.subgroups.traverse(_.parseInt.toOption)
        } yield (y, Some((m, d))))
         .orElse(for {
-                  n <- """[0-9]+""".r findFirstIn s
+                  n <- """[0-9]+""".r.findFirstIn(s)
                   yi <- n.parseInt.toOption
                 } yield (yi, None)) <\/ s
 
@@ -74,10 +73,10 @@ object ContravariantCoyonedaUsage {
     // result.
 
     def caseInsensitivelyOrd: Order[String] =
-      Order orderBy caseInsensitively
+      Order.orderBy(caseInsensitively)
 
     def dateOrd: Order[String] =
-      Order orderBy parseDate
+      Order.orderBy(parseDate)
 
     // Schwartzian transform
     // ---------------------
@@ -264,7 +263,7 @@ object ContravariantCoyonedaUsage {
 
     def recItemOrd(i: Int, o: CtCoyo[Order, String])
         : CtCoyo[Order, Vector[String]] =
-      o contramap (v => v(i))
+      o.contramap((v => v(i)))
 
     // Now what?  A `SortSpec' has several such values in it; how do we
     // combine them?
@@ -512,7 +511,7 @@ object ContravariantCoyonedaUsage {
 
     def recItem[F[_]](i: Int, o: CtCoyo[F, String])
         : CtCoyo[F, Vector[String]] =
-      o contramap (v => v(i))
+      o.contramap((v => v(i)))
 
     // And, again, with a general notion of the underlying product
     // function and identity you could probably produce the monoid

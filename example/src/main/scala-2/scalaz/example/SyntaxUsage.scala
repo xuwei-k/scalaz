@@ -120,7 +120,7 @@ object SyntaxUsage {
       // and there is a unique Monad[F] in scope.
       import scalaz.syntax.monad._
 
-      fa map f
+      fa.map(f)
     }
   }
 
@@ -136,13 +136,13 @@ object SyntaxUsage {
       import scalaz.syntax.traverse0._
 
       // Functor syntax
-      fa map f
+      fa.map(f)
 
       // Monad syntax
-      fa flatMap (a => f(a).point[F])
+      fa.flatMap((a => f(a).point[F]))
 
       // Traverse and Applicative syntax
-      fa traverse (a => f(a).point[F])
+      fa.traverse((a => f(a).point[F]))
     }
   }
 
@@ -156,7 +156,7 @@ object SyntaxUsage {
       import scalaz.syntax.applicative0._
 
       // Bind syntax
-      fa flatMap (_ => fb)
+      fa.flatMap((_ => fb))
 
       // Applicative syntax
       1.point[F]
@@ -176,13 +176,13 @@ object SyntaxUsage {
       import scalaz.syntax.monadError0._
       import scalaz.syntax.applicativeError0._
       // Monad syntax
-      fa flatMap (_ => fa)
+      fa.flatMap((_ => fa))
 
       // MonadTell syntax
       fa :++> "foo"
 
       // ApplicativeError syntax
-      fa handleError (e => fa)
+      fa.handleError((e => fa))
     }
   }
 }

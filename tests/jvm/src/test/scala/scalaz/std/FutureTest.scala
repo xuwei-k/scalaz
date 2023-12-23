@@ -28,10 +28,10 @@ class FutureTest extends SpecLite {
   {
     import scala.concurrent.ExecutionContext.Implicits.global
 
-    implicit def futureEqual[A : Equal]: Equal[Future[A]] = Equal[Throwable \/ A] contramap { (future: Future[A]) =>
+    implicit def futureEqual[A : Equal]: Equal[Future[A]] = Equal[Throwable \/ A].contramap({ (future: Future[A]) =>
       val futureWithError = future.map(_.right[Throwable]).recover { case e => e.left[A] }
       Await.result(futureWithError, duration)
-    }
+    })
 
     implicit def futureShow[A: Show]: Show[Future[A]] = Contravariant[Show].contramap(Show[String \/ A]){
       (future: Future[A]) =>
@@ -108,7 +108,7 @@ class FutureTest extends SpecLite {
     "gather maintains order" ! forAll { (xs: List[Int]) =>
       val promises = Vector.fill(xs.size)(Promise[Int]())
       val f = Nondeterminism[Future].gather(IList.fromSeq(promises.map(_.future)))
-      (promises zip xs).reverseIterator.foreach { case (p, x) =>
+      (promises.zip(xs)).reverseIterator.foreach { case (p, x) =>
         p.complete(scala.util.Try(x))
       }
       Await.result(f, duration) must_== IList.fromSeq(xs)

@@ -135,7 +135,7 @@ object IListTest extends SpecLite {
   }
 
   "concat" ! forAll { (ns: IList[Int], ms: IList[Int]) =>
-    (ns concat ms).toList must_=== ns.toList ++ ms.toList
+    (ns.concat(ms)).toList must_=== ns.toList ++ ms.toList
   }
 
   "containsSlice" ! forAll { (ns: IList[Int], ms: IList[Int]) =>
@@ -225,7 +225,7 @@ object IListTest extends SpecLite {
   }
 
   "interleave" ! forAll { (xs: IList[Int], ys: IList[Int]) =>
-    val a = xs interleave ys
+    val a = xs.interleave(ys)
     (xs.length + ys.length) must_=== a.length
     val min = math.min(xs.length, ys.length)
 
@@ -284,7 +284,7 @@ object IListTest extends SpecLite {
   }
 
   "prepend" ! forAll { (ns: IList[Int], ms: IList[Int]) =>
-    (ms prepend ns).toList must_== ns.toList ++: ms.toList
+    (ms.prepend(ns)).toList must_== ns.toList ++: ms.toList
   }
 
   "reduceLeftOption" ! forAll { (ns: IList[Int], f: (Int, Int) => Int) =>

@@ -92,14 +92,14 @@ private trait SelectTFunctor[R, M[_]] extends Functor[SelectT[R, M, *]] {
   protected implicit def F: Functor[M]
 
   override final def map[A, B](fa: SelectT[R, M, A])(f: A => B) =
-    fa map f
+    fa.map(f)
 }
 
 private trait SelectTBind[R, M[_]] extends Bind[SelectT[R, M, *]] with SelectTFunctor[R, M] {
   protected implicit def F: Bind[M]
 
   override def bind[A, B](fa: SelectT[R, M, A])(f: A => SelectT[R, M, B]) =
-    fa flatMap f
+    fa.flatMap(f)
 }
 
 private trait SelectTMonad[R, M[_]] extends Monad[SelectT[R, M, *]] with SelectTBind[R, M] {

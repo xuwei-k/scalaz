@@ -24,7 +24,7 @@ object MonadErrorTest extends SpecLite {
       },
       new (Decoder ~> λ[a => (String => Int \/ a)]) {
         override def apply[A](a: Decoder[A]) =
-          a decode _
+          a.decode(_)
       }
     )
 

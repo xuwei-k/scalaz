@@ -59,11 +59,11 @@ trait Reducer[C, M] {
       case Just((b, c)) => rec(b, cons(c, acc))
       case _ => acc
     }
-    f(seed) map { case (b, c) => rec(b, unit(c)) }
+    f(seed).map({ case (b, c) => rec(b, unit(c)) })
   }
 
   def unfoldl[B](seed: B)(f: B => Maybe[(B, C)])(implicit M: Monoid[M]): M =
-    unfoldlOpt(seed)(f) getOrElse M.zero
+    unfoldlOpt(seed)(f).getOrElse(M.zero)
 
   def unfoldrOpt[B](seed: B)(f: B => Maybe[(C, B)]): Maybe[M] =
     defaultUnfoldrOpt(seed)(f)
@@ -74,11 +74,11 @@ trait Reducer[C, M] {
       case Just((c, b)) => rec(snoc(acc, c), b)
       case _ => acc
     }
-    f(seed) map { case (c, b) => rec(unit(c), b) }
+    f(seed).map({ case (c, b) => rec(unit(c), b) })
   }
 
   def unfoldr[B](seed: B)(f: B => Maybe[(C, B)])(implicit M: Monoid[M]): M =
-    unfoldrOpt(seed)(f) getOrElse M.zero
+    unfoldrOpt(seed)(f).getOrElse(M.zero)
 
   trait ReducerLaw {
     def consCorrectness(c: C, m: M)(implicit E: Equal[M]): Boolean =
@@ -89,7 +89,7 @@ trait Reducer[C, M] {
 
     def unfoldlOptConsistency[B](seed: B, f: B => Maybe[(B, C)])(implicit E: Equal[M]): Boolean = {
       val g: ((Int, B)) => Maybe[((Int, B), C)] = { case (i, b) =>
-        if(i > 0) f(b) map { case (b, c) => ((i-1, b), c) }
+        if(i > 0) f(b).map({ case (b, c) => ((i-1, b), c) })
         else Maybe.empty
       }
       val limit = 4 // to prevent infinite unfolds
@@ -98,7 +98,7 @@ trait Reducer[C, M] {
 
     def unfoldrOptConsistency[B](seed: B, f: B => Maybe[(C, B)])(implicit E: Equal[M]): Boolean = {
       val g: ((Int, B)) => Maybe[(C, (Int, B))] = { case (i, b) =>
-        if(i > 0) f(b) map { case (c, b) => (c, (i-1, b)) }
+        if(i > 0) f(b).map({ case (c, b) => (c, (i-1, b)) })
         else Maybe.empty
       }
       val limit = 4 // to prevent infinite unfolds
@@ -116,10 +116,10 @@ sealed abstract class UnitReducer[C, M] extends Reducer[C, M] {
   def cons(c: C, m: M): M = semigroup.append(unit(c), m)
 
   override def unfoldlOpt[B](seed: B)(f: B => Maybe[(B, C)]): Maybe[M] =
-    semigroup.unfoldlSumOpt(seed)(f(_) map { case (b, c) => (b, unit(c)) })
+    semigroup.unfoldlSumOpt(seed)(f(_).map({ case (b, c) => (b, unit(c)) }))
 
   override def unfoldrOpt[B](seed: B)(f: B => Maybe[(C, B)]): Maybe[M] =
-    semigroup.unfoldrSumOpt(seed)(f(_) map { case (c, b) => (unit(c), b) })
+    semigroup.unfoldrSumOpt(seed)(f(_).map({ case (c, b) => (unit(c), b) }))
 }
 
 object UnitReducer {
@@ -270,7 +270,7 @@ sealed abstract class ReducerInstances {
     override def unfoldr[B](seed: B)(f: B => Maybe[(C, B)])(implicit M: Monoid[M]): M = {
       import  std.function._
       def go(s: B, f: B => Maybe[(C, B)]): Trampoline[M] = f(s) match {
-        case Just((c, b)) => suspend(go(b, f)) map (m => cs(c, m))
+        case Just((c, b)) => suspend(go(b, f)).map((m => cs(c, m)))
         case _ => return_[Function0, M](M.zero)
       }
       go(seed, f).run

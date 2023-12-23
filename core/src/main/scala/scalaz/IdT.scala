@@ -5,7 +5,7 @@ final case class IdT[F[_], A](run: F[A]) {
     new IdT[F, B](F.map(run)(f))
 
   def flatMap[B](f: A => IdT[F, B])(implicit F: Bind[F]) =
-    new IdT[F, B](F.bind(run)(f andThen ((_: IdT[F, B]).run)))
+    new IdT[F, B](F.bind(run)(f.andThen(((_: IdT[F, B]).run))))
 
   def flatMapF[B](f: A => F[B])(implicit F: Bind[F]) =
     new IdT[F, B](F.bind(run)(f))

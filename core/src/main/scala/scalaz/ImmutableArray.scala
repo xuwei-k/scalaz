@@ -30,7 +30,7 @@ sealed abstract class ImmutableArrayInstances {
 
   implicit def immutableArrayEqual[A](implicit A: Equal[A]): Equal[ImmutableArray[A]] =
     Equal.equal{ (a, b) =>
-      (a.length == b.length) && (0 until a.length).forall(i => A.equal(a(i), b(i)))
+      (a.length == b.length) && (0.until(a.length)).forall(i => A.equal(a(i), b(i)))
     }
 
   implicit val immutableArrayInstance: Foldable[ImmutableArray] & Zip[ImmutableArray] =
@@ -53,7 +53,7 @@ sealed abstract class ImmutableArrayInstances {
       def zip[A, B](a: => ImmutableArray[A], b: => ImmutableArray[B]) = {
         val _a = a
         if(_a.isEmpty) new ImmutableArray.ofRef(Array[(A, B)]())
-        else new ImmutableArray.ofRef((_a.iterator zip b.iterator).toArray)
+        else new ImmutableArray.ofRef((_a.iterator.zip(b.iterator)).toArray)
       }
       override def index[A](fa: ImmutableArray[A], i: Int) =
         if(0 <= i && i < fa.length) Some(fa(i)) else None

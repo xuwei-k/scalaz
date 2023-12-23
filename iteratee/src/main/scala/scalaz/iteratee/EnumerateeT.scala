@@ -23,7 +23,7 @@ trait EnumerateeTFunctions {
   def map[O, I, F[_] : Monad](f: O => I): EnumerateeT[O, I, F] =
     new EnumerateeT[O, I, F] {
       def apply[A] = {
-        def loop = step andThen cont[O, F, StepT[I, F, A]]
+        def loop = step.andThen(cont[O, F, StepT[I, F, A]])
         def step: (Input[I] => IterateeT[I, F, A]) => (Input[O] => IterateeT[O, F, StepT[I, F, A]]) = {
           k => in =>
             in(
@@ -60,7 +60,7 @@ trait EnumerateeTFunctions {
   def collect[O, I, F[_] : Monad](pf: PartialFunction[O, I]): EnumerateeT[O, I, F] =
     new EnumerateeT[O, I, F] {
       def apply[A] = {
-        def loop = step andThen cont[O, F, StepT[I, F, A]]
+        def loop = step.andThen(cont[O, F, StepT[I, F, A]])
         def step: (Input[I] => IterateeT[I, F, A]) => (Input[O] => IterateeT[O, F, StepT[I, F, A]]) = {
           k => in =>
             in(
@@ -77,7 +77,7 @@ trait EnumerateeTFunctions {
   def filter[E, F[_] : Monad](p: E => Boolean): EnumerateeT[E, E, F] =
     new EnumerateeT[E, E, F] {
       def apply[A] = {
-        def loop = step andThen cont[E, F, StepT[E, F, A]]
+        def loop = step.andThen(cont[E, F, StepT[E, F, A]])
         def step: (Input[E] => IterateeT[E, F, A]) => (Input[E] => IterateeT[E, F, StepT[E, F, A]]) = {
           k => in =>
             in(
@@ -100,12 +100,12 @@ trait EnumerateeTFunctions {
     new EnumerateeT[E, E, F] {
       def apply[A] = {
         def step(s: StepT[E, F, A], last: Input[E]): IterateeT[E, F, A] =
-          s mapCont { k =>
+          s.mapCont({ k =>
             cont { in =>
               val inr = in.filter(e => last.forall(l => Order[E].order(e, l) != EQ))
               k(inr) >>== (step(_, in))
             }
-          }
+          })
 
         s => step(s, emptyInput).map(sdone(_, emptyInput))
       }
@@ -118,7 +118,7 @@ trait EnumerateeTFunctions {
     new EnumerateeT[E, (E, Long), F] {
       def apply[A] = {
         type StepEl = Input[(E, Long)] => IterateeT[(E, Long), F, A]
-        def loop(i: Long) = (step(_: StepEl, i)) andThen (cont[E, F, StepT[(E, Long), F, A]])
+        def loop(i: Long) = (step(_: StepEl, i)) .andThen((cont[E, F, StepT[(E, Long), F, A]]))
         def step(k: StepEl, i: Long): (Input[E] => IterateeT[E, F, StepT[(E, Long), F, A]]) = {
           (in: Input[E]) =>
             in.map(e => (e, i)).fold(
@@ -140,7 +140,7 @@ trait EnumerateeTFunctions {
   def splitOn[E, F[_], G[_]](p: E => Boolean)(implicit F: Applicative[F], FE: Monoid[F[E]], G: Monad[G]): EnumerateeT[E, F[E], G] =
     new EnumerateeT[E, F[E], G] {
       def apply[A] = {
-        (takeWhile[E, F](p).up[G] flatMap (xs => drop[E, G](1).map(_ => xs))).sequenceI.apply[A]
+        (takeWhile[E, F](p).up[G].flatMap((xs => drop[E, G](1).map(_ => xs)))).sequenceI.apply[A]
       }
     }
 

@@ -68,7 +68,7 @@ trait Contravariant[F[_]] extends InvariantFunctor[F] { self =>
      * A series of contramaps may be freely rewritten as a single
      * contramap on a composed function.
      */
-    def composite[A, B, C](fa: F[A], f1: B => A, f2: C => B)(implicit FC: Equal[F[C]]): Boolean = FC.equal(contramap(contramap(fa)(f1))(f2), contramap(fa)(f1 compose f2))
+    def composite[A, B, C](fa: F[A], f1: B => A, f2: C => B)(implicit FC: Equal[F[C]]): Boolean = FC.equal(contramap(contramap(fa)(f1))(f2), contramap(fa)(f1.compose(f2)))
   }
   def contravariantLaw: ContravariantLaw = new ContravariantLaw {}
 

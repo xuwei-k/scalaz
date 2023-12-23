@@ -44,7 +44,7 @@ object FreeTTest extends SpecLite {
       val g = ().point[FreeTListOption]
 
       // by the monad laws, f1 = f2
-      val f1 = a.point[FreeTListOption] flatMap f
+      val f1 = a.point[FreeTListOption].flatMap(f)
       val f2 = f(a)
 
       // by the substitution property of equality,
@@ -72,7 +72,7 @@ object FreeTTest extends SpecLite {
     "not stack overflow with 50k left-associated binds" in {
       val expected = Applicative[FreeTListOption].point(())
       val result =
-        (0 until 50000).foldLeft(Applicative[FreeTListOption].point(()))(
+        (0.until(50000)).foldLeft(Applicative[FreeTListOption].point(()))(
           (fu, i) => fu.flatMap(u => Applicative[FreeTListOption].point(u))
         )
 
@@ -82,7 +82,7 @@ object FreeTTest extends SpecLite {
     "not stack overflow with bind followed by 50k maps" in {
       val expected = Applicative[FreeTListOption].point(())
       val result =
-        (0 until 50000).foldLeft(().point[FreeTListOption].flatMap(u => u.point[FreeTListOption]))(
+        (0.until(50000)).foldLeft(().point[FreeTListOption].flatMap(u => u.point[FreeTListOption]))(
           (fu, i) => fu.map(u => u)
         )
 
@@ -95,7 +95,7 @@ object FreeTTest extends SpecLite {
     }
 
     "hoist stack-safety" in {
-      val a = (0 until 50000).foldLeft(Applicative[FreeTListOption].point(()))(
+      val a = (0.until(50000)).foldLeft(Applicative[FreeTListOption].point(()))(
         (fu, i) => fu.flatMap(u => Applicative[FreeTListOption].point(u))
       )
 
@@ -108,7 +108,7 @@ object FreeTTest extends SpecLite {
     }
 
     "interpret stack-safety" in {
-      val a = (0 until 50000).foldLeft(Applicative[FreeTListOption].point(()))(
+      val a = (0.until(50000)).foldLeft(Applicative[FreeTListOption].point(()))(
         (fu, i) => fu.flatMap(u => Applicative[FreeTListOption].point(u))
       )
 

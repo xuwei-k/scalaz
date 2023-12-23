@@ -4,9 +4,9 @@ package std
 
 final class EitherOps[A, B](private val self: Either[A, B]) extends AnyVal {
 
-  final def toDisjunction: A \/ B = \/ fromEither self
+  final def toDisjunction: A \/ B = \/.fromEither(self)
 
-  final def toValidation: Validation[A, B] = Validation fromEither self
+  final def toValidation: Validation[A, B] = Validation.fromEither(self)
 }
 
 final class RightOps[A, B](private val self: Right[A, B]) extends AnyVal {

@@ -42,8 +42,8 @@ trait PartialFunctionInstances {
     }
 
     def choice[A, B, C](f: => PartialFunction[A, C], g: => PartialFunction[B, C]): PartialFunction[A \/ B, C] = {
-      case -\/(a) if f isDefinedAt a => f(a)
-      case \/-(b) if g isDefinedAt b => g(b)
+      case -\/(a) if f.isDefinedAt(a) => f(a)
+      case \/-(b) if g.isDefinedAt(b) => g(b)
     }
 
     override def split[A, B, C, D](f: PartialFunction[A, B], g: PartialFunction[C, D]): PartialFunction[(A,  C), (B, D)] = {

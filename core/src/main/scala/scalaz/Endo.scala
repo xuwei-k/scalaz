@@ -11,10 +11,10 @@ final case class Endo[A](run: A => A) {
   final def apply(a: A): A = run(a)
 
   /** Do `other`, than call myself with its result. */
-  final def compose(other: Endo[A]): Endo[A] = Endo.endo(run compose other.run)
+  final def compose(other: Endo[A]): Endo[A] = Endo.endo(run.compose(other.run))
 
   /** Call `other` with my result. */
-  final def andThen(other: Endo[A]): Endo[A] = other compose this
+  final def andThen(other: Endo[A]): Endo[A] = other.compose(this)
 }
 
 /** Endomorphisms using by-name evaluation.  They have special properties among functions, so
@@ -29,7 +29,7 @@ final case class EndoByName[A](run: (=>A) => A) {
   final def compose(other: => EndoByName[A]): EndoByName[A] = EndoByName(x => run(other.run(x)))
 
   /** Call `other` with my result. */
-  final def andThen(other: EndoByName[A]): EndoByName[A] = other compose this
+  final def andThen(other: EndoByName[A]): EndoByName[A] = other.compose(this)
 }
 
 object Endo extends EndoInstances {
@@ -71,12 +71,12 @@ sealed abstract class EndoInstances {
   /** Endo forms a monoid where `zero` is the identity endomorphism
     * and `append` composes the underlying functions. */
   implicit def endoInstance[A]: Monoid[Endo[A]] = new Monoid[Endo[A]] {
-    def append(f1: Endo[A], f2: => Endo[A]) = f1 compose f2
+    def append(f1: Endo[A], f2: => Endo[A]) = f1.compose(f2)
     def zero = Endo.idEndo
   }
   implicit val endoInstances: Zip[Endo] & Unzip[Endo] & InvariantFunctor[Endo] = new Zip[Endo] with Unzip[Endo] with InvariantFunctor[Endo] {
     def xmap[A, B](fa: Endo[A], f: A => B, g: B => A) =
-      Endo.endo(g andThen fa.run andThen f)
+      Endo.endo(g.andThen(fa.run).andThen(f))
 
     def zip[A, B](a: => Endo[A], b: => Endo[B]) =
       Endo {
@@ -95,7 +95,7 @@ sealed abstract class EndoByNameInstances {
   /** Endo forms a monoid where `zero` is the identity endomorphism
     * and `append` composes the underlying functions. */
   implicit def endoInstance[A]: Monoid[EndoByName[A]] = new Monoid[EndoByName[A]] {
-    def append(f1: EndoByName[A], f2: => EndoByName[A]) = f1 compose f2
+    def append(f1: EndoByName[A], f2: => EndoByName[A]) = f1.compose(f2)
     def zero = Endo.idEndoByName
   }
   implicit val endoInstances: Zip[EndoByName] & Unzip[EndoByName] & InvariantFunctor[EndoByName] = new Zip[EndoByName] with Unzip[EndoByName] with InvariantFunctor[EndoByName] {

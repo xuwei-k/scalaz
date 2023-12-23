@@ -40,7 +40,7 @@ object EnumeratorPTest extends SpecLite {
       val enum3 = enumPStream[Int, Id](Stream(3, 5, 8))
 
       val cf = cogroupE[Int, Int, Id](Order[Int].order)
-      val enumR = cf(cf(enum1, enum2) map { _.fold(identity[Int], _._1, identity[Int]) }, enum3)
+      val enumR = cf(cf(enum1, enum2).map({ _.fold(identity[Int], _._1, identity[Int]) }), enum3)
 
       (consume[Either3[Int, (Int, Int), Int], Id, List] &= enumR.apply[Id](id)).run must_===(List(
         left3(1),

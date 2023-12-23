@@ -51,7 +51,7 @@ object VectorTest extends SpecLite {
 
   "takeWhileM" ! forAll {
     (xs: Vector[Int]) =>
-      takeWhileM[Int, Id](xs)(evenp) must_===(xs takeWhile evenp)
+      takeWhileM[Int, Id](xs)(evenp) must_===(xs.takeWhile(evenp))
   }
 
   "groupWhen" ! forAll {
@@ -71,7 +71,7 @@ object VectorTest extends SpecLite {
 
   "findM" ! forAll {
     (xs: Vector[Int]) =>
-      val i = xs indexWhere evenp
+      val i = xs.indexWhere(evenp)
       type W[A] = Writer[Vector[Int], A]
       val wxs = findM[Int, W](xs)(x =>
         WriterT.writer(Vector(x) -> evenp(x)))
@@ -100,7 +100,7 @@ object VectorTest extends SpecLite {
   }
 
   "index" ! forAll { (xs: Vector[Int], n: Int) =>
-    (xs index n) must_===(if (n >= 0 && xs.size > n) Some(xs(n)) else None)
+    (xs.index(n)) must_===(if (n >= 0 && xs.size > n) Some(xs(n)) else None)
   }
 
   "groupWhen is groupWhenM[Id]" ! forAll { (xs: Vector[Int]) =>

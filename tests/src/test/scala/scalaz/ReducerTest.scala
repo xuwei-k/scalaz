@@ -37,7 +37,7 @@ object ReducerTest extends SpecLite {
       if(i >= 0) Maybe.just((i-1, i))
       else sys.error("BOOM!")
     }
-    val g = (i: Int) => f(i) map (_.swap)
+    val g = (i: Int) => f(i).map((_.swap))
 
     R.unfoldl(5)(f) must_=== Multiplication(0)
     R.unfoldr(5)(g) must_=== Multiplication(0)
@@ -52,7 +52,7 @@ object ReducerTest extends SpecLite {
       else if(i == 0) Maybe.just((i-1, false))
       else sys.error("BOOM!")
     }
-    val g = (i: Int) => f(i) map (_.swap)
+    val g = (i: Int) => f(i).map((_.swap))
 
     R.unfoldl(5)(f) must_=== Conjunction(false)
     R.unfoldr(5)(g) must_=== Conjunction(false)

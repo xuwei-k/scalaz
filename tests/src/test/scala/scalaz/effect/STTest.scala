@@ -16,7 +16,7 @@ object STTest extends SpecLite {
   "STRef" in {
     def e1[S] = for {
       x <- newVar[S](0)
-      r <- x mod {_ + 1}
+      r <- x.mod({_ + 1})
     } yield x
     def e2[S]: ST[S, Int] = for {
       x <- e1[S]

@@ -20,7 +20,7 @@ sealed abstract class RegionT[S, P[_], A] {
     value.run(r)
 
   def mapT[Q[_], B](f: P[A] => Q[B]): RegionT[S, Q, B] =
-    RegionT(Kleisli(f compose runT))
+    RegionT(Kleisli(f.compose(runT)))
 }
 
 object RegionT extends RegionTInstances {

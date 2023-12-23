@@ -99,7 +99,7 @@ case class StrictTree[A](
     val f = (s: Vector[StrictTree[A]]) => {
       Foldable[Vector].foldMap(s)((_: StrictTree[A]).subForest)
     }
-    Vector.iterate(Vector(this), size)(f) takeWhile (!_.isEmpty) map (_ map (_.rootLabel))
+    Vector.iterate(Vector(this), size)(f).takeWhile((!_.isEmpty)).map((_.map((_.rootLabel))))
   }
 
   def toTree: Tree[A] = {
@@ -178,10 +178,10 @@ sealed abstract class StrictTreeInstances {
 
   implicit val strictTreeInstance: Traverse1[StrictTree] & Monad[StrictTree] & Comonad[StrictTree] & Align[StrictTree] & Zip[StrictTree] = new Traverse1[StrictTree] with Monad[StrictTree] with Comonad[StrictTree] with Align[StrictTree] with Zip[StrictTree] {
     def point[A](a: => A): StrictTree[A] = StrictTree.Leaf(a)
-    def cobind[A, B](fa: StrictTree[A])(f: StrictTree[A] => B): StrictTree[B] = fa cobind f
+    def cobind[A, B](fa: StrictTree[A])(f: StrictTree[A] => B): StrictTree[B] = fa.cobind(f)
     def copoint[A](p: StrictTree[A]): A = p.rootLabel
-    override def map[A, B](fa: StrictTree[A])(f: A => B) = fa map f
-    def bind[A, B](fa: StrictTree[A])(f: A => StrictTree[B]): StrictTree[B] = fa flatMap f
+    override def map[A, B](fa: StrictTree[A])(f: A => B) = fa.map(f)
+    def bind[A, B](fa: StrictTree[A])(f: A => StrictTree[B]): StrictTree[B] = fa.flatMap(f)
     def traverse1Impl[G[_]: Apply, A, B](fa: StrictTree[A])(f: A => G[B]): G[StrictTree[B]] = fa traverse1 f
     override def foldRight[A, B](fa: StrictTree[A], z: => B)(f: (A, => B) => B): B = fa.foldRight(z)(f)
     override def foldMapRight1[A, B](fa: StrictTree[A])(z: A => B)(f: (A, => B) => B) = (fa.flatten.reverse: @unchecked) match {
@@ -192,7 +192,7 @@ sealed abstract class StrictTreeInstances {
     override def foldMapLeft1[A, B](fa: StrictTree[A])(z: A => B)(f: (B, A) => B): B = fa.flatten match {
       case h +: t => t.foldLeft(z(h))(f)
     }
-    override def foldMap[A, B](fa: StrictTree[A])(f: A => B)(implicit F: Monoid[B]): B = fa foldMap f
+    override def foldMap[A, B](fa: StrictTree[A])(f: A => B)(implicit F: Monoid[B]): B = fa.foldMap(f)
 
     //This implementation is 14x faster than the trampolined implementation for StrictTreeTestJVM's align test.
     override def alignWith[A, B, C](f: (\&/[A, B]) => C): (StrictTree[A], StrictTree[B]) => StrictTree[C] = {

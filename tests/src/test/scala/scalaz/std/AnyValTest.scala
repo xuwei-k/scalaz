@@ -77,7 +77,7 @@ object AnyValTest extends SpecLite {
       if(i >= 0) Maybe.just((i-1, Tag(i)))
       else sys.error("BOOM!")
     }
-    val g = (i: Int) => f(i) map (_.swap)
+    val g = (i: Int) => f(i).map((_.swap))
 
     M.unfoldlSum(5)(f) must_=== Tag(0)
     M.unfoldrSum(5)(g) must_=== Tag(0)
@@ -91,7 +91,7 @@ object AnyValTest extends SpecLite {
       else if(i == 0) Maybe.just((i-1, false))
       else sys.error("BOOM!")
     }
-    val g = (i: Int) => f(i) map (_.swap)
+    val g = (i: Int) => f(i).map((_.swap))
 
     M.unfoldlSum(5)(f) must_=== false
     M.unfoldrSum(5)(g) must_=== false
@@ -105,7 +105,7 @@ object AnyValTest extends SpecLite {
       else if(i == 0) Maybe.just((i-1, true))
       else sys.error("BOOM!")
     }
-    val g = (i: Int) => f(i) map (_.swap)
+    val g = (i: Int) => f(i).map((_.swap))
 
     M.unfoldlSum(5)(f) must_=== true
     M.unfoldrSum(5)(g) must_=== true

@@ -85,16 +85,16 @@ abstract class StreamT[M[_], A] { self =>
 
   def trans[N[_]](t: M ~> N)(implicit M: Functor[M]): StreamT[N, A] = { () =>
     t(M.map[Step[M, A], Step[N, A]](this.step()) {
-      case Yield(a, s) => Yield(a, s trans t)
-      case Skip(s)     => Skip(s trans t)
+      case Yield(a, s) => Yield(a, s.trans(t))
+      case Skip(s)     => Skip(s.trans(t))
       case Done()      => Done()
     })
   }
 
   def filter(p: A => Boolean)(implicit m: Functor[M]): StreamT[M, A] =
     stepMap[A] {
-      case Yield(a, s) => if (p(a)) Yield(a, s filter p) else Skip(s filter p)
-      case Skip(s)     => Skip(s filter p)
+      case Yield(a, s) => if (p(a)) Yield(a, s.filter(p)) else Skip(s.filter(p))
+      case Skip(s)     => Skip(s.filter(p))
       case Done()      => Done()
     }
 
@@ -115,14 +115,14 @@ abstract class StreamT[M[_], A] { self =>
 
   def drop(n: Int)(implicit M: Functor[M]): StreamT[M, A] = stepMap[A] {
     case Yield(a, s) => if (n > 0) Skip(s drop (n - 1)) else Yield(a, s)
-    case Skip(s)     => Skip(s drop n)
+    case Skip(s)     => Skip(s.drop(n))
     case Done()      => Done()
   }
 
   def dropWhile(p: A => Boolean)(implicit m: Functor[M]): StreamT[M, A] =
     stepMap[A] {
-      case Yield(a, s) => if (p(a)) Skip(s dropWhile p) else Yield(a, s)
-      case Skip(s)     => Skip(s dropWhile p)
+      case Yield(a, s) => if (p(a)) Skip(s.dropWhile(p)) else Yield(a, s)
+      case Skip(s)     => Skip(s.dropWhile(p))
       case Done()      => Done()
     }
 
@@ -181,14 +181,14 @@ abstract class StreamT[M[_], A] { self =>
 
   def take(n: Int)(implicit M: Functor[M]): StreamT[M, A] = stepMap[A] {
     case Yield(a, s) => if (n <= 0) Done() else Yield(a, s take (n - 1))
-    case Skip(s)     => Skip(s take n)
+    case Skip(s)     => Skip(s.take(n))
     case Done()      => Done()
   }
 
   def takeWhile(p: A => Boolean)(implicit m: Functor[M]): StreamT[M, A] =
     stepMap[A] {
-      case Yield(a, s) => if (p(a)) Yield(a, s takeWhile p) else Done()
-      case Skip(s)     => Skip(s takeWhile p)
+      case Yield(a, s) => if (p(a)) Yield(a, s.takeWhile(p)) else Done()
+      case Skip(s)     => Skip(s.takeWhile(p))
       case Done()      => Done()
     }
 
@@ -201,21 +201,21 @@ abstract class StreamT[M[_], A] { self =>
 
   def flatMap[B](f: A => StreamT[M, B])(implicit m: Functor[M]): StreamT[M, B] =
     stepMap[B] {
-      case Yield(a, s) => Skip(f(a) ++ (s flatMap f))
-      case Skip(s)     => Skip(s flatMap f)
+      case Yield(a, s) => Skip(f(a) ++ (s.flatMap(f)))
+      case Skip(s)     => Skip(s.flatMap(f))
       case Done()      => Done()
     }
 
   def map[B](f: A => B)(implicit m: Functor[M]): StreamT[M, B] = stepMap[B] {
-    case Yield(a, s) => Yield(f(a), s map f)
-    case Skip(s)     => Skip(s map f)
+    case Yield(a, s) => Yield(f(a), s.map(f))
+    case Skip(s)     => Skip(s.map(f))
     case Done()      => Done()
   }
 
   /** @since 7.0.1 */
   def mapM[B](f: A => M[B])(implicit M: Monad[M]): StreamT[M, B] = stepBind[B] {
-    case Yield(a, s) => M.map(f(a))(Yield(_, s mapM f))
-    case Skip(s)     => M.point(Skip(s mapM f))
+    case Yield(a, s) => M.map(f(a))(Yield(_, s.mapM(f)))
+    case Skip(s)     => M.point(Skip(s.mapM(f)))
     case Done()      => M.point(Done())
   }
 
@@ -330,7 +330,7 @@ abstract class StreamT[M[_], A] { self =>
     foldLeftRec(0)((c, a) => 1 + c)
 
   def foreach(f: A => M[Unit])(implicit M: Monad[M]): M[Unit] = M.bind(step()) {
-    case Yield(a, s) => M.bind(f(a))(_ => s foreach f)
+    case Yield(a, s) => M.bind(f(a))(_ => s.foreach(f))
     case Skip(s)     => s.foreach(f)
     case Done()      => M.pure(())
   }
@@ -604,7 +604,7 @@ object StreamT extends StreamTInstances {
     }
 
   def empty[M[_], A](implicit M: Applicative[M]): StreamT[M, A] =
-    StreamT[M, A](M point Done())
+    StreamT[M, A](M.point(Done()))
 
   def liftM[M[_], A](a: M[A])(implicit M: Applicative[M]): StreamT[M, A] =
     StreamT[M, A](M.map(a)(Yield(_, empty[M, A](M))))
@@ -755,10 +755,10 @@ private trait StreamTInstance1[F[_]]
   implicit def F: Functor[F]
 
   override final def map[A, B](fa: StreamT[F, A])(f: A => B) =
-    fa map f
+    fa.map(f)
 
   override final def bind[A, B](fa: StreamT[F, A])(f: A => StreamT[F, B]) =
-    fa flatMap f
+    fa.flatMap(f)
 
   override final def plus[A](a: StreamT[F, A], b: => StreamT[F, A]) =
     a ++ b

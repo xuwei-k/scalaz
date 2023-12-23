@@ -104,7 +104,7 @@ sealed abstract class IterateeT[E, F[_], A] {
   def mapI[G[_]](f: F ~> G)(implicit F: Functor[F]): IterateeT[E, G, A] = {
     def step: StepT[E, F, A] => StepT[E, G, A] =
       _.fold(
-        cont = k => scont[E, G, A](k andThen loop)
+        cont = k => scont[E, G, A](k.andThen(loop))
         , done = (a, i) => sdone[E, G, A](a, i)
       )
     def loop: IterateeT[E, F, A] => IterateeT[E, G, A] = i => iterateeT(f(F.map(i.value)(step)))
@@ -126,7 +126,7 @@ sealed abstract class IterateeT[E, F[_], A] {
       , done = (a, _) => M0.point(a)
     )
 
-    outer(this) flatMap check
+    outer(this).flatMap(check)
   }
 
   /**
@@ -138,11 +138,11 @@ sealed abstract class IterateeT[E, F[_], A] {
       def apply[B] = {
         def loop = doneOr(checkEof)
         def checkEof: (Input[A] => IterateeT[A, F, B]) => IterateeT[E, F, StepT[A, F, B]] = k =>
-          isEof[E, F] flatMap {
+          isEof[E, F].flatMap({
             eof =>
               if (eof) done(scont(k), eofInput)
               else step(k)
-          }
+          })
         def step: (Input[A] => IterateeT[A, F, B]) => IterateeT[E, F, StepT[A, F, B]] = k =>
           flatMap (a => k(elInput(a)) >>== loop)
         loop
@@ -157,15 +157,15 @@ sealed abstract class IterateeT[E, F[_], A] {
       ))
     def loop(x: IterateeT[E, F, A], y: IterateeT[E, F, B])(in: Input[E]): IterateeT[E, F, (A, B)] = in(
       el = _ =>
-        step(x, in) flatMap {
+        step(x, in).flatMap({
           case (a, xx) =>
-            step(y, in) flatMap {
+            step(y, in).flatMap({
               case (b, yy) => (a, b) match {
                 case (Some((a, e)), Some((b, ee))) => done((a, b), if (e.isEl) e else ee)
                 case _                             => cont(loop(xx, yy))
               }
-            }
-        }
+            })
+        })
       , empty = cont(loop(x, y))
       , eof = (x &= enumEofT[E, F]) flatMap (a => (y &= enumEofT[E, F]) map (b => (a, b)))
     )
@@ -267,10 +267,10 @@ trait IterateeTFunctions {
   }
 
   def headDoneOr[E, F[_] : Monad, B](b: => B, f: E => IterateeT[E, F, B]): IterateeT[E, F, B] = {
-    head[E, F] flatMap {
+    head[E, F].flatMap({
       case None => done(b, eofInput)
       case Some(a) => f(a)
-    }
+    })
   }
 
   /**An iteratee that returns the first element of the input **/
@@ -283,10 +283,10 @@ trait IterateeTFunctions {
   }
 
   def peekDoneOr[E, F[_] : Monad, B](b: => B, f: E => IterateeT[E, F, B]): IterateeT[E, F, B] = {
-    peek[E, F] flatMap {
+    peek[E, F].flatMap({
       case None => done(b, eofInput)
       case Some(a) => f(a)
-    }
+    })
   }
 
   /**An iteratee that skips the first n elements of the input **/
@@ -325,7 +325,7 @@ trait IterateeTFunctions {
 
   def foldM[E, F[_], A](init: A)(f: (A, E) => F[A])(implicit m: Monad[F]): IterateeT[E, F, A] = {
     def step(acc: A): Input[E] => IterateeT[E, F, A] = s =>
-      s(el = e => IterateeT.IterateeTMonadTrans[E].liftM(f(acc, e)) flatMap (a => cont(step(a))),
+      s(el = e => IterateeT.IterateeTMonadTrans[E].liftM(f(acc, e)).flatMap((a => cont(step(a)))),
         empty = cont(step(acc)),
         eof = done(acc, eofInput[E]))
     cont(step(init))
@@ -353,8 +353,8 @@ private trait IterateeTMonad[E, F[_]] extends Monad[IterateeT[E, F, *]] {
   implicit def F: Monad[F]
 
   def point[A](a: => A) = StepT.sdone(a, emptyInput).pointI
-  override def map[A, B](fa: IterateeT[E, F, A])(f: A => B): IterateeT[E, F, B] = fa map f
-  def bind[A, B](fa: IterateeT[E, F, A])(f: A => IterateeT[E, F, B]): IterateeT[E, F, B] = fa flatMap f
+  override def map[A, B](fa: IterateeT[E, F, A])(f: A => B): IterateeT[E, F, B] = fa.map(f)
+  def bind[A, B](fa: IterateeT[E, F, A])(f: A => IterateeT[E, F, B]): IterateeT[E, F, B] = fa.flatMap(f)
 }
 
 private trait IterateeTHoist[E] extends Hoist[({type l[β[_], α] = IterateeT[E, β, α]})#l] {
@@ -363,7 +363,7 @@ private trait IterateeTHoist[E] extends Hoist[({type l[β[_], α] = IterateeT[E,
   }
 
   override def hoist[F[_]: Monad, G[_]](f: F ~> G): IterateeTF[F]#λ ~> IterateeTF[G]#λ = new (IterateeTF[F]#λ ~> IterateeTF[G]#λ) {
-    def apply[A](fa: IterateeT[E, F, A]): IterateeT[E, G, A] = fa mapI f
+    def apply[A](fa: IterateeT[E, F, A]): IterateeT[E, G, A] = fa.mapI(f)
   }
 
   def liftM[G[_] : Monad, A](ga: G[A]): IterateeT[E, G, A] =

@@ -120,7 +120,7 @@ object Order {
 
   /** Alias for `Order[B] contramap f`, with inferred `B`. */
   def orderBy[A, B: Order](f: A => B): Order[A] =
-    Order[B] contramap f
+    Order[B].contramap(f)
 
   /** Derive from an `order` function. */
   def order[A](f: (A, A) => Ordering): Order[A] =

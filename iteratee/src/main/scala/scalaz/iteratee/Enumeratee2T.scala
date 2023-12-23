@@ -25,13 +25,13 @@ trait Enumeratee2TFunctions {
         // in the pathological case, this degrades to the cartesian product, which will blow up
         // your memory. Sorry!
         def advance(j: J, buf: List[K], s: StepT[Either3[J, (J, K), K], F, A]): IterateeT[Either3[J,(J, K),K],F,A] = {
-          s mapCont { contf =>
+          s.mapCont({ contf =>
             buf match {
               case k :: Nil if compare(j, k) == EQ => contf(elInput(Middle3((j, k))))
               case k :: ks  if compare(j, k) == EQ => contf(elInput(Middle3((j, k)))) >>== (advance(j, ks, _))
               case _ => contf(elInput(Left3(j)))
             }
-          }
+          })
         }
 
         def step(s: StepM[A], rbuf: List[K]): IterateeT[J, IterateeM, StepM[A]] = {
@@ -83,7 +83,7 @@ trait Enumeratee2TFunctions {
           done = (a, r) => sdone(sdone(a, if (r.isEof) eofInput else emptyInput), if (r.isEof) eofInput else emptyInput)
         )
 
-        (step: StepT[(J, K), F, A]) => cogroupI[J, K, F](compare).apply(cstep(step)) flatMap { endStep[J, K, (J, K), F, A] }
+        (step: StepT[(J, K), F, A]) => cogroupI[J, K, F](compare).apply(cstep(step)).flatMap({ endStep[J, K, (J, K), F, A] })
       }
     }
 
@@ -125,18 +125,18 @@ trait Enumeratee2TFunctions {
       def apply[A] = {
         def cstep(step: StepT[J, F, A]): StepT[Either3[J, (J, K), K], F, StepT[J, F, A]]  = step.fold(
           cont = contf => scont { (in: Input[Either3[J, (J, K), K]]) =>
-            val nextInput = in map {
+            val nextInput = in.map({
               case Left3(j) => j
               case Middle3((j, k)) => m.append(j, f(k))
               case Right3(k) => m.zero
-            }
+            })
 
             contf(nextInput) >>== (s => cstep(s).pointI)
           },
           done = (a, r) => sdone(sdone(a, if (r.isEof) eofInput else emptyInput), if (r.isEof) eofInput else emptyInput)
         )
 
-        (step: StepT[J, F, A]) => cogroupI[J, K, F](compare).apply(cstep(step)) flatMap { endStep[J, K, J, F, A] }
+        (step: StepT[J, F, A]) => cogroupI[J, K, F](compare).apply(cstep(step)).flatMap({ endStep[J, K, J, F, A] })
       }
     }
 

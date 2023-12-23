@@ -104,7 +104,7 @@ sealed abstract class Free[S[_], A] {
     flatMap(a => Return(f(a)))
 
   /** Alias for `flatMap` */
-  final def >>=[B](f: A => Free[S, B]): Free[S, B] = this flatMap f
+  final def >>=[B](f: A => Free[S, B]): Free[S, B] = this.flatMap(f)
 
   /** Binds the given continuation to the result of this computation. */
   final def flatMap[B](f: A => Free[S, B]): Free[S, B] = Gosub(this, f)
@@ -242,7 +242,7 @@ sealed abstract class Free[S[_], A] {
       case Return(a) => M.pure(a)
       case Suspend(s) => f(s)
       // This is stack safe because `step` ensures right-associativity of Gosub
-      case a@Gosub(_, _) => M.bind(a.a foldMap f)(c => a.f(c) foldMap f)
+      case a@Gosub(_, _) => M.bind(a.a.foldMap(f))(c => a.f(c).foldMap(f))
     }
 
   final def foldMapRec[M[_]](f: S ~> M)(implicit M: Applicative[M], B: BindRec[M]): M[A] =
@@ -392,7 +392,7 @@ object Trampoline {
 sealed abstract class FreeInstances4 {
   implicit val trampolineInstance: Comonad[Trampoline] =
     new Comonad[Trampoline] {
-      override def map[A, B](fa: Trampoline[A])(f: A => B) = fa map f
+      override def map[A, B](fa: Trampoline[A])(f: A => B) = fa.map(f)
       def copoint[A](fa: Trampoline[A]) = fa.run
       def cobind[A, B](fa: Trampoline[A])(f: Trampoline[A] => B) = return_(f(fa))
       override def cojoin[A](fa: Trampoline[A]) = Free.point(fa)
@@ -433,8 +433,8 @@ sealed abstract class FreeInstances0 extends FreeInstances1 {
 sealed abstract class FreeInstances extends FreeInstances0 {
   implicit def freeMonad[S[_]]: Monad[Free[S, *]] & BindRec[Free[S, *]] =
     new Monad[Free[S, *]] with BindRec[Free[S, *]] {
-      override def map[A, B](fa: Free[S, A])(f: A => B) = fa map f
-      def bind[A, B](a: Free[S, A])(f: A => Free[S, B]) = a flatMap f
+      override def map[A, B](fa: Free[S, A])(f: A => B) = fa.map(f)
+      def bind[A, B](a: Free[S, A])(f: A => Free[S, B]) = a.flatMap(f)
       def point[A](a: => A) = Free.point(a)
       // Free trampolines, should be alright to just perform binds.
       def tailrecM[A, B](a: A)(f: A => Free[S, A \/ B]): Free[S, B] =
@@ -457,8 +457,8 @@ sealed abstract class FreeInstances extends FreeInstances0 {
 }
 
 private sealed trait FreeBind[F[_]] extends Bind[Free[F, *]] {
-  override def map[A, B](fa: Free[F, A])(f: A => B) = fa map f
-  def bind[A, B](a: Free[F, A])(f: A => Free[F, B]) = a flatMap f
+  override def map[A, B](fa: Free[F, A])(f: A => B) = fa.map(f)
+  def bind[A, B](a: Free[F, A])(f: A => Free[F, B]) = a.flatMap(f)
 }
 
 private sealed trait FreeFoldable[F[_]] extends Foldable[Free[F, *]] {
@@ -470,7 +470,7 @@ private sealed trait FreeFoldable[F[_]] extends Foldable[Free[F, *]] {
       fa => F.foldMap(fa)(f),
       new ~>[({type l[a] = (F[a], a => Free[F, A])})#l, ({type l[a] = B})#l] {
         override def apply[X](a: (F[X], X => Free[F, A])) =
-          F.foldMap(a._1)(x => foldMap(a._2 apply x)(f))
+          F.foldMap(a._1)(x => foldMap(a._2.apply(x))(f))
       }
     )
 
@@ -480,7 +480,7 @@ private sealed trait FreeFoldable[F[_]] extends Foldable[Free[F, *]] {
       fa => F.foldLeft(fa, z)(f),
       new ~>[({type l[a] = (F[a], a => Free[F, A])})#l, ({type l[a] = B})#l] {
         override def apply[X](a: (F[X], X => Free[F, A])) =
-          F.foldLeft(a._1, z)((b, x) => foldLeft(a._2 apply x, b)(f))
+          F.foldLeft(a._1, z)((b, x) => foldLeft(a._2.apply(x), b)(f))
       }
     )
 
@@ -490,7 +490,7 @@ private sealed trait FreeFoldable[F[_]] extends Foldable[Free[F, *]] {
       fa => F.foldRight(fa, z)(f),
       new ~>[({type l[a] = (F[a], a => Free[F, A])})#l, ({type l[a] = B})#l] {
         override def apply[X](a: (F[X], X => Free[F, A])) =
-          F.foldRight(a._1, z)((x, b) => foldRight(a._2 apply x, b)(f))
+          F.foldRight(a._1, z)((x, b) => foldRight(a._2.apply(x), b)(f))
       }
     )
 }
@@ -504,7 +504,7 @@ private sealed trait FreeFoldable1[F[_]] extends Foldable1[Free[F, *]] {
       fa => F.foldMap1(fa)(f),
       new ~>[({type l[a] = (F[a], a => Free[F, A])})#l, ({type l[a] = B})#l] {
         override def apply[X](a: (F[X], X => Free[F, A])) =
-          F.foldMap1(a._1)(x => foldMap1(a._2 apply x)(f))
+          F.foldMap1(a._1)(x => foldMap1(a._2.apply(x))(f))
       }
     )
 
@@ -514,7 +514,7 @@ private sealed trait FreeFoldable1[F[_]] extends Foldable1[Free[F, *]] {
       fa => F.foldMapRight1(fa)(z)(f),
       new ~>[({type l[a] = (F[a], a => Free[F, A])})#l, ({type l[a] = B})#l] {
         override def apply[X](a: (F[X], X => Free[F, A])) =
-          F.foldMapRight1(a._1)(x => foldMapRight1(a._2 apply x)(z)(f))((x, b) => foldRight(a._2 apply x, b)(f))
+          F.foldMapRight1(a._1)(x => foldMapRight1(a._2.apply(x))(z)(f))((x, b) => foldRight(a._2.apply(x), b)(f))
       }
     )
 
@@ -524,7 +524,7 @@ private sealed trait FreeFoldable1[F[_]] extends Foldable1[Free[F, *]] {
       fa => F.foldMapLeft1(fa)(z)(f),
       new ~>[({type l[a] = (F[a], a => Free[F, A])})#l, ({type l[a] = B})#l] {
         override def apply[X](a: (F[X], X => Free[F, A])) =
-          F.foldMapLeft1(a._1)(x => foldMapLeft1(a._2 apply x)(z)(f))((b, x) => foldLeft(a._2 apply x, b)(f))
+          F.foldMapLeft1(a._1)(x => foldMapLeft1(a._2.apply(x))(z)(f))((b, x) => foldLeft(a._2.apply(x), b)(f))
       }
     )
 }
@@ -532,7 +532,7 @@ private sealed trait FreeFoldable1[F[_]] extends Foldable1[Free[F, *]] {
 private sealed trait FreeTraverse[F[_]] extends Traverse[Free[F, *]] with FreeFoldable[F]{
   implicit def F: Traverse[F]
 
-  override final def map[A, B](fa: Free[F, A])(f: A => B) = fa map f
+  override final def map[A, B](fa: Free[F, A])(f: A => B) = fa.map(f)
 
   override final def traverseImpl[G[_], A, B](fa: Free[F, A])(f: A => G[B])(implicit G: Applicative[G]): G[Free[F, B]] =
     fa.resume match {

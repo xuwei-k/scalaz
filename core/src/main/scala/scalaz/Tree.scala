@@ -99,7 +99,7 @@ sealed abstract class Tree[A] {
     val f = (s: EStream[Tree[A]]) => {
       Foldable[EStream].foldMap(s)((_: Tree[A]).subForest)
     }
-    EphemeralStream.iterate(EphemeralStream(this))(f) takeWhile (!_.isEmpty) map (_ map (_.rootLabel))
+    EphemeralStream.iterate(EphemeralStream(this))(f).takeWhile((!_.isEmpty)).map((_.map((_.rootLabel))))
   }
 
   def toStrictTree: StrictTree[A] = {
@@ -128,8 +128,8 @@ sealed abstract class Tree[A] {
   /** Turns a tree of pairs into a pair of trees. */
   def unzip[A1, A2](p: A => (A1, A2)): (Tree[A1], Tree[A2]) = {
     val uz = Need(subForest.map(_.unzip(p)))
-    val fst = Need(uz.value map (_._1))
-    val snd = Need(uz.value map (_._2))
+    val fst = Need(uz.value.map((_._1)))
+    val snd = Need(uz.value.map((_._2)))
     val (a, b) = p(rootLabel)
     (Node(a, fst.value), Node(b, snd.value))
   }
@@ -138,7 +138,7 @@ sealed abstract class Tree[A] {
     f(rootLabel)(subForest)
 
   def map[B](f: A => B): Tree[B] =
-    Node(f(rootLabel), subForest map (_ map f))
+    Node(f(rootLabel), subForest.map((_.map(f))))
 
   def flatMap[B](f: A => Tree[B]): Tree[B] = {
     val r: Tree[B] = f(rootLabel)
@@ -170,10 +170,10 @@ sealed abstract class TreeInstances {
 
   implicit val treeInstance: Traverse1[Tree] & Monad[Tree] & Comonad[Tree] & Align[Tree] & Zip[Tree] = new Traverse1[Tree] with Monad[Tree] with Comonad[Tree] with Align[Tree] with Zip[Tree] {
     def point[A](a: => A): Tree[A] = Tree.Leaf(a)
-    def cobind[A, B](fa: Tree[A])(f: Tree[A] => B): Tree[B] = fa cobind f
+    def cobind[A, B](fa: Tree[A])(f: Tree[A] => B): Tree[B] = fa.cobind(f)
     def copoint[A](p: Tree[A]): A = p.rootLabel
-    override def map[A, B](fa: Tree[A])(f: A => B) = fa map f
-    def bind[A, B](fa: Tree[A])(f: A => Tree[B]): Tree[B] = fa flatMap f
+    override def map[A, B](fa: Tree[A])(f: A => B) = fa.map(f)
+    def bind[A, B](fa: Tree[A])(f: A => Tree[B]): Tree[B] = fa.flatMap(f)
     def traverse1Impl[G[_]: Apply, A, B](fa: Tree[A])(f: A => G[B]): G[Tree[B]] = fa traverse1 f
     override def foldRight[A, B](fa: Tree[A], z: => B)(f: (A, => B) => B): B = fa.foldRight(z)(f)
 
@@ -188,12 +188,12 @@ sealed abstract class TreeInstances {
       case h ##:: t => t.foldLeft(z(h))((b, a) => f(b, a))
     }
 
-    override def foldMap[A, B](fa: Tree[A])(f: A => B)(implicit F: Monoid[B]): B = fa foldMap f
+    override def foldMap[A, B](fa: Tree[A])(f: A => B)(implicit F: Monoid[B]): B = fa.foldMap(f)
     def alignWith[A, B, C](f: (\&/[A, B]) => C) = {
       def align(ta: Tree[A], tb: Tree[B]): Tree[C] =
         Tree.Node(f(\&/(ta.rootLabel, tb.rootLabel)), Align[EStream].alignWith[Tree[A], Tree[B], Tree[C]]({
-          case \&/.This(sta) => sta map {a => f(\&/.This(a))}
-          case \&/.That(stb) => stb map {b => f(\&/.That(b))}
+          case \&/.This(sta) => sta.map({a => f(\&/.This(a))})
+          case \&/.That(stb) => stb.map({b => f(\&/.That(b))})
           case \&/(sta, stb) => align(sta, stb)
         })(ta.subForest, tb.subForest))
       align

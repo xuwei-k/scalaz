@@ -270,7 +270,7 @@ object MapTest extends SpecLite {
         a.lookupLT(r) must_=== Maybe.empty
       }
       else {
-        (0 until a.keys.length).foreach { i =>
+        (0.until(a.keys.length)).foreach { i =>
           val (k, v) = a.elemAt(i).toOption.get
 
           a.lookupLT(k) must_=== a.elemAt(i-1)
@@ -287,7 +287,7 @@ object MapTest extends SpecLite {
         a.lookupGT(r) must_=== Maybe.empty
       }
       else {
-        (0 until a.keys.length).foreach { i =>
+        (0.until(a.keys.length)).foreach { i =>
           val (k, v) = a.elemAt(i).toOption.get
 
           a.lookupGT(k) must_=== a.elemAt(i+1)
@@ -304,7 +304,7 @@ object MapTest extends SpecLite {
         a.lookupLE(r) must_=== Maybe.empty
       }
       else {
-        (0 until a.keys.length).foreach { i =>
+        (0.until(a.keys.length)).foreach { i =>
           val (k, v) = a.elemAt(i).toOption.get
 
           a.lookupLE(k) must_=== just((k, v))
@@ -321,7 +321,7 @@ object MapTest extends SpecLite {
         a.lookupGE(r) must_=== Maybe.empty
       }
       else {
-        (0 until a.keys.length).foreach { i =>
+        (0.until(a.keys.length)).foreach { i =>
           val (k, v) = a.elemAt(i).toOption.get
 
           a.lookupGE(k) must_=== just((k, v))
@@ -384,10 +384,10 @@ object MapTest extends SpecLite {
       empty.delete(5) must_===(empty[Int, Int])
     }
     "be sound" ! forAll {(m: Int ==>> Int, i: Int) =>
-      val a = m delete i
+      val a = m.delete(i)
       structurallySound(a)
-      (a member i) must_=== false
-      if(m member i)
+      (a.member(i)) must_=== false
+      if(m.member(i))
         (m.size - 1) must_=== a.size
       else
         m must_=== a
@@ -404,7 +404,7 @@ object MapTest extends SpecLite {
     "insert sound" ! forAll {(m: Int ==>> Int, a: Int, b: Int) =>
       val c = m.insert(a, b)
       structurallySound(c)
-      if(m member a)
+      if(m.member(a))
         m.size must_=== c.size
       else
         (m.size + 1) must_=== c.size
@@ -448,23 +448,23 @@ object MapTest extends SpecLite {
 
   "==>> union operations" should {
     "be sound" ! forAll {(a: Int ==>> Int, b: Int ==>> Int) =>
-      val c = a union b
+      val c = a.union(b)
       structurallySound(c)
-      (a.keySet union b.keySet) must_=== c.keySet
+      (a.keySet.union(b.keySet)) must_=== c.keySet
     }
 
     "union" in {
-      fromList(List((5, "a"), (3, "b"))) union fromList(List((5, "A"), (7, "C"))) must_== fromList(List((3, "b"), (5, "a"), (7, "C")))
+      fromList(List((5, "a"), (3, "b"))).union(fromList(List((5, "A"), (7, "C")))) must_== fromList(List((3, "b"), (5, "a"), (7, "C")))
     }
 
     "commute" ! forAll {(a: Int ==>> Int, b: Int ==>> Int) =>
-      (a unionWith b)(_ + _) must_===((b unionWith a)(_ + _))
+      (a.unionWith(b))(_ + _) must_===((b.unionWith(a))(_ + _))
     }
 
     "be idempotent" ! forAll {(a: Int ==>> Int, b: Int ==>> Int) =>
-      val ab = a union b
-      ab union a must_===(ab)
-      ab union b must_===(ab)
+      val ab = a.union(b)
+      ab.union(a) must_===(ab)
+      ab.union(b) must_===(ab)
     }
 
     "unions" in {
@@ -537,20 +537,20 @@ object MapTest extends SpecLite {
 
   "==>> intersection operations" should {
     "intersection" in {
-      val r = fromList(List(5 -> "a", 3 -> "b")) intersection fromList(List(5 -> "A", 7 -> "C"))
+      val r = fromList(List(5 -> "a", 3 -> "b")).intersection(fromList(List(5 -> "A", 7 -> "C")))
       r must_== singleton(5, "a")
     }
 
     "intersect soundly" ! forAll {(a: Int ==>> Int, b: Int ==>> Int) =>
-      structurallySound(a intersection b)
+      structurallySound(a.intersection(b))
     }
 
     "form an identity" ! forAll {(a: Int ==>> Int) =>
-      a intersection a must_===(a)
+      a.intersection(a) must_===(a)
     }
 
     "commute" ! forAll {(a: Int ==>> Int, b: Int ==>> Int) =>
-      (a intersectionWith b)(_ + _) must_===((b intersectionWith a)(_ + _))
+      (a.intersectionWith(b))(_ + _) must_===((b.intersectionWith(a))(_ + _))
     }
 
     "commute (in one case)" in {
@@ -559,7 +559,7 @@ object MapTest extends SpecLite {
       val b = Bin(-12693552,-2147483648,
                   Bin(-1587083834,-729342404,Tip(),Tip()),
                   Bin(-1,0,Tip(),Tip()))
-      (a intersectionWith b)(_ + _) must_===((b intersectionWith a)(_ + _))
+      (a.intersectionWith(b))(_ + _) must_===((b.intersectionWith(a))(_ + _))
     }
 
     "intersectionWith" in {
@@ -644,8 +644,8 @@ object MapTest extends SpecLite {
     }
 
     "isSubmapOf" ! forAll { (a: Byte ==>> Byte, b: Byte ==>> Byte) =>
-      if(a isSubmapOf b){
-        (a.keySet isSubsetOf b.keySet) must_=== true
+      if(a.isSubmapOf(b)){
+        (a.keySet.isSubsetOf(b.keySet)) must_=== true
         a.difference(b) must_=== ==>>.empty
         a.toList.foreach{case (k, v) => b.lookup(k) must_=== just(v)}
       }
@@ -681,7 +681,7 @@ object MapTest extends SpecLite {
       val (ma, mb) = m.partition(n > _)
       structurallySound(ma)
       structurallySound(mb)
-      (ma union mb) must_=== m
+      (ma.union(mb)) must_=== m
     }
 
     "partitionWithKey" in {
@@ -994,11 +994,11 @@ object MapTest extends SpecLite {
     val keysB = b.keySet
 
     x must_=== F.alignWith[String, Long, String \&/ Long](identity)(a, b)
-    x.keySet must_=== (keysA union keysB)
+    x.keySet must_=== (keysA.union(keysB))
 
-    x.filter(_.isThis).keySet must_=== (keysA difference keysB)
-    x.filter(_.isThat).keySet must_=== (keysB difference keysA)
-    x.filter(_.isBoth).keySet must_=== (keysA intersection keysB)
+    x.filter(_.isThis).keySet must_=== (keysA.difference(keysB))
+    x.filter(_.isThat).keySet must_=== (keysB.difference(keysA))
+    x.filter(_.isBoth).keySet must_=== (keysA.intersection(keysB))
 
     x.filter(_.isThis) must_=== a.filterWithKey((k, _) => ! keysB.member(k)).map(This(_))
     x.filter(_.isThat) must_=== b.filterWithKey((k, _) => ! keysA.member(k)).map(That(_))

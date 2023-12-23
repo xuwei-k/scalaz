@@ -26,11 +26,11 @@ object MaybeTTest extends SpecLite {
   }
 
   "flatMapF consistent with flatMap" ! forAll { (fa: MaybeTList[Int], f: Int => List[Maybe[Int]]) =>
-    fa.flatMap(f andThen MaybeT.apply) must_=== fa.flatMapF(f)
+    fa.flatMap(f.andThen(MaybeT.apply)) must_=== fa.flatMapF(f)
   }
 
   "mapF consistent with map" ! forAll { (fa: MaybeTList[Int], f: Int => Int) =>
-    fa.map(f) must_=== fa.mapF(f andThen (i => Applicative[List].point(i)))
+    fa.map(f) must_=== fa.mapF(f.andThen((i => Applicative[List].point(i))))
   }
 
   object instances {

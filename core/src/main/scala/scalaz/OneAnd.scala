@@ -133,11 +133,10 @@ private sealed trait OneAndFoldable[F[_]] extends Foldable1[OneAnd[F, *]] {
     }
 
   override def foldMap1[A, B: Semigroup](fa: OneAnd[F, A])(f: A => B) =
-    foldMap(fa)(a => some(f(a))) getOrElse f(fa.head)
+    foldMap(fa)(a => some(f(a))).getOrElse(f(fa.head))
 
   override def foldMapRight1[A, B](fa: OneAnd[F, A])(z: A => B)(f: (A, => B) => B) =
-    (F.foldRight(fa.tail, none[B])((a, ob) => ob map (f(a, _)) orElse some(z(a)))
-       map (f(fa.head, _)) getOrElse z(fa.head))
+    (F.foldRight(fa.tail, none[B])((a, ob) => ob.map((f(a, _))).orElse(some(z(a)))).map((f(fa.head, _))).getOrElse(z(fa.head)))
 
   override def foldMapLeft1[A, B](fa: OneAnd[F, A])(z: A => B)(f: (B, A) => B) =
     F.foldLeft(fa.tail, z(fa.head))(f)
@@ -198,7 +197,7 @@ private sealed trait OneAndTraverse[F[_]] extends Traverse1[OneAnd[F, *]] with O
   def F: Traverse[F]
 
   def traverse1Impl[G[_],A,B](fa: OneAnd[F, A])(f: A => G[B])(implicit G: Apply[G]) =
-    G.applyApplicative.traverse(fa.tail)(f andThen \/.left[G[B], B])(F)
+    G.applyApplicative.traverse(fa.tail)(f.andThen(\/.left[G[B], B]))(F)
      .fold(ftl => G.apply2(f(fa.head), ftl)(OneAnd.apply),
            tl => G.map(f(fa.head))(OneAnd(_, tl)))
 

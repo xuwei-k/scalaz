@@ -24,7 +24,7 @@ object SortedMapTest extends SpecLite {
 
   implicit def sortedMapArb[A: Arbitrary: Order, B: Arbitrary]: Arbitrary[SortedMap[A, B]] = {
     implicit val o: scala.Ordering[A] = Order[A].toScalaOrdering
-    Arbitrary(arbitrary[SMap[A, B]] map (m => SortedMap(m.toSeq:_*)))
+    Arbitrary(arbitrary[SMap[A, B]].map((m => SortedMap(m.toSeq:_*))))
   }
 
   "SortedMap ordering" ! forAll {

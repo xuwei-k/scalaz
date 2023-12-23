@@ -10,7 +10,7 @@ trait LazyListInstances {
       LazyList(a)
 
     override def bind[A, B](fa: LazyList[A])(f: A => LazyList[B]): LazyList[B] =
-      fa flatMap f
+      fa.flatMap(f)
 
     override def isEmpty[A](fa: LazyList[A]): Boolean =
       fa.isEmpty
@@ -24,7 +24,7 @@ trait LazyListInstances {
     override def zip[A, B](a: => LazyList[A],b: => LazyList[B]): LazyList[(A, B)] = {
       val _a = a
       if(_a.isEmpty) empty
-      else _a zip b
+      else _a.zip(b)
     }
 
     override def cojoin[A](a: LazyList[A]) = a.tails.to(LazyList).init
@@ -121,7 +121,7 @@ trait LazyListInstances {
           case _ => Maybe.empty
         }(Reducer.ReverseListReducer[B])
 
-      val rev: F[List[B]] = revOpt getOrElse F.point(Nil)
+      val rev: F[List[B]] = revOpt.getOrElse(F.point(Nil))
 
       F.map(rev)((rev) => rev.foldLeft(LazyList[B]())((r, c) => c +: r))
     }
@@ -274,5 +274,5 @@ object lazylist extends LazyListInstances with LazyListFunctions {
 
 private trait LazyListEqual[A] extends Equal[LazyList[A]] {
   def A: Equal[A]
-  override final def equal(a1: LazyList[A], a2: LazyList[A]) = (a1 corresponds a2)(A.equal)
+  override final def equal(a1: LazyList[A], a2: LazyList[A]) = (a1.corresponds(a2))(A.equal)
 }

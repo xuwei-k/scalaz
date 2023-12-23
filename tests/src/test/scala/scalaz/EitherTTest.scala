@@ -58,11 +58,11 @@ object EitherTTest extends SpecLite {
   }
 
   "flatMapF consistent with flatMap" ! forAll { (a: EitherTList[Int, Int], f: Int => List[Int \/ String]) =>
-    a.flatMap(f andThen EitherT.apply) must_=== a.flatMapF(f)
+    a.flatMap(f.andThen(EitherT.apply)) must_=== a.flatMapF(f)
   }
 
   "mapF consistent with map" ! forAll { (a: EitherTList[Int, Int], f: Int => String) =>
-    a.map(f) must_=== a.mapF(f andThen (s => Applicative[List].point(s)))
+    a.map(f) must_=== a.mapF(f.andThen((s => Applicative[List].point(s))))
   }
 
 
@@ -71,7 +71,7 @@ object EitherTTest extends SpecLite {
     val inc: EitherTComputation[Int] = EitherT.rightT(() => counter.incrementAndGet())
     val other: EitherTComputation[Int] = EitherT.rightT(() => 0) // does nothing
 
-    (inc orElse other).run.apply() must_== \/-(1)
+    (inc.orElse(other)).run.apply() must_== \/-(1)
     counter.get() must_== 1
   }
 

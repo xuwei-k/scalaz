@@ -13,9 +13,9 @@ object IdSyntaxTest extends SpecLite {
 
     1.squared must_===((1, 1))
 
-    "foo" matchOrZero {
+    "foo".matchOrZero({
       case "bar" => 1
-    } must_===(0)
+    }) must_===(0)
 
     0.doWhile(_ + 1, _ < 3) must_===(3)
 

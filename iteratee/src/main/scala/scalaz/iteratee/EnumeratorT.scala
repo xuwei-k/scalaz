@@ -8,10 +8,10 @@ import Id._
 trait EnumeratorT[E, F[_]] { self =>
   def apply[A]: StepT[E, F, A] => IterateeT[E, F, A]
 
-  def mapE[I](et: EnumerateeT[E, I, F])(implicit M: Monad[F]): EnumeratorT[I, F] = et run self
+  def mapE[I](et: EnumerateeT[E, I, F])(implicit M: Monad[F]): EnumeratorT[I, F] = et.run(self)
 
   def map[B](f: E => B)(implicit ev: Monad[F]): EnumeratorT[B, F] =
-    EnumerateeT.map[E, B, F](f) run self
+    EnumerateeT.map[E, B, F](f).run(self)
 
   def #::(e: E)(implicit F: Monad[F]): EnumeratorT[E, F] = {
     new EnumeratorT[E, F] {
@@ -20,7 +20,7 @@ trait EnumeratorT[E, F[_]] { self =>
   }
 
   def flatMap[B](f: E => EnumeratorT[B, F])(implicit M1: Monad[F]): EnumeratorT[B, F] =
-    EnumerateeT.flatMap(f) run self
+    EnumerateeT.flatMap(f).run(self)
 
   def flatten[B](implicit ev: E === F[B], F: Monad[F]): EnumeratorT[B, F] =
     flatMap(e => EnumeratorT.enumeratorTMonadTrans.liftM(ev(e)))
@@ -37,13 +37,13 @@ trait EnumeratorT[E, F[_]] { self =>
   }
 
   def collect[B](pf: PartialFunction[E, B])(implicit monad: Monad[F]): EnumeratorT[B, F] =
-    EnumerateeT.collect[E, B, F](pf) run self
+    EnumerateeT.collect[E, B, F](pf).run(self)
 
   def uniq(implicit ord: Order[E], M: Monad[F]): EnumeratorT[E, F] =
-    EnumerateeT.uniq[E, F] run self
+    EnumerateeT.uniq[E, F].run(self)
 
   def zipWithIndex(implicit M: Monad[F]): EnumeratorT[(E, Long), F] =
-    EnumerateeT.zipWithIndex[E, F] run self
+    EnumerateeT.zipWithIndex[E, F].run(self)
 
   def drainTo[M[_]](implicit M: Monad[F], P: PlusEmpty[M], Z: Applicative[M]): F[M[E]] =
     (IterateeT.consume[E, F, M] &= self).run
@@ -63,7 +63,7 @@ trait EnumeratorT[E, F[_]] { self =>
     }
 
   def cross[E2](e2: EnumeratorT[E2, F])(implicit M: Monad[F]): EnumeratorT[(E, E2), F] =
-    EnumerateeT.cross[E, E2, F](e2) run self
+    EnumerateeT.cross[E, E2, F](e2).run(self)
 }
 
 trait EnumeratorTInstances0 {
@@ -146,10 +146,10 @@ trait EnumeratorTFunctions {
         def go(xs: Iterator[E])(s: StepT[E, F, A]): IterateeT[E, F, A] =
           if(xs.isEmpty) s.pointI
           else {
-            s mapCont { k =>
+            s.mapCont({ k =>
               val next = xs.next()
               k(elInput(next)) >>== go(xs)
-            }
+            })
           }
         go(x)
       }
@@ -170,20 +170,20 @@ trait EnumeratorTFunctions {
   def enumReader[F[_]](r: => java.io.Reader)(implicit F: MonadIO[F]): EnumeratorT[IoExceptionOr[Char], F] = {
     lazy val src = r
     enumIoSource(get = () => IoExceptionOr(src.read),
-                 gotdata = (i: IoExceptionOr[Int]) => i exists (_ != -1),
+                 gotdata = (i: IoExceptionOr[Int]) => i.exists((_ != -1)),
                  render = ((n: Int) => n.toChar))
   }
 
   def enumInputStream[F[_]](is: => java.io.InputStream)(implicit F: MonadIO[F]): EnumeratorT[IoExceptionOr[Byte], F] = {
     lazy val src = is
     enumIoSource(get = () => IoExceptionOr(src.read),
-                 gotdata = (i: IoExceptionOr[Int]) => i exists (_ != -1),
+                 gotdata = (i: IoExceptionOr[Int]) => i.exists((_ != -1)),
                  render = ((n:Int) => n.toByte))
   }
 
   def enumIndexedSeq[E, F[_]: Monad](a : IndexedSeq[E], min: Int = 0, max: Option[Int] = None) : EnumeratorT[E, F] =
     new EnumeratorT[E, F] {
-      private[this] val limit = max.map(_ min (a.length)).getOrElse(a.length)
+      private[this] val limit = max.map(_.min((a.length))).getOrElse(a.length)
       def apply[A] = {
         def loop(pos : Int): StepT[E, F, A] => IterateeT[E, F, A] = {
           s =>

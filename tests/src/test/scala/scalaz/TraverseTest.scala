@@ -32,7 +32,7 @@ object TraverseTest extends SpecLite {
 
     "traverse int function as monoidal applicative" in {
       import scalaz.syntax.const._
-      val s: Const[Int, List[String]] = List(1, 2, 3) traverse {a => (a + 1).const[String]}
+      val s: Const[Int, List[String]] = List(1, 2, 3).traverse({a => (a + 1).const[String]})
       s.getConst must_===(9)
     }
 
@@ -43,11 +43,11 @@ object TraverseTest extends SpecLite {
 
     "be stack-safe and short-circuiting" in {
       val N = 10000
-      val s: Maybe[List[Int]] = List.range(0, N) traverse { x =>
+      val s: Maybe[List[Int]] = List.range(0, N).traverse({ x =>
         if(x < N-2) Maybe.just(x)
         else if(x == N-2) Maybe.empty
         else sys.error("BOOM!")
-      }
+      })
       s must_=== Maybe.empty
     }
 
@@ -68,11 +68,11 @@ object TraverseTest extends SpecLite {
   "ilist" should {
     "be stack-safe and short-circuiting" in {
       val N = 10000
-      val s: Maybe[IList[Int]] = IList.fromList(List.range(0, N)) traverse { x =>
+      val s: Maybe[IList[Int]] = IList.fromList(List.range(0, N)).traverse({ x =>
         if(x < N-2) Maybe.just(x)
         else if(x == N-2) Maybe.empty
         else sys.error("BOOM!")
-      }
+      })
       s must_=== Maybe.empty
     }
   }
@@ -85,11 +85,11 @@ object TraverseTest extends SpecLite {
 
     "be stack-safe and short-circuiting" in {
       val N = 10000
-      val s: Maybe[LazyList[Int]] = LazyList.from(0) traverse { x =>
+      val s: Maybe[LazyList[Int]] = LazyList.from(0).traverse({ x =>
         if(x < N-2) Maybe.just(x)
         else if(x == N-2) Maybe.empty
         else sys.error("BOOM!")
-      }
+      })
       s must_=== Maybe.empty
     }
   }
@@ -97,11 +97,11 @@ object TraverseTest extends SpecLite {
   "ephemeralstream" should {
     "be stack-safe and short-circuiting" in {
       val N = 10000
-      val s: Maybe[EphemeralStream[Int]] = EphemeralStream.fromLazyList(LazyList.from(0)) traverse { x =>
+      val s: Maybe[EphemeralStream[Int]] = EphemeralStream.fromLazyList(LazyList.from(0)).traverse({ x =>
         if(x < N-2) Maybe.just(x)
         else if(x == N-2) Maybe.empty
         else sys.error("BOOM!")
-      }
+      })
       s must_=== Maybe.empty
     }
   }

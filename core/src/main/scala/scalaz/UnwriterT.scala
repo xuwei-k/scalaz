@@ -161,20 +161,20 @@ trait UnwriterTFunctions {
 private trait UnwriterTFunctor[F[_], W] extends Functor[UnwriterT[F, W, *]] {
   implicit def F: Functor[F]
 
-  override def map[A, B](fa: UnwriterT[F, W, A])(f: A => B) = fa map f
+  override def map[A, B](fa: UnwriterT[F, W, A])(f: A => B) = fa.map(f)
 }
 
 private trait UnwriterTApply[F[_], W] extends Apply[UnwriterT[F, W, *]] with UnwriterTFunctor[F, W] {
   implicit def F: Apply[F]
 
-  override def ap[A, B](fa: => UnwriterT[F, W, A])(f: => UnwriterT[F, W, A => B]) = fa ap f
+  override def ap[A, B](fa: => UnwriterT[F, W, A])(f: => UnwriterT[F, W, A => B]) = fa.ap(f)
 }
 
 
 private trait UnwriterTBind[F[_], W] extends Bind[UnwriterT[F, W, *]] with UnwriterTApply[F, W] {
   implicit def F: Bind[F]
 
-  def bind[A, B](fa: UnwriterT[F, W, A])(f: A => UnwriterT[F, W, B]) = fa flatMap f
+  def bind[A, B](fa: UnwriterT[F, W, A])(f: A => UnwriterT[F, W, B]) = fa.flatMap(f)
 }
 
 private trait UnwriterTFoldable[F[_], W] extends Foldable.FromFoldr[UnwriterT[F, W, *]] {
@@ -186,7 +186,7 @@ private trait UnwriterTFoldable[F[_], W] extends Foldable.FromFoldr[UnwriterT[F,
 private trait UnwriterTTraverse[F[_], W] extends Traverse[UnwriterT[F, W, *]] with UnwriterTFoldable[F, W] {
   implicit def F: Traverse[F]
 
-  def traverseImpl[G[_]: Applicative, A, B](fa: UnwriterT[F, W, A])(f: A => G[B]) = fa traverse f
+  def traverseImpl[G[_]: Applicative, A, B](fa: UnwriterT[F, W, A])(f: A => G[B]) = fa.traverse(f)
 }
 
 private trait UnwriterTBifunctor[F[_]] extends Bifunctor[UnwriterT[F, *, *]] {

@@ -362,14 +362,14 @@ private trait WriterTPlusEmpty[F[_], W] extends PlusEmpty[WriterT[W, F, *]] with
 private trait WriterTFunctor[F[_], W] extends Functor[WriterT[W, F, *]] {
   implicit def F: Functor[F]
 
-  override def map[A, B](fa: WriterT[W, F, A])(f: A => B) = fa map f
+  override def map[A, B](fa: WriterT[W, F, A])(f: A => B) = fa.map(f)
 }
 
 private trait WriterTApply[F[_], W] extends Apply[WriterT[W, F, *]] with WriterTFunctor[F, W] {
   implicit def F: Apply[F]
   implicit def W: Semigroup[W]
 
-  override def ap[A, B](fa: => WriterT[W, F, A])(f: => WriterT[W, F, A => B]) = fa ap f
+  override def ap[A, B](fa: => WriterT[W, F, A])(f: => WriterT[W, F, A => B]) = fa.ap(f)
 }
 
 private trait WriterTApplicative[F[_], W] extends Applicative[WriterT[W, F, *]] with WriterTApply[F, W] {
@@ -381,7 +381,7 @@ private trait WriterTApplicative[F[_], W] extends Applicative[WriterT[W, F, *]] 
 private trait WriterTBind[F[_], W] extends Bind[WriterT[W, F, *]] with WriterTApply[F, W] {
   implicit def F: Bind[F]
 
-  override final def bind[A, B](fa: WriterT[W, F, A])(f: A => WriterT[W, F, B]) = fa flatMap f
+  override final def bind[A, B](fa: WriterT[W, F, A])(f: A => WriterT[W, F, B]) = fa.flatMap(f)
 }
 
 private trait WriterTBindRec[F[_], W] extends BindRec[WriterT[W, F, *]] with WriterTBind[F, W] {
@@ -430,7 +430,7 @@ private trait WriterTFoldable[F[_], W] extends Foldable.FromFoldr[WriterT[W, F, 
 private trait WriterTTraverse[F[_], W] extends Traverse[WriterT[W, F, *]] with WriterTFoldable[F, W] {
   implicit def F: Traverse[F]
 
-  def traverseImpl[G[_]: Applicative, A, B](fa: WriterT[W, F, A])(f: A => G[B]) = fa traverse f
+  def traverseImpl[G[_]: Applicative, A, B](fa: WriterT[W, F, A])(f: A => G[B]) = fa.traverse(f)
 }
 
 private trait WriterTBifunctor[F[_]] extends Bifunctor[WriterT[*, F, *]] {

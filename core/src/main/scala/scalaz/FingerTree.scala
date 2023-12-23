@@ -470,7 +470,7 @@ sealed abstract class FingerTree[V, A](implicit measurer: Reducer[A, V]) {
     fold(
       empty[V2, B],
       (v, x) => single(f(x)),
-      (v, pr, mt, sf) => deep(pr map f, mt.map(_.map(f)), sf map f))
+      (v, pr, mt, sf) => deep(pr.map(f), mt.map(_.map(f)), sf.map(f)))
   }
 
   /**
@@ -584,16 +584,16 @@ sealed abstract class FingerTreeInstances {
 
   implicit def nodeFoldable[V]: Foldable[Node[V, *]] =
     new Foldable[Node[V, *]] {
-      def foldMap[A, M: Monoid](t: Node[V, A])(f: A => M): M = t foldMap f
+      def foldMap[A, M: Monoid](t: Node[V, A])(f: A => M): M = t.foldMap(f)
       def foldRight[A, B](v: Node[V, A], z: => B)(f: (A, => B) => B): B =
-         foldMap(v)((a: A) => Endo.endoByName[B](f(a, _))) apply z
+         foldMap(v)((a: A) => Endo.endoByName[B](f(a, _))).apply(z)
     }
 
   implicit def fingerTreeFoldable[V]: Foldable[FingerTree[V, *]] =
     new Foldable[FingerTree[V, *]] {
       override def foldLeft[A, B](t: FingerTree[V, A], b: B)(f: (B, A) => B) = t.foldLeft(b)(f)
 
-      def foldMap[A, M: Monoid](t: FingerTree[V, A])(f: A => M): M = t foldMap(f)
+      def foldMap[A, M: Monoid](t: FingerTree[V, A])(f: A => M): M = t.foldMap((f))
 
       override def foldRight[A, B](t: FingerTree[V, A], z: => B)(f: (A, => B) => B) = t.foldRight(z)(f)
     }
@@ -1084,7 +1084,7 @@ final class IndSeq[A](val self: FingerTree[Int, A]) {
   def init: IndSeq[A] = indSeq(self.init)
   def drop(n: Int): IndSeq[A] = split(n)._2
   def take(n: Int): IndSeq[A] = split(n)._1
-  def map[B](f: A => B): IndSeq[B] = indSeq(self map f)
+  def map[B](f: A => B): IndSeq[B] = indSeq(self.map(f))
 
   import FingerTree.fingerTreeFoldable
 
@@ -1128,9 +1128,9 @@ sealed abstract class IndSeqInstances {
       def point[A](a: => A) =
         IndSeq(a)
       def bind[A, B](fa: IndSeq[A])(f: A => IndSeq[B]) =
-        fa flatMap f
+        fa.flatMap(f)
       override def map[A, B](fa: IndSeq[A])(f: A => B) =
-        fa map f
+        fa.map(f)
       def plus[A](a: IndSeq[A], b: => IndSeq[A]) =
         a ++ b
       def alt[A](a: => IndSeq[A], b: => IndSeq[A]) =
@@ -1169,7 +1169,7 @@ sealed abstract class OrdSeq[A] extends Ops[FingerTree[A @@ LastVal, A]] {
   }
 
   /** Append `xs` to this sequence, reordering elements to  */
-  def ++(xs: OrdSeq[A]): OrdSeq[A] = xs.self.toList.foldLeft(this)(_ insert _)
+  def ++(xs: OrdSeq[A]): OrdSeq[A] = xs.self.toList.foldLeft(this)(_.insert(_))
 }
 
 object OrdSeq {
@@ -1185,6 +1185,6 @@ object OrdSeq {
       implicit val keyer: Reducer[A, A @@ LastVal] = UnitReducer((a: A) => LastVal(a))
       ordSeq(empty[A @@ LastVal, A])
     }
-    as.foldLeft(z)((x, y) => x insert y)
+    as.foldLeft(z)((x, y) => x.insert(y))
   }
 }

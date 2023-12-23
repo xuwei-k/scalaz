@@ -33,11 +33,11 @@ object OptionTTest extends SpecLite {
   "listT" ! forAll { (a: OptionTList[Int]) => a.toListT.run must_=== a.run.map(_.toIList)}
 
   "flatMapF consistent with flatMap" ! forAll { (fa: OptionTList[Int], f: Int => List[Option[Int]]) =>
-    fa.flatMap(f andThen OptionT.apply) must_=== fa.flatMapF(f)
+    fa.flatMap(f.andThen(OptionT.apply)) must_=== fa.flatMapF(f)
   }
 
   "mapF consistent with map" ! forAll { (fa: OptionTList[Int], f: Int => Int) =>
-    fa.map(f) must_=== fa.mapF(f andThen (i => Applicative[List].point(i)))
+    fa.map(f) must_=== fa.mapF(f.andThen((i => Applicative[List].point(i))))
   }
 
   object instances {

@@ -42,6 +42,6 @@ trait IsomorphismLiftControlIO[F[_], G[_]] extends LiftControlIO[F] {
   def iso: F <~> G
 
   override def liftControlIO[A](f: IO.RunInBase[F, IO] => IO[A]): F[A] =
-    iso.from(G.liftControlIO(f compose IO.hoistRunInBase(iso)))
+    iso.from(G.liftControlIO(f.compose(IO.hoistRunInBase(iso))))
   ////
 }

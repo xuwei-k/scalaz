@@ -11,7 +11,7 @@ object Tag {
   @inline def apply[@specialized A, T](a: A): A @@ T = k(a)
 
   /** `unsubst` specialized to `Id`. */
-  @inline def unwrap[@specialized A, T](a: A @@ T): A = k unwrap a
+  @inline def unwrap[@specialized A, T](a: A @@ T): A = k.unwrap(a)
 
   /** Add a tag `T` to `A`.
     *
@@ -33,13 +33,13 @@ object Tag {
     * is safe if and only if the parameter has "representational" or
     * "phantom" role.
     */
-  @inline def subst[A, F[_], T](fa: F[A]): F[A @@ T] = k subst fa
+  @inline def subst[A, F[_], T](fa: F[A]): F[A @@ T] = k.subst(fa)
 
   /** Add a tag `T` to `G[_]` */
   def subst1[G[_], F[_[_]], T](fa: F[G]): F[λ[α => G[α] @@ T]] = k subst1 fa
 
   /** Remove the tag `T`, leaving `A`. */
-  @inline def unsubst[A, F[_], T](fa: F[A @@ T]): F[A] = k unsubst fa
+  @inline def unsubst[A, F[_], T](fa: F[A @@ T]): F[A] = k.unsubst(fa)
 
   /** Remove the tag `T`, leaving `G` */
   @inline def unsubst1[G[_], F[_[_]], T](fa: F[λ[α => G[α] @@ T]]): F[G] = k unsubst1 fa

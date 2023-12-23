@@ -19,7 +19,7 @@ trait ListInstances extends ListInstances0 {
         List(a)
 
       override def bind[A, B](fa: List[A])(f: A => List[B]): List[B] =
-        fa flatMap f
+        fa.flatMap(f)
 
       override def createNewBuilder[A]() =
         List.newBuilder[A]
@@ -42,7 +42,7 @@ trait ListInstances extends ListInstances0 {
       override def zip[A, B](a: => List[A], b: => List[B]): List[(A, B)] = {
         val _a = a
         if(_a.isEmpty) empty
-        else _a zip b
+        else _a.zip(b)
       }
 
       override def findLeft[A](fa: List[A])(f: A => Boolean) = fa.find(f)
@@ -76,7 +76,7 @@ trait ListInstances extends ListInstances0 {
             case Nil => Maybe.empty
           }(Reducer.ReverseListReducer[B])
 
-        val rev: F[List[B]] = revOpt getOrElse F.point(Nil)
+        val rev: F[List[B]] = revOpt.getOrElse(F.point(Nil))
 
         F.map(rev)(_.reverse)
       }
@@ -84,7 +84,7 @@ trait ListInstances extends ListInstances0 {
       override def foldRight[A, B](fa: List[A], z: => B)(f: (A, => B) => B) = {
         import scala.collection.mutable.ArrayStack
         val s = new ArrayStack[A]
-        fa.foreach(a => s push a)
+        fa.foreach(a => s.push(a))
         var r = z
         while (!s.isEmpty) {
           // force and copy the value of r to ensure correctness
@@ -236,8 +236,8 @@ trait ListFunctions {
   /** As with the standard library `groupBy` but preserving the fact that the values in the Map must be non-empty  */
   final def groupBy1[A, B](as: List[A])(f: A => B): Map[B, NonEmptyList[A]] = as.foldLeft(Map.empty[B, NonEmptyList[A]]) { (nels, a) =>
     val b = f(a)
-    nels + (b -> (nels get b map (a <:: _) getOrElse NonEmptyList(a)))
-  } map { case (k, v) => k -> v.reverse }
+    nels + (b -> (nels.get(b).map((a <:: _)).getOrElse(NonEmptyList(a))))
+  }.map({ case (k, v) => k -> v.reverse })
 
   /** `groupWhenM` specialized to [[scalaz.Id.Id]]. */
   final def groupWhen[A](as: List[A])(p: (A, A) => Boolean): List[NonEmptyList[A]] = {
@@ -283,17 +283,17 @@ trait ListFunctions {
   /** `[Nil, as take 1, as take 2, ..., as]` */
   final def initz[A](as: List[A]): List[List[A]] = as match {
     case Nil           => Nil :: Nil
-    case xxs@(x :: xs) => Nil :: (initz(xs) map (x :: _))
+    case xxs@(x :: xs) => Nil :: (initz(xs).map((x :: _)))
   }
 
   /** Combinations of `as` and `as`, excluding same-element pairs. */
   final def allPairs[A](as: List[A]): List[(A, A)] =
-    tailz(as).tail flatMap (as zip _)
+    tailz(as).tail.flatMap((as.zip(_)))
 
   /** `[(as(0), as(1)), (as(1), as(2)), ... (as(size-2), as(size-1))]` */
   final def adjacentPairs[A](as: List[A]): List[(A, A)] = as match {
     case Nil      => Nil
-    case (_ :: t) => as zip t
+    case (_ :: t) => as.zip(t)
   }
 }
 
@@ -307,7 +307,7 @@ private trait ListEqual[A] extends Equal[List[A]] {
 
   override def equalIsNatural: Boolean = A.equalIsNatural
 
-  override def equal(a1: List[A], a2: List[A]) = (a1 corresponds a2)(Equal[A].equal)
+  override def equal(a1: List[A], a2: List[A]) = (a1.corresponds(a2))(Equal[A].equal)
 }
 
 private trait ListOrder[A] extends Order[List[A]] with ListEqual[A] {

@@ -7,7 +7,7 @@ final class NullArgument[A, B] private(_apply: Option[A] => B) {
     NullArgument(c => g(_apply(c.map(f))))
 
   def map[C](f: B => C): NullArgument[A, C] =
-    NullArgument(_apply andThen f)
+    NullArgument(_apply.andThen(f))
 
   def contramap[C](f: C => A): NullArgument[C, B] =
     NullArgument(c => apply(c.map(f)))
@@ -34,7 +34,7 @@ final class NullArgument[A, B] private(_apply: Option[A] => B) {
     }
 
   def +++[C, D](x: NullArgument[C, D]): NullArgument[A \/ C, B \/ D] =
-    left[D] compose x.right[A]
+    left[D].compose(x.right[A])
 
   def left[C]: NullArgument[A \/ C, B \/ C] =
     NullArgument {
@@ -57,7 +57,7 @@ final class NullArgument[A, B] private(_apply: Option[A] => B) {
     }
 
   def andThen[C](g: NullArgument[B, C]): NullArgument[A, C] =
-    g compose this
+    g.compose(this)
 
   def |+|(x: NullArgument[A, B])(implicit S: Semigroup[B]): NullArgument[A, B] =
     for {
@@ -115,9 +115,9 @@ sealed abstract class NullArgumentInstances0 {
   implicit val nullArgumentProfunctor: Profunctor[NullArgument] =
     new Profunctor[NullArgument] {
       def mapfst[A, B, C](fab: NullArgument[A, B])(f: C => A) =
-        fab contramap f
+        fab.contramap(f)
       def mapsnd[A, B, C](fab: NullArgument[A, B])(f: B => C) =
-        fab map f
+        fab.map(f)
       override def dimap[A, B, C, D](fab: NullArgument[A, B])(f: C => A)(g: B => D) =
         fab.dimap(f, g)
     }
@@ -134,25 +134,25 @@ sealed abstract class NullArgumentInstances extends NullArgumentInstances0 {
   implicit val nullArgumentCategory: Split[NullArgument] & Profunctor[NullArgument] =
     new Split[NullArgument] with Profunctor[NullArgument] {
       override def compose[A, B, C](f: NullArgument[B, C], g: NullArgument[A, B]): NullArgument[A, C] =
-        f compose g
+        f.compose(g)
       override def split[A, B, C, D](f: NullArgument[A, B], g: NullArgument[C, D]) =
         f *** g
       override def mapfst[A, B, C](r: NullArgument[A, B])(f: C => A) =
-        r contramap f
+        r.contramap(f)
       override def mapsnd[A, B, C](r: NullArgument[A, B])(f: B => C) =
-        r map f
+        r.map(f)
     }
 
   implicit def nullArgumentMonad[X]: Monad[NullArgument[X, *]] & BindRec[NullArgument[X, *]] =
     new Monad[NullArgument[X, *]] with BindRec[NullArgument[X, *]] {
       override def ap[A, B](a: => NullArgument[X, A])(f: => NullArgument[X, A => B]) =
-        a ap f
+        a.ap(f)
       override def map[A, B](a: NullArgument[X, A])(f: A => B) =
-        a map f
+        a.map(f)
       override def point[A](a: => A): NullArgument[X, A] =
         NullArgument.always(a)
       override def bind[A, B](a: NullArgument[X, A])(f: A => NullArgument[X, B]) =
-        a flatMap f
+        a.flatMap(f)
       override def tailrecM[A, B](a: A)(f: A => NullArgument[X, A \/ B]) =
         NullArgument{ t =>
           @annotation.tailrec
@@ -168,7 +168,7 @@ sealed abstract class NullArgumentInstances extends NullArgumentInstances0 {
   implicit def nullArgumentContravariant[X]: Contravariant[NullArgument[*, X]] =
     new Contravariant[NullArgument[*, X]] {
       override def contramap[A, B](a: NullArgument[A, X])(f: B => A) =
-        a contramap f
+        a.contramap(f)
     }
 }
 

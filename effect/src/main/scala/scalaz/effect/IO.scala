@@ -52,15 +52,15 @@ sealed abstract class IO[A] {
 
   /** Continues this action with the given function. */
   def map[B](f: A => B): IO[B] = io(rw =>
-    apply(rw) map {
+    apply(rw).map({
       case (nw, a) => (nw, f(a))
-    })
+    }))
 
   /** Continues this action with the given action. */
   def flatMap[B](f: A => IO[B]): IO[B] = io(rw =>
-    apply(rw) flatMap {
+    apply(rw).flatMap({
       case (nw, a) => f(a)(nw)
-    })
+    }))
 
   /** Lift this action to a given IO-like monad. */
   def liftIO[M[_]](implicit m: LiftIO[M]): M[A] =
@@ -85,17 +85,17 @@ sealed abstract class IO[A] {
    * exception was raised.
    */
   def catchLeft: IO[Throwable \/ A] =
-    map(\/.right[Throwable, A]) except (t => IO(-\/(t)))
+    map(\/.right[Throwable, A]).except((t => IO(-\/(t))))
 
   /**Like "catchLeft" but takes a predicate to select which exceptions are caught. */
   def catchSomeLeft[B](p: Throwable => Option[B]): IO[B \/ A] =
-    catchLeft map (_.leftMap(e => p(e).getOrElse(throw e)))
+    catchLeft.map((_.leftMap(e => p(e).getOrElse(throw e))))
 
   /**Like "finally", but only performs the final action if there was an exception. */
-  def onException[B](action: IO[B]): IO[A] = this except (e => for {
+  def onException[B](action: IO[B]): IO[A] = this.except((e => for {
     _ <- action
     a <- (throw e): IO[A]
-  } yield a)
+  } yield a))
 
   /**
    * Applies the "during" action, calling "after" regardless of whether there was an exception.
@@ -103,7 +103,7 @@ sealed abstract class IO[A] {
    */
   def bracket[B, C](after: A => IO[B])(during: A => IO[C]): IO[C] = for {
     a <- this
-    r <- during(a) onException after(a)
+    r <- during(a).onException(after(a))
     _ <- after(a)
   } yield r
 
@@ -120,11 +120,11 @@ sealed abstract class IO[A] {
   /**A variant of "bracket" that performs the final action only if there was an error. */
   def bracketOnError[B, C](after: A => IO[B])(during: A => IO[C]): IO[C] = for {
     a <- this
-    r <- during(a) onException after(a)
+    r <- during(a).onException(after(a))
   } yield r
 
   def bracketIO[M[_], B](after: A => IO[Unit])(during: A => M[B])(implicit m: MonadControlIO[M]): M[B] =
-    controlIO((runInIO: RunInBase[M, IO]) => bracket(after)(runInIO.apply compose during))
+    controlIO((runInIO: RunInBase[M, IO]) => bracket(after)(runInIO.apply.compose(during)))
 
   /** An automatic resource management. */
   def using[C](f: A => IO[C])(implicit resource: Resource[A]): IO[C] =
@@ -153,8 +153,8 @@ sealed abstract class IOInstances extends IOInstances0 {
 
 private trait IOMonad extends Monad[IO] with BindRec[IO] {
   def point[A](a: => A): IO[A] = IO(a)
-  override def map[A, B](fa: IO[A])(f: A => B) = fa map f
-  def bind[A, B](fa: IO[A])(f: A => IO[B]): IO[B] = fa flatMap f
+  override def map[A, B](fa: IO[A])(f: A => B) = fa.map(f)
+  def bind[A, B](fa: IO[A])(f: A => IO[B]): IO[B] = fa.flatMap(f)
   def tailrecM[A, B](a: A)(f: A => IO[A \/ B]): IO[B] = IO.tailrecM(a)(f)
 }
 
@@ -176,7 +176,7 @@ object IO extends IOInstances {
     if (s == null)
       throw new java.io.EOFException("Console has reached end of input")
     else
-      s charAt 0
+      s.charAt(0)
   }
 
   /** Writes a character to standard output. */
@@ -199,12 +199,12 @@ object IO extends IOInstances {
 
   def put[A](a: A)(implicit S: Show[A]): IO[Unit] =
     io(rw => return_(rw ->
-      print(S shows a)
+      print(S.shows(a))
     ))
 
   def putLn[A](a: A)(implicit S: Show[A]): IO[Unit] =
     io(rw => return_(rw ->
-      println(S shows a)
+      println(S.shows(a))
     ))
 
   type RunInBase[M[_], Base[_]] =
@@ -226,7 +226,7 @@ object IO extends IOInstances {
 
   // Mutable variables in the IO monad
   def newIORef[A](a: => A): IO[IORef[A]] =
-    STToIO(newVar(a)) flatMap (v => IO(IORef.ioRef(v)))
+    STToIO(newVar(a)).flatMap((v => IO(IORef.ioRef(v))))
 
   /**Throw the given error in the IO monad. */
   def throwIO[A](e: Throwable): IO[A] = IO(throw e)

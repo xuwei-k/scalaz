@@ -34,8 +34,8 @@ object EndoUsage {
 
     val ef3 = Endo(f1) |+| Endo(f2)
 
-    assert(ef3(1) == (f1 compose f2)(1))
-    assert(ef3(10) == (f1 compose f2)(10))
+    assert(ef3(1) == (f1.compose(f2))(1))
+    assert(ef3(10) == (f1.compose(f2))(10))
 
     // having this monoid allows us to take a Foldable full of
     // endomorphisms for some type, and squash that down into a single
@@ -60,7 +60,7 @@ object EndoUsage {
     val plus1: Endo[Int] = Endo(_ + 1)
     val toUpper: Endo[String] = Endo(_.toUpperCase)
 
-    val foo = (ints zip strings) map Zip[Endo].zip(plus1, toUpper).run
+    val foo = (ints.zip(strings)) .map(Zip[Endo].zip(plus1, toUpper).run)
     assert(foo == IList((2,"A"),(3,"B"),(4,"C")))
   }
 

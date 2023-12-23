@@ -325,7 +325,7 @@ object ScalazArbitrary {
 
   private[this] def withSize[A](size: Int)(f: Int => Gen[A]): Gen[EphemeralStream[A]] = {
     Applicative[Gen].sequence(
-      (IList.fill(size)(Gen.choose(1, size max 1))).toEphemeralStream
+      (IList.fill(size)(Gen.choose(1, size.max(1)))).toEphemeralStream
     ).flatMap { s =>
       val ns = Traverse[EphemeralStream].traverseS(s) { n =>
         for {
@@ -411,10 +411,10 @@ object ScalazArbitrary {
     }
 
     for{
-      a <- Gen.choose(1, size max 1)
+      a <- Gen.choose(1, size.max(1))
       b = size - a
-      aa <- Gen.choose(1, a max 1)
-      ba <- Gen.choose(0, b max 0)
+      aa <- Gen.choose(1, a.max(1))
+      ba <- Gen.choose(0, b.max(0))
       t <- Apply[Gen].apply4(
         treeGenSized[A](aa),
         forest(a - aa),

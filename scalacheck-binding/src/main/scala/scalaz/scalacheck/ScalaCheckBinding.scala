@@ -16,13 +16,13 @@ object ScalaCheckBinding {
 
   implicit val GenMonad: Monad[Gen] = new Monad[Gen] {
     def point[A](a: => A) = sized(_ => const(a))
-    def bind[A, B](fa: Gen[A])(f: A => Gen[B]) = fa flatMap f
-    override def map[A, B](fa: Gen[A])(f: A => B) = fa map f
+    def bind[A, B](fa: Gen[A])(f: A => Gen[B]) = fa.flatMap(f)
+    override def map[A, B](fa: Gen[A])(f: A => B) = fa.map(f)
   }
 
   implicit val CogenInstance: Divisible[Cogen] = new Divisible[Cogen] {
     override def contramap[A, B](a: Cogen[A])(f: B => A) =
-      a contramap f
+      a.contramap(f)
     override def conquer[A] =
       Cogen((seed, _) => seed)
     override def divide2[A, B, C](fa: =>Cogen[A], fb: =>Cogen[B])(f: C => (A, B)) =
@@ -35,7 +35,7 @@ object ScalaCheckBinding {
   implicit val ShrinkFunctor: InvariantFunctor[Shrink] =
     new InvariantFunctor[Shrink] {
       def xmap[A, B](ma: Shrink[A], f: A => B, g: B => A): Shrink[B] =
-        Shrink{b => ma shrink g(b) map f}
+        Shrink{b => ma.shrink(g(b)).map(f)}
     }
 }
 

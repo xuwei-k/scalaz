@@ -13,15 +13,14 @@ import scalaz.Maybe.just
 object ZipperTest extends SpecLite {
 
   "Zipper From LazyList" ! forAll { (xs: LazyList[Int]) =>
-    (xs.toZipper map (_.toLazyList)).getOrElse(LazyList()) === xs
+    (xs.toZipper.map((_.toLazyList))).getOrElse(LazyList()) === xs
   }
 
   "Mapping on a zipper should be the same as mapping on the elements of the stream" ! forAll { (xs: LazyList[Int], a: Int) =>
     val fun: Int => Int = _ + a
 
     (
-      for (z <- xs.toZipper; zM <- (xs map fun).toZipper) yield z.map(fun) must_===(zM)
-    ) getOrElse { xs.length must_===(0) }
+      for (z <- xs.toZipper; zM <- (xs.map(fun)).toZipper) yield z.map(fun) must_===(zM)) .getOrElse({ xs.length must_===(0) })
   }
 
   "Zipper Move Then To LazyList" in check {
@@ -35,8 +34,7 @@ object ZipperTest extends SpecLite {
         yield {
         (zn.lefts.length must_===(z.lefts.length + 1));
         (zn.rights.length must_===(z.rights.length - 1))
-      }
-    ) getOrElse { xs.length mustBe_<(2) }
+      }) .getOrElse({ xs.length mustBe_<(2) })
   }
 
   "nextC moves focus or loops" ! forAll { (z: Zipper[Int]) =>
@@ -77,8 +75,7 @@ object ZipperTest extends SpecLite {
   "Previous Affects Lengths" ! forAll { (xs: LazyList[Int]) =>
     (
       for (z <- xs.zipperEnd; zn <- z.previous)
-        yield zn.lefts.length must_===(z.lefts.length - 1) and (zn.rights.length must_===(z.rights.length + 1))
-    ) getOrElse { xs.length mustBe_<(2) }
+        yield zn.lefts.length must_===(z.lefts.length - 1) and (zn.rights.length must_===(z.rights.length + 1))) .getOrElse({ xs.length mustBe_<(2) })
   }
 
   "previousC moves focus or loops" ! forAll { (z: Zipper[Int]) =>
@@ -130,17 +127,11 @@ object ZipperTest extends SpecLite {
   }
 
   val leftAndFocusChanged: (Zipper[Int], Zipper[Int], Int) => Prop = { (zNew, zOld, newFocus) =>
-    {zNew.focus must_===(newFocus)} and
-    {zNew.lefts.head  must_===(zOld.focus)} and
-    {zNew.lefts.tail must_===(zOld.lefts)} and
-    {zNew.rights must_===(zOld.rights)}
+    {zNew.focus must_===(newFocus)}.and({zNew.lefts.head  must_===(zOld.focus)}).and({zNew.lefts.tail must_===(zOld.lefts)}).and({zNew.rights must_===(zOld.rights)})
   }
 
   val rightAndFocusChanged: (Zipper[Int], Zipper[Int], Int) => Prop = { (zNew, zOld, newFocus) =>
-    {zNew.focus must_===(newFocus)} and
-    {zNew.lefts must_===(zOld.lefts)} and
-    {zNew.rights.head must_===(zOld.focus)} and
-    {zNew.rights.tail must_===(zOld.rights)}
+    {zNew.focus must_===(newFocus)}.and({zNew.lefts must_===(zOld.lefts)}).and({zNew.rights.head must_===(zOld.focus)}).and({zNew.rights.tail must_===(zOld.rights)})
   }
 
   insertionTest("insertRight changes focus and appends to lefts", (z, e) => z.insertRight(e), leftAndFocusChanged)
@@ -150,15 +141,13 @@ object ZipperTest extends SpecLite {
   "DeleteRight Affects Lengths" ! forAll { (xs: LazyList[Int]) =>
     (
       for (z <- xs.toZipper; zn <- z.deleteRight)
-        yield zn.rights.length must_===(z.rights.length - 1)
-    ) getOrElse {xs.length mustBe_<(2) }
+        yield zn.rights.length must_===(z.rights.length - 1)) .getOrElse({xs.length mustBe_<(2) })
   }
 
   "DeleteRightC Affects Lengths" ! forAll { (xs: LazyList[Int]) =>
     (
       for (z <- xs.toZipper; zn <- z.deleteRightC)
-        yield zn.rights.length must_===(z.rights.length - 1)
-    ) getOrElse {xs.length mustBe_<(2) }
+        yield zn.rights.length must_===(z.rights.length - 1)) .getOrElse({xs.length mustBe_<(2) })
   }
 
   "deleteRightC moves the focus to the right or if not possible to the first element" ! forAll { (z: Zipper[Int]) =>
@@ -168,8 +157,7 @@ object ZipperTest extends SpecLite {
       } yield {
         if (z.rights.length > 0) zd.focus must_===(z.rights(0))
         else                     zd.focus must_===(z.lefts.last)
-      }
-    ) getOrElse{ (z.lefts.isEmpty must_==(true)) and (z.rights.isEmpty must_==(true)) }
+      }) .getOrElse({ (z.lefts.isEmpty must_==(true)) and (z.rights.isEmpty must_==(true)) })
   }
 
   "deleteRightCOr should return Some of deleteLeftC or an alternative" ! forAll { (z: Zipper[Int], alt: Zipper[Int]) =>
@@ -192,8 +180,7 @@ object ZipperTest extends SpecLite {
       } yield {
         if (z.rights.length > 0) zd.focus must_===(z.rights(0))
         else                     zd.focus must_===(z.lefts(0))
-      }
-    ) getOrElse{ (z.lefts.isEmpty must_==(true)) and (z.rights.isEmpty must_==(true)) }
+      }) .getOrElse({ (z.lefts.isEmpty must_==(true)) and (z.rights.isEmpty must_==(true)) })
   }
 
   "deleteRightOr should return Some of deleteLeft or an alternative" ! forAll { (z: Zipper[Int], alt: Zipper[Int]) =>
@@ -297,7 +284,7 @@ object ZipperTest extends SpecLite {
 
   "Move" ! forAll { (xs: LazyList[Int], ys: LazyList[Int], f: Int, n: Short) =>
 
-    zipper(xs, f, ys).move(n) map { (z: Zipper[Int]) =>
+    zipper(xs, f, ys).move(n).map({ (z: Zipper[Int]) =>
       z.lefts.length must_===(xs.length + n)
       z.rights.length must_===(ys.length - n)
       if(n > 0)
@@ -306,10 +293,10 @@ object ZipperTest extends SpecLite {
         xs(-(n + 1)) must_===(z.focus)
       else
         f must_===(z.focus)
-    } getOrElse {
+    }).getOrElse({
       val okay = xs.length < -n || ys.length < n
       okay must_==(true)
-    }
+    })
   }
 
   "move should not cause a stackoverflow error" in {
@@ -376,14 +363,14 @@ object ZipperTest extends SpecLite {
 
   "Find" ! forAll { (xs: LazyList[Int], ys: LazyList[Int], f: Int, n: Int, m: Int) =>
     val p = (i: Int) => i < n && i > m
-    zipper(xs, f, ys).findZ(p) map { z => p(z.focus) } getOrElse !(xs.find(p).isDefined || ys.find(p).isDefined || p(f))
+    zipper(xs, f, ys).findZ(p).map({ z => p(z.focus) }).getOrElse(!(xs.find(p).isDefined || ys.find(p).isDefined || p(f)))
   }
 
   "findZ shouldn't change elements" ! forAll { (xs: LazyList[Int], ys: LazyList[Int], f: Int, n: Int, m: Int) =>
     val p = (i: Int) => i < n && i > m
     zipper(xs, f, ys).findZ(p).map {
       _.toLazyList == zipper(xs, f, ys).toLazyList
-    } getOrElse !(xs.find(p).isDefined || ys.find(p).isDefined || p(f))
+    }.getOrElse(!(xs.find(p).isDefined || ys.find(p).isDefined || p(f)))
   }
 
   "findZor returns some of find or an alternative" ! forAll {

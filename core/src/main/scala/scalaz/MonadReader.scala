@@ -18,7 +18,7 @@ trait MonadReader[F[_], S] extends Monad[F] { self =>
       FA.equal(local(f)(point(a)), point(a))
 
     def localComposition[A](f: S => S, g: S => S)(fa: F[A])(implicit FA: Equal[F[A]]): Boolean =
-      FA.equal(local(f)(local(g)(fa)), local(f andThen g)(fa))
+      FA.equal(local(f)(local(g)(fa)), local(f.andThen(g))(fa))
 
     def localFAsk(f: S => S)(implicit FS: Equal[F[S]]): Boolean =
       FS.equal(local(f)(ask), map(ask)(f))

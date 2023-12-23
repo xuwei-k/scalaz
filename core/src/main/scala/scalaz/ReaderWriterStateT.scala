@@ -155,7 +155,7 @@ private trait IndexedReaderWriterStateTPlusEmpty[F[_], R, W, S1, S2]
 private trait IndexedReaderWriterStateTFunctor[F[_], R, W, S1, S2] extends Functor[IndexedReaderWriterStateT[R, W, S1, S2, F, *]] {
   implicit def F: Functor[F]
 
-  override final def map[A, B](fa: IndexedReaderWriterStateT[R, W, S1, S2, F, A])(f: A => B): IndexedReaderWriterStateT[R, W, S1, S2, F, B] = fa map f
+  override final def map[A, B](fa: IndexedReaderWriterStateT[R, W, S1, S2, F, A])(f: A => B): IndexedReaderWriterStateT[R, W, S1, S2, F, B] = fa.map(f)
 }
 
 private trait ReaderWriterStateTMonadError[F[_], R, W, S, E] extends MonadError[ReaderWriterStateT[R, W, S, F, *], E] {
@@ -169,7 +169,7 @@ private trait ReaderWriterStateTMonadError[F[_], R, W, S, E] extends MonadError[
     RWST((r, s) => F.handleError(fa.run(r, s))(f(_).run(r, s)))
 
   override def bind[A, B](fa: RWST[R, W, S, F, A])(f: (A) => RWST[R, W, S, F, B]): RWST[R, W, S, F, B] =
-    fa flatMap f
+    fa.flatMap(f)
 
   override def point[A](a: => A): RWST[R, W, S, F, A] =
     RWST((_, s) => F.point((W.zero, a, s)))
@@ -180,7 +180,7 @@ private trait ReaderWriterStateTBind[F[_], R, W, S] extends Bind[ReaderWriterSta
   implicit def W: Semigroup[W]
 
   override final def bind[A, B](fa: ReaderWriterStateT[R, W, S, F, A])(f: A => ReaderWriterStateT[R, W, S, F, B]) =
-    fa flatMap f
+    fa.flatMap(f)
 }
 
 private trait ReaderWriterStateTBindRec[F[_], R, W, S] extends BindRec[ReaderWriterStateT[R, W, S, F, *]] with ReaderWriterStateTBind[F, R, W, S] {
@@ -249,7 +249,7 @@ private trait ReaderWriterStateTHoist[R, W, S] extends Hoist[({type l[α[_], β]
   def hoist[M[_], N[_]](f: M ~> N)(implicit M: Monad[M]): ReaderWriterStateT[R, W, S, M, *] ~> ReaderWriterStateT[R, W, S, N, *] =
     new (ReaderWriterStateT[R, W, S, M, *] ~> ReaderWriterStateT[R, W, S, N, *]) {
       def apply[A](ma: ReaderWriterStateT[R, W, S, M, A]): ReaderWriterStateT[R, W, S, N, A] =
-        ma mapT f.apply
+        ma.mapT(f.apply)
     }
 
   def liftM[M[_], A](ma: M[A])(implicit M: Monad[M]): ReaderWriterStateT[R, W, S, M, A] =

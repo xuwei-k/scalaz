@@ -83,7 +83,7 @@ object LaunchburyInterpreter {
   // e.g. sub(map("x" -> "y"), Var("x")) => Var("y")
   private def sub(m: IMap[String, String])(e: Expr): Expr = {
     val subExpr = sub(m) _
-    def subName(n: String) : String = m lookup n getOrElse n
+    def subName(n: String) : String = m.lookup(n).getOrElse(n)
     e match {
       case Lambda(z, e2) => Lambda(subName(z), subExpr(e2))
       case Apply(e2, z)  => Apply(subExpr(e2), subName(z))

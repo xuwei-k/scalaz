@@ -72,6 +72,6 @@ trait IsomorphismBindRec[F[_], G[_]] extends BindRec[F] with IsomorphismBind[F, 
   ////
 
   override def tailrecM[A, B](a: A)(f: A => F[A \/ B]): F[B] =
-    iso.from(G.tailrecM(a)(f andThen iso.unlift[A \/ B].to))
+    iso.from(G.tailrecM(a)(f.andThen(iso.unlift[A \/ B].to)))
   ////
 }

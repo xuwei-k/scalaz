@@ -40,7 +40,7 @@ final case class OneOr[F[_], A](run: F[A] \/ A) {
     })
 
   def copoint(implicit F: Comonad[F]): A =
-    run valueOr F.copoint
+    run.valueOr(F.copoint)
 
   def foldMap[B](f: A => B)(implicit M: Monoid[B], F: Foldable[F]): B =
     run match {
@@ -113,14 +113,14 @@ private sealed trait OneOrFunctor[F[_]] extends Functor[OneOr[F, *]] {
   implicit def F: Functor[F]
 
   override final def map[A, B](fa: OneOr[F, A])(f: A => B): OneOr[F, B] =
-    fa map f
+    fa.map(f)
 }
 
 private sealed trait OneOrCobind[F[_]] extends Cobind[OneOr[F, *]] with OneOrFunctor[F]{
   implicit def F: Cobind[F]
 
   override final def cobind[A, B](fa: OneOr[F, A])(f: OneOr[F, A] => B): OneOr[F, B] =
-    fa cobind f
+    fa.cobind(f)
 }
 
 private sealed trait OneOrComonad[F[_]] extends OneOrCobind[F] with Comonad[OneOr[F, *]] {
@@ -134,7 +134,7 @@ private sealed trait OneOrApplicative[F[_]] extends Applicative[OneOr[F, *]] wit
   implicit def F: Apply[F]
 
   override final def ap[A,B](fa: => OneOr[F, A])(f: => OneOr[F, A => B]) =
-    fa ap f
+    fa.ap(f)
 
   override def point[A](a: => A) =
     OneOr(\/-(a))
@@ -189,7 +189,7 @@ private sealed trait OneOrTraverse[F[_]] extends Traverse[OneOr[F, *]] with OneO
   implicit def F: Traverse[F]
 
   override final def traverseImpl[G[_]: Applicative,A,B](fa: OneOr[F, A])(f: A => G[B]) =
-    fa traverse f
+    fa.traverse(f)
 
 }
 
@@ -217,7 +217,7 @@ private sealed trait OneOrOrder[F[_], A] extends Order[OneOr[F, A]]
   implicit def OFA: Order[F[A]]
 
   override def order(a1: OneOr[F, A], a2: OneOr[F, A]) =
-    a1.run compare a2.run
+    a1.run.compare(a2.run)
 }
 
 private sealed trait OneOrShow[F[_], A] extends Show[OneOr[F, A]] {

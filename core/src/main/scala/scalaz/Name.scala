@@ -39,7 +39,7 @@ object Name {
       def point[A](a: => A) = Name(a)
       override def map[A, B](fa: Name[A])(f: A => B) = Name(f(fa.value))
       override def ap[A, B](fa: => Name[A])(f: => Name[A => B]) =
-        Name(f.value apply fa.value)
+        Name(f.value.apply(fa.value))
       def bind[A,B](v: Name[A])(f: A => Name[B]): Name[B] = Name(f(v.value).value)
       def cobind[A, B](fa: Name[A])(f: Name[A] => B): Name[B] = Name(f(fa))
       override def cojoin[A](a: Name[A]): Name[Name[A]] = Name(a)
@@ -77,7 +77,7 @@ object Need {
       def point[A](a: => A) = Need(a)
       override def map[A, B](fa: Need[A])(f: A => B) = Need(f(fa.value))
       override def ap[A, B](fa: => Need[A])(f: => Need[A => B]) =
-        Need(f.value apply fa.value)
+        Need(f.value.apply(fa.value))
       def bind[A, B](v: Need[A])(f: A => Need[B]): Need[B] = Need(f(v.value).value)
       def cobind[A, B](fa: Need[A])(f: Need[A] => B): Need[B] = Need(f(fa))
       override def cojoin[A](a: Need[A]): Need[Need[A]] = Need(a)

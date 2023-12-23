@@ -57,7 +57,7 @@ trait Semigroup[F]  { self =>
       case Just((s, f)) => go(s, append(f, acc))
       case _ => acc
     }
-    f(seed) map { case (s, a) => go(s, a) }
+    f(seed).map({ case (s, a) => go(s, a) })
   }
 
   /**
@@ -73,7 +73,7 @@ trait Semigroup[F]  { self =>
       case Just((f, s)) => go(append(acc, f), s)
       case _ => acc
     }
-    f(seed) map { case (a, s) => go(a, s) }
+    f(seed).map({ case (a, s) => go(a, s) })
   }
 
 
@@ -115,7 +115,7 @@ trait Semigroup[F]  { self =>
 
     def unfoldlSumOptConsistency[S](s: S, f: S => Maybe[(S, F)])(implicit E: Equal[F]): Boolean = {
       val g: ((Int, S)) => Maybe[((Int, S), F)] = { case (i, s) =>
-        if(i > 0) f(s) map { case (s, f) => ((i-1, s), f) }
+        if(i > 0) f(s).map({ case (s, f) => ((i-1, s), f) })
         else Maybe.empty
       }
       val limit = 4 // to prevent infinite unfolds
@@ -124,7 +124,7 @@ trait Semigroup[F]  { self =>
 
     def unfoldrSumOptConsistency[S](s: S, f: S => Maybe[(F, S)])(implicit E: Equal[F]): Boolean = {
       val g: ((Int, S)) => Maybe[(F, (Int, S))] = { case (i, s) =>
-        if(i > 0) f(s) map { case (f, s) => (f, (i-1, s)) }
+        if(i > 0) f(s).map({ case (f, s) => (f, (i-1, s)) })
         else Maybe.empty
       }
       val limit = 4 // to prevent infinite unfolds

@@ -104,7 +104,7 @@ trait Functor[F[_]] extends InvariantFunctor[F] { self =>
      * A series of maps may be freely rewritten as a single map on a
      * composed function.
      */
-    def composite[A, B, C](fa: F[A], f1: A => B, f2: B => C)(implicit FC: Equal[F[C]]): Boolean = FC.equal(map(map(fa)(f1))(f2), map(fa)(f2 compose f1))
+    def composite[A, B, C](fa: F[A], f1: A => B, f2: B => C)(implicit FC: Equal[F[C]]): Boolean = FC.equal(map(map(fa)(f1))(f2), map(fa)(f2.compose(f1)))
   }
   def functorLaw: FunctorLaw = new FunctorLaw {}
   ////

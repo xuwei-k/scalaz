@@ -46,7 +46,7 @@ object ReducerOps {
 
   sealed abstract class UnfoldTo[C] {
     def reduceToOpt[M](implicit r: Reducer[C, M]): Maybe[M]
-    def reduceTo[M: Monoid](implicit r: Reducer[C, M]): M = reduceToOpt[M] getOrElse Monoid[M].zero
+    def reduceTo[M: Monoid](implicit r: Reducer[C, M]): M = reduceToOpt[M].getOrElse(Monoid[M].zero)
 
     final def to[M[_]](implicit r: Reducer[C, M[C]], m: Monoid[M[C]]): M[C] = reduceTo[M[C]]
     final def toOpt[M[_]](implicit r: Reducer[C, M[C]]): Maybe[M[C]] = reduceToOpt[M[C]]

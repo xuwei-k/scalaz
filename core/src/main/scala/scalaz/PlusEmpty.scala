@@ -10,10 +10,10 @@ trait PlusEmpty[F[_]] extends Plus[F] { self =>
   def empty[A]: F[A]
 
   def unfoldlPsum[S, A](seed: S)(f: S => Maybe[(S, F[A])]): F[A] =
-    unfoldlPsumOpt(seed)(f) getOrElse empty
+    unfoldlPsumOpt(seed)(f).getOrElse(empty)
 
   def unfoldrPsum[S, A](seed: S)(f: S => Maybe[(F[A], S)]): F[A] =
-    unfoldrPsumOpt(seed)(f) getOrElse empty
+    unfoldrPsumOpt(seed)(f).getOrElse(empty)
 
   /**The composition of PlusEmpty `F` and `G`, `[x]F[G[x]]`, is a PlusEmpty */
   override def compose[G[_]]: PlusEmpty[λ[α => F[G[α]]]] =

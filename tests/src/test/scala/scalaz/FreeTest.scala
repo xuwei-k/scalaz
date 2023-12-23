@@ -172,7 +172,7 @@ object FreeTest extends SpecLite {
     val ms: MonadState[FreeState[Int, *], Int] = FreeState.monadState
 
     "be stack-safe on left-associated binds" in {
-      val go = (0 until 10000).foldLeft(ms.init)((fs, _) => fs.flatMap(_ => ms.state(i => (i+1, i+1))))
+      val go = (0.until(10000)).foldLeft(ms.init)((fs, _) => fs.flatMap(_ => ms.state(i => (i+1, i+1))))
 
       10000 must_=== FreeState.run(go)(0)._1
     }
@@ -194,7 +194,7 @@ object FreeTest extends SpecLite {
     val ms: MonadState[FreeStateT[Option, Int, *], Int] = FreeStateT.monadState
 
     "be stack-safe on left-associated binds" in {
-      val go = (0 until 10000).foldLeft(ms.init)((fs, _) => fs.flatMap(_ => ms.state(i => (i+1, i+1))))
+      val go = (0.until(10000)).foldLeft(ms.init)((fs, _) => fs.flatMap(_ => ms.state(i => (i+1, i+1))))
 
       Option((10000, 10000)) must_=== FreeStateT.run(go)(0)
     }

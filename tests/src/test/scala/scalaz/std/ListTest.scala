@@ -67,7 +67,7 @@ object ListTest extends SpecLite {
   "groupBy1" ! forAll {
       (a: List[String]) =>
       val strlen = (_ : String).length
-      (a groupBy strlen) must_=== ((a groupBy1 strlen).map{ case (k, v) => k -> v.list.toList})
+      (a.groupBy(strlen)) must_=== ((a groupBy1 strlen).map{ case (k, v) => k -> v.list.toList})
   }
 
   "groupWhen.flatten is identity" ! forAll {
@@ -141,7 +141,7 @@ object ListTest extends SpecLite {
   }
 
   "index" ! forAll { (xs: List[Int], n: Int) =>
-    (xs index n) must_===(if (n >= 0 && xs.size > n) Some(xs(n)) else None)
+    (xs.index(n)) must_===(if (n >= 0 && xs.size > n) Some(xs(n)) else None)
   }
 
   "groupWhen is groupWhenM[Id]" ! forAll { (xs: List[Int]) =>

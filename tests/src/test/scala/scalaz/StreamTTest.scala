@@ -115,7 +115,7 @@ object StreamTTest extends SpecLite {
 
   "mapM" ! forAll {
     (s: LazyList[Int], l: List[Int]) =>
-      val s0 = s map (_ + 1)
+      val s0 = s.map((_ + 1))
       StreamT.fromLazyList(List(s, s0)).mapM(i => l.map(_ + i)).toLazyList must_==(
         Traverse[LazyList].traverse(s)(i => l.map(_ + i)) :::
         Traverse[LazyList].traverse(s0)(i => l.map(_ + i))
@@ -206,9 +206,9 @@ object StreamTTest extends SpecLite {
     }
 
     "not stack-overflow on tailMRec" in {
-      s.tailMRec.step() mustMatch {
+      s.tailMRec.step().mustMatch({
         case StreamT.Done() => true
-      }
+      })
     }
 
     "not stack-overflow on foreachRec" in {

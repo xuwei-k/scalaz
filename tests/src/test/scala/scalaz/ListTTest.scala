@@ -52,7 +52,7 @@ object ListTTest extends SpecLite {
   }
 
   "mapF consistent with map" ! forAll { (fa: ListTOpt[Int], f: Int => Int) =>
-    fa.map(f) must_=== fa.mapF(f andThen (i => Applicative[Option].point(i)))
+    fa.map(f) must_=== fa.mapF(f.andThen((i => Applicative[Option].point(i))))
   }
 
   "collect" ! forAll {
@@ -68,7 +68,7 @@ object ListTTest extends SpecLite {
   }
 
   "flatMapF consistent with flatMap" ! forAll { (fa: ListTOpt[Int], f: Int => Option[IList[String]]) =>
-    fa.flatMap(f andThen ListT.apply) must_=== fa.flatMapF(f)
+    fa.flatMap(f.andThen(ListT.apply)) must_=== fa.flatMapF(f)
   }
 
   // Exists to ensure that fromList and map don't stack overflow.

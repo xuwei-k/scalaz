@@ -58,7 +58,7 @@ object Equal {
   def equalRef[A <: AnyRef]: Equal[A] =
     (a1: A, a2: A) => a1 eq a2
 
-  def equalBy[A, B: Equal](f: A => B): Equal[A] = Equal[B] contramap f
+  def equalBy[A, B: Equal](f: A => B): Equal[A] = Equal[B].contramap(f)
 
   // scalaz-deriving provides a coherent n-arity extension
   private[scalaz] class EqualDecidable extends Decidable[Equal] {

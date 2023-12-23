@@ -238,8 +238,8 @@ object PrioritySearchQueue {
             maxPrio,
             minByPrio,
             maxByPrio,
-            s1.minKey min s2.minKey,
-            s1.maxKey max s2.maxKey
+            s1.minKey.min(s2.minKey),
+            s1.maxKey.max(s2.maxKey)
           )
         }
       }

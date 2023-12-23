@@ -75,15 +75,15 @@ object EphemeralStreamTest extends SpecLite {
 
   "unzip zip" ! forAll { (xs: EphemeralStream[(Int, Int)]) =>
     val (firsts, seconds) = xs.unzip
-    (firsts zip seconds) must_===(xs)
+    (firsts.zip(seconds)) must_===(xs)
   }
 
   "zip has right length" ! forAll {(xs: EphemeralStream[Int], ys: EphemeralStream[Int]) =>
-    (xs zip ys).length must_===(xs.length min ys.length)
+    (xs.zip(ys)).length must_===(xs.length.min(ys.length))
   }
 
   "interleave has right length" ! forAll {(xs: EphemeralStream[Int], ys: EphemeralStream[Int]) =>
-    (xs interleave ys).length must_===(xs.length + ys.length)
+    (xs.interleave(ys)).length must_===(xs.length + ys.length)
   }
 
   "take" ! forAll { (xs: LazyList[Int], n: Int) =>
@@ -110,7 +110,7 @@ object EphemeralStreamTest extends SpecLite {
 
   "index infinite LazyList" in {
     val i = util.Random.nextInt(1000)
-    val xs = LazyList from 0
+    val xs = LazyList.from(0)
     Foldable[EphemeralStream].index(EphemeralStream.fromLazyList(xs), i) must_===(xs.lift.apply(i))
   }
 
@@ -134,7 +134,7 @@ object EphemeralStreamTest extends SpecLite {
     EphemeralStream.iterate(0)(_ + 1).tails
       .map(t => Foldable[EphemeralStream].toLazyList(t.take(n)))
       .take(n) must_===(
-      EphemeralStream.fromLazyList(LazyList.iterate(0)(_ + 1).tails.map(_ take n).take(n).to(LazyList))
+      EphemeralStream.fromLazyList(LazyList.iterate(0)(_ + 1).tails.map(_.take(n)).take(n).to(LazyList))
     )
   }
 
@@ -184,7 +184,7 @@ object EphemeralStreamTest extends SpecLite {
     val F = Traverse[EphemeralStream]
     F.zipL(infinite, infinite)
     F.zipL(finite, infinite).length must_===(size)
-    F.zipL(finite, infinite) must_===((finite zip infinite).map{x => (x._1, Option(x._2))})
+    F.zipL(finite, infinite) must_===((finite.zip(infinite)).map{x => (x._1, Option(x._2))})
     F.zipL(infinite, finite).take(1000).length must_===(1000)
     F.zipL(infinite, finite).takeWhile(_._2.isDefined).length must_===(size)
   }

@@ -248,7 +248,7 @@ sealed abstract class DequeueInstances {
       override def alt[A](a: => Dequeue[A], b: => Dequeue[A]): Dequeue[A] = plus(a, b)
       override def isEmpty[A](fa: Dequeue[A]) = fa.isEmpty
       override def length[A](fa: Dequeue[A]) = fa.size
-      override def map[A,B](fa: Dequeue[A])(f: A => B): Dequeue[B] = fa map f
+      override def map[A,B](fa: Dequeue[A])(f: A => B): Dequeue[B] = fa.map(f)
       override def point[A](a: => A): Dequeue[A] = Dequeue(a)
       override def bind[A, B](fa: Dequeue[A])(f: A => Dequeue[B]): Dequeue[B] = foldMap(fa)(f)
       override def traverseImpl[F[_], A, B](fa: Dequeue[A])(f: A => F[B])(implicit F: Applicative[F]): F[Dequeue[B]] =

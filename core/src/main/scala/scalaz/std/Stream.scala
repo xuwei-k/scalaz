@@ -13,7 +13,7 @@ trait StreamInstances {
       Stream(a)
 
     override def bind[A, B](fa: Stream[A])(f: A => Stream[B]): Stream[B] =
-      fa flatMap f
+      fa.flatMap(f)
 
     override def isEmpty[A](fa: Stream[A]): Boolean =
       fa.isEmpty
@@ -27,7 +27,7 @@ trait StreamInstances {
     override def zip[A, B](a: => Stream[A],b: => Stream[B]): Stream[(A, B)] = {
       val _a = a
       if(_a.isEmpty) empty
-      else _a zip b
+      else _a.zip(b)
     }
 
     override def cojoin[A](a: Stream[A]) = a.tails.toStream.init
@@ -121,7 +121,7 @@ trait StreamInstances {
           case Stream.Empty => Maybe.empty
         }(Reducer.ReverseListReducer[B])
 
-      val rev: F[List[B]] = revOpt getOrElse F.point(Nil)
+      val rev: F[List[B]] = revOpt.getOrElse(F.point(Nil))
 
       F.map(rev)((rev) => rev.foldLeft(Stream[B]())((r, c) => c +: r))
     }
@@ -278,5 +278,5 @@ object stream extends StreamInstances with StreamFunctions {
 @nowarn("since=2.13.0")
 private trait StreamEqual[A] extends Equal[Stream[A]] {
   def A: Equal[A]
-  override final def equal(a1: Stream[A], a2: Stream[A]) = (a1 corresponds a2)(A.equal)
+  override final def equal(a1: Stream[A], a2: Stream[A]) = (a1.corresponds(a2))(A.equal)
 }

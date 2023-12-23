@@ -340,7 +340,7 @@ sealed abstract class Validation[E, A] extends Product with Serializable {
   def excepting(pf: PartialFunction[A, E]): Validation[E, A] = {
     import syntax.std.option._
     this match {
-      case Success(s) => pf.lift(s) toFailure s
+      case Success(s) => pf.lift(s).toFailure(s)
       case _          => this
     }
   }
@@ -447,7 +447,7 @@ sealed abstract class ValidationInstances0 extends ValidationInstances1 {
 
   implicit def ValidationOrder[E: Order, A: Order]: Order[Validation[E, A]] = new Order[Validation[E, A]] {
     def order(f1: Validation[E, A], f2: Validation[E, A]) =
-      f1 compare f2
+      f1.compare(f2)
     override def equal(f1: Validation[E, A], f2: Validation[E, A]) =
       f1 === f2
   }
@@ -517,7 +517,7 @@ sealed abstract class ValidationInstances2 extends ValidationInstances3 {
     new Traverse[Validation[L, *]] with Cozip[Validation[L, *]] with Optional[Validation[L, *]] {
 
       override def map[A, B](fa: Validation[L, A])(f: A => B) =
-        fa map f
+        fa.map(f)
 
       def traverseImpl[G[_] : Applicative, A, B](fa: Validation[L, A])(f: A => G[B]) =
         fa.traverse(f)
@@ -540,7 +540,7 @@ sealed abstract class ValidationInstances2 extends ValidationInstances3 {
 
   implicit def ValidationPlus[E: Semigroup]: Plus[Validation[E, *]] = new Plus[Validation[E, *]] {
     override def plus[A](a1: Validation[E, A], a2: => Validation[E, A]) =
-      a1 findSuccess a2
+      a1.findSuccess(a2)
   }
 }
 
@@ -564,16 +564,16 @@ sealed abstract class ValidationInstances3 {
   implicit def ValidationApplicativeError[L: Semigroup]: ApplicativeError[Validation[L, *], L] & Alt[Validation[L, *]] =
     new ApplicativeError[Validation[L, *], L] with Alt[Validation[L, *]] {
       override def map[A, B](fa: Validation[L, A])(f: A => B) =
-        fa map f
+        fa.map(f)
 
       def point[A](a: => A): Validation[L, A] =
         Success(a)
 
       def ap[A, B](fa: => Validation[L, A])(f: => Validation[L, A => B]) =
-        fa ap f
+        fa.ap(f)
 
       def alt[A](a: => Validation[L, A], b: => Validation[L, A]) =
-        a orElse b
+        a.orElse(b)
 
       override def raiseError[A](e: L): Validation[L, A] = Failure(e)
 

@@ -19,7 +19,7 @@ object CokleisliTest extends SpecLite {
     import std.AllInstances._
 
     val ck = Cokleisli((a: NonEmptyList[Int]) => a.size)
-    val ck1 = ck compose ck
+    val ck1 = ck.compose(ck)
     val run: Int = ck1.run(NonEmptyList(0, 0))
     run must_===(2)
   }

@@ -26,7 +26,7 @@ object IterateeUsage {
     (takeWhile[Int, List](_ <= 5) &= stream1_10).run assert_=== (1 to 5).toList
     (takeUntil[Int, List](_ >  5) &= stream1_10).run assert_=== (1 to 5).toList
 
-    val readLn = takeWhile[Char, List](_ != '\n') flatMap (ln => drop[Char, Id](1).map(_ => ln))
+    val readLn = takeWhile[Char, List](_ != '\n').flatMap((ln => drop[Char, Id](1).map(_ => ln)))
     (collect[List[Char], List] %= readLn.sequenceI &= enumStream("Iteratees\nare\ncomposable".toStream)).run assert_=== List("Iteratees".toList, "are".toList, "composable".toList)
 
     (collect[List[Int], List] %= splitOn(_ % 3 != 0) &= stream1_10).run assert_=== List(List(1, 2), List(4, 5), List(7, 8), List(10))
@@ -40,26 +40,26 @@ object IterateeUsage {
 
     def r = enumReader[IO](new StringReader("file contents"))
 
-    ((head[IoExceptionOr[Char], IO] &= r).map(_ flatMap (_.toOption)).run.unsafePerformIO()) assert_=== Some('f')
+    ((head[IoExceptionOr[Char], IO] &= r).map(_.flatMap((_.toOption))).run.unsafePerformIO()) assert_=== Some('f')
     ((length[ IoExceptionOr[Char], IO] &= r).run.unsafePerformIO()) assert_=== 13
-    ((peek[IoExceptionOr[Char], IO]   &= r).map(_ flatMap (_.toOption)).run.unsafePerformIO()) assert_=== Some('f')
-    ((head[IoExceptionOr[Char], IO]  &= enumReader[IO](new StringReader(""))).map(_ flatMap (_.toOption)).run.unsafePerformIO()) assert_=== None
+    ((peek[IoExceptionOr[Char], IO]   &= r).map(_.flatMap((_.toOption))).run.unsafePerformIO()) assert_=== Some('f')
+    ((head[IoExceptionOr[Char], IO]  &= enumReader[IO](new StringReader(""))).map(_.flatMap((_.toOption))).run.unsafePerformIO()) assert_=== None
 
     // As a monad
-    val m1 = head[Int, Id] flatMap (b => head[Int, Id] map (b2 => (b tuple b2)))
+    val m1 = head[Int, Id].flatMap((b => head[Int, Id].map((b2 => (b.tuple(b2))))))
     (m1 &= stream123).run assert_=== Some(1 -> 2)
 
     // As a monad using for comprehension (same as 'm1' example above)
     val m2 = for{
       b <- head[Int, Id]
       b2 <- head[Int, Id]
-    } yield b tuple b2
+    } yield b.tuple(b2)
     (m2 &= stream123).run assert_=== Some(1 -> 2)
 
     val colc = takeWhile[IoExceptionOr[Char], List](_.fold(_ => false, _ != ' ')).up[IO]
-    ((colc &= r).map(_ flatMap (_.toOption)).run.unsafePerformIO()) assert_=== List('f', 'i', 'l', 'e')
+    ((colc &= r).map(_.flatMap((_.toOption))).run.unsafePerformIO()) assert_=== List('f', 'i', 'l', 'e')
 
-    val take10And5ThenHead = take[Int, List](10) zip take[Int, List](5) flatMap (ab => head[Int, Id] map (h => (ab, h)))
+    val take10And5ThenHead = take[Int, List](10).zip(take[Int, List](5)).flatMap((ab => head[Int, Id].map((h => (ab, h)))))
     (take10And5ThenHead &= enumStream((1 to 20).toStream)).run assert_=== (((1 to 10).toList -> (1 to 5).toList) -> Some(11))
   }
 }

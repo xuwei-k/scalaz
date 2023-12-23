@@ -18,7 +18,7 @@ trait VectorInstances extends VectorInstances0 {
       Vector(a)
 
     override def bind[A, B](fa: Vector[A])(f: A => Vector[B]): Vector[B] =
-      fa flatMap f
+      fa.flatMap(f)
 
     override def createNewBuilder[A](): scala.collection.mutable.Builder[A, Vector[A]] =
       Vector.newBuilder[A]
@@ -41,7 +41,7 @@ trait VectorInstances extends VectorInstances0 {
     override def zip[A, B](a: => Vector[A],b: => Vector[B]): Vector[(A, B)] = {
       val _a = a
       if(_a.isEmpty) empty
-      else _a zip b
+      else _a.zip(b)
     }
 
     def traverseImpl[F[_], A, B](v: Vector[A])(f: A => F[B])(implicit F: Applicative[F]) = {
@@ -168,7 +168,7 @@ trait VectorFunctions {
   /** A pair of the longest prefix of passing `as` against `p`, and
     * the remainder. */
   final def spanM[A, M[_] : Monad](as: Vector[A])(p: A => M[Boolean]): M[(Vector[A], Vector[A])] =
-    Monad[M].map(takeWhileM(as)(p))(ys => (ys, as drop (ys.length)))
+    Monad[M].map(takeWhileM(as)(p))(ys => (ys, as.drop((ys.length))))
 
   /** `spanM` with `p`'s complement. */
   final def breakM[A, M[_] : Monad](as: Vector[A])(p: A => M[Boolean]): M[(Vector[A], Vector[A])] =
@@ -239,11 +239,11 @@ trait VectorFunctions {
 
   /** Combinations of `as` and `as`, excluding same-element pairs. */
   final def allPairs[A](as: Vector[A]): Vector[(A, A)] =
-    tailz(as).tail flatMap (as zip _)
+    tailz(as).tail.flatMap((as.zip(_)))
 
   /** `[(as(0), as(1)), (as(1), as(2)), ... (as(size-2), as(size-1))]` */
   final def adjacentPairs[A](as: Vector[A]): Vector[(A, A)] =
-    if (as.isEmpty) empty else as zip as.tail
+    if (as.isEmpty) empty else as.zip(as.tail)
 }
 
 private trait VectorEqual[A] extends Equal[Vector[A]] {
@@ -251,7 +251,7 @@ private trait VectorEqual[A] extends Equal[Vector[A]] {
 
   override def equalIsNatural: Boolean = A.equalIsNatural
 
-  override def equal(a1: Vector[A], a2: Vector[A]) = (a1 corresponds a2)(Equal[A].equal)
+  override def equal(a1: Vector[A], a2: Vector[A]) = (a1.corresponds(a2))(Equal[A].equal)
 }
 
 private trait VectorOrder[A] extends Order[Vector[A]] with VectorEqual[A] {

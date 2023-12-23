@@ -104,7 +104,7 @@ sealed abstract class FreeT[S[_], M[_], A] {
         case g @ Gosub(_, _) => g.a match {
           case Suspend(mx) => M0.bind(mx) {
             case -\/(x) => M1.point(-\/(g.f(x)))
-            case \/-(sx) => M0.map(f(sx))(g.f andThen \/.left)
+            case \/-(sx) => M0.map(f(sx))(g.f.andThen(\/.left))
           }
           case g0 @ Gosub(_, _) => go(g0.a.flatMap(g0.f(_).flatMap(g.f)))
         }

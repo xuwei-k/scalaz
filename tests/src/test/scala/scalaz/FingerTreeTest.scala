@@ -87,7 +87,7 @@ object FingerTreeTest extends SpecLite {
 
     "traverseTree through the option effect yielding result" in {
       val tree = lazyListToTree(intLazyList.take(20)).traverseTree[Option, Int, Int](i => Some(i * 2))
-      tree.map(_.toLazyList) getOrElse(LazyList.empty) must_===(lazyListToTree(intLazyList.take(20).map(_ * 2)).toLazyList)
+      tree.map(_.toLazyList).getOrElse((LazyList.empty)) must_===(lazyListToTree(intLazyList.take(20).map(_ * 2)).toLazyList)
     }
 
     "traverseTree through the option effect yielding none" in {
@@ -97,7 +97,7 @@ object FingerTreeTest extends SpecLite {
 
     "not blow the stack" in {
       val tree: Option[FingerTree[Int, Int]] = lazyListToTree(intLazyList.take(32 * 1024)).traverseTree[Option, Int, Int](x => Some(x))
-      tree.map(_.toLazyList.take(100)) getOrElse LazyList.empty must_===(intLazyList.take(100))
+      tree.map(_.toLazyList.take(100)).getOrElse(LazyList.empty) must_===(intLazyList.take(100))
     }
 
   }

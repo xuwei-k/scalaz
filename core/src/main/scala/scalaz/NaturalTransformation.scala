@@ -20,7 +20,7 @@ trait NaturalTransformation[F[_], G[_]] {
   }
 
   def andThen[H[_]](f: G ~> H): F ~> H =
-    f compose self
+    f.compose(self)
 
   /**
     * Combines this [[scalaz.NaturalTransformation]] with another one to create one

@@ -53,7 +53,7 @@ sealed abstract class IList[A] extends Product with Serializable {
     @tailrec def go(as: IList[A], acc: IList[B]): IList[B] =
       as match {
         case ICons(h, t) =>
-          if(pf isDefinedAt h) go(t, ICons(pf(h), acc))
+          if(pf.isDefinedAt(h)) go(t, ICons(pf(h), acc))
           else go(t, acc)
         case INil() => acc
       }
@@ -161,12 +161,12 @@ sealed abstract class IList[A] extends Product with Serializable {
 
   def groupBy[K](f: A => K)(implicit ev: Order[K]): K ==>> NonEmptyList[A] =
     foldLeft(==>>.empty[K, NonEmptyList[A]]) { (m, a) =>
-      m.alter(f(a), _.map(a <:: _) orElse Maybe.just(NonEmptyList(a)))
+      m.alter(f(a), _.map(a <:: _).orElse(Maybe.just(NonEmptyList(a))))
     } .map(_.reverse) // should we bother with this? we don't do it for groupBy1
 
   def groupBy1[K](f: A => K)(implicit ev: Order[K]): K ==>> OneAnd[IList, A] =
     foldLeft(==>>.empty[K, OneAnd[IList,A]]) { (m, a) =>
-      m.alter(f(a), _.map(oa => OneAnd(a, oa.head :: oa.tail)) orElse Maybe.just(OneAnd(a, empty)))
+      m.alter(f(a), _.map(oa => OneAnd(a, oa.head :: oa.tail)).orElse(Maybe.just(OneAnd(a, empty))))
     }
 
   def headOption: Option[A] =
@@ -279,7 +279,7 @@ sealed abstract class IList[A] extends Product with Serializable {
 
   def patch(from: Int, patch: IList[A], replaced: Int): IList[A] = {
     val (init, tail) = splitAt(from)
-    init ++ patch ++ (tail drop replaced)
+    init ++ patch ++ (tail.drop(replaced))
   }
 
   def prefixLength(f: A => Boolean): Int = {
@@ -339,7 +339,7 @@ sealed abstract class IList[A] extends Product with Serializable {
     scan0(reverse, z)((b, a) => f(a, b))
 
   def slice(from: Int, until: Int): IList[A] =
-    drop(from).take((until max 0)- (from max 0))
+    drop(from).take((until.max(0))- (from.max(0)))
 
   def sortBy[B](f: A => B)(implicit B: Order[B]): IList[A] =
     IList.fromSeq(toList.sortBy(f)(B.toScalaOrdering))
@@ -503,7 +503,7 @@ sealed abstract class IList[A] extends Product with Serializable {
     IList.covariant.widen(this)
 
   def zipWithIndex: IList[(A, Int)] =
-    zip(IList.fromSeq(0 until length))
+    zip(IList.fromSeq(0.until(length)))
 
 }
 
@@ -600,13 +600,13 @@ sealed abstract class IListInstances extends IListInstance0 {
       }
 
       override def map[A, B](fa: IList[A])(f: A => B): IList[B] =
-        fa map f
+        fa.map(f)
 
       def point[A](a: => A): IList[A] =
         single(a)
 
       def bind[A, B](fa: IList[A])(f: A => IList[B]): IList[B] =
-        fa flatMap f
+        fa.flatMap(f)
 
       def plus[A](a: IList[A],b: => IList[A]): IList[A] =
         a ++ b
@@ -615,7 +615,7 @@ sealed abstract class IListInstances extends IListInstance0 {
         IList.empty[A]
 
       def zip[A, B](a: => IList[A], b: => IList[B]): IList[(A, B)] =
-        a zip b
+        a.zip(b)
 
       def isEmpty[A](fa: IList[A]): Boolean =
         fa.isEmpty
@@ -636,7 +636,7 @@ sealed abstract class IListInstances extends IListInstance0 {
             case INil() => Maybe.empty
           }(Reducer.ReverseListReducer[B])
 
-        val rev: F[List[B]] = revOpt getOrElse F.point(Nil)
+        val rev: F[List[B]] = revOpt.getOrElse(F.point(Nil))
 
         F.map(rev)((rev) => rev.foldLeft(IList[B]())((r, c) => c +: r))
       }

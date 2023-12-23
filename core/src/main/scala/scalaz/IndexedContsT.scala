@@ -12,7 +12,7 @@ final case class IndexedContsT[W[_], R, O, M[_], A](_run: W[A => M[O]] => M[R]) 
 
   def map[B](f: A => B)(implicit W: Functor[W]): IndexedContsT[W, R, O, M, B] =
     IndexedContsT { wbmo =>
-      run(W.map(wbmo)(f andThen _))
+      run(W.map(wbmo)(f.andThen(_)))
     }
 
   def flatten[E, B](implicit ev: A === IndexedContsT[W, O, E, M, B], W: Cobind[W]): IndexedContsT[W, R, E, M, B] = flatMap(ev)
@@ -36,7 +36,7 @@ final case class IndexedContsT[W[_], R, O, M[_], A](_run: W[A => M[O]] => M[R]) 
 
   def bimap[E, B](f: R => E, g: A => B)(implicit M: Functor[M], W: Functor[W]): IndexedContsT[W, E, O, M, B] =
     IndexedContsT { wbmo =>
-      M.map(run(W.map(wbmo)(g andThen _)))(f)
+      M.map(run(W.map(wbmo)(g.andThen(_))))(f)
     }
 
   def xmap[E, I](f: R => E, g: I => O)(implicit M: Functor[M], W: Functor[W]): IndexedContsT[W, E, I, M, A] =
@@ -48,7 +48,7 @@ final case class IndexedContsT[W[_], R, O, M[_], A](_run: W[A => M[O]] => M[R]) 
 
   def bmap[X >: R <: O, Z](f: Bijection[X, Z])(implicit M: Functor[M], W: Functor[W]): ContsT[W, Z, M, A] =
     IndexedContsT { wami =>
-      M.map(run(W.map(wami) { ami => { a => M.map(ami(a))(f from _) } }))(f to _)
+      M.map(run(W.map(wami) { ami => { a => M.map(ami(a))(f.from(_)) } }))(f to _)
     }
 
   def plus(that: IndexedContsT[W, R, O, M, A])(implicit M: Plus[M]): IndexedContsT[W, R, O, M, A] =

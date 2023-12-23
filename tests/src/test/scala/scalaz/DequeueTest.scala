@@ -38,15 +38,15 @@ object DequeueTest extends SpecLite {
   }
 
   "toBackIList.reverse is toIList" ! forAll{ (l: List[Int]) =>
-    val q = l.foldLeft[Dequeue[Int]](Dequeue.empty)((q,a) => q cons a)
+    val q = l.foldLeft[Dequeue[Int]](Dequeue.empty)((q,a) => q.cons(a))
     q.toBackIList.reverse must_===(q.toIList)
   }
 
   "snoc works" ! forAll{ (l: List[Int]) =>
-    (l.foldLeft[Dequeue[Int]](Dequeue.empty)((q,a) => q snoc a)).toLazyList must_=== l.to(LazyList)
+    (l.foldLeft[Dequeue[Int]](Dequeue.empty)((q,a) => q.snoc(a))).toLazyList must_=== l.to(LazyList)
   }
 
   "cons works" ! forAll{ (l: List[Int]) =>
-    (l.foldRight[Dequeue[Int]](Dequeue.empty)((a,q) => q cons a)).toLazyList must_=== l.to(LazyList)
+    (l.foldRight[Dequeue[Int]](Dequeue.empty)((a,q) => q.cons(a))).toLazyList must_=== l.to(LazyList)
   }
 }

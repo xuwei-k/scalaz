@@ -19,7 +19,7 @@ object MixedBag {
     import syntax.monoid._
 
     1 |+| 2
-    1 mappend 2
+    1.mappend(2)
     some(1) |+| some(2)
     some(1) |+| mzero[Option[Int]]
 
@@ -32,7 +32,7 @@ object MixedBag {
     import syntax.traverse._
 
     val xs: Option[List[Int]] = (1 to 100000).toList.traverse(x => some(x * 2))
-    println(xs map (_ take 10))
+    println(xs.map((_.take(10))))
   }
 
   def traverseBigLazyList(): Unit = {
@@ -84,7 +84,7 @@ object MixedBag {
     import syntax.compose._
 
     val f = kleisli((i: Int) => some(i))
-    f map (i => i * 2) map (x => println(x)) run 3
+    f.map((i => i * 2)).map((x => println(x))).run(3)
 
     val K = Arrow[λ[(α,β)=>Kleisli[Option,α,β]]]
     f >>> K.arr(i => i * 2) >>> K.arr(x => println(x)) run 3

@@ -141,12 +141,12 @@ trait MapInstances extends MapInstances0 with MapFunctions {
 trait MapFunctions {
   /** Vary the value of `m get k`. */
   final def alter[K, A](m: Map[K, A], k: K)(f: (Option[A] => Option[A])): Map[K, A] =
-    f(m get k) map (x => m + ((k, x))) getOrElse (m - k)
+    f(m.get(k)).map((x => m + ((k, x)))) getOrElse (m - k)
 
   /** Like `intersectWith`, but tell `f` about the key. */
-  final def intersectWithKey[K, A, B, C](m1: Map[K, A], m2: Map[K, B])(f: (K, A, B) => C): Map[K, C] = m1 collect {
-    case (k, v) if m2 contains k => k -> f(k, v, m2(k))
-  }
+  final def intersectWithKey[K, A, B, C](m1: Map[K, A], m2: Map[K, B])(f: (K, A, B) => C): Map[K, C] = m1.collect({
+    case (k, v) if m2.contains(k) => k -> f(k, v, m2(k))
+  })
 
   /** Collect only elements with matching keys, joining their
     * associated values with `f`.
@@ -159,14 +159,14 @@ trait MapFunctions {
     * resulting associated value is an arbitrary choice.
     */
   final def mapKeys[K, K2, A](m: Map[K, A])(f: K => K2): Map[K2, A] =
-    m map {case (k, v) => f(k) -> v}
+    m.map({case (k, v) => f(k) -> v})
 
   /** Like `unionWith`, but telling `f` about the key. */
   final def unionWithKey[K, A](m1: Map[K, A], m2: Map[K, A])(f: (K, A, A) => A): Map[K, A] = {
     val diff = m2 -- m1.keySet
-    val aug = m1 transform {
-      case (k, v) => if (m2 contains k) f(k, v, m2(k)) else v
-    }
+    val aug = m1.transform({
+      case (k, v) => if (m2.contains(k)) f(k, v, m2(k)) else v
+    })
     aug ++ diff
   }
 
@@ -182,13 +182,13 @@ trait MapFunctions {
     * first argument is guaranteed to be from `m1`.
     */
   final def insertWith[K, A](m1: Map[K, A], k: K, v: A)(f: (A, A) => A): Map[K, A] =
-    if(m1 contains k) m1 + ((k, f(m1(k), v))) else m1 + ((k, v))
+    if(m1.contains(k)) m1 + ((k, f(m1(k), v))) else m1 + ((k, v))
 
   /** Grab a value out of Map if it's present. Otherwise evaluate
     * a value to be placed at that key in the Map.
     */
   final def getOrAdd[F[_], K, A](m: Map[K, A], k: K)(fa: => F[A])(implicit F: Applicative[F]): F[(Map[K, A], A)] =
-    (m get k).fold(F.map(fa)(a => (m + ((k, a)), a)))(a => F.point((m, a)))
+    (m.get(k)).fold(F.map(fa)(a => (m + ((k, a)), a)))(a => F.point((m, a)))
 }
 
 object map extends MapInstances with MapFunctions

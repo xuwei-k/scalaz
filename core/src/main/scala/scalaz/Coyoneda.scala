@@ -27,14 +27,14 @@ sealed abstract class Coyoneda[F[_], A] { coyo =>
 
   /** Converts to `Yoneda[F,A]` given that `F` is a functor */
   final def toYoneda(implicit F: Functor[F]): Yoneda[F, A] = new Yoneda[F, A] {
-    def apply[B](f: A => B) = F.map(fi)(k andThen f)
+    def apply[B](f: A => B) = F.map(fi)(k.andThen(f))
   }
 
   /** Simple function composition. Allows map fusion without touching
     * the underlying `F`.
     */
   final def map[B](f: A => B): Aux[F, B, I] =
-    apply(fi)(f compose k)
+    apply(fi)(f.compose(k))
 
   final def trans[G[_]](f: F ~> G): Aux[G, A, I] =
     apply(f(fi))(k)
@@ -100,7 +100,7 @@ object Coyoneda extends CoyonedaInstances {
     type CG[A] = Coyoneda[G, A]
     val m: (CF ~> CG) = liftT(fg)
     val n: (CG ~> G) = iso[G].to
-    n compose m
+    n.compose(m)
   }
 
   /** Turns a natural transformation F ~> G into CF ~> CG */
@@ -266,14 +266,14 @@ sealed abstract class CoyonedaInstances12 {
 }
 
 private trait CoyonedaFunctor[F[_]] extends Functor[Coyoneda[F, *]] {
-  override def map[A, B](ya: Coyoneda[F, A])(f: A => B): Coyoneda[F, B] = ya map f
+  override def map[A, B](ya: Coyoneda[F, A])(f: A => B): Coyoneda[F, B] = ya.map(f)
 }
 
 private trait CoyonedaFoldable[F[_]] extends Foldable[Coyoneda[F, *]] {
   def F: Foldable[F]
 
   override final def foldMap[A, B: Monoid](fa: Coyoneda[F, A])(f: A => B) =
-    F.foldMap(fa.fi)(fa.k andThen f)
+    F.foldMap(fa.fi)(fa.k.andThen(f))
   override final def foldRight[A, B](fa: Coyoneda[F, A], z: => B)(f: (A, => B) => B) =
     F.foldRight(fa.fi, z)((i, b) => f(fa.k(i), b))
   override final def foldLeft[A, B](fa: Coyoneda[F, A], z: B)(f: (B, A) => B) =
@@ -284,7 +284,7 @@ private abstract class CoyonedaFoldable1[F[_]] extends Foldable1[Coyoneda[F, *]]
   def F: Foldable1[F]
 
   override final def foldMap1[A, B: Semigroup](fa: Coyoneda[F, A])(f: A => B) =
-    F.foldMap1(fa.fi)(fa.k andThen f)
+    F.foldMap1(fa.fi)(fa.k.andThen(f))
   override final def foldMapRight1[A, B](fa: Coyoneda[F, A])(z: A => B)(f: (A, => B) => B) =
     F.foldMapRight1(fa.fi)(i => z(fa.k(i)))((i, b) => f(fa.k(i), b))
 }

@@ -18,17 +18,17 @@ object FoldableTest extends SpecLite {
     (xs: List[Int]) =>
       val f: Int => Double = 1D + _
       if (xs.isEmpty)
-        (xs maximumOf f) must_==(None)
+        (xs.maximumOf(f)) must_==(None)
       else
-        (xs maximumOf f) must_==(Some((xs.iterator map f).max))
+        (xs.maximumOf(f)) must_==(Some((xs.iterator.map(f)).max))
   }
   "maximumBy" ! forAll {
     (xs: List[Int]) =>
       val f: Int => String = _.toString
       if (xs.isEmpty)
-        (xs maximumBy f) must_== None
+        (xs.maximumBy(f)) must_== None
       else
-        (xs maximumBy f) must_== Some((xs zip (xs map f)).maxBy(_._2)._1)
+        (xs.maximumBy(f)) must_== Some((xs.zip((xs.map(f)))).maxBy(_._2)._1)
   }
   "minimum" ! forAll {
     (xs: List[Int]) =>
@@ -41,17 +41,17 @@ object FoldableTest extends SpecLite {
     (xs: List[Int]) =>
       val f: Int => Double = 1D + _
       if (xs.isEmpty)
-        (xs minimumOf f) must_== None
+        (xs.minimumOf(f)) must_== None
       else
-        (xs minimumOf f) must_== Some((xs.iterator map f).min)
+        (xs.minimumOf(f)) must_== Some((xs.iterator.map(f)).min)
   }
   "minimumBy" ! forAll {
     (xs: List[Int]) =>
       val f: Int => String = _.toString
       if (xs.isEmpty)
-        (xs minimumBy f) must_== None
+        (xs.minimumBy(f)) must_== None
       else
-        (xs minimumBy f) must_== Some((xs zip (xs map f)).minBy(_._2)._1)
+        (xs.minimumBy(f)) must_== Some((xs.zip((xs.map(f)))).minBy(_._2)._1)
   }
   "extrema" ! forAll {
     (xs: List[Int]) =>
@@ -60,19 +60,19 @@ object FoldableTest extends SpecLite {
   "extremaOf" ! forAll {
     (xs: List[Int]) =>
       val f: Int => Double = 1D + _
-      (xs extremaOf f) must_== (xs minimumOf f).tuple(xs maximumOf f)
+      (xs.extremaOf(f)) must_== (xs.minimumOf(f)).tuple(xs.maximumOf(f))
   }
   "extremaBy" ! forAll {
     (xs: List[Int], f: Int => Int) =>
-      (xs extremaBy f) must_== (xs minimumBy f).tuple(xs maximumBy f)
+      (xs.extremaBy(f)) must_== (xs.minimumBy(f)).tuple(xs.maximumBy(f))
   }
   "extremaBy consistent with minimumBy/maximumBy" ! {
     val xs = (1 to 6).toList
     val f: Int => Int = _ % 3
-    (xs extremaBy f) must_== (xs minimumBy f).tuple(xs maximumBy f)
+    (xs.extremaBy(f)) must_== (xs.minimumBy(f)).tuple(xs.maximumBy(f))
 
     val g: Int => Int = _ => 0
-    (xs extremaBy g) must_== (xs minimumBy g).tuple(xs maximumBy g)
+    (xs.extremaBy(g)) must_== (xs.minimumBy(g)).tuple(xs.maximumBy(g))
   }
 
   "distinct" ! forAll {

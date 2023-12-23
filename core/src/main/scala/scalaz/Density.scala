@@ -20,7 +20,7 @@ trait Density[F[_], Y] { self =>
 
   def runDensity: Y = f(fb)
 
-  def map[A](fab: Y => A): Density[F, A] = Density[F,A,X](fb, f andThen fab)
+  def map[A](fab: Y => A): Density[F, A] = Density[F,A,X](fb, f.andThen(fab))
 
   /**
     * The natural isomorphism between a Comonad F and the Density F.

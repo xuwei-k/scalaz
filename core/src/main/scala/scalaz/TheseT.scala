@@ -3,7 +3,7 @@ package scalaz
 final case class TheseT[F[_], A, B](run: F[A \&/ B]) {
 
   def map[C](f: B => C)(implicit F: Functor[F]): TheseT[F, A, C] =
-    TheseT(F.map(run)(_ map f))
+    TheseT(F.map(run)(_.map(f)))
 
   def mapT[G[_], C, D](f: F[A \&/ B] => G[C \&/ D]): TheseT[G, C, D] =
     TheseT(f(run))
@@ -19,7 +19,7 @@ final case class TheseT[F[_], A, B](run: F[A \&/ B]) {
     }
   })
   def flatMapF[C](f: B => F[A \&/ C])(implicit M: Monad[F], S: Semigroup[A]): TheseT[F, A, C]
-  = flatMap[C](f andThen (x => TheseT(x)))
+  = flatMap[C](f.andThen((x => TheseT(x))))
 
 
   def swap(implicit F: Functor[F]): TheseT[F, B, A]
@@ -39,8 +39,8 @@ final case class TheseT[F[_], A, B](run: F[A \&/ B]) {
   def pad(implicit F: Functor[F]): F[(Option[A], Option[B])] = F.map(run)(_.pad)
   def fold[X](s: A => X, t: B => X, q: (A, B) => X)(implicit F: Functor[F]): F[X] = F.map(run)(_.fold(s, t, q))
 
-  def exists(p: B => Boolean)(implicit F: Functor[F]): F[Boolean] = F.map(run)(_ exists p)
-  def forall(p: B => Boolean)(implicit F: Functor[F]): F[Boolean] = F.map(run)(_ forall p)
+  def exists(p: B => Boolean)(implicit F: Functor[F]): F[Boolean] = F.map(run)(_.exists(p))
+  def forall(p: B => Boolean)(implicit F: Functor[F]): F[Boolean] = F.map(run)(_.forall(p))
   def toListT(implicit F: Functor[F]): ListT[F, B] = ListT(toIList)
   def toIList(implicit F: Functor[F]): F[IList[B]] = F.map(run)(_.toIList)
   def toList(implicit F: Functor[F]): F[List[B]] = F.map(run)(_.toList)
@@ -51,7 +51,7 @@ final case class TheseT[F[_], A, B](run: F[A \&/ B]) {
   = getOrElse(default)
 
   def valueOr[BB >: B](x: A => BB)(implicit M: Semigroup[BB], F: Functor[F]): F[BB]
-  = F.map(run)(_ valueOr x)
+  = F.map(run)(_.valueOr(x))
 
   def swapped[AA, BB](k: (B \&/ A) => (BB \&/ AA))(implicit F: Functor[F]): TheseT[F, AA,  BB] =
     TheseT(F.map(run)(_.swapped(k)))
@@ -63,7 +63,7 @@ final case class TheseT[F[_], A, B](run: F[A \&/ B]) {
   def b(implicit F: Functor[F]): OptionT[F, B] = OptionT(F.map(run)(_.b))
 
   def append[AA >: A, BB >: B](that: => TheseT[F, AA,  BB])(implicit F: Apply[F], SA: Semigroup[AA], SB: Semigroup[BB]): TheseT[F, AA,  BB]
-  = TheseT(F.apply2(this.run, that.run)(_ append _))
+  = TheseT(F.apply2(this.run, that.run)(_.append(_)))
 
   def leftMap[C](f: A => C)(implicit F: Functor[F]): TheseT[F, C, B]
   = TheseT(F.map(run)(_.leftMap(f)))
@@ -136,7 +136,7 @@ sealed abstract class TheseTInstances extends TheseTInstances0 {
   }
 
   implicit def theseTSemigroup[F[_]: Apply, A: Semigroup, B: Semigroup]: Semigroup[TheseT[F, A, B]] = new Semigroup[TheseT[F, A, B]] {
-    override def append(f1: TheseT[F, A, B], f2: => TheseT[F, A, B]) = TheseT(Apply[F].apply2(f1.run, f2.run)(_ append _))
+    override def append(f1: TheseT[F, A, B], f2: => TheseT[F, A, B]) = TheseT(Apply[F].apply2(f1.run, f2.run)(_.append(_)))
   }
   implicit def theseTEqual[F[_], A, B](implicit F0: Equal[F[A \&/ B]]): Equal[TheseT[F, A, B]] =
     F0.contramap((_: TheseT[F, A, B]).run)
@@ -155,5 +155,5 @@ private trait TheseTFunctor[F[_], L] extends Functor[TheseT[F, L, *]] {
   protected implicit def F: Functor[F]
 
   override final def map[A, B](fa: TheseT[F, L, A])(f: A => B) =
-    fa map f
+    fa.map(f)
 }

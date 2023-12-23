@@ -26,18 +26,18 @@ sealed abstract class Cofree[S[_], A] {
   final def out: S[Cofree[S, A]] = tail
 
   final def map[B](f: A => B)(implicit S: Functor[S]): Cofree[S, B] =
-    applyCofree(f, _ map f)
+    applyCofree(f, _.map(f))
 
   /** Alias for `extend` */
-  final def `=>>`[B](f: Cofree[S, A] => B)(implicit S: Functor[S]): Cofree[S, B] = this extend f
+  final def `=>>`[B](f: Cofree[S, A] => B)(implicit S: Functor[S]): Cofree[S, B] = this.extend(f)
 
   /** Redecorates this structure with a computation whose context is the entire structure under that value. */
   final def extend[B](f: Cofree[S, A] => B)(implicit S: Functor[S]): Cofree[S, B] =
-    applyTail(f(this), _ extend f)
+    applyTail(f(this), _.extend(f))
 
   /** Folds over this cofree structure, returning all the intermediate values in a new structure. */
   def scanr[B](g: (A, S[Cofree[S, B]]) => B)(implicit S: Functor[S]): Cofree[S, B] = {
-    val qs = S.map(tail)(_ scanr g)
+    val qs = S.map(tail)(_.scanr(g))
     Cofree(g(head, qs), qs)
   }
 
@@ -50,11 +50,11 @@ sealed abstract class Cofree[S[_], A] {
 
   /** Changes the branching functor with the given natural transformation, using the source branching functor's fmap. */
   final def mapBranching[T[_]](f: S ~> T)(implicit S: Functor[S]): Cofree[T, A] =
-    Cofree.delay(head, f(S.map(tail)(_ mapBranching f)))
+    Cofree.delay(head, f(S.map(tail)(_.mapBranching(f))))
 
   /** Changes the branching functor with the given natural transformation, using the target branching functor's fmap. */
   final def mapBranchingT[T[_]](f: S ~> T)(implicit T: Functor[T]): Cofree[T, A] =
-    Cofree.delay(head, T.map(f(tail))(_ mapBranchingT f))
+    Cofree.delay(head, T.map(f(tail))(_.mapBranchingT(f)))
 
   /** Modifies the first branching with the given natural transformation. */
   final def mapFirstBranching(f: S ~> S): Cofree[S, A] =
@@ -62,7 +62,7 @@ sealed abstract class Cofree[S[_], A] {
 
   /** Injects a constant value into this structure. */
   final def inject[B](b: B)(implicit S: Functor[S]): Cofree[S, B] =
-    applyTail(b, _ inject b)
+    applyTail(b, _.inject(b))
 
    /** Replaces the head with `b` and applies `g` through the tail. */
   final def applyTail[B](b: B, g: Cofree[S, A] => Cofree[S, B])(implicit S: Functor[S]): Cofree[S, B] =
@@ -113,7 +113,7 @@ object Cofree extends CofreeInstances {
   }
 
   def mapUnfold[F[_],W[_],A](z: W[A])(f: W ~> F)(implicit W: Comonad[W]): Cofree[F,A] =
-    Cofree.delay(W copoint z, f(W.extend(z)(mapUnfold(_:W[A])(f))))
+    Cofree.delay(W.copoint(z), f(W.extend(z)(mapUnfold(_:W[A])(f))))
 }
 
 sealed abstract class CofreeInstances6 {
@@ -223,15 +223,15 @@ private trait CofreeComonad[S[_]] extends Comonad[Cofree[S, *]] {
 
   override def cojoin[A](a: Cofree[S, A]) = a.duplicate
 
-  override final def map[A, B](fa: Cofree[S, A])(f: A => B) = fa map f
+  override final def map[A, B](fa: Cofree[S, A])(f: A => B) = fa.map(f)
 
-  def cobind[A, B](fa: Cofree[S, A])(f: (Cofree[S, A]) => B) = fa extend f
+  def cobind[A, B](fa: Cofree[S, A])(f: (Cofree[S, A]) => B) = fa.extend(f)
 }
 
 private trait CofreeZipFunctor[F[_]] extends Functor[CofreeZip[F, *]]{
   implicit def F: Functor[F]
 
-  override final def map[A, B](fa: CofreeZip[F, A])(f: A => B) = Tags.Zip(Tag unwrap fa map f)
+  override final def map[A, B](fa: CofreeZip[F, A])(f: A => B) = Tags.Zip(Tag.unwrap(fa).map(f))
 }
 
 private trait CofreeZipApply[F[_]] extends Apply[CofreeZip[F, *]] with CofreeZipFunctor[F]{

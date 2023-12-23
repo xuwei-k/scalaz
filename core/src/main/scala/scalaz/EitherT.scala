@@ -50,7 +50,7 @@ final case class EitherT[A, F[_], B](run: F[A \/ B]) {
 
   /** Run the given function on this swapped value. Alias for `~` */
   def swapped[AA, BB](k: (B \/ A) => (BB \/ AA))(implicit F: Functor[F]): EitherT[AA, F, BB] =
-    EitherT(F.map(run)(_ swapped k))
+    EitherT(F.map(run)(_.swapped(k)))
 
   /** Run the given function on this swapped value. Alias for `swapped` */
   def ~[AA, BB](k: (B \/ A) => (BB \/ AA))(implicit F: Functor[F]): EitherT[AA, F, BB] =
@@ -75,7 +75,7 @@ final case class EitherT[A, F[_], B](run: F[A \/ B]) {
   /** Map on the right of this disjunction. */
   def mapF[C](f: B => F[C])(implicit M: Monad[F]): EitherT[A, F, C] =
     flatMapF {
-      f andThen (mb => M.map(mb)(b => \/-(b)))
+      f.andThen((mb => M.map(mb)(b => \/-(b))))
     }
 
   def mapT[G[_], C, D](f: F[A \/ B] => G[C \/ D]): EitherT[C, G, D] =
@@ -90,7 +90,7 @@ final case class EitherT[A, F[_], B](run: F[A \/ B]) {
     * it is not consistent with `ap`.
     */
   def app[C](f: => EitherT[A, F, B => C])(implicit F: Apply[F]): EitherT[A, F, C] =
-    EitherT(F.apply2(f.run, run)((a, b) => b ap a))
+    EitherT(F.apply2(f.run, run)((a, b) => b.ap(a)))
 
   /** Bind through the right of this disjunction. */
   def flatMap[C](f: B => EitherT[A, F, C])(implicit F: Monad[F]): EitherT[A, F, C] =
@@ -115,11 +115,11 @@ final case class EitherT[A, F[_], B](run: F[A \/ B]) {
 
   /** Return `true` if this disjunction is a right value satisfying the given predicate. */
   def exists(f: B => Boolean)(implicit F: Functor[F]): F[Boolean] =
-    F.map(run)(_ exists f)
+    F.map(run)(_.exists(f))
 
   /** Return `true` if this disjunction is a left value or the right value satisfies the given predicate. */
   def forall(f: B => Boolean)(implicit F: Functor[F]): F[Boolean] =
-    F.map(run)(_ forall f)
+    F.map(run)(_.forall(f))
 
   /** Return an empty list or list with one element on the right of this disjunction. */
   def toList(implicit F: Functor[F]): F[List[B]] =
@@ -146,7 +146,7 @@ final case class EitherT[A, F[_], B](run: F[A \/ B]) {
 
   /** Return the right value of this disjunction or the given default if left. Alias for `|` */
   def getOrElse(default: => B)(implicit F: Functor[F]): F[B] =
-    F.map(run)(_ getOrElse default)
+    F.map(run)(_.getOrElse(default))
 
   /** Return the right value of this disjunction or the given default if left. Alias for `getOrElse` */
   def |(default: => B)(implicit F: Functor[F]): F[B] =
@@ -154,7 +154,7 @@ final case class EitherT[A, F[_], B](run: F[A \/ B]) {
 
   /** Return the right value of this disjunction or run the given function on the left. */
   def valueOr(x: A => B)(implicit F: Functor[F]): F[B] =
-    F.map(run)(_ valueOr x)
+    F.map(run)(_.valueOr(x))
 
   /** Return this if it is a right, otherwise, return the given value. Alias for `|||` */
   def orElse(x: => EitherT[A, F, B])(implicit F: Monad[F]): EitherT[A, F, B] = {
@@ -191,7 +191,7 @@ final case class EitherT[A, F[_], B](run: F[A \/ B]) {
 
   /** Compare two disjunction values for ordering. */
   def compare(x: EitherT[A, F, B])(implicit EA: Order[A], EB: Order[B], F: Apply[F]): F[Ordering] =
-    F.apply2(run, x.run)(_ compare _)
+    F.apply2(run, x.run)(_.compare(_))
 
   /** Show for a disjunction value. */
   def show(implicit SA: Show[A], SB: Show[B], F: Functor[F]): F[Cord] =
@@ -207,7 +207,7 @@ final case class EitherT[A, F[_], B](run: F[A \/ B]) {
 
   /** Run a validation function and back to disjunction again. */
   def validationed[AA, BB](k: Validation[A, B] => Validation[AA, BB])(implicit F: Functor[F]): EitherT[AA, F, BB] =
-    EitherT(F.map(run)(_ validationed k))
+    EitherT(F.map(run)(_.validationed(k)))
 
   /** Return the value from whichever side of the disjunction is defined, given a commonly assignable type. */
   def merge[AA >: A](implicit F: Functor[F], ev: B <~< AA): F[AA] = {
@@ -381,13 +381,13 @@ sealed abstract class EitherTInstances extends EitherTInstances0 {
 private trait EitherTFunctor[F[_], E] extends Functor[EitherT[E, F, *]] {
   implicit def F: Functor[F]
 
-  override def map[A, B](fa: EitherT[E, F, A])(f: A => B): EitherT[E, F, B] = fa map f
+  override def map[A, B](fa: EitherT[E, F, A])(f: A => B): EitherT[E, F, B] = fa.map(f)
 }
 
 private trait EitherTBind[F[_], E] extends Bind[EitherT[E, F, *]] with EitherTFunctor[F, E] {
   implicit def F: Monad[F]
 
-  final def bind[A, B](fa: EitherT[E, F, A])(f: A => EitherT[E, F, B]): EitherT[E, F, B] = fa flatMap f
+  final def bind[A, B](fa: EitherT[E, F, A])(f: A => EitherT[E, F, B]): EitherT[E, F, B] = fa.flatMap(f)
 }
 
 private trait EitherTBindRec[F[_], E] extends BindRec[EitherT[E, F, *]] with EitherTBind[F, E] {
@@ -440,7 +440,7 @@ private trait EitherTFoldable[F[_], E] extends Foldable.FromFoldr[EitherT[E, F, 
 private trait EitherTTraverse[F[_], E] extends Traverse[EitherT[E, F, *]] with EitherTFoldable[F, E] {
   implicit def F: Traverse[F]
 
-  def traverseImpl[G[_]: Applicative, A, B](fa: EitherT[E, F, A])(f: A => G[B]): G[EitherT[E, F, B]] = fa traverse f
+  def traverseImpl[G[_]: Applicative, A, B](fa: EitherT[E, F, A])(f: A => G[B]): G[EitherT[E, F, B]] = fa.traverse(f)
 }
 
 private trait EitherTBifunctor[F[_]] extends Bifunctor[EitherT[*, F, *]] {
@@ -518,7 +518,7 @@ private trait EitherTNondeterminism[F[_], E] extends Nondeterminism[EitherT[E, F
   implicit def F: Nondeterminism[F]
 
   def chooseAny[A](head: EitherT[E, F, A], tail: IList[EitherT[E, F, A]]): EitherT[E, F, (A, IList[EitherT[E, F, A]])] =
-    EitherT(F.map(F.chooseAny(head.run, tail map (_.run))) {
+    EitherT(F.map(F.chooseAny(head.run, tail.map((_.run)))) {
       case (a, residuals) =>
         a.map((_, residuals.map(new EitherT(_))))
     })

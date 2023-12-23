@@ -25,7 +25,7 @@ final class DList[A] private[scalaz](f: IList[A] => Trampoline[IList[A]]) {
   def toList: List[A] = toIList.toList
 
   /** Prepend a single element in constant time. */
-  def +:(a: A): DList[A] = mkDList(as => suspend(apply(as) map (a :: _)))
+  def +:(a: A): DList[A] = mkDList(as => suspend(apply(as).map((a :: _))))
 
   /** Append a single element in constant time. */
   def :+(a: A): DList[A] = mkDList(as => suspend(apply(a :: as)))
@@ -64,7 +64,7 @@ final class DList[A] private[scalaz](f: IList[A] => Trampoline[IList[A]]) {
   def flatMap[B](f: A => DList[B]): DList[B] =
    foldr(DList.empty[B])((x, y) => f(x) ++ y)
 
-  def zip[B](bs: => DList[B]): DList[(A,B)] = uncons(DList.empty, (h,t) => bs.uncons(DList.empty, (h2,t2) => (h -> h2) +: (t zip t2)))
+  def zip[B](bs: => DList[B]): DList[(A,B)] = uncons(DList.empty, (h,t) => bs.uncons(DList.empty, (h2,t2) => (h -> h2) +: (t.zip(t2))))
 }
 
 object DList extends DListInstances {
@@ -92,7 +92,7 @@ object DList extends DListInstances {
     })
   def unfoldr[A, B](b: B, f: B => Option[(A, B)]): DList[A] = {
     def go(b: B, f: B => Option[(A, B)]): Trampoline[DList[A]] =
-      f(b) map { case (a, c) => suspend(go(c, f)) map (a +: _) } getOrElse return_(DList.empty)
+      f(b).map({ case (a, c) => suspend(go(c, f)).map((a +: _)) }).getOrElse(return_(DList.empty))
     go(b, f).run
   }
 }
@@ -106,12 +106,12 @@ sealed abstract class DListInstances {
     IsCovariant.force[DList]
   implicit val dlistMonadPlus: MonadPlus[DList] & Alt[DList] & Traverse[DList] & BindRec[DList] & Zip[DList] & IsEmpty[DList] = new MonadPlus[DList] with Alt[DList] with Traverse[DList] with BindRec[DList] with Zip[DList] with IsEmpty[DList] {
     def point[A](a: => A) = DList(a)
-    def bind[A, B](as: DList[A])(f: A => DList[B]) = as flatMap f
+    def bind[A, B](as: DList[A])(f: A => DList[B]) = as.flatMap(f)
     def plus[A](a: DList[A], b: => DList[A]) = a ++ b
     def alt[A](a: => DList[A], b: => DList[A]) = plus(a, b)
     def empty[A] = DList.empty
     def isEmpty[A](fa: DList[A]) = fa.isEmpty
-    def zip[A,B](a: => DList[A], b: => DList[B]): DList[(A, B)] = a zip b
+    def zip[A,B](a: => DList[A], b: => DList[B]): DList[(A, B)] = a.zip(b)
     def traverseImpl[F[_], A, B](fa: DList[A])(f: A => F[B])(implicit F: Applicative[F]): F[DList[B]] =
       fa.foldr(F.point(DList.empty[B]))((a, fbs) => F.apply2(f(a), fbs)(_ +: _))
 

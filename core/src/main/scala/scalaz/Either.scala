@@ -129,7 +129,7 @@ sealed abstract class \/[A, B] extends Product with Serializable {
 
   /** Apply a function in the environment of the right of this disjunction. */
   def ap[C](f: => A \/ (B => C)): (A \/ C) =
-    f flatMap (ff => map(ff(_)))
+    f.flatMap((ff => map(ff(_))))
 
   /** Bind through the right of this disjunction. */
   def flatMap[D](g: B => (A \/ D)): (A \/ D) =
@@ -267,13 +267,13 @@ sealed abstract class \/[A, B] extends Product with Serializable {
 
   /** Run the given function on the left and return right with the result. */
   def recover(pf: PartialFunction[A, B]): (A \/ B) = this match {
-    case -\/(a) if (pf isDefinedAt a) => \/-(pf(a))
+    case -\/(a) if (pf.isDefinedAt(a)) => \/-(pf(a))
     case _ => this
   }
 
   /** Run the given function on the left and return the result. */
   def recoverWith(pf: PartialFunction[A, A \/ B]): (A \/ B) = this match {
-    case -\/(a) if (pf isDefinedAt a) => pf(a)
+    case -\/(a) if (pf.isDefinedAt(a)) => pf(a)
     case _ => this
   }
 
@@ -481,7 +481,7 @@ sealed abstract class DisjunctionInstances extends DisjunctionInstances0 {
   implicit def DisjunctionOrder[A: Order, B: Order]: Order[A \/ B] =
     new Order[A \/ B] {
       def order(a1: A \/ B, a2: A \/ B) =
-        a1 compare a2
+        a1.compare(a2)
       override def equal(a1: A \/ B, a2: A \/ B) =
         a1 === a2
     }
@@ -522,7 +522,7 @@ sealed abstract class DisjunctionInstances1 extends DisjunctionInstances2 {
   implicit def DisjunctionInstances1[L]: Traverse[\/[L, *]] & Monad[\/[L, *]] & BindRec[\/[L, *]] & Cozip[\/[L, *]] & Plus[\/[L, *]] & Alt[\/[L, *]] & Optional[\/[L, *]] & MonadError[\/[L, *], L] =
     new Traverse[\/[L, *]] with Monad[\/[L, *]] with BindRec[\/[L, *]] with Cozip[\/[L, *]] with Plus[\/[L, *]] with Alt[\/[L, *]] with Optional[\/[L, *]] with MonadError[\/[L, *], L] {
       override def map[A, B](fa: L \/ A)(f: A => B) =
-        fa map f
+        fa.map(f)
 
       override def ap[A,B](fa: => L \/ A)(f: => L \/ (A => B)): L \/ B = fa.ap(f)
 
@@ -545,7 +545,7 @@ sealed abstract class DisjunctionInstances1 extends DisjunctionInstances2 {
         }
 
       def bind[A, B](fa: L \/ A)(f: A => L \/ B) =
-        fa flatMap f
+        fa.flatMap(f)
 
       override def emap[A, B](fa: L \/ A)(f: A => L \/ B) = bind(fa)(f)
 
@@ -568,7 +568,7 @@ sealed abstract class DisjunctionInstances1 extends DisjunctionInstances2 {
         }
 
       def plus[A](a: L \/ A, b: => L \/ A) =
-        a orElse b
+        a.orElse(b)
 
       def alt[A](a: => L \/ A, b: => L \/ A) =
         plus(a, b)

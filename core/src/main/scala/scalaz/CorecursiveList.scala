@@ -119,7 +119,7 @@ object CorecursiveList extends CorecursiveListInstances {
     */
   def cons[A](a: A, fa: CorecursiveList[A]): CorecursiveList[A] =
     CorecursiveList(Empty(): Maybe[fa.S]){ms =>
-      ms.cata(s => fa.step(s) map {case (fas, a) => (just(fas), a)},
+      ms.cata(s => fa.step(s).map({case (fas, a) => (just(fas), a)}),
                just((just(fa.init), a)))
     }
 
@@ -130,19 +130,18 @@ object CorecursiveList extends CorecursiveListInstances {
         with IsEmpty[CorecursiveList] with Align[CorecursiveList]
         with Zip[CorecursiveList] {
       override def map[A, B](fa: CorecursiveList[A])(f: A => B) =
-        CorecursiveList(fa.init)(fa.step andThen (_ map {
+        CorecursiveList(fa.init)(fa.step.andThen((_.map({
           case (s, a) => (s, f(a))
-        }))
+        }))))
 
       override def ap[A, B](fa0: => CorecursiveList[A])(ff0: => CorecursiveList[A => B]) = {
         val fa = fa0
         val ff = ff0
         def bstep(sa: fa.S, ffs: Maybe[(ff.S, A => B)])
             : Maybe[((fa.S, Maybe[(ff.S, A => B)]), B)] = ffs match {
-          case Empty() => ff.step(ff.init) flatMap (st => bstep(sa, just(st)))
+          case Empty() => ff.step(ff.init).flatMap((st => bstep(sa, just(st))))
           case Just((sf, f)) =>
-            (fa.step(sa) map {case (sa, a) => ((sa, ffs), f(a))}
-              orElse ff.step(sf).flatMap(st => bstep(fa.init, just(st))))
+            (fa.step(sa).map({case (sa, a) => ((sa, ffs), f(a))}).orElse(ff.step(sf).flatMap(st => bstep(fa.init, just(st)))))
         }
         CorecursiveList((fa.init, Empty(): Maybe[(ff.S, A => B)])
                       )((bstep _).tupled)
@@ -151,12 +150,12 @@ object CorecursiveList extends CorecursiveListInstances {
       override def bind[A, B](fa: CorecursiveList[A])(f: A => CorecursiveList[B]) = {
         def bstep(sa: fa.S, mfb: Maybe[CorecursiveList[B]])
             : Maybe[((fa.S, Maybe[CorecursiveList[B]]), B)] = mfb match {
-          case Empty() => fa.step(sa) flatMap {case (sa, a) =>
+          case Empty() => fa.step(sa).flatMap({case (sa, a) =>
             bstep(sa, just(f(a)))
-          }
-          case Just(fb) => fb.step(fb.init) map {
+          })
+          case Just(fb) => fb.step(fb.init).map({
             case (sb, b) => ((sa, just(CorecursiveList(sb)(fb.step))), b)
-          } orElse bstep(sa, Empty())
+          }).orElse(bstep(sa, Empty()))
         }
         CorecursiveList((fa.init, Empty(): Maybe[CorecursiveList[B]])){
           case (sa, mfb) => bstep(sa, mfb)
@@ -209,17 +208,16 @@ object CorecursiveList extends CorecursiveListInstances {
       }
 
       override def empty[A] =
-        CorecursiveList(())(Function const Empty())
+        CorecursiveList(())(Function.const(Empty()))
 
       override def plus[A](la: CorecursiveList[A], ra0: => CorecursiveList[A]) = {
         val ra = Need(ra0)
         type SS = la.S \/ ra.value.S
         def rightStep(rs: ra.value.S): Maybe[(SS, A)] =
-          ra.value.step(rs) map {case (rs, a) => (\/-(rs): SS, a)}
+          ra.value.step(rs).map({case (rs, a) => (\/-(rs): SS, a)})
         CorecursiveList(-\/(la.init): SS){
           case -\/(ls) =>
-            (la.step(ls) map {case (ls, a) => (-\/(ls): SS, a)}
-              orElse rightStep(ra.value.init))
+            (la.step(ls).map({case (ls, a) => (-\/(ls): SS, a)}).orElse(rightStep(ra.value.init)))
           case \/-(rs) =>
             rightStep(rs)
         }
@@ -238,9 +236,9 @@ object CorecursiveList extends CorecursiveListInstances {
             Align[Maybe].align(fa.step(sa), fb.step(sb)).map(sasb =>
               (sasb.bimap(_._1, _._1), f(sasb.bimap(_._2, _._2))))
           case This(sa) =>
-            fa.step(sa) map {case (sa, a) => (This(sa), f(This(a)))}
+            fa.step(sa).map({case (sa, a) => (This(sa), f(This(a)))})
           case That(sb) =>
-            fb.step(sb) map {case (sb, b) => (That(sb), f(That(b)))}
+            fb.step(sb).map({case (sb, b) => (That(sb), f(That(b)))})
         }
       }
 

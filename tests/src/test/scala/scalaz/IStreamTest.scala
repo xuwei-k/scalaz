@@ -69,7 +69,7 @@ object IStreamTest extends SpecLite {
 
   "index infinite" in {
     val i = util.Random.nextInt(1000)
-    val xs = LazyList from 0
+    val xs = LazyList.from(0)
     Foldable[IStream].index(IStream.fromLazyList(xs), i) must_===(xs.lift.apply(i))
   }
 

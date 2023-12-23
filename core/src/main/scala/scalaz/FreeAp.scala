@@ -17,7 +17,7 @@ sealed abstract class FreeAp[F[_],A] {
   def foldMap[G[_]:Applicative](f: F ~> G): G[A] =
     this match {
       case Pure(x) => Applicative[G].pure(x)
-      case x@Ap() => Applicative[G].ap(f(x.v()))(x.k() foldMap f)
+      case x@Ap() => Applicative[G].ap(f(x.v()))(x.k().foldMap(f))
     }
 
   /** Provides access to the first instruction of this program, if present */
@@ -50,7 +50,7 @@ sealed abstract class FreeAp[F[_],A] {
    */
   def hoist[G[_]](f: F ~> G): FreeAp[G,A] = this match {
     case Pure(a) => Pure(a)
-    case x@Ap() => FreeAp(f(x.v()), x.k() hoist f)
+    case x@Ap() => FreeAp(f(x.v()), x.k().hoist(f))
   }
 
   /**
@@ -79,7 +79,7 @@ sealed abstract class FreeAp[F[_],A] {
   /** Append a function to the end of this program */
   def map[B](f: A => B): FreeAp[F,B] = this match {
     case Pure(a) => Pure(f(a))
-    case x@Ap() => FreeAp(x.v(), x.k().map(f compose _))
+    case x@Ap() => FreeAp(x.v(), x.k().map(f.compose(_)))
   }
 }
 
@@ -141,7 +141,7 @@ object FreeAp extends FreeApInstances {
   implicit def freeInstance[F[_]]: Applicative[FreeAp[F, *]] =
     new Applicative[FreeAp[F, *]] {
       def point[A](a: => A) = FreeAp.point(a)
-      def ap[A,B](fa: => FreeAp[F,A])(ff: => FreeAp[F, A => B]) = fa ap ff
+      def ap[A,B](fa: => FreeAp[F,A])(ff: => FreeAp[F, A => B]) = fa.ap(ff)
     }
 
   /** Return a value in a free applicative functor */
@@ -189,6 +189,6 @@ private trait FreeApCobind[F[_]] extends Cobind[FreeAp[F, *]] {
     }
 
   override final def map[A, B](fa: FreeAp[F, A])(f: A => B): FreeAp[F, B] =
-    fa map f
+    fa.map(f)
 }
 

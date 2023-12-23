@@ -35,7 +35,7 @@ object CorecursiveListTest extends SpecLite {
   import EphemeralStreamTest.ephemeralStreamShow
 
   implicit def corecursiveListShow[A: Show]: Show[CL[A]] =
-    Show[LazyList[A]] contramap (CL.lazyListIso.from(_))
+    Show[LazyList[A]].contramap((CL.lazyListIso.from(_)))
 
   def isoTest[F[_], G[_]](iso: F <~> G)(
     implicit AF: Arbitrary[F[Int]], AG: Arbitrary[G[Int]],

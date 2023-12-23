@@ -61,7 +61,7 @@ final class IdOps[A](private val self: A) extends AnyVal {
    * otherwise lift `self` into `F` with the provided [[scalaz.Applicative]].
    */
   def visit[F[_] : Applicative](p: PartialFunction[A, F[A]]): F[A] =
-    if (p isDefinedAt self) p(self)
+    if (p.isDefinedAt(self)) p(self)
     else Applicative[F].point(self)
 }
 

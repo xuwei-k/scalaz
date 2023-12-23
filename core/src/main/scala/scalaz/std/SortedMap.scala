@@ -144,12 +144,12 @@ trait SortedMapInstances extends SortedMapInstances0 with SortedMapFunctions {
 trait SortedMapFunctions {
   /** Vary the value of `m get k`. */
   final def alter[K, A](m: SortedMap[K, A], k: K)(f: (Option[A] => Option[A])): SortedMap[K, A] =
-    f(m get k) map (x => m + ((k, x))) getOrElse (m - k)
+    f(m.get(k)).map((x => m + ((k, x)))) getOrElse (m - k)
 
   /** Like `intersectWith`, but tell `f` about the key. */
-  final def intersectWithKey[K: scala.Ordering, A, B, C](m1: SortedMap[K, A], m2: SortedMap[K, B])(f: (K, A, B) => C): SortedMap[K, C] = m1 collect {
-    case (k, v) if m2 contains k => k -> f(k, v, m2(k))
-  }
+  final def intersectWithKey[K: scala.Ordering, A, B, C](m1: SortedMap[K, A], m2: SortedMap[K, B])(f: (K, A, B) => C): SortedMap[K, C] = m1.collect({
+    case (k, v) if m2.contains(k) => k -> f(k, v, m2(k))
+  })
 
   /** Collect only elements with matching keys, joining their
     * associated values with `f`.
@@ -162,13 +162,13 @@ trait SortedMapFunctions {
     * resulting associated value is an arbitrary choice.
     */
   final def mapKeys[K, K2: scala.Ordering, A](m: SortedMap[K, A])(f: K => K2): SortedMap[K2, A] =
-    m map {case (k, v) => f(k) -> v}
+    m.map({case (k, v) => f(k) -> v})
 
   /** Like `unionWith`, but telling `f` about the key. */
   final def unionWithKey[K: scala.Ordering, A](m1: SortedMap[K, A], m2: SortedMap[K, A])(f: (K, A, A) => A): SortedMap[K, A] = {
     val diff = m2 -- m1.keySet
     val aug = m1.map {
-      case (k, v) => (k, if (m2 contains k) f(k, v, m2(k)) else v)
+      case (k, v) => (k, if (m2.contains(k)) f(k, v, m2(k)) else v)
     }
     aug ++ diff
   }
@@ -185,13 +185,13 @@ trait SortedMapFunctions {
     * first argument is guaranteed to be from `m1`.
     */
   final def insertWith[K, A](m1: SortedMap[K, A], k: K, v: A)(f: (A, A) => A): SortedMap[K, A] =
-    if(m1 contains k) m1 + ((k, f(m1(k), v))) else m1 + ((k, v))
+    if(m1.contains(k)) m1 + ((k, f(m1(k), v))) else m1 + ((k, v))
 
   /** Grab a value out of SortedMap if it's present. Otherwise evaluate
     * a value to be placed at that key in the SortedMap.
     */
   final def getOrAdd[F[_], K, A](m: SortedMap[K, A], k: K)(fa: => F[A])(implicit F: Applicative[F]): F[(SortedMap[K, A], A)] =
-    (m get k).fold(F.map(fa)(a => (m + ((k, a)), a)))(a => F.point((m, a)))
+    (m.get(k)).fold(F.map(fa)(a => (m + ((k, a)), a)))(a => F.point((m, a)))
 }
 
 object sortedMap extends SortedMapInstances with SortedMapFunctions

@@ -16,7 +16,7 @@ final class OptionOps[A](private val self: Option[A]) extends AnyVal {
   /**
    * Returns the item contained in the Option if it is defined, otherwise, the provided argument.
    */
-  final def |(a: => A): A = self getOrElse a
+  final def |(a: => A): A = self.getOrElse(a)
 
   /**
    * Returns the item contained in the Option if it is defined, otherwise, the zero element for the type A
@@ -27,9 +27,9 @@ final class OptionOps[A](private val self: Option[A]) extends AnyVal {
    * val a: List[String] = ~o // List()
    * }}}
    */
-  final def unary_~(implicit z: Monoid[A]): A = self getOrElse z.zero
+  final def unary_~(implicit z: Monoid[A]): A = self.getOrElse(z.zero)
 
-  final def orZero(implicit z: Monoid[A]): A = self getOrElse z.zero
+  final def orZero(implicit z: Monoid[A]): A = self.getOrElse(z.zero)
 
   final def toSuccess[E](e: => E): Validation[E, A] = o.toSuccess(self)(e)
 
