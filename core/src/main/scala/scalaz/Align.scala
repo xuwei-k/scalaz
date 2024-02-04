@@ -64,7 +64,7 @@ trait Align[F[_]] extends Functor[F] { self =>
 }
 
 object Align {
-  @inline def apply[F[_]](implicit F: Align[F]): Align[F] = F
+  @inline inline def apply[F[_]](implicit F: Align[F]): Align[F] = F
 
   import Isomorphism._
 

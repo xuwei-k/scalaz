@@ -40,7 +40,7 @@ trait MonadReader[F[_], S] extends Monad[F] { self =>
 }
 
 object MonadReader {
-  @inline def apply[F[_], S](implicit F: MonadReader[F, S]): MonadReader[F, S] = F
+  @inline inline def apply[F[_], S](implicit F: MonadReader[F, S]): MonadReader[F, S] = F
 
   import Isomorphism._
 

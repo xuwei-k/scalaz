@@ -97,7 +97,7 @@ trait Strong[=>:[_, _]] extends Profunctor[=>:] { self =>
 }
 
 object Strong {
-  @inline def apply[F[_, _]](implicit F: Strong[F]): Strong[F] = F
+  @inline inline def apply[F[_, _]](implicit F: Strong[F]): Strong[F] = F
 
   import Isomorphism._
 

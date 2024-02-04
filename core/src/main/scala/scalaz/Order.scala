@@ -73,7 +73,7 @@ trait Order[F] extends Equal[F] { self =>
 }
 
 object Order {
-  @inline def apply[F](implicit F: Order[F]): Order[F] = F
+  @inline inline def apply[F](implicit F: Order[F]): Order[F] = F
 
   import Isomorphism._
 

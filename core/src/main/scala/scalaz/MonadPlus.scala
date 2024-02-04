@@ -66,7 +66,7 @@ trait MonadPlus[F[_]] extends Monad[F] with ApplicativePlus[F] { self =>
 }
 
 object MonadPlus {
-  @inline def apply[F[_]](implicit F: MonadPlus[F]): MonadPlus[F] = F
+  @inline inline def apply[F[_]](implicit F: MonadPlus[F]): MonadPlus[F] = F
 
   import Isomorphism._
 

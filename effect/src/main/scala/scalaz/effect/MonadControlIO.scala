@@ -17,7 +17,7 @@ trait MonadControlIO[F[_]] extends LiftControlIO[F] with Monad[F] { self =>
 }
 
 object MonadControlIO {
-  @inline def apply[F[_]](implicit F: MonadControlIO[F]): MonadControlIO[F] = F
+  @inline inline def apply[F[_]](implicit F: MonadControlIO[F]): MonadControlIO[F] = F
 
   import Isomorphism._
 

@@ -100,7 +100,7 @@ trait Bifoldable[F[_, _]]  { self =>
 }
 
 object Bifoldable {
-  @inline def apply[F[_, _]](implicit F: Bifoldable[F]): Bifoldable[F] = F
+  @inline inline def apply[F[_, _]](implicit F: Bifoldable[F]): Bifoldable[F] = F
 
 
 

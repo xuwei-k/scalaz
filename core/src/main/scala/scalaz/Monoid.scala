@@ -90,7 +90,7 @@ trait Monoid[F] extends Semigroup[F] { self =>
 }
 
 object Monoid {
-  @inline def apply[F](implicit F: Monoid[F]): Monoid[F] = F
+  @inline inline def apply[F](implicit F: Monoid[F]): Monoid[F] = F
 
   import Isomorphism._
 

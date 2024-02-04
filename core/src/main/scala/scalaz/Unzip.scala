@@ -65,7 +65,7 @@ trait Unzip[F[_]]  { self =>
 }
 
 object Unzip {
-  @inline def apply[F[_]](implicit F: Unzip[F]): Unzip[F] = F
+  @inline inline def apply[F[_]](implicit F: Unzip[F]): Unzip[F] = F
 
   import Isomorphism._
 

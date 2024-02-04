@@ -37,7 +37,7 @@ trait Equal[F]  { self =>
 }
 
 object Equal {
-  @inline def apply[F](implicit F: Equal[F]): Equal[F] = F
+  @inline inline def apply[F](implicit F: Equal[F]): Equal[F] = F
 
   import Isomorphism._
 

@@ -72,7 +72,7 @@ trait Bifunctor[F[_, _]]  { self =>
 }
 
 object Bifunctor {
-  @inline def apply[F[_, _]](implicit F: Bifunctor[F]): Bifunctor[F] = F
+  @inline inline def apply[F[_, _]](implicit F: Bifunctor[F]): Bifunctor[F] = F
 
   import Isomorphism._
 

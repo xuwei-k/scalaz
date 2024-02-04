@@ -78,7 +78,7 @@ trait Decidable[F[_]] extends Divisible[F] with InvariantAlt[F] { self =>
 }
 
 object Decidable {
-  @inline def apply[F[_]](implicit F: Decidable[F]): Decidable[F] = F
+  @inline inline def apply[F[_]](implicit F: Decidable[F]): Decidable[F] = F
 
   import Isomorphism._
 

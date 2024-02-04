@@ -15,7 +15,7 @@ trait MonadCatchIO[F[_]] extends MonadIO[F] { self =>
 }
 
 object MonadCatchIO {
-  @inline def apply[F[_]](implicit F: MonadCatchIO[F]): MonadCatchIO[F] = F
+  @inline inline def apply[F[_]](implicit F: MonadCatchIO[F]): MonadCatchIO[F] = F
 
   import Isomorphism._
 

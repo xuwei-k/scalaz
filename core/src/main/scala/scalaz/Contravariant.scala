@@ -78,7 +78,7 @@ trait Contravariant[F[_]] extends InvariantFunctor[F] { self =>
 }
 
 object Contravariant {
-  @inline def apply[F[_]](implicit F: Contravariant[F]): Contravariant[F] = F
+  @inline inline def apply[F[_]](implicit F: Contravariant[F]): Contravariant[F] = F
 
   import Isomorphism._
 

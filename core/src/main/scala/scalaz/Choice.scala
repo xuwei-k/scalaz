@@ -20,7 +20,7 @@ trait Choice[=>:[_, _]] extends Category[=>:] { self =>
 }
 
 object Choice {
-  @inline def apply[F[_, _]](implicit F: Choice[F]): Choice[F] = F
+  @inline inline def apply[F[_, _]](implicit F: Choice[F]): Choice[F] = F
 
   import Isomorphism._
 

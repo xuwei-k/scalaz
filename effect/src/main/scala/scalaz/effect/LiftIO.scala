@@ -19,7 +19,7 @@ trait LiftIO[F[_]]  { self =>
 }
 
 object LiftIO {
-  @inline def apply[F[_]](implicit F: LiftIO[F]): LiftIO[F] = F
+  @inline inline def apply[F[_]](implicit F: LiftIO[F]): LiftIO[F] = F
 
   import Isomorphism._
 

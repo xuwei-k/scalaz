@@ -222,7 +222,7 @@ trait Enum[F] extends Order[F] { self =>
 }
 
 object Enum {
-  @inline def apply[F](implicit F: Enum[F]): Enum[F] = F
+  @inline inline def apply[F](implicit F: Enum[F]): Enum[F] = F
 
   import Isomorphism._
 

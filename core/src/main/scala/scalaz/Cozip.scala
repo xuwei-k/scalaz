@@ -31,7 +31,7 @@ trait Cozip[F[_]]  { self =>
 }
 
 object Cozip {
-  @inline def apply[F[_]](implicit F: Cozip[F]): Cozip[F] = F
+  @inline inline def apply[F[_]](implicit F: Cozip[F]): Cozip[F] = F
 
   import Isomorphism._
 

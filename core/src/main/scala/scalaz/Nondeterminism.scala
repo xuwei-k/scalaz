@@ -207,7 +207,7 @@ trait Nondeterminism[F[_]] extends Monad[F] { self =>
 }
 
 object Nondeterminism {
-  @inline def apply[F[_]](implicit F: Nondeterminism[F]): Nondeterminism[F] = F
+  @inline inline def apply[F[_]](implicit F: Nondeterminism[F]): Nondeterminism[F] = F
 
   import Isomorphism._
 

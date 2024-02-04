@@ -23,7 +23,7 @@ trait MonadState[F[_], S] extends Monad[F] { self =>
 }
 
 object MonadState {
-  @inline def apply[F[_], S](implicit F: MonadState[F, S]): MonadState[F, S] = F
+  @inline inline def apply[F[_], S](implicit F: MonadState[F, S]): MonadState[F, S] = F
 
   import Isomorphism._
 

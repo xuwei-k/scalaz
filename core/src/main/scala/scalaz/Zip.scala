@@ -67,7 +67,7 @@ trait Zip[F[_]]  { self =>
 }
 
 object Zip {
-  @inline def apply[F[_]](implicit F: Zip[F]): Zip[F] = F
+  @inline inline def apply[F[_]](implicit F: Zip[F]): Zip[F] = F
 
   import Isomorphism._
 

@@ -44,7 +44,7 @@ trait IsContravariant[F[_]]  { self =>
 }
 
 object IsContravariant {
-  @inline def apply[F[_]](implicit F: IsContravariant[F]): IsContravariant[F] = F
+  @inline inline def apply[F[_]](implicit F: IsContravariant[F]): IsContravariant[F] = F
 
 
 

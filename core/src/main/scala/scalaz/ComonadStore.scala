@@ -26,7 +26,7 @@ trait ComonadStore[F[_], S] extends Comonad[F] { self =>
 }
 
 object ComonadStore {
-  @inline def apply[F[_], S](implicit F: ComonadStore[F, S]): ComonadStore[F, S] = F
+  @inline inline def apply[F[_], S](implicit F: ComonadStore[F, S]): ComonadStore[F, S] = F
 
   import Isomorphism._
 

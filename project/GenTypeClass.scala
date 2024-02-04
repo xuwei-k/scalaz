@@ -333,9 +333,9 @@ object GenTypeClass {
     } else ""
 
     val applyMethod = if(kind.multipleParam) {
-      s"""@inline def apply[$classifiedTypeF](implicit F: $typeClassName[F, S]): $typeClassName[F, S] = F"""
+      s"""@inline inline def apply[$classifiedTypeF](implicit F: $typeClassName[F, S]): $typeClassName[F, S] = F"""
     } else {
-      s"""@inline def apply[$classifiedTypeF](implicit F: $typeClassName[F]): $typeClassName[F] = F"""
+      s"""@inline inline def apply[$classifiedTypeF](implicit F: $typeClassName[F]): $typeClassName[F] = F"""
     }
 
     val iso = if (tc.iso) {

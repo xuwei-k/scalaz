@@ -56,7 +56,7 @@ trait PlusEmpty[F[_]] extends Plus[F] { self =>
 }
 
 object PlusEmpty {
-  @inline def apply[F[_]](implicit F: PlusEmpty[F]): PlusEmpty[F] = F
+  @inline inline def apply[F[_]](implicit F: PlusEmpty[F]): PlusEmpty[F] = F
 
   import Isomorphism._
 

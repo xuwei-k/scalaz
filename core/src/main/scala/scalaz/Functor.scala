@@ -113,7 +113,7 @@ trait Functor[F[_]] extends InvariantFunctor[F] { self =>
 }
 
 object Functor {
-  @inline def apply[F[_]](implicit F: Functor[F]): Functor[F] = F
+  @inline inline def apply[F[_]](implicit F: Functor[F]): Functor[F] = F
 
   import Isomorphism._
 

@@ -23,7 +23,7 @@ trait Resource[F]  { self =>
 }
 
 object Resource {
-  @inline def apply[F](implicit F: Resource[F]): Resource[F] = F
+  @inline inline def apply[F](implicit F: Resource[F]): Resource[F] = F
 
   import Isomorphism._
 

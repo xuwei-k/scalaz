@@ -46,7 +46,7 @@ trait Divisible[F[_]] extends Divide[F] with InvariantApplicative[F] { self =>
 }
 
 object Divisible {
-  @inline def apply[F[_]](implicit F: Divisible[F]): Divisible[F] = F
+  @inline inline def apply[F[_]](implicit F: Divisible[F]): Divisible[F] = F
 
   import Isomorphism._
 

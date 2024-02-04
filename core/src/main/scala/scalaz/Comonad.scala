@@ -30,7 +30,7 @@ trait Comonad[F[_]] extends Cobind[F] { self =>
 }
 
 object Comonad {
-  @inline def apply[F[_]](implicit F: Comonad[F]): Comonad[F] = F
+  @inline inline def apply[F[_]](implicit F: Comonad[F]): Comonad[F] = F
 
   import Isomorphism._
 

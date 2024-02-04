@@ -17,7 +17,7 @@ trait Split[=>:[_, _]] extends Compose[=>:] { self =>
 }
 
 object Split {
-  @inline def apply[F[_, _]](implicit F: Split[F]): Split[F] = F
+  @inline inline def apply[F[_, _]](implicit F: Split[F]): Split[F] = F
 
   import Isomorphism._
 

@@ -41,7 +41,7 @@ trait Compose[=>:[_, _]]  { self =>
 }
 
 object Compose {
-  @inline def apply[F[_, _]](implicit F: Compose[F]): Compose[F] = F
+  @inline inline def apply[F[_, _]](implicit F: Compose[F]): Compose[F] = F
 
   import Isomorphism._
 

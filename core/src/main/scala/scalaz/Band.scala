@@ -35,7 +35,7 @@ trait Band[F] extends Semigroup[F] { self =>
 }
 
 object Band {
-  @inline def apply[F](implicit F: Band[F]): Band[F] = F
+  @inline inline def apply[F](implicit F: Band[F]): Band[F] = F
 
   import Isomorphism._
 

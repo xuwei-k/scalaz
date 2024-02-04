@@ -17,7 +17,7 @@ trait ProChoice[=>:[_, _]] extends Profunctor[=>:] { self =>
 }
 
 object ProChoice {
-  @inline def apply[F[_, _]](implicit F: ProChoice[F]): ProChoice[F] = F
+  @inline inline def apply[F[_, _]](implicit F: ProChoice[F]): ProChoice[F] = F
 
   import Isomorphism._
 

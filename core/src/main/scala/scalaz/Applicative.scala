@@ -143,7 +143,7 @@ trait Applicative[F[_]] extends Apply[F] with InvariantApplicative[F] { self =>
 }
 
 object Applicative {
-  @inline def apply[F[_]](implicit F: Applicative[F]): Applicative[F] = F
+  @inline inline def apply[F[_]](implicit F: Applicative[F]): Applicative[F] = F
 
   import Isomorphism._
 

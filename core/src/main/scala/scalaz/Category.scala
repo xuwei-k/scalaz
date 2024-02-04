@@ -49,7 +49,7 @@ trait Category[=>:[_, _]] extends Compose[=>:] { self =>
 }
 
 object Category {
-  @inline def apply[F[_, _]](implicit F: Category[F]): Category[F] = F
+  @inline inline def apply[F[_, _]](implicit F: Category[F]): Category[F] = F
 
   import Isomorphism._
 

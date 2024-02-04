@@ -27,7 +27,7 @@ trait IsEmpty[F[_]] extends PlusEmpty[F] { self =>
 }
 
 object IsEmpty {
-  @inline def apply[F[_]](implicit F: IsEmpty[F]): IsEmpty[F] = F
+  @inline inline def apply[F[_]](implicit F: IsEmpty[F]): IsEmpty[F] = F
 
   import Isomorphism._
 

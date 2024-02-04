@@ -19,7 +19,7 @@ trait Show[F]  { self =>
 }
 
 object Show {
-  @inline def apply[F](implicit F: Show[F]): Show[F] = F
+  @inline inline def apply[F](implicit F: Show[F]): Show[F] = F
 
   import Isomorphism._
 

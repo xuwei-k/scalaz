@@ -22,7 +22,7 @@ trait ApplicativeError[F[_], S] extends Applicative[F] { self =>
 }
 
 object ApplicativeError {
-  @inline def apply[F[_], S](implicit F: ApplicativeError[F, S]): ApplicativeError[F, S] = F
+  @inline inline def apply[F[_], S](implicit F: ApplicativeError[F, S]): ApplicativeError[F, S] = F
 
   import Isomorphism._
 

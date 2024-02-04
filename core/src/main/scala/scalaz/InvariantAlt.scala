@@ -59,7 +59,7 @@ trait InvariantAlt[F[_]] extends InvariantApplicative[F] { self =>
 }
 
 object InvariantAlt {
-  @inline def apply[F[_]](implicit F: InvariantAlt[F]): InvariantAlt[F] = F
+  @inline inline def apply[F[_]](implicit F: InvariantAlt[F]): InvariantAlt[F] = F
 
   import Isomorphism._
 

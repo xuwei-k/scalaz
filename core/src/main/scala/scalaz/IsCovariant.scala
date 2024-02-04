@@ -44,7 +44,7 @@ trait IsCovariant[F[_]]  { self =>
 }
 
 object IsCovariant {
-  @inline def apply[F[_]](implicit F: IsCovariant[F]): IsCovariant[F] = F
+  @inline inline def apply[F[_]](implicit F: IsCovariant[F]): IsCovariant[F] = F
 
 
 

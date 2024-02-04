@@ -52,7 +52,7 @@ trait Profunctor[=>:[_, _]]  { self =>
 }
 
 object Profunctor {
-  @inline def apply[F[_, _]](implicit F: Profunctor[F]): Profunctor[F] = F
+  @inline inline def apply[F[_, _]](implicit F: Profunctor[F]): Profunctor[F] = F
 
   import Isomorphism._
 

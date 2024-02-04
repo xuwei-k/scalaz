@@ -75,7 +75,7 @@ trait Plus[F[_]]  { self =>
 }
 
 object Plus {
-  @inline def apply[F[_]](implicit F: Plus[F]): Plus[F] = F
+  @inline inline def apply[F[_]](implicit F: Plus[F]): Plus[F] = F
 
   import Isomorphism._
 

@@ -79,7 +79,7 @@ trait Bind[F[_]] extends Apply[F] { self =>
 }
 
 object Bind {
-  @inline def apply[F[_]](implicit F: Bind[F]): Bind[F] = F
+  @inline inline def apply[F[_]](implicit F: Bind[F]): Bind[F] = F
 
   import Isomorphism._
 

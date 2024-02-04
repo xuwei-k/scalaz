@@ -140,7 +140,7 @@ trait Semigroup[F]  { self =>
 }
 
 object Semigroup {
-  @inline def apply[F](implicit F: Semigroup[F]): Semigroup[F] = F
+  @inline inline def apply[F](implicit F: Semigroup[F]): Semigroup[F] = F
 
   import Isomorphism._
 

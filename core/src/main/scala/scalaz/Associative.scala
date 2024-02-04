@@ -32,7 +32,7 @@ trait Associative[=>:[_, _]]  { self =>
 }
 
 object Associative {
-  @inline def apply[F[_, _]](implicit F: Associative[F]): Associative[F] = F
+  @inline inline def apply[F[_, _]](implicit F: Associative[F]): Associative[F] = F
 
 
 

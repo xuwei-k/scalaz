@@ -109,7 +109,7 @@ trait Traverse1[F[_]] extends Traverse[F] with Foldable1[F] { self =>
 }
 
 object Traverse1 {
-  @inline def apply[F[_]](implicit F: Traverse1[F]): Traverse1[F] = F
+  @inline inline def apply[F[_]](implicit F: Traverse1[F]): Traverse1[F] = F
 
   import Isomorphism._
 

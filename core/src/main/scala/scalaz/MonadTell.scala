@@ -17,7 +17,7 @@ trait MonadTell[F[_], S] extends Monad[F] { self =>
 }
 
 object MonadTell {
-  @inline def apply[F[_], S](implicit F: MonadTell[F, S]): MonadTell[F, S] = F
+  @inline inline def apply[F[_], S](implicit F: MonadTell[F, S]): MonadTell[F, S] = F
 
   import Isomorphism._
 

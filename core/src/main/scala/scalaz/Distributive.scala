@@ -46,7 +46,7 @@ trait Distributive[F[_]] extends Functor[F] { self =>
 }
 
 object Distributive {
-  @inline def apply[F[_]](implicit F: Distributive[F]): Distributive[F] = F
+  @inline inline def apply[F[_]](implicit F: Distributive[F]): Distributive[F] = F
 
   import Isomorphism._
 

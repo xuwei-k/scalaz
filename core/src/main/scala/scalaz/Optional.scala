@@ -52,7 +52,7 @@ trait Optional[F[_]]  { self =>
 }
 
 object Optional {
-  @inline def apply[F[_]](implicit F: Optional[F]): Optional[F] = F
+  @inline inline def apply[F[_]](implicit F: Optional[F]): Optional[F] = F
 
   import Isomorphism._
 

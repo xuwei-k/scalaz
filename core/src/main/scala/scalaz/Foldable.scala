@@ -416,7 +416,7 @@ trait Foldable[F[_]]  { self =>
 }
 
 object Foldable {
-  @inline def apply[F[_]](implicit F: Foldable[F]): Foldable[F] = F
+  @inline inline def apply[F[_]](implicit F: Foldable[F]): Foldable[F] = F
 
 
 

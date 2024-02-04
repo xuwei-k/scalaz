@@ -25,7 +25,7 @@ trait MonadError[F[_], S] extends Monad[F] with ApplicativeError[F, S] { self =>
 }
 
 object MonadError {
-  @inline def apply[F[_], S](implicit F: MonadError[F, S]): MonadError[F, S] = F
+  @inline inline def apply[F[_], S](implicit F: MonadError[F, S]): MonadError[F, S] = F
 
   import Isomorphism._
 

@@ -59,7 +59,7 @@ trait Divide[F[_]] extends Contravariant[F] { self =>
 }
 
 object Divide {
-  @inline def apply[F[_]](implicit F: Divide[F]): Divide[F] = F
+  @inline inline def apply[F[_]](implicit F: Divide[F]): Divide[F] = F
 
   import Isomorphism._
 
