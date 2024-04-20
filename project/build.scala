@@ -100,7 +100,7 @@ object build {
   }
 
   private def Scala213 = "2.13.13"
-  private def Scala3 = "3.3.3"
+  private def Scala3 = "3.5.0-RC1-bin-20240419-fef6576-NIGHTLY"
 
   private[this] val buildInfoPackageName = "scalaz"
 
@@ -135,7 +135,7 @@ object build {
     commands += Command.command("SetScala3") {
       s"""++ ${Scala3}! -v""" :: _
     },
-    scalaVersion := Scala213,
+    scalaVersion := Scala3,
     crossScalaVersions := Seq(Scala213, Scala3),
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
     scalacOptions ++= Seq(

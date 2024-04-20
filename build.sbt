@@ -1,5 +1,7 @@
 import build._
 
+ThisBuild / usePipelining := sys.props.get("scalaz.pipeline") == Some("true")
+
 val minSuccessfulTests = settingKey[Int]("")
 
 /*
