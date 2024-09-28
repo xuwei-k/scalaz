@@ -27,6 +27,9 @@ jobs:
       with:
         java-version: ${{matrix.java}}
         distribution: adopt
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 22
     - uses: coursier/cache-action@v6
     - run: ./sbt -v
            -Dcheck_build_file_imports
