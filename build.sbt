@@ -112,10 +112,23 @@ lazy val example = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .jsSettings(
     scalajsProjectSettings,
     scalaJSUseMainModuleInitializer := true,
-    commands += Command.command("runAllMain") { state1 =>
+    TaskKey[Unit]("jsOutputSize") := Def.taskDyn{
+      val _ = (Compile / fullLinkJS).value
+      Def.task{
+        val all = (Compile / fullLinkJSOutput).value.allPaths.get
+        println((
+          (Compile / mainClass).value.get,
+          all.map(_.length).sum,
+          all.filterNot(_.getName endsWith "map").map(_.length).sum,
+        ))
+      }
+    }.value,
+    commands += Command.command("allMainSize") { state1 =>
       val extracted = Project.extract(state1)
       val (state2, classes) = extracted.runTask(Compile / discoveredMainClasses, state1)
-      classes.sorted.flatMap(c => s"""set Compile / mainClass := Some("$c")""" :: "run" :: Nil).toList ::: state2
+      classes.sorted.flatMap(c =>
+        s"""set Compile / mainClass := Some("$c")""" :: "jsOutputSize" :: Nil
+      ).toList ::: state2
     },
   )
   .nativeSettings(
