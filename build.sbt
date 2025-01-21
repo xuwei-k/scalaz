@@ -73,7 +73,32 @@ lazy val rootJVM = Project(
   notPublish
 ).aggregate(jvmProjects: _*)
 
-lazy val coreJVM = core.jvm
+lazy val coreJVM = core.jvm.settings(
+  wartremoverWarnings ++= Warts.all,
+  /*
+  wartremoverWarnings ++= Seq(
+    Wart.IterableOps,
+    Wart.SortedMaxMin,
+    Wart.SortedMaxMinOption,
+    Wart.SizeIs,
+    Wart.FilterEmpty,
+    Wart.RedundantConversions,
+    Wart.FilterSize,
+    Wart.SizeToLength,
+    Wart.EitherProjectionPartial,
+    Wart.ArrayEquals,
+    Wart.CollectHeadOption,
+    Wart.Null,
+    Wart.GetGetOrElse,
+    Wart.FilterHeadOption,
+  ),
+  */
+  scalacOptions ++= Seq(
+//    "-P:wartremover:separate-phase",
+    "-Yprofile-enabled",
+    "-Yprofile-trace:target/scalaz-core.json",
+  )
+)
 lazy val coreJS  = core.js
 lazy val coreNative = core.native
 
