@@ -11,102 +11,29 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        scala: [2, 3]
-        project: [rootJVM, rootJS, rootNative]
-        java: [8]
-        include:
-          - java: 11
-            scala: 2
-            project: rootJVM
-          - java: 21
-            scala: 2
-            project: rootJVM
-    steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-java@7a6d8a8234af8eb26422e24e3006232cccaa061b # v4.6.0
-      with:
-        java-version: ${{matrix.java}}
-        distribution: adopt
-    - uses: coursier/cache-action@v6
-    - run: ./sbt -v
-           -Dcheck_build_file_imports
-           checkGenTypeClasses
-           $(if [[ "${{ matrix.scala }}" == "3" ]]; then echo SetScala3; fi)
-           "project ${{ matrix.project }}"
-           Test/compile
-           $(if [[ "${ matrix.project }}" == "rootJS" ]]; then echo "Test/fastOptJS"; fi)
-    - run: ./sbt -v
-           $(if [[ "${{ matrix.scala }}" == "3" ]]; then echo SetScala3; fi)
-           "project ${{ matrix.project }}"
-           test
-           "project /"
-           $(if [[ "${{ matrix.project }}" == "rootJVM" ]]; then echo "publishLocal"; fi)
-    - run: |
-        case ${{ matrix.project }} in
-          "rootJVM")
-            ./sbt -v \
-               $(if [[ "${{ matrix.scala }}" == "3" ]]; then echo SetScala3; fi) \
-               "project exampleJVM" \
-               runAllMain
-            ;;
-          "rootJS")
-            ./sbt -v \
-               $(if [[ "${{ matrix.scala }}" == "3" ]]; then echo SetScala3; fi) \
-               "project exampleJS" \
-               runAllMain
-            ;;
-          "rootNative")
-            ./sbt -v \
-               $(if [[ "${{ matrix.scala }}" == "3" ]]; then echo SetScala3; fi) \
-               "project exampleNative" \
-               runAllMain
-            ;;
-          *)
-            echo "unknown project"
-            exit 1
-        esac
-    - uses: mikepenz/action-junit-report@db71d41eb79864e25ab0337e395c352e84523afe # v4.3.1
-      if: always()
-      with:
-        report_paths: '**/target/test-reports/*.xml'
-        require_tests: true
-        check_name: "${{ matrix.java }}-${{ matrix.scala }}-${{ matrix.project }}"
-    - uses: test-summary/action@v2
-      if: always()
-      with:
-        paths: '**/target/test-reports/*.xml'
-    - run: rm -rf "$HOME/.ivy2/local" || true
-  latest:
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    strategy:
-      fail-fast: false
+        wartremover: ["3.2.7", "3.2.5"]
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-java@7a6d8a8234af8eb26422e24e3006232cccaa061b # v4.6.0
       with:
         java-version: 21
         distribution: adopt
-    - uses: coursier/cache-action@v6
     - run: ./sbt -v
-           "++ 3.6.3!"
-           Test/compile
-  wasm:
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-java@7a6d8a8234af8eb26422e24e3006232cccaa061b # v4.6.0
-      with:
-        java-version: 21
-        distribution: adopt
-    - uses: actions/setup-node@v4
-      with:
-        node-version: 22
-    - uses: coursier/cache-action@v6
-    - run: ./sbt -v
-           -Dscala_js_wasm
-           rootJS/Test/compile
-           testsJS/test
-    - run: ls -l "tests/js/target/scala-2.13/scalaz-tests-test-fastopt/main.wasm"
-    - run: ls -l "tests/js/target/scala-2.13/scalaz-tests-test-fastopt/"
+           -Dwartremover.version=${{ matrix.wartremover }}
+           "project coreJVM"
+           '++ 3.6.3!'
+           update compile
+           clean update compile
+           clean update compile
+           clean update compile
+           clean update compile
+           clean update compile
+           clean update compile
+           clean update compile
+           clean update compile
+           clean update compile
+           clean update compile
+           clean update compile
+           clean update compile
+           clean update compile
+           clean update compile

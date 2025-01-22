@@ -1,4 +1,4 @@
--Xms3784m
--Xmx3784m
+-Xms12G
+-Xmx12G
 -XX:MaxMetaspaceSize=1g
 -Xss4m

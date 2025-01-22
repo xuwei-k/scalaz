@@ -73,7 +73,9 @@ lazy val rootJVM = Project(
   notPublish
 ).aggregate(jvmProjects: _*)
 
-lazy val coreJVM = core.jvm
+lazy val coreJVM = core.jvm.settings(
+  wartremoverWarnings ++= Warts.all
+)
 lazy val coreJS  = core.js
 lazy val coreNative = core.native
 
