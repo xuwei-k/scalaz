@@ -200,16 +200,24 @@ object build {
       (c / console / scalacOptions) --= unusedWarnOptions.value
     ),
 
-    (Compile / doc / scalacOptions) := {
+    (Compile / doc / scalacOptions) ++= {
       val tag = tagOrHash.value
       val base = (LocalRootProject / baseDirectory).value.getAbsolutePath
-      val options = (Compile / doc / scalacOptions).value
 
       CrossVersion.partialVersion(scalaVersion.value) match {
         case Some((3, _)) =>
-          Nil
+          Seq(
+            "-source-links:github://scalaz/scalaz",
+            "-revision",
+            tag,
+          )
         case _ =>
-          options ++ Seq("-sourcepath", base, "-doc-source-url", "https://github.com/scalaz/scalaz/tree/" + tag + "€{FILE_PATH}.scala")
+          Seq(
+            "-sourcepath",
+            base,
+            "-doc-source-url",
+            "https://github.com/scalaz/scalaz/tree/" + tag + "€{FILE_PATH}.scala",
+          )
       }
     },
     (Compile / doc / sources) := {
