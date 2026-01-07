@@ -33,3 +33,5 @@ Global / onLoad := { state1 =>
   }
   (Global / onLoad).value.apply(state2)
 }
+
+addSbtPlugin("org.scoverage" % "sbt-scoverage" % "2.4.3")

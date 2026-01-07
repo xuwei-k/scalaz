@@ -73,7 +73,10 @@ lazy val rootJVM = Project(
   notPublish
 ).aggregate(jvmProjects*)
 
-lazy val coreJVM = core.jvm
+lazy val coreJVM = core.jvm.settings(
+  coverageEnabled := true,
+  Compile / compile / scalacOptions ++= Seq("-Yprofile-enabled", "-Yprofile-trace", "scalaz-core-main.json")
+)
 lazy val coreJS  = core.js
 lazy val coreNative = core.native
 

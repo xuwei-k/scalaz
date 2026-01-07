@@ -159,7 +159,7 @@ object build {
     commands += Command.command("SetScala3") {
       s"""++ ${Scala3}! -v""" :: _
     },
-    scalaVersion := Scala213,
+    scalaVersion := "3.8.0-RC5",
     crossScalaVersions := Seq(Scala213, Scala3),
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
     scalacOptions ++= Seq(
