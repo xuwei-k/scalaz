@@ -2,104 +2,38 @@ import build._
 
 val minSuccessfulTests = settingKey[Int]("")
 
-/*
- * NOTICE if you are a contributor who only cares about the JVM, create a file
- * `local.sbt` containing
- *
- *   Global / onLoad := { s => "project rootJVM" :: s }
- *
- * and regular commands such as "compile" / "test" will skip over all the
- * scalajs / scala-native stuff.
- */
+lazy val scalaz = Project("scalaz-root", file("."))
+  .settings(
+    standardSettings,
+    description := "scalaz unidoc",
+    artifacts := Classpaths.artifactDefs(Seq(Compile / packageDoc, Compile / makePom)).value,
+    packagedArtifacts := Classpaths.packaged(Seq(Compile / packageDoc, Compile / makePom)).value,
+    pomPostProcess := { node =>
+      import scala.xml._
+      import scala.xml.transform._
+      val rule = new RewriteRule {
+        override def transform(n: Node) =
+          if (n.label == "dependencies") NodeSeq.Empty else n
+      }
+      new RuleTransformer(rule).transform(node)(0)
+    },
+    ScalaUnidoc / unidoc / unidocProjectFilter := {
+      //(jsProjects ++ nativeProjects).foldLeft(inAnyProject)((acc, a) => acc -- inProjects(a))
+      (ScalaUnidoc / unidoc / unidocProjectFilter).value // TODO
+    },
+    Defaults.packageTaskSettings(Compile / packageDoc, (Compile / unidoc).map(_.flatMap(Path.allSubpaths)))
+  ).enablePlugins(ScalaUnidocPlugin)
 
-lazy val jsProjects = Seq[ProjectReference](
-  coreJS, effectJS, iterateeJS, scalacheckBindingJS, testsJS, exampleJS
-)
-
-lazy val jvmProjects = Seq[ProjectReference](
-  coreJVM, effectJVM, iterateeJVM, scalacheckBindingJVM, testsJVM, exampleJVM
-)
-
-lazy val nativeProjects = Seq[ProjectReference](
-  coreNative, effectNative, iterateeNative, scalacheckBindingNative, testsNative, exampleNative
-)
-
-lazy val scalaz = Project(
-  id = "scalaz",
-  base = file(".")
-).settings(
-  standardSettings,
-  description := "scalaz unidoc",
-  artifacts := Classpaths.artifactDefs(Seq(Compile / packageDoc, Compile / makePom)).value,
-  packagedArtifacts := Classpaths.packaged(Seq(Compile / packageDoc, Compile / makePom)).value,
-  pomPostProcess := { node =>
-    import scala.xml._
-    import scala.xml.transform._
-    val rule = new RewriteRule {
-      override def transform(n: Node) =
-        if (n.label == "dependencies") NodeSeq.Empty else n
-    }
-    new RuleTransformer(rule).transform(node)(0)
-  },
-  ScalaUnidoc / unidoc / unidocProjectFilter := {
-    (jsProjects ++ nativeProjects).foldLeft(inAnyProject)((acc, a) => acc -- inProjects(a))
-  },
-  Defaults.packageTaskSettings(Compile / packageDoc, (Compile / unidoc).map(_.flatMap(Path.allSubpaths)))
-).aggregate(
-  (jvmProjects ++ jsProjects ++ nativeProjects)*
-).enablePlugins(ScalaUnidocPlugin)
-
-lazy val rootNative = Project(
-  "rootNative",
-  file("rootNative")
-).settings(
-  standardSettings,
-  notPublish
-).aggregate(nativeProjects*)
-
-lazy val rootJS = Project(
-  "rootJS",
-  file("rootJS")
-).settings(
-  standardSettings,
-  notPublish
-).aggregate(jsProjects*)
-
-lazy val rootJVM = Project(
-  "rootJVM",
-  file("rootJVM")
-).settings(
-  standardSettings,
-  notPublish
-).aggregate(jvmProjects*)
-
-lazy val coreJVM = core.jvm
-lazy val coreJS  = core.js
-lazy val coreNative = core.native
-
-lazy val effectJVM = effect.jvm
-lazy val effectJS  = effect.js
-lazy val effectNative = effect.native
-
-lazy val iterateeJVM = iteratee.jvm
-lazy val iterateeJS  = iteratee.js
-lazy val iterateeNative = iteratee.native
-
-lazy val exampleJVM = example.jvm
-lazy val exampleJS = example.js
-lazy val exampleNative = example.native
-
-lazy val example = crossProject(JVMPlatform, JSPlatform, NativePlatform)
-  .crossType(ScalazCrossType)
+lazy val example = projectMatrix
   .in(file("example"))
   .settings(
     standardSettings,
-    unmanagedSourcePathSettings,
     name := "scalaz-example",
     notPublish,
     Compile / compile / scalacOptions -= "-Xlint:adapted-args",
   )
-  .jvmSettings(
+  .jvmPlatform(
+    scalaVersions,
     TaskKey[Unit]("runAllMain") := {
       val r = (run / runner).value
       val classpath = (Compile / fullClasspath).value
@@ -109,16 +43,20 @@ lazy val example = crossProject(JVMPlatform, JSPlatform, NativePlatform)
       )
     },
   )
-  .jsSettings(
-    scalajsProjectSettings,
-    scalaJSUseMainModuleInitializer := true,
-    commands += Command.command("runAllMain") { state1 =>
-      val extracted = Project.extract(state1)
-      val (state2, classes) = extracted.runTask(Compile / discoveredMainClasses, state1)
-      classes.sorted.flatMap(c => s"""set Compile / mainClass := Some("$c")""" :: "run" :: Nil).toList ::: state2
-    },
+  .jsPlatform(
+    scalaVersions,
+    Def.settings(
+      scalajsProjectSettings,
+      scalaJSUseMainModuleInitializer := true,
+      commands += Command.command("runAllMain") { state1 =>
+        val extracted = Project.extract(state1)
+        val (state2, classes) = extracted.runTask(Compile / discoveredMainClasses, state1)
+        classes.sorted.flatMap(c => s"""set Compile / mainClass := Some("$c")""" :: "run" :: Nil).toList ::: state2
+      },
+    )
   )
-  .nativeSettings(
+  .nativePlatform(
+    scalaVersions,
     commands += Command.command("runAllMain") { state1 =>
       val extracted = Project.extract(state1)
       val (state2, classes) = extracted.runTask(Compile / discoveredMainClasses, state1)
@@ -129,26 +67,25 @@ lazy val example = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   )
 
 lazy val scalacheckBinding =
-  crossProject(JVMPlatform, JSPlatform, NativePlatform).crossType(ScalazCrossType)
+  projectMatrix
     .in(file("scalacheck-binding"))
     .settings(standardSettings)
     .settings(
-      unmanagedSourcePathSettings,
       name := "scalaz-scalacheck-binding",
       Compile / compile / scalacOptions -= "-Ywarn-value-discard",
       libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.19.0",
     )
     .dependsOn(core, iteratee)
-    .jsSettings(scalajsProjectSettings)
+    .jvmPlatform(scalaVersions)
+    .jsPlatform(
+      scalaVersions,
+      scalajsProjectSettings
+    )
+    .nativePlatform(scalaVersions)
 
-lazy val scalacheckBindingJVM = scalacheckBinding.jvm
-lazy val scalacheckBindingJS  = scalacheckBinding.js
-lazy val scalacheckBindingNative = scalacheckBinding.native
-
-lazy val tests = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
+lazy val tests = projectMatrix
   .settings(standardSettings)
   .settings(
-    unmanagedSourcePathSettings,
     name := "scalaz-tests",
     notPublish,
     (Test / testOptions) += {
@@ -177,16 +114,20 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType
       }
     },
   )
-  .platformsSettings(JVMPlatform, NativePlatform)(
+  .jvmPlatform(
+    scalaVersions,
     minSuccessfulTests := 33,
   )
-  .jsSettings(
-    minSuccessfulTests := 10,
-    libraryDependencies += ("org.scala-js" %%% "scalajs-weakreferences" % "1.0.0" % Test).cross(CrossVersion.for3Use2_13)
+  .nativePlatform(
+    scalaVersions,
+    minSuccessfulTests := 33,
+  )
+  .jsPlatform(
+    scalaVersions,
+    Def.settings(
+      scalajsProjectSettings,
+      minSuccessfulTests := 10,
+      libraryDependencies += ("org.scala-js" %%% "scalajs-weakreferences" % "1.0.0" % Test).cross(CrossVersion.for3Use2_13)
+    )
   )
   .dependsOn(core, effect, iteratee, scalacheckBinding)
-  .jsSettings(scalajsProjectSettings)
-
-lazy val testsJVM = tests.jvm
-lazy val testsJS  = tests.js
-lazy val testsNative = tests.native

@@ -1,3 +1,4 @@
+import sbtprojectmatrix.ProjectMatrixPlugin.autoImport.*
 import GenTypeClass.*
 import com.jsuereth.sbtpgp.SbtPgp.autoImport.PgpKeys.publishLocalSigned
 import com.jsuereth.sbtpgp.SbtPgp.autoImport.PgpKeys.publishSigned
@@ -7,12 +8,9 @@ import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport.*
 import sbt.*
 import sbt.Keys.*
 import sbtbuildinfo.BuildInfoPlugin.autoImport.*
-import sbtcrossproject.CrossPlugin.autoImport.*
 import sbtrelease.ReleasePlugin.autoImport.*
 import sbtrelease.ReleaseStateTransformations.*
 import sbtrelease.Utilities.*
-import scalajscrossproject.ScalaJSCrossPlugin.autoImport.*
-import scalanativecrossproject.ScalaNativeCrossPlugin.autoImport.*
 
 object build {
   type Sett = Def.Setting[?]
@@ -92,33 +90,6 @@ object build {
     publishLocalSigned := {}
   )
 
-  // avoid move files
-  object ScalazCrossType extends sbtcrossproject.CrossType {
-    override def projectDir(crossBase: File, projectType: String) =
-      crossBase / projectType
-
-    override def projectDir(crossBase: File, projectType: sbtcrossproject.Platform) = {
-      val dir = projectType match {
-        case JVMPlatform => "jvm"
-        case JSPlatform => "js"
-        case NativePlatform => "native"
-      }
-      crossBase / dir
-    }
-
-    def shared(projectBase: File, conf: String) =
-      projectBase.getParentFile / "src" / conf / "scala"
-
-    def scala2(projectBase: File, conf: String) =
-      projectBase.getParentFile / "src" / conf / "scala-2"
-
-    def scala3(projectBase: File, conf: String) =
-      projectBase.getParentFile / "src" / conf / "scala-3"
-
-    override def sharedSrcDir(projectBase: File, conf: String) =
-      Some(shared(projectBase, conf))
-  }
-
   val unusedWarnOptions = Def.setting {
     Seq("-Ywarn-unused:imports")
   }
@@ -128,21 +99,7 @@ object build {
 
   private[this] val buildInfoPackageName = "scalaz"
 
-  lazy val unmanagedSourcePathSettings: Seq[Sett] = Def.settings(
-    Seq(Compile, Test).map { scope =>
-      (scope / unmanagedSourceDirectories) ++= {
-        val dir = Defaults.nameForSrc(scope.name)
-        CrossVersion.partialVersion(scalaVersion.value) match {
-          case Some((2, _)) =>
-            Seq(ScalazCrossType.scala2(baseDirectory.value, dir))
-          case Some((0 | 3, _)) =>
-            Seq(ScalazCrossType.scala3(baseDirectory.value, dir))
-          case _ =>
-            Nil
-        }
-      }
-    },
-  )
+  val scalaVersions = Seq(Scala213, Scala3)
 
   lazy val standardSettings: Seq[Sett] = Def.settings(
     organization := "org.scalaz",
@@ -159,8 +116,6 @@ object build {
     commands += Command.command("SetScala3") {
       s"""++ ${Scala3}! -v""" :: _
     },
-    scalaVersion := Scala213,
-    crossScalaVersions := Seq(Scala213, Scala3),
     fullResolvers ~= {_.filterNot(_.name == "jcenter")}, // https://github.com/sbt/sbt/issues/2217
     scalacOptions ++= Seq(
       "-deprecation",
@@ -228,9 +183,10 @@ object build {
     genTypeClasses := {
       val s = streams.value
       typeClasses.value.flatMap { tc =>
-        val dir = ScalazCrossType.shared(baseDirectory.value, "main")
-        val scala2dir = ScalazCrossType.scala2(baseDirectory.value, "main")
-        val scala3dir = ScalazCrossType.scala3(baseDirectory.value, "main")
+        val base = projectMatrixBaseDirectory.value / "src" / "main"
+        val dir = base / "scala"
+        val scala2dir = base / "scala-2"
+        val scala3dir = base / "scala-3"
         val t = typeclassSource(tc)
 
         List(
@@ -348,50 +304,6 @@ object build {
       baseDirectory.value.getParentFile / "jvm_js/src/main/scala/"
     }
   )
-
-  lazy val core = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
-    .settings(
-      standardSettings,
-      unmanagedSourcePathSettings,
-      name := "scalaz-core",
-      Compile / sourceGenerators += (Compile / sourceManaged).map{
-        dir => Seq(GenerateTupleW(dir), TupleNInstances(dir))
-      }.taskValue,
-      buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
-      buildInfoPackage := buildInfoPackageName,
-      buildInfoObject := "ScalazBuildInfo",
-    )
-    .enablePlugins(sbtbuildinfo.BuildInfoPlugin)
-    .jsSettings(
-      jvm_js_settings,
-      scalajsProjectSettings,
-      libraryDependencies += ("org.scala-js" %%% "scalajs-weakreferences" % "1.0.0" % Optional).cross(CrossVersion.for3Use2_13)
-    )
-    .jvmSettings(
-      jvm_js_settings,
-      typeClasses := TypeClass.core
-    )
-
-  lazy val effect = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
-    .settings(
-      standardSettings,
-      unmanagedSourcePathSettings,
-      name := "scalaz-effect",
-    )
-    .dependsOn(core)
-    .jsSettings(scalajsProjectSettings)
-    .jvmSettings(
-      typeClasses := TypeClass.effect
-    )
-
-  lazy val iteratee = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(ScalazCrossType)
-    .settings(
-      standardSettings,
-      unmanagedSourcePathSettings,
-      name := "scalaz-iteratee",
-    )
-    .dependsOn(core, effect)
-    .jsSettings(scalajsProjectSettings)
 
   lazy val licenseFile = settingKey[File]("The license file to include in packaged artifacts")
 
