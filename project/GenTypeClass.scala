@@ -33,6 +33,7 @@ object TypeClass {
   lazy val band = TypeClass("Band", *, extendsList = Seq(semigroup))
   lazy val semilattice = TypeClass("SemiLattice", *, extendsList = Seq(band))
   lazy val equal = TypeClass("Equal", *)
+  lazy val equalIsNatural = TypeClass("EqualIsNatural", *, extendsList = Seq(equal))
   lazy val show = TypeClass("Show", *)
   lazy val order = TypeClass("Order", *, extendsList = Seq(equal))
   lazy val `enum` = TypeClass("Enum", *, extendsList = Seq(order))
@@ -110,6 +111,7 @@ object TypeClass {
     band,
     semilattice,
     equal,
+    equalIsNatural,
     show,
     order,
     `enum`,
