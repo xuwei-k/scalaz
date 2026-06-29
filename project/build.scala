@@ -34,12 +34,12 @@ object build {
 
   val kindProjectorVersion = SettingKey[String]("kindProjectorVersion")
 
-  private[this] def gitHash(): String = sys.process.Process("git rev-parse HEAD").lineStream_!.head
+  private def gitHash(): String = sys.process.Process("git rev-parse HEAD").lazyLines_!.head
 
-  private[this] val tagName = Def.setting{
+  private val tagName = Def.setting{
     s"v${if (releaseUseGlobalVersion.value) (ThisBuild / version).value else version.value}"
   }
-  private[this] val tagOrHash = Def.setting{
+  private val tagOrHash = Def.setting{
     if(isSnapshot.value) gitHash() else tagName.value
   }
 
@@ -50,7 +50,7 @@ object build {
         scalaJSLinkerConfig ~= (
           _.withExperimentalUseWebAssembly(true).withModuleKind(ModuleKind.ESModule)
         ),
-        jsEnv := {
+        jsEnv := Def.uncached {
           import org.scalajs.jsenv.nodejs.NodeJSEnv
           val config = NodeJSEnv.Config()
             .withArgs(List(
@@ -142,16 +142,6 @@ object build {
 
   lazy val standardSettings: Seq[Sett] = Def.settings(
     organization := "org.scalaz",
-    (Compile / packageSrc / mappings) ++= (Compile / managedSources).value.map{ f =>
-      // https://github.com/sbt/sbt-buildinfo/blob/v0.7.0/src/main/scala/sbtbuildinfo/BuildInfoPlugin.scala#L58
-      val buildInfoDir = "sbt-buildinfo"
-      val path = if(f.getAbsolutePath.contains(buildInfoDir)) {
-        (file(buildInfoPackageName) / f.relativeTo((Compile / sourceManaged).value / buildInfoDir).get.getPath).getPath
-      } else {
-        f.relativeTo((Compile / sourceManaged).value).get.getPath
-      }
-      (f, path)
-    },
     commands += Command.command("SetScala3") {
       s"""++ ${Scala3}! -v""" :: _
     },
@@ -239,7 +229,7 @@ object build {
     checkGenTypeClasses := {
       val classes = genTypeClasses.value
       if(classes.exists(_._1 != FileStatus.NoChange))
-        sys.error(classes.groupBy(_._1).filterKeys(_ != FileStatus.NoChange).mapValues(_.map(_._2)).toString)
+        sys.error(classes.groupBy(_._1).view.filterKeys(_ != FileStatus.NoChange).mapValues(_.map(_._2)).toMap.toString)
     },
     typeClasses := Seq(),
     genToSyntax := {
@@ -332,10 +322,7 @@ object build {
           compilerPlugin(("org.typelevel" % "kind-projector" % kindProjectorVersion.value).cross(CrossVersion.full))
         )
     }.toList.flatten
-  ) ++ Seq(packageBin, packageDoc, packageSrc).flatMap {
-    // include LICENSE.txt in all packaged artifacts
-    inTask(_)(Seq((Compile / mappings) += licenseFile.value -> "LICENSE"))
-  }
+  )
 
   val jvm_js_settings = Seq(
     scalacOptions ++= {

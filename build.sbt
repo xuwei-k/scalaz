@@ -31,7 +31,7 @@ lazy val scalaz = Project(
   standardSettings,
   description := "scalaz unidoc",
   artifacts := Classpaths.artifactDefs(Seq(Compile / packageDoc, Compile / makePom)).value,
-  packagedArtifacts := Classpaths.packaged(Seq(Compile / packageDoc, Compile / makePom)).value,
+  packagedArtifacts := Def.uncached(Classpaths.packaged(Seq(Compile / packageDoc, Compile / makePom)).value),
   pomPostProcess := { node =>
     import scala.xml._
     import scala.xml.transform._
@@ -44,7 +44,6 @@ lazy val scalaz = Project(
   ScalaUnidoc / unidoc / unidocProjectFilter := {
     (jsProjects ++ nativeProjects).foldLeft(inAnyProject)((acc, a) => acc -- inProjects(a))
   },
-  Defaults.packageTaskSettings(Compile / packageDoc, (Compile / unidoc).map(_.flatMap(Path.allSubpaths)))
 ).aggregate(
   (jvmProjects ++ jsProjects ++ nativeProjects)*
 ).enablePlugins(ScalaUnidocPlugin)
@@ -88,7 +87,7 @@ lazy val core = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(
   .enablePlugins(sbtbuildinfo.BuildInfoPlugin)
   .jsSettings(
     scalajsProjectSettings,
-    libraryDependencies += ("org.scala-js" %%% "scalajs-weakreferences" % "1.0.0" % Optional).cross(CrossVersion.for3Use2_13)
+    libraryDependencies += ("org.scala-js" %% "scalajs-weakreferences" % "1.0.0" % Optional).cross(CrossVersion.for3Use2_13)
   )
   .jvmSettings(
     typeClasses := TypeClass.core
@@ -154,14 +153,6 @@ lazy val example = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     jvm_js_settings,
   )
   .jvmSettings(
-    TaskKey[Unit]("runAllMain") := {
-      val r = (run / runner).value
-      val classpath = (Compile / fullClasspath).value
-      val log = streams.value.log
-      (Compile / discoveredMainClasses).value.sorted.foreach(c =>
-        r.run(c, classpath.map(_.data), Nil, log)
-      )
-    },
   )
   .jsSettings(
     scalajsProjectSettings,
@@ -190,7 +181,7 @@ lazy val scalacheckBinding =
       unmanagedSourcePathSettings,
       name := "scalaz-scalacheck-binding",
       Compile / compile / scalacOptions -= "-Ywarn-value-discard",
-      libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.19.0",
+      libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.19.0",
     )
     .dependsOn(core, iteratee)
     .jsSettings(scalajsProjectSettings)
@@ -245,7 +236,7 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType
   )
   .jsSettings(
     minSuccessfulTests := 10,
-    libraryDependencies += ("org.scala-js" %%% "scalajs-weakreferences" % "1.0.0" % Test).cross(CrossVersion.for3Use2_13)
+    libraryDependencies += ("org.scala-js" %% "scalajs-weakreferences" % "1.0.0" % Test).cross(CrossVersion.for3Use2_13)
   )
   .dependsOn(core, effect, iteratee, scalacheckBinding)
   .jsSettings(scalajsProjectSettings)
