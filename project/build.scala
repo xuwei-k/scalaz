@@ -12,10 +12,7 @@ import sbtrelease.Utilities._
 
 import com.jsuereth.sbtpgp.SbtPgp.autoImport.PgpKeys.{publishSigned, publishLocalSigned}
 
-import com.typesafe.sbt.osgi.OsgiKeys
-import com.typesafe.sbt.osgi.SbtOsgi
-
-import sbtbuildinfo.BuildInfoPlugin.autoImport._
+import sbtbuildinfo.BuildInfoPlugin.autoImport.{given, *}
 
 import com.typesafe.tools.mima.core.ProblemFilters
 import com.typesafe.tools.mima.core.IncompatibleSignatureProblem
@@ -23,7 +20,6 @@ import com.typesafe.tools.mima.core.InheritedNewAbstractMethodProblem
 import com.typesafe.tools.mima.plugin.MimaPlugin
 import com.typesafe.tools.mima.plugin.MimaKeys.{mimaPreviousArtifacts, mimaReportSignatureProblems, mimaBinaryIssueFilters}
 
-import org.portablescala.sbtplatformdeps.PlatformDepsPlugin.autoImport._
 import scalanativecrossproject.ScalaNativeCrossPlugin.autoImport._
 import scalanative.sbtplugin.ScalaNativePlugin.autoImport._
 import scalajscrossproject.ScalaJSCrossPlugin.autoImport._
@@ -162,16 +158,6 @@ object build {
         case _ =>
           (Compile / doc / sources).value
       }
-    },
-    (Compile / packageSrc / mappings) ++= (Compile / managedSources).value.map{ f =>
-      // https://github.com/sbt/sbt-buildinfo/blob/v0.7.0/src/main/scala/sbtbuildinfo/BuildInfoPlugin.scala#L58
-      val buildInfoDir = "sbt-buildinfo"
-      val path = if(f.getAbsolutePath.contains(buildInfoDir)) {
-        (file(buildInfoPackageName) / f.relativeTo((Compile / sourceManaged).value / buildInfoDir).get.getPath).getPath
-      } else {
-        f.relativeTo((Compile / sourceManaged).value).get.getPath
-      }
-      (f, path)
     },
     scalaVersion := Scala212,
     crossScalaVersions := Seq(Scala212, Scala213, Scala3),
@@ -323,7 +309,7 @@ object build {
     licenseFile := {
       val LICENSE_txt = (ThisBuild / baseDirectory).value / "LICENSE.txt"
       if (!LICENSE_txt.exists()) sys.error(s"cannot find license file at $LICENSE_txt")
-      LICENSE_txt
+      fileConverter.value.toVirtualFile(LICENSE_txt.toPath)
     },
     // kind-projector plugin
     kindProjectorVersion := "0.13.4",
@@ -336,10 +322,8 @@ object build {
     }
   ) ++ Seq(packageBin, packageDoc, packageSrc).flatMap {
     // include LICENSE.txt in all packaged artifacts
-    inTask(_)(Seq((Compile / mappings) += licenseFile.value -> "LICENSE"))
-  } ++ SbtOsgi.projectSettings ++ Seq[Sett](
-    OsgiKeys.additionalHeaders := Map("-removeheaders" -> "Include-Resource,Private-Package")
-  ) ++ Def.settings(
+    Project.inTask(_)(Seq((Compile / mappings) += licenseFile.value -> "LICENSE"))
+  } ++ Def.settings(
     ThisBuild / mimaReportSignatureProblems := (scalaBinaryVersion.value != "3"),
     mimaPreviousArtifacts := {
       scalazMimaBasis.?.value.map {
@@ -379,8 +363,7 @@ object build {
       }.taskValue,
       buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
       buildInfoPackage := buildInfoPackageName,
-      osgiExport("scalaz"),
-      OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*"))
+    )
     .enablePlugins(sbtbuildinfo.BuildInfoPlugin, MimaPlugin)
     .jsSettings(scalajsProjectSettings)
     .jvmSettings(
@@ -396,7 +379,7 @@ object build {
     .settings(standardSettings)
     .settings(
       name := "scalaz-effect",
-      osgiExport("scalaz.effect", "scalaz.std.effect", "scalaz.syntax.effect"))
+    )
     .dependsOn(core)
     .enablePlugins(MimaPlugin)
     .jsSettings(scalajsProjectSettings)
@@ -411,7 +394,7 @@ object build {
     .settings(standardSettings)
     .settings(
       name := "scalaz-iteratee",
-      osgiExport("scalaz.iteratee"))
+    )
     .dependsOn(core, effect)
     .enablePlugins(MimaPlugin)
     .jsSettings(scalajsProjectSettings)
@@ -439,7 +422,7 @@ object build {
     }
   }
 
-  lazy val licenseFile = settingKey[File]("The license file to include in packaged artifacts")
+  lazy val licenseFile = settingKey[HashedVirtualFileRef]("The license file to include in packaged artifacts")
 
   lazy val scalazMimaBasis = settingKey[String]("Version of scalaz against which to run MIMA.")
 
@@ -460,8 +443,6 @@ object build {
 
   @transient
   lazy val checkGenTypeClasses = taskKey[Unit]("")
-
-  def osgiExport(packs: String*) = OsgiKeys.exportPackage := packs.map(_ + ".*;version=${Bundle-Version}")
 }
 
 // vim: expandtab:ts=2:sw=2

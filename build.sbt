@@ -1,6 +1,5 @@
 import build._
 
-import com.typesafe.sbt.osgi.OsgiKeys
 import com.typesafe.tools.mima.plugin.MimaKeys.mimaPreviousArtifacts
 import sbtcrossproject.CrossPlugin.autoImport.crossProject
 import sbtcrossproject.CrossProject
@@ -39,7 +38,7 @@ lazy val scalaz = Project(
   mimaPreviousArtifacts := Set.empty,
   description := "scalaz unidoc",
   artifacts := Classpaths.artifactDefs(Seq(Compile / packageDoc, Compile / makePom)).value,
-  packagedArtifacts := Classpaths.packaged(Seq(Compile / packageDoc, Compile / makePom)).value,
+  packagedArtifacts := Def.uncached(Classpaths.packaged(Seq(Compile / packageDoc, Compile / makePom)).value),
   pomPostProcess := { node =>
     import scala.xml._
     import scala.xml.transform._
@@ -52,7 +51,13 @@ lazy val scalaz = Project(
   ScalaUnidoc / unidoc / unidocProjectFilter := {
     (jsProjects ++ nativeProjects).foldLeft(inAnyProject)((acc, a) => acc -- inProjects(a))
   },
-  Defaults.packageTaskSettings(Compile / packageDoc, (Compile / unidoc).map(_.flatMap(Path.allSubpaths)))
+  Defaults.packageTaskSettings(
+    Compile / packageDoc,
+    Def.task {
+      given FileConverter = fileConverter.value
+      (Compile / unidoc).value.flatMap(Mapper.allSubpaths)
+    }
+  ),
 ).aggregate(
   jvmProjects ++ jsProjects : _*
 ).enablePlugins(ScalaUnidocPlugin)
@@ -92,8 +97,6 @@ lazy val concurrent = Project(
   standardSettings,
   name := ConcurrentName,
   typeClasses := TypeClass.concurrent,
-  osgiExport("scalaz.concurrent"),
-  OsgiKeys.importPackage := Seq("javax.swing;resolution:=optional", "*")
 ).dependsOn(
   coreJVM, effectJVM
 ).enablePlugins(MimaPlugin)
@@ -114,9 +117,9 @@ lazy val example = CrossProject(id = "example", base = file("example"))(JVMPlatf
     notPublish
   )
  .jvmSettings(
-    TaskKey[Unit]("runAllMain") := {
+    TaskKey[Unit]("runAllMain") := Def.uncached {
       val r = (run / runner).value
-      val classpath = (Compile / fullClasspath).value.map(_.data)
+      val classpath = (Compile / fullClasspath).value.map(_.data).map(fileConverter.value.toPath)
       val log = streams.value.log
       (Compile / discoveredMainClasses).value.sorted.foreach(c =>
         r.run(c, classpath, Nil, log)
@@ -177,8 +180,8 @@ def scalacheckBindingProject(
       (Compile / unmanagedSourceDirectories) += {
         (LocalRootProject / baseDirectory).value / "scalacheck-binding/src/main/scala"
       },
-      libraryDependencies += "org.scalacheck" %%% "scalacheck" % scalacheckVersion,
-      osgiExport("scalaz.scalacheck"))
+      libraryDependencies += "org.scalacheck" %% "scalacheck" % scalacheckVersion,
+    )
     .dependsOn(core, iteratee)
     .jvmConfigure(_ dependsOn concurrent)
     .jsSettings(scalajsProjectSettings)
