@@ -108,6 +108,7 @@ object build {
   )
 
   lazy val standardSettings: Seq[Sett] = Def.settings(
+    exportJars := false,
     organization := "org.scalaz",
     scalacOptions ++= Seq(
       "-deprecation",
