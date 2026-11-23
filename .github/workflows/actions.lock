@@ -8,7 +8,7 @@ workflows:
         - 'actions/setup-java@v6.2.0'
         - 'actions/setup-node@v7.1.0'
         - 'coursier/cache-action@v9.0.1'
-        - 'mikepenz/action-junit-report@v6.7.1'
+        - 'mikepenz/action-junit-report@v3.7.1'
         - 'test-summary/action@v2'
     '.github/workflows/scala-steward.yml':
         - 'actions/create-github-app-token@v3.3.0'
@@ -77,9 +77,9 @@ dependencies:
         commit: 'sha1-ee0650f98295f27a505e4bfd284c9bfaa913a465'
         owner_id: 24917177
         repo_id: 287573200
-    'mikepenz/action-junit-report@v6.7.1':
-        ref: 'v6.7.1'
-        commit: 'sha1-a16be3a69023e9bd7e748ede768b3282ea7b30ce'
+    'mikepenz/action-junit-report@v3.7.1':
+        ref: 'v3.7.1'
+        commit: 'sha1-7210fead7f92f6395c37241964df3b0f730f5e4e'
         owner_id: 1476232
         repo_id: 330384746
     'sbt/setup-sbt@v1.5.14':
