@@ -4,7 +4,7 @@
 version: 'v0.0.3'
 workflows:
     '.github/workflows/ci.yml':
-        - 'actions/checkout@v7.0.1'
+        - 'actions/checkout@v2.3.4'
         - 'actions/setup-java@v6.2.0'
         - 'actions/setup-node@v7.1.0'
         - 'coursier/cache-action@v9.0.1'
@@ -20,9 +20,9 @@ dependencies:
         commit: 'sha1-55cc8345863c7cc4c66a329aec7e433d2d1c52a9'
         owner_id: 44036562
         repo_id: 215566462
-    'actions/checkout@v7.0.1':
-        ref: 'v7.0.1'
-        commit: 'sha1-3d3c42e5aac5ba805825da76410c181273ba90b1'
+    'actions/checkout@v2.3.4':
+        ref: 'v2.3.4'
+        commit: 'sha1-5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f'
         owner_id: 44036562
         repo_id: 197814629
     'actions/create-github-app-token@v3.3.0':
