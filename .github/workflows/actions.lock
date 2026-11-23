@@ -7,7 +7,7 @@ workflows:
         - 'actions/checkout@v7.0.1'
         - 'actions/setup-java@v6.2.0'
         - 'actions/setup-node@v7.1.0'
-        - 'coursier/cache-action@v9.0.1'
+        - 'coursier/cache-action@v5'
         - 'mikepenz/action-junit-report@v6.7.1'
         - 'test-summary/action@v2'
     '.github/workflows/scala-steward.yml':
@@ -72,9 +72,9 @@ dependencies:
         repo_id: 941189561
         uses:
             - 'carabiner-dev/actions@2fec8bd8e1dcfdea26080648070b4827f1fa0584'
-    'coursier/cache-action@v9.0.1':
-        ref: 'v9.0.1'
-        commit: 'sha1-ee0650f98295f27a505e4bfd284c9bfaa913a465'
+    'coursier/cache-action@v5':
+        ref: 'v5'
+        commit: 'sha1-b74a57cd5434385877191a348c5f9929f064fda5'
         owner_id: 24917177
         repo_id: 287573200
     'mikepenz/action-junit-report@v6.7.1':
